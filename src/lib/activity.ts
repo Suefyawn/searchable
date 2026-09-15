@@ -24,7 +24,8 @@ export async function activityFeed(limit = 24): Promise<FeedItem[]> {
   const [news, guides, press, points] = await Promise.all([
     listArticles({ kind: "news", limit: 8 }),
     listArticles({ kind: "guide", limit: 3 }),
-    fetchPress({ limit: 14, perFeed: 6 }),
+    // Pakistan-first: the world feeds publish ten times as much, so they are capped separately.
+    Promise.all([fetchPress({ limit: 10, perFeed: 6, region: "pk" }), fetchPress({ limit: 5, perFeed: 3, region: "world" })]).then(([pk, world]) => [...pk, ...world]),
     db
       .select({ value: schema.dataPoints.value, date: schema.dataPoints.date, note: schema.dataPoints.note, createdAt: schema.dataPoints.createdAt, name: schema.dataSeries.name, slug: schema.dataSeries.slug, unit: schema.dataSeries.unit })
       .from(schema.dataPoints)
