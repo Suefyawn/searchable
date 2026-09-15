@@ -46,7 +46,10 @@ export default async function AdminDashboard() {
         (select count(*) from businesses where status = 'active' and is_verified)::int as verified,
         (select coalesce(sum(amount_pkr), 0) from orders where status in ('paid', 'active', 'expired') and paid_at > now() - interval '30 days')::int as revenue_30,
         (select coalesce(sum(amount_pkr), 0) from orders where status in ('paid', 'active', 'expired') and paid_at between now() - interval '60 days' and now() - interval '30 days')::int as revenue_prev,
-        (select count(*) from analytics_events where name = 'business_click' and created_at > now() - interval '7 days')::int as clicks_week`,
+        (select count(*) from analytics_events where name = 'business_click' and created_at > now() - interval '7 days')::int as clicks_week,
+        (select count(*) from posts where status = 'published' and published_at > now() - interval '7 days')::int as posts_week,
+        (select count(*) from comments where status = 'published' and created_at > now() - interval '7 days')::int as comments_week,
+        (select count(*) from professionals where status = 'active')::int as pros`,
     ),
     rawQuery<Daily>(db, sql`select date_trunc('day', created_at)::date as d, count(*)::int as n from search_queries where created_at > now() - interval '14 days' group by 1`),
     rawQuery<Daily>(db, sql`select date_trunc('day', created_at)::date as d, count(*)::int as n from tool_runs where created_at > now() - interval '14 days' group by 1`),
@@ -100,6 +103,7 @@ export default async function AdminDashboard() {
         <Stat label="Revenue, 30 days" value={pkr(k?.revenue_30 ?? 0)} delta={delta(k?.revenue_30 ?? 0, k?.revenue_prev ?? 0)} href="/admin/orders" />
         <Stat label="Businesses" value={(k?.businesses ?? 0).toLocaleString()} hint={`${k?.claimed ?? 0} claimed · ${k?.verified ?? 0} verified`} href="/admin/businesses?status=active" />
         <Stat label="Contact clicks" value={(k?.clicks_week ?? 0).toLocaleString()} hint="calls, WhatsApp, website, last 7 days" href="/admin/leads" />
+        <Stat label="Community this week" value={(k?.posts_week ?? 0).toLocaleString()} hint={`posts · ${k?.comments_week ?? 0} comments · ${k?.pros ?? 0} professionals live`} href="/admin/community" />
         <Stat label="Email budget today" value={allowance.today} hint={`${allowance.month.toLocaleString()} left this month`} href="/admin/system" />
       </div>
 

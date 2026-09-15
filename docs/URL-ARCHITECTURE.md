@@ -36,6 +36,21 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /businesses/[category]/[city]            Category × city listing  ← primary SEO page type
 /businesses/[category]/[city]/[area]     Category × area (Phase 4, gated)
 /b/[slug]                                Business profile (LocalBusiness JSON-LD)
+/claim/[slug]                            Ownership claim (signed in; ?t= invite token)   noindex
+/claim/opt-out?t=                        One-click stop for claim invitations
+
+/professionals                           Professionals hub (groups, cities)
+/professionals/[profession]              Profession list, national (all = every profession)
+/professionals/[profession]/[city]       Profession × city (noindex under 3 profiles)
+/professionals/join                      Create a profile (signed in)
+/p/[slug]                                Professional profile (Person JSON-LD)
+/professional  /professional/[id]        Owner dashboard, editor, /upgrade for the Verified plan
+
+/community  → /community/all             Posts hub
+/community/[kind]                        job · listing · auction · question · discussion · all
+/community/post/[slug]                   Post (JobPosting / Product / DiscussionForumPosting JSON-LD); /edit
+/community/new                           Create a post (signed in; editor-approved)
+/u/[handle]                              Member profile (noindex until they have posted)
 
 /cities                                  All cities
 /cities/[city]                           City hub: top categories, latest local news, areas
@@ -49,9 +64,8 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /compare                                 (Phase 6)
 /compare/[slug]                          e.g. /compare/toyota-corolla-vs-honda-civic
 
-/jobs  /jobs/[city]  /jobs/[slug]        (Phase 7)
-/events /events/[city] /events/[slug]    (Phase 7)
-/deals  /deals/[city]  /deals/[slug]     (Phase 7)
+/events /events/[city] /events/[slug]    (later)
+/deals  /deals/[city]  /deals/[slug]     (later)
 
 /newsletter                              Subscribe + preferences
 /newsletter/confirm?token=               Double opt-in
@@ -59,12 +73,15 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 
 /about  /contact  /editorial-policy  /privacy  /terms  /advertise  /add-business
 
-/account                                 User: saved, follows, preferences
-/business                                Owner dashboard (claimed businesses)
-/admin                                   CMS + operations (role ≥ editor)
+/account                                 User home; /account/profile, /account/posts, /account/saved
+/business                                Owner dashboard (claimed businesses); /business/[id], /upgrade
+/admin                                   CMS + operations (role ≥ editor); /admin/claims, /outreach,
+                                         /professionals, /community, /system
 
 /api/auth/[...all]                       better-auth
-/api/search  /api/suggest                JSON search
+/api/search  /api/suggest                JSON search; /suggest-index.json (cached client index)
+/api/community/liked  /api/community/saved   Signed-in reader state (private, no-store)
+/api/md/[...path]  /llms.txt  /llms-full.txt  Markdown and LLM renditions
 /api/newsletter/subscribe                POST
 /api/tools/[slug]                        POST run (for Ask Searchable + embeds)
 /api/cron/*                              scheduled jobs (Phase 6)

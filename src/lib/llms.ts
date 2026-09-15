@@ -56,6 +56,8 @@ export async function llmsIndex(): Promise<string> {
 
   L.push("## Optional");
   L.push(`- [Business directory](${SITE.url}/businesses): verified listings by category and city with phone, hours and reviews.`);
+  L.push(`- [Professionals](${SITE.url}/professionals): doctors, engineers, architects, lawyers, tradespeople and tutors with qualifications, fees and contact, verified against their registration bodies.`);
+  L.push(`- [Community](${SITE.url}/community): jobs, listings, auctions and questions posted by members and checked by editors before publication.`);
   L.push(`- [RSS feed](${SITE.url}/feed.xml)`);
   L.push(`- [Sitemap](${SITE.url}/sitemap.xml)`);
   return L.join("\n") + "\n";

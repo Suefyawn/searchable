@@ -245,6 +245,15 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
       </div>
 
       <div className="max-w-3xl">
+        {kind === "guide" ? (
+          <p className="mt-10 border-y-2 border-[var(--rule)] py-3 text-[15px]">
+            <span className="font-medium">Still stuck?</span>{" "}
+            <Link href={`/community/new?kind=question&topic=${encodeURIComponent(article.category?.name ?? "")}`} className="underline underline-offset-4">
+              Ask the community
+            </Link>
+            : members and our desk answer questions about {article.category?.name?.toLowerCase() ?? "this"} every day.
+          </p>
+        ) : null}
         <CommentsSection targetType="article" targetId={article.id} path={path} title="Reader comments" />
       </div>
 
