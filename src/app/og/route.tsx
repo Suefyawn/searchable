@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
 import { SITE } from "@/lib/utils";
 
@@ -6,17 +8,30 @@ const S_PATH = "M34.38 17.86L34.38 17.86L31.76 17.40L33.83 15.72L34.63 15.72L35.
 
 export const runtime = "nodejs";
 
+/** Newsreader for the headline, Inter for everything else; read once per instance from the files beside this route. */
+type Font = { name: string; data: ArrayBuffer; weight: 400 | 600; style: "normal" };
+let fonts: Promise<Font[]> | null = null;
+function loadFonts() {
+  const read = async (file: string, name: string, weight: 400 | 600): Promise<Font> => {
+    const b = await readFile(path.join(process.cwd(), "src/app/og", file));
+    return { name, data: b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer, weight, style: "normal" };
+  };
+  fonts ??= Promise.all([read("newsreader-600.ttf", "Newsreader", 600), read("inter-400.ttf", "Inter", 400), read("inter-600.ttf", "Inter", 600)]);
+  return fonts;
+}
+
 /** Social card: /og?title=…&kicker=…  Rendered on demand and cached. */
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const title = (url.searchParams.get("title") ?? SITE.tagline).slice(0, 140);
   const kicker = (url.searchParams.get("kicker") ?? "").slice(0, 40);
   const big = title.length < 60;
+  const loaded = await loadFonts().catch(() => null);
   // Immutable per title: the CDN keeps it for a year, so a share never re-renders the card.
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "64px 72px", background: "#fdfdfc", color: "#1f1d1a", fontFamily: "Georgia, 'Times New Roman', serif" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "Inter, Arial, sans-serif", fontSize: 22, letterSpacing: 3, textTransform: "uppercase", color: "#1f1d1a" }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "64px 72px", background: "#fdfdfc", color: "#1f1d1a", fontFamily: "Newsreader, Georgia, serif", fontWeight: 600 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "Inter", fontWeight: 400, fontSize: 22, letterSpacing: 3, textTransform: "uppercase", color: "#1f1d1a" }}>
           <span>{kicker || "Searchable"}</span>
           <span style={{ color: "#8a8680" }}>searchable.pk</span>
         </div>
@@ -24,12 +39,12 @@ export async function GET(req: Request) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "2px solid #1f1d1a", paddingTop: 22, fontSize: 30 }}>
           <span style={{ display: "flex", alignItems: "center" }}>
             <svg width="34" height="34" viewBox="0 0 64 64"><circle cx="28" cy="28" r="23" fill="none" stroke="#1f1d1a" strokeWidth="5" /><path d="M45 45 L62 62" stroke="#1f1d1a" strokeWidth="7" /><path d={S_PATH} fill="#1f1d1a" /></svg>
-            <span style={{ fontFamily: "Inter, Arial, sans-serif", fontWeight: 600, letterSpacing: -1, marginLeft: 10 }}>searchable<span style={{ color: "#8a8680" }}>.pk</span></span>
+            <span style={{ fontFamily: "Inter", fontWeight: 600, letterSpacing: -1, marginLeft: 10 }}>searchable<span style={{ color: "#8a8680" }}>.pk</span></span>
           </span>
-          <span style={{ fontFamily: "Inter, Arial, sans-serif", fontSize: 22, color: "#8a8680" }}>Find what you need. Know what matters.</span>
+          <span style={{ fontFamily: "Inter", fontWeight: 400, fontSize: 22, color: "#8a8680" }}>Find what you need. Know what matters.</span>
         </div>
       </div>
     ),
-    { width: 1200, height: 630, headers: { "cache-control": "public, max-age=86400, s-maxage=31536000, immutable" } },
+    { width: 1200, height: 630, headers: { "cache-control": "public, max-age=86400, s-maxage=31536000, immutable" }, fonts: loaded ?? undefined },
   );
 }
