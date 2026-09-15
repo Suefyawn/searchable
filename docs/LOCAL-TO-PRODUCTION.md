@@ -78,7 +78,7 @@ In Supabase: Database > Extensions > enable `pg_trgm` before reindexing (search 
 - [ ] Rich Results test on one tool page, one data page, one professional profile.
 
 ## 5. Photos and content
-- The 65 seeded Openverse photos live in local `public/uploads/`; re-run `npm run seed-images` against production once R2 is configured, or upload through admin.
+- The 65 seeded Openverse photos live in local `public/uploads/`; re-run `npm run db:seed-images` against production once R2 is configured, or upload through admin.
 - Import real businesses with email addresses (`/admin/businesses/import`), then switch on claim outreach (`/admin/outreach`).
 
 ## 6. Rollback
