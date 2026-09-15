@@ -8,6 +8,7 @@ import { plotSizeConverter } from "./calculators/plot-size-converter";
 import { ptaMobileTaxCalculator } from "./calculators/pta-mobile-tax-calculator";
 import { salaryBreakdownCalculator } from "./calculators/salary-breakdown-calculator";
 import { solarPaybackCalculator } from "./calculators/solar-payback-calculator";
+import { tokenTaxCalculator } from "./calculators/token-tax-calculator";
 import { zakatCalculator } from "./calculators/zakat-calculator";
 import { TOOL_CATEGORIES, type ToolCategory, type ToolDefinition } from "./types";
 
@@ -19,6 +20,7 @@ export const TOOLS: ToolDefinition[] = [
   electricityBillCalculator,
   zakatCalculator,
   carLoanCalculator,
+  tokenTaxCalculator,
   solarPaybackCalculator,
   homeLoanCalculator,
   fuelCostCalculator,

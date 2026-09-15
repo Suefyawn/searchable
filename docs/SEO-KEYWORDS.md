@@ -61,7 +61,7 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 | car financing calculator | 2,400 | 33 | /tools/cars/car-loan-calculator |
 | meezan car finance calculator | 1,900 | 29 | same (Meezan mentioned in title) |
 | fbr tax calculator | 1,900 | 17 | income tax tool |
-| token tax calculator | 720 | 29 | ❌ build (Punjab/Sindh/ICT token tax slabs) |
+| token tax calculator | 720 | 29 | /tools/cars/token-tax-calculator | ✅ Punjab + ICT FY26-27 verified; Sindh/KP annual rates unpublished, omitted |
 | home loan calculator pakistan | 590 | 28 | /tools/finance/home-loan-calculator |
 | capital gain tax on property | 170 | 13 | ❌ build after verifying FY26 rates |
 | property tax calculator pakistan | 140 | 10 | ❌ build |
@@ -96,6 +96,6 @@ pta imei check 74k · pta check 60k · pta dirbs 60k · pta tax 22k · pta appro
 1. FBR IRIS guide (165k) and ATL/filer status check guide (10k+)
 2. ✅ Solar panel price page (49.5k); inverter compare page later
 3. ✅ Inflation (CPI) series and gold city sections
-4. Token tax calculator (720) and property tax/CGT calculators (verify FY26 rates first)
+4. ✅ Token tax calculator; property tax/CGT calculators next (verify FY26 rates first)
 5. ✅ PTA hub
 6. Track rankings monthly with Semrush Position Tracking once live; feed zero-result searches from `/admin/search-log` back into this map
