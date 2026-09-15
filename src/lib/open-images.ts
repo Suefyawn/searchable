@@ -97,6 +97,7 @@ export async function searchCommons(query: string, opts: { limit?: number; minWi
     gsrlimit: String(Math.min(opts.limit ?? 12, 30)),
     prop: "imageinfo",
     iiprop: "url|extmetadata|size|mime",
+    iiextmetadatafilter: "LicenseShortName|License|Artist|ImageDescription|Categories",
     iiurlwidth: "1600",
     format: "json",
     origin: "*",
@@ -105,11 +106,16 @@ export async function searchCommons(query: string, opts: { limit?: number; minWi
   if (!res.ok) throw new Error(`Commons search failed: ${res.status}`);
   const data = (await res.json()) as { query?: { pages?: Record<string, { title: string; imageinfo?: Array<{ url: string; thumburl?: string; descriptionurl?: string; width?: number; height?: number; mime?: string; extmetadata?: Record<string, { value?: string }> }> }> } };
   const minWidth = opts.minWidth ?? 800;
+  // Commons full-text search is loose (a query for a cricketer once returned a donkey). Keep a file only when
+  // a meaningful word of the query appears in its title, description or categories.
+  const words = query.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 4);
   const out: OpenImage[] = [];
   for (const page of Object.values(data.query?.pages ?? {})) {
     const ii = page.imageinfo?.[0];
     if (!ii || !/^image\/(jpeg|png|webp)$/i.test(ii.mime ?? "")) continue;
     const em = ii.extmetadata ?? {};
+    const hay = `${page.title} ${em.ImageDescription?.value ?? ""} ${em.Categories?.value ?? ""}`.toLowerCase();
+    if (words.length && !words.some((w) => hay.includes(w))) continue;
     const short = (em.LicenseShortName?.value ?? em.License?.value ?? "").toLowerCase();
     let license: string | null = null;
     let licenseVersion: string | null = null;
