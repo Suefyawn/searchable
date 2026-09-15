@@ -7,10 +7,13 @@ import { currencyConverter } from "./calculators/currency-converter";
 import { electricityBillCalculator } from "./calculators/electricity-bill-calculator";
 import { eobiCalculator } from "./calculators/eobi-calculator";
 import { fuelCostCalculator } from "./calculators/fuel-cost-calculator";
+import { gasBillCalculator } from "./calculators/gas-bill-calculator";
 import { homeLoanCalculator } from "./calculators/home-loan-calculator";
 import { incomeTaxCalculator } from "./calculators/income-tax-calculator";
+import { nationalSavingsCalculator } from "./calculators/national-savings-calculator";
 import { personalLoanCalculator } from "./calculators/personal-loan-calculator";
 import { plotSizeConverter } from "./calculators/plot-size-converter";
+import { providentFundCalculator } from "./calculators/provident-fund-calculator";
 import { propertyTaxCalculator } from "./calculators/property-tax-calculator";
 import { ptaMobileTaxCalculator } from "./calculators/pta-mobile-tax-calculator";
 import { salaryBreakdownCalculator } from "./calculators/salary-breakdown-calculator";
@@ -44,6 +47,9 @@ export const TOOLS: ToolDefinition[] = [
   salaryIncrementCalculator,
   eobiCalculator,
   ageCalculator,
+  gasBillCalculator,
+  nationalSavingsCalculator,
+  providentFundCalculator,
 ];
 
 const bySlug = new Map(TOOLS.map((t) => [t.slug, t]));

@@ -46,7 +46,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 |---|---|
 | Section, category, article routes with pagination, RSS | ✅ |
 | Tools framework: fields, compute, methodology, sources, versions, JSON-LD, share URLs, live defaults from data | ✅ |
-| Tools built | 🟡 21 of 50 (tax 4 · finance 7 · cars 4 · property 2 · utilities 1 · solar 1 · telecom 1 · government 1) |
+| Tools built | 🟡 24 of 50 (tax 4 · finance 9 · cars 4 · property 2 · utilities 2 · solar 1 · telecom 1 · government 1) |
 | Embeddable widgets (`?embed=1` mode + copyable iframe snippet with attribution link) | ✅ |
 | Hubs: `/pta`, `/electricity` + 11 DISCOs, `/electricity/net-metering`, `/data/solar-panel-price`, `/compare/solar-inverters` | ✅ |
 
