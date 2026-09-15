@@ -17,8 +17,9 @@ import { indexDataSeries } from "./indexers";
  *  - CoinGecko simple price: BTC and ETH in USD
  */
 
-// sbp.org.pk answers 403 to any user agent that does not start with "Mozilla/5.0" (the network is fine: the
-// same request from Tokyo works with this string). Still names us and gives a contact, as a crawler should.
+// sbp.org.pk answers 403 to any user agent that does not start with "Mozilla/5.0" from Pakistan, and 403 to
+// everything from the Vercel functions (tested from Tokyo), so KIBOR and the policy rate stay with the
+// editorial task. The string names us and gives a contact, as a crawler should.
 const UA = "Mozilla/5.0 (compatible; SearchablePK/0.1; +https://searchable.pk; data@searchable.pk)";
 const TOLA_PER_OZ = 11.664 / 31.1035;
 
