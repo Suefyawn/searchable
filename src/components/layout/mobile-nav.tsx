@@ -30,7 +30,8 @@ export function MobileNav({ nav, sections = [] }: { nav: { href: string; label: 
             </button>
           </div>
           <div className="container-x space-y-6 pt-4">
-            <SearchBox autoFocus />
+            {/* No autofocus: a focused box drops its suggestions over the menu and pops the keyboard before the reader has seen the sections. */}
+            <SearchBox />
             <nav className="divide-y divide-[var(--border)] border-y border-line" aria-label="Mobile">
               {nav.map((n) => {
                 const sec = sections.find((s) => s.href === n.href);
