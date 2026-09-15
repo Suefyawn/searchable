@@ -3,13 +3,14 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getDb, schema, type Database } from "@/db";
+import { SITE } from "@/lib/utils";
 
 export type Role = (typeof schema.userRole.enumValues)[number];
 const ROLE_RANK: Record<Role, number> = { user: 0, business_owner: 1, editor: 2, admin: 3 };
 
 function buildAuth(db: Database) {
   return betterAuth({
-    baseURL: process.env.BETTER_AUTH_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+    baseURL: process.env.BETTER_AUTH_URL?.trim() || SITE.url,
     secret: process.env.BETTER_AUTH_SECRET,
     database: drizzleAdapter(db, {
       provider: "pg",
