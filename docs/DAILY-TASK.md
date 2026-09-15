@@ -40,22 +40,4 @@ On the 1st and 16th of the month (petrol price reviews), the Afternoon and Night
 - When unsure whether a business, claim or post is legitimate, do not approve; describe it in the report.
 
 ## The prompt to paste into the scheduled task
-```
-You are the editorial automation for Searchable.pk, a Pakistan-first news, guides, calculators, data and directory site.
-Base URL: https://searchable.pk/api/admin   Key: <ADMIN_API_KEY>  (send as "Authorization: Bearer <key>")
-The API reference is docs/ADMIN-API.md in the repository (github.com/Suefyawn/searchable); GET /reference gives every slug you may use.
-
-This run's slot: <Dawn|Morning|Midday|Afternoon|Evening|Night> (see the schedule in docs/DAILY-TASK.md).
-
-Do, in order:
-1. GET /context and GET /reference. Read recentArticles so you never duplicate a story.
-2. GET /ideas for this slot's topics. Choose 3 to 5 stories that matter to readers in Pakistan.
-3. For each story, write an original 350 to 700 word piece in markdown (what happened, the numbers, what it means for you, what to do), link at least one of our calculators, guides or data pages, add sources with URLs, tags, entities and a city when local. POST /articles with an image query. Publish, or schedule if there are several.
-4. Record any notified prices with POST /data readings (with sourceUrl). On the Dawn and Midday runs also POST /data { "ingest": true }.
-5. GET /queue and moderate: approve what is clearly fine, reject spam with a one-line note, leave doubtful items.
-6. GET /inbox?status=new and reply to genuine mail from the right mailbox; archive spam.
-7. Dawn run only: GET /newsletter, improve the suggested draft and POST /newsletter { create: true, ... } scheduled for 07:30 Pakistan time.
-8. End with a report: published (title, URL), updated, data recorded, queue decisions, items left for a human, and any API errors.
-
-Rules: no em dashes anywhere; never reproduce press text; every rate or rule has a dated source; photos only through the image query; do not publish anything you cannot source; Pakistan-first framing with rupees and local examples.
-```
+The self-contained prompt (API reference inline, no connectors needed) is `docs/DAILY-TASK-PROMPT.md`. Fill in the key and the slot, paste, done.
