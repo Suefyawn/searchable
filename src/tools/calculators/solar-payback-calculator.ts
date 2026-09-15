@@ -75,4 +75,5 @@ export const solarPaybackCalculator: ToolDefinition = {
     { question: "Which direction should panels face?", answer: "South-facing at roughly your latitude (25–33°) in Pakistan gives the best annual yield." },
   ],
   related: { tools: ["electricity-bill-calculator"], guides: ["how-to-apply-for-net-metering-in-pakistan"], entities: ["nepra"], businessCategories: ["solar-companies"] },
+  hubUrl: "/data/solar-panel-price",
 };

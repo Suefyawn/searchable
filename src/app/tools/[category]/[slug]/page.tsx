@@ -127,6 +127,13 @@ export default async function ToolPage({ params }: Props) {
         </div>
 
         <aside className="space-y-6 self-start lg:sticky lg:top-24">
+          {tool.hubUrl ? (
+            <div className="border-y-2 border-[var(--rule)] py-3 text-[15px]">
+              <Link href={tool.hubUrl} className="font-medium underline-offset-4 hover:underline">
+                Everything about this topic on one page →
+              </Link>
+            </div>
+          ) : null}
           {relatedTools.length ? (
             <div>
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-3">Related tools</p>

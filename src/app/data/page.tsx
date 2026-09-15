@@ -19,7 +19,7 @@ export default async function DataPage() {
       <SectionHeader as="h1" title="Data" description="The numbers Pakistanis check every day, recorded with their source and date. Each series has a history chart and feeds the relevant calculator." />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {series.map((s) => (
-          <Link key={s.id} href={`/data/${s.slug}`} className="group surface surface-hover p-5 transition-colors">
+          <Link key={s.id} href={s.slug === "solar-panel-per-watt" ? "/data/solar-panel-price" : `/data/${s.slug}`} className="group surface surface-hover p-5 transition-colors">
             <p className="text-sm font-medium text-2">{s.name}</p>
             {s.latest ? (
               <>

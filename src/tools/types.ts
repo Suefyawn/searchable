@@ -67,6 +67,8 @@ export interface ToolDefinition {
   methodology: string;
   faqs: Faq[];
   related?: { tools?: string[]; guides?: string[]; entities?: string[]; businessCategories?: string[] };
+  /** A topic hub page this tool belongs to (e.g. /pta). */
+  hubUrl?: string;
   featured?: boolean;
 }
 

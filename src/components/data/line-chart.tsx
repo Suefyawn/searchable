@@ -28,7 +28,6 @@ export function LineChart({ points, unit, className = "" }: { points: Point[]; u
   const yTicks = Array.from({ length: ticks + 1 }, (_, i) => lo + ((hi - lo) * i) / ticks);
   const xIdx = [0, Math.floor((points.length - 1) / 2), points.length - 1];
   const last = points[points.length - 1];
-  const up = points.length > 1 && last.value >= points[0].value;
 
   return (
     <figure className={className}>
@@ -47,7 +46,7 @@ export function LineChart({ points, unit, className = "" }: { points: Point[]; u
             </text>
           </g>
         ))}
-        <g className={up ? "text-brand-600" : "text-red-600"}>
+        <g className="text-brand-700">
           <path d={area} fill="url(#chart-fill)" />
           <path d={path} fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinejoin="round" strokeLinecap="round" />
           <circle cx={x(points.length - 1)} cy={y(last.value)} r="4" fill="currentColor" />

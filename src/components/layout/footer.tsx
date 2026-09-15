@@ -22,6 +22,8 @@ const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
       { href: "/tools/utilities/electricity-bill-calculator", label: "Electricity bill" },
       { href: "/tools/finance/zakat-calculator", label: "Zakat" },
       { href: "/electricity", label: "Electricity bill check" },
+      { href: "/pta", label: "PTA tax & IMEI check" },
+      { href: "/data/solar-panel-price", label: "Solar panel prices" },
     ],
   },
   {

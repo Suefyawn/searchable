@@ -101,7 +101,7 @@ export async function indexDataSeries(seriesId: string) {
   await syncSearchDocument({
     entityType: "data_series",
     entityId: s.id,
-    url: `/data/${s.slug}`,
+    url: s.slug === "solar-panel-per-watt" ? "/data/solar-panel-price" : `/data/${s.slug}`,
     title: /today/i.test(s.name) ? s.name : `${s.name} today`,
     summary: s.description ?? `${s.name} in Pakistan — latest value, history and source (${s.sourceName ?? "official"}).`,
     keywords: [s.slug.replace(/-/g, " "), "today", "rate", "price", "history"].join(" "),
@@ -110,8 +110,19 @@ export async function indexDataSeries(seriesId: string) {
   });
 }
 
-/** Static high-intent pages (DISCO bill-check) live in code but must be searchable. */
+/** Static high-intent pages (DISCO bill-check, PTA hub) live in code but must be searchable. */
 export async function indexStaticPages() {
+  await syncSearchDocument({
+    entityType: "guide",
+    entityId: "hub:pta",
+    url: "/pta",
+    title: "PTA tax check, IMEI check and DIRBS registration",
+    summary: "Check PTA approval by IMEI (SMS 8484), see the PTA tax list for passport and CNIC, and register a phone on DIRBS step by step.",
+    keywords: "pta, pta tax, pta tax check, pta imei check, pta check, pta approved check, dirbs, pta mobile registration, pta tax list, pta registration, iphone pta tax, mobile registration pakistan",
+    category: "Telecom",
+    categorySlug: "telecom",
+    boost: 1.4,
+  });
   for (const d of DISCOS) {
     await syncSearchDocument({
       entityType: "guide",

@@ -79,4 +79,5 @@ This tool applies the slab table published for the current fiscal year. The revi
     { question: "Does dual-SIM cost more?", answer: "Each IMEI is registered; a dual-SIM phone has two IMEIs but is treated as one device with a single payment." },
   ],
   related: { tools: ["income-tax-calculator"], guides: ["how-to-register-phone-with-pta"], entities: ["pta", "fbr", "apple"], businessCategories: ["mobile-shops"] },
+  hubUrl: "/pta",
 };

@@ -30,8 +30,8 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 | dirham / riyal rate in pakistan | 18,100 each | 43 / 48 | /data/aed-pkr, /data/sar-pkr | ✅ new |
 | kibor rate today / kibor rate | 14,800 / 12,100 | 19 | /data/kibor-1y | ✅ new; feeds loan calculators |
 | inflation rate in pakistan | 2,900 | 34 | — | ❌ add `cpi-yoy` series (monthly PBS) |
-| solar panel price in pakistan | 49,500 | 30 | — | ❌ add `solar-panel-per-watt` series + page (weekly market survey) |
-| inverter price in pakistan | 8,100 | 14 | — | ❌ compare page (Phase 6) |
+| solar panel price in pakistan | 49,500 | 30 | /data/solar-panel-price | ✅ built (per-watt series + brand table + system costs) |
+| inverter price in pakistan | 8,100 | 14 | /data/solar-panel-price (inverter table) | 🟡 compare page later |
 
 ### Electricity (`/electricity/[disco]`)
 | Keyword | Vol | KD | Page |
@@ -84,7 +84,7 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 | how to register company in pakistan | 1,300 | 21 | SECP guide |
 
 ### PTA cluster (related terms; all navigational/informational)
-pta imei check 74k · pta check 60k · pta dirbs 60k · pta tax 22k · pta approved check 18k · pta imei check online 18k · pta mobile registration 12k · pta approved 8k · pta registration 8k · pta tax check online 6.6k → the PTA guide should become a hub: IMEI check by SMS (8484), DIRBS registration, tax table, passport vs CNIC, common errors.
+pta imei check 74k · pta check 60k · pta dirbs 60k · pta tax 22k · pta approved check 18k · pta imei check online 18k · pta mobile registration 12k · pta approved 8k · pta registration 8k · pta tax check online 6.6k → ✅ `/pta` hub built: IMEI check by SMS (8484), tax list by slab, tax on popular phones at today’s dollar rate, DIRBS steps, FAQs.
 
 ## Title conventions (applied)
 - Tool: `<exact head keyword> — <secondary keyword> (<qualifier/year>)`, ≤ 70 chars where possible.
@@ -94,8 +94,8 @@ pta imei check 74k · pta check 60k · pta dirbs 60k · pta tax 22k · pta appro
 
 ## Content backlog from this research (priority order)
 1. FBR IRIS guide (165k) and ATL/filer status check guide (10k+)
-2. Solar panel price per watt series + page (49.5k) and inverter price compare
+2. ✅ Solar panel price page (49.5k); inverter compare page later
 3. Inflation (CPI) series (2.9k, easy) and city sections on the gold page (Karachi 60k, Lahore 22k)
 4. Token tax calculator (720) and property tax/CGT calculators (verify FY26 rates first)
-5. PTA hub restructure: IMEI check, DIRBS steps, tax table on one page
+5. ✅ PTA hub
 6. Track rankings monthly with Semrush Position Tracking once live; feed zero-result searches from `/admin/search-log` back into this map
