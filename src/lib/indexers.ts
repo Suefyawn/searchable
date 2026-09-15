@@ -104,7 +104,7 @@ export async function indexDataSeries(seriesId: string) {
     url: s.slug === "solar-panel-per-watt" ? "/data/solar-panel-price" : `/data/${s.slug}`,
     title: /today/i.test(s.name) ? s.name : `${s.name} today`,
     summary: s.description ?? `${s.name} in Pakistan — latest value, history and source (${s.sourceName ?? "official"}).`,
-    keywords: [s.slug.replace(/-/g, " "), "today", "rate", "price", "history"].join(" "),
+    keywords: [s.slug.replace(/-/g, " "), "today", "rate", "price", "history", ...(s.slug.startsWith("gold") ? ["gold rate today karachi", "gold rate today lahore", "gold rate today islamabad", "1 tola gold price", "sona"] : []), ...(s.slug === "cpi-yoy" ? ["inflation rate in pakistan", "cpi", "mehngai"] : [])].join(", "),
     category: "Data",
     categorySlug: "data",
   });

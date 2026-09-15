@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Change } from "@/components/data/change";
+import { GoldExtras } from "@/components/data/gold-extras";
 import { LineChart } from "@/components/data/line-chart";
 import { ToolCard } from "@/components/cards";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
@@ -22,6 +23,7 @@ const LINKS: Record<string, { tools?: string[]; entities?: string[] }> = {
   "gold-24k-tola": { tools: ["zakat-calculator"], entities: ["gold"] },
   "sbp-policy-rate": { tools: ["car-loan-calculator", "home-loan-calculator"], entities: ["sbp"] },
   "kibor-1y": { tools: ["car-loan-calculator", "home-loan-calculator"], entities: ["sbp", "meezan-bank", "hbl"] },
+  "cpi-yoy": { tools: ["salary-breakdown-calculator"], entities: ["sbp"] },
   "gold-22k-tola": { tools: ["zakat-calculator"], entities: ["gold"] },
   "silver-tola": { tools: ["zakat-calculator"], entities: ["gold"] },
   "eur-pkr": { tools: [], entities: ["usd-pkr", "sbp"] },
@@ -90,6 +92,8 @@ export default async function SeriesPage({ params }: Props) {
           <div className="surface p-5 text-brand-700">
             <LineChart points={points.map((p) => ({ date: p.date, value: p.value }))} unit={series.unit} />
           </div>
+          {(slug === "gold-24k-tola" || slug === "gold-22k-tola") && latest ? <GoldExtras slug={slug} latestPerTola={latest.value} date={latest.date} /> : null}
+
           <section>
             <h2 className="mb-3 text-lg font-semibold">History</h2>
             <div className="surface overflow-x-auto">

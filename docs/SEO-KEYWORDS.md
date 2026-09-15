@@ -17,7 +17,7 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 | gold price in pakistan | 823,000 | 43 | /data/gold-24k-tola | ✅ renamed "Gold rate in Pakistan today (24K per tola)" |
 | gold rate in pakistan today | 550,000 | 46 | same | ✅ |
 | gold rate today | 246,000 | 34 | same | ✅ |
-| gold rate today karachi / lahore | 60,500 / 22,200 | 30 / 28 | same (city mention in description) | 🟡 add city sections |
+| gold rate today karachi / lahore | 60,500 / 22,200 | 30 / 28 | same — city sections with anchors (#karachi, #lahore) | ✅ |
 | 1 tola gold price in pakistan | 60,500 | 34 | same | ✅ |
 | 22k gold rate today | 3,600 | 21 | /data/gold-22k-tola | ✅ new |
 | silver rate today | 74,000 | 32 | /data/silver-tola | ✅ new |
@@ -29,7 +29,7 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 | euro / pound rate in pakistan | 40,500 each | 54 / 46 | /data/eur-pkr, /data/gbp-pkr | ✅ new |
 | dirham / riyal rate in pakistan | 18,100 each | 43 / 48 | /data/aed-pkr, /data/sar-pkr | ✅ new |
 | kibor rate today / kibor rate | 14,800 / 12,100 | 19 | /data/kibor-1y | ✅ new; feeds loan calculators |
-| inflation rate in pakistan | 2,900 | 34 | — | ❌ add `cpi-yoy` series (monthly PBS) |
+| inflation rate in pakistan | 2,900 | 34 | /data/cpi-yoy | ✅ monthly PBS series |
 | solar panel price in pakistan | 49,500 | 30 | /data/solar-panel-price | ✅ built (per-watt series + brand table + system costs) |
 | inverter price in pakistan | 8,100 | 14 | /data/solar-panel-price (inverter table) | 🟡 compare page later |
 
@@ -95,7 +95,7 @@ pta imei check 74k · pta check 60k · pta dirbs 60k · pta tax 22k · pta appro
 ## Content backlog from this research (priority order)
 1. FBR IRIS guide (165k) and ATL/filer status check guide (10k+)
 2. ✅ Solar panel price page (49.5k); inverter compare page later
-3. Inflation (CPI) series (2.9k, easy) and city sections on the gold page (Karachi 60k, Lahore 22k)
+3. ✅ Inflation (CPI) series and gold city sections
 4. Token tax calculator (720) and property tax/CGT calculators (verify FY26 rates first)
 5. ✅ PTA hub
 6. Track rankings monthly with Semrush Position Tracking once live; feed zero-result searches from `/admin/search-log` back into this map
