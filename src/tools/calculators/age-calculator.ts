@@ -21,8 +21,8 @@ const DAY = 86_400_000;
 export const ageCalculator: ToolDefinition = {
   slug: "age-calculator",
   category: "government",
-  name: "Age Calculator — Exact Age, Retirement & Next Birthday",
-  seoTitle: "Age Calculator — Exact Age in Years, Months & Days, Retirement Date (60 / 55 / 65), Next Birthday",
+  name: "Age Calculator: Exact Age, Retirement & Next Birthday",
+  seoTitle: "Age Calculator: Exact Age in Years, Months & Days, Retirement Date (60 / 55 / 65), Next Birthday",
   shortName: "Age",
   description: "Your exact age in years, months and days from your date of birth, total days lived, days to your next birthday, and the dates you reach 18, 60 and the retirement age for government, EOBI and private jobs in Pakistan.",
   keywords: ["age calculator", "age calculator pakistan", "date of birth calculator", "how old am i", "exact age calculator", "age in days", "retirement age calculator pakistan", "next birthday calculator", "cnic age", "age difference calculator"],
@@ -38,9 +38,9 @@ export const ageCalculator: ToolDefinition = {
       label: "Retirement age to show",
       type: "select",
       options: [
-        { value: "60", label: "60 — government service, EOBI (men)" },
-        { value: "55", label: "55 — EOBI (women)" },
-        { value: "65", label: "65 — many private employers / self-employed" },
+        { value: "60", label: "60: government service, EOBI (men)" },
+        { value: "55", label: "55: EOBI (women)" },
+        { value: "65", label: "65: many private employers / self-employed" },
       ],
       default: "60",
     },
@@ -53,7 +53,7 @@ export const ageCalculator: ToolDefinition = {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (Number.isNaN(dob.getTime()) || dob > today) {
-      return { headline: { label: "Age", value: "—", primary: true }, summary: "Enter a date of birth in the past.", sections: [] };
+      return { headline: { label: "Age", value: "-", primary: true }, summary: "Enter a date of birth in the past.", sections: [] };
     }
     const age = diff(dob, today);
     const days = Math.floor((today.getTime() - dob.getTime()) / DAY);
@@ -90,9 +90,9 @@ export const ageCalculator: ToolDefinition = {
   },
   methodology: `Age is counted in completed years, then completed months, then days, using calendar months (so 31 January → 28 February counts as one month). Days lived are the whole days between the two dates. Milestones use the same calendar day in the target year. Government superannuation is 60 under the Civil Servants Act; EOBI pension age is 60 for men and 55 for women; many private employers use 60 or 65.`,
   faqs: [
-    { question: "How is age calculated for CNIC or school admission?", answer: "By the date of birth on the birth certificate or B-form: completed years on the cut-off date. Schools in Pakistan usually require a minimum age on 1 April or 1 September of the admission year — use the exact-age line for that date." },
+    { question: "How is age calculated for CNIC or school admission?", answer: "By the date of birth on the birth certificate or B-form: completed years on the cut-off date. Schools in Pakistan usually require a minimum age on 1 April or 1 September of the admission year: use the exact-age line for that date." },
     { question: "What is the retirement age in Pakistan?", answer: "60 for federal and provincial government servants (superannuation), 60 for men and 55 for women under EOBI; private companies set their own, commonly 60." },
-    { question: "How many days until my birthday?", answer: "Shown in the summary — counted to the next occurrence of your birth date. Leap-day births are treated as 1 March in non-leap years." },
+    { question: "How many days until my birthday?", answer: "Shown in the summary: counted to the next occurrence of your birth date. Leap-day births are treated as 1 March in non-leap years." },
   ],
   related: { tools: ["eobi-calculator", "salary-increment-calculator"], guides: ["how-to-renew-cnic-online-nadra"], entities: ["nadra", "eobi"] },
 };

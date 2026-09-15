@@ -34,11 +34,11 @@ export function GoldExtras({ slug, latestPerTola, date }: { slug: string; latest
   const perGram24 = per24Tola / TOLA_G;
   const faqs = [
     { question: "What is the gold rate in Pakistan today?", answer: `24K gold is ${pkr(per24Tola)} per tola (${pkr(perGram24)} per gram) as of ${formatDate(date)}, based on the Karachi Sarafa quote. 22K is ${pkr(per24Tola * (22 / 24))} per tola.` },
-    { question: "Is the gold rate different in Karachi, Lahore and Islamabad?", answer: "The base rate is the same nationwide because it is derived from the international price and the rupee. Local Sarafa markets add a small premium — usually Rs 0–300 per tola — and jewellers add making charges on top." },
+    { question: "Is the gold rate different in Karachi, Lahore and Islamabad?", answer: "The base rate is the same nationwide because it is derived from the international price and the rupee. Local Sarafa markets add a small premium: usually Rs 0–300 per tola: and jewellers add making charges on top." },
     { question: "How is 1 tola gold price calculated?", answer: "1 tola = 11.664 grams. The Sarafa rate is roughly the international spot price per ounce ÷ 31.1035 × 11.664 × USD/PKR, plus a local premium for duties, dealer margin and demand." },
-    { question: "What is the difference between 24K and 22K gold?", answer: "24K is 99.9% pure and used for bars and coins. 22K is 91.67% pure — the standard for jewellery in Pakistan — so its price per tola is 22/24 of the 24K rate." },
+    { question: "What is the difference between 24K and 22K gold?", answer: "24K is 99.9% pure and used for bars and coins. 22K is 91.67% pure: the standard for jewellery in Pakistan: so its price per tola is 22/24 of the 24K rate." },
     { question: "Why does the gold rate change every day?", answer: "It tracks the international gold price (which moves on interest rates, the dollar and geopolitics) and the USD/PKR exchange rate. A weaker rupee raises the local rate even when world gold is flat." },
-    { question: "Is zakat due on gold?", answer: "Yes, if your gold and other zakatable wealth exceed the nisab for a lunar year. Use the Zakat Calculator with today's rate — it pre-fills from this page." },
+    { question: "Is zakat due on gold?", answer: "Yes, if your gold and other zakatable wealth exceed the nisab for a lunar year. Use the Zakat Calculator with today's rate: it pre-fills from this page." },
   ];
 
   return (

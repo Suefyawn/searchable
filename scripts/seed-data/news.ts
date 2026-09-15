@@ -18,7 +18,7 @@ export const NEWS: ArticleDef[] = [
 
 ## Who benefits most
 
-The relief is concentrated on salaries between Rs 50,000 and Rs 183,000 a month — the range where most formal-sector employees sit.
+The relief is concentrated on salaries between Rs 50,000 and Rs 183,000 a month, the range where most formal-sector employees sit.
 
 | Monthly salary | Annual tax FY2024-25 | Annual tax FY2025-26 | Saving / year |
 |---|---|---|---|
@@ -40,7 +40,7 @@ Above Rs 4.1 million a year (about Rs 342,000 a month) the marginal rate stays a
   {
     slug: "how-petrol-prices-are-set-in-pakistan-every-fortnight",
     category: "economy",
-    title: "How petrol prices are set in Pakistan — and why they change every two weeks",
+    title: "How petrol prices are set in Pakistan: and why they change every two weeks",
     dek: "The fortnightly revision follows a formula: international product prices, the rupee, and a stack of government levies that now make up over a third of the pump price.",
     publishedDaysAgo: 2,
     entities: ["ogra", "petrol", "usd-pkr"],
@@ -48,11 +48,11 @@ Above Rs 4.1 million a year (about Rs 342,000 a month) the marginal rate stays a
 
 ## What is in a litre
 
-1. **Ex-refinery / import price** — Platts Arab Gulf average for the previous fortnight, converted at the interbank rupee rate.
-2. **Inland freight equalisation margin** — so the price is the same nationwide.
-3. **Oil marketing company and dealer margins** — fixed per litre, revised occasionally.
-4. **Petroleum levy** — a fixed per-litre tax that has become the government's main revenue lever on fuel.
-5. **Sales tax** — currently zero-rated on petrol and diesel; the levy does the work instead.
+1. **Ex-refinery / import price**, Platts Arab Gulf average for the previous fortnight, converted at the interbank rupee rate.
+2. **Inland freight equalisation margin**, so the price is the same nationwide.
+3. **Oil marketing company and dealer margins**, fixed per litre, revised occasionally.
+4. **Petroleum levy**, a fixed per-litre tax that has become the government's main revenue lever on fuel.
+5. **Sales tax**, currently zero-rated on petrol and diesel; the levy does the work instead.
 
 Because the levy is fixed per litre, a fall in international prices does not pass through fully when the government chooses to raise the levy in the same revision.
 
@@ -66,7 +66,7 @@ A 1% move in USD/PKR moves the import component by roughly Rs 1.5–2 per litre.
 - Diesel drives transport and food prices with a lag of 2–4 weeks.
 
 Searchable records every revision on the [petrol price](/e/petrol) hub.`,
-    sources: [{ title: "OGRA — Petroleum pricing mechanism", url: "https://ogra.org.pk", publisher: "OGRA" }],
+    sources: [{ title: "OGRA: Petroleum pricing mechanism", url: "https://ogra.org.pk", publisher: "OGRA" }],
   },
   {
     slug: "pta-tax-on-iphone-17-what-you-will-actually-pay",
@@ -87,11 +87,11 @@ For a $999 base model at today's rate, the difference between the two routes is 
 
 ## Should you buy local or import?
 
-Locally sold "PTA-approved" units already include the tax in the price. Imported units are cheaper up front but you pay the tax to use them beyond 120 days. Compare the all-in figure, and factor in the warranty — Apple's warranty is regional.
+Locally sold "PTA-approved" units already include the tax in the price. Imported units are cheaper up front but you pay the tax to use them beyond 120 days. Compare the all-in figure, and factor in the warranty, Apple's warranty is regional.
 
 ## How to register
 
-The full process — IMEI check, DIRBS application, PSID payment — is in our guide: [How to register an imported phone with PTA](/guides/telecom/how-to-register-phone-with-pta).`,
+The full process, IMEI check, DIRBS application, PSID payment, is in our guide: [How to register an imported phone with PTA](/guides/telecom/how-to-register-phone-with-pta).`,
     sources: [{ title: "PTA DIRBS", url: "https://dirbs.pta.gov.pk", publisher: "PTA" }],
   },
   {
@@ -107,7 +107,7 @@ The full process — IMEI check, DIRBS application, PSID payment — is in our g
 
 A car loan is typically priced at 1-year KIBOR + 2–4%. At an 11% policy rate, that puts most car financing at 13–15%. On a Rs 3 million loan over five years, each 1% change in the rate moves the monthly instalment by about Rs 1,500. Model it with the [Car Loan Calculator](/tools/cars/car-loan-calculator).
 
-Home finance is similar but longer — a 1% change on a 20-year Rs 10 million mortgage is roughly Rs 6,500 a month.
+Home finance is similar but longer, a 1% change on a 20-year Rs 10 million mortgage is roughly Rs 6,500 a month.
 
 ## Savings
 
@@ -116,7 +116,7 @@ Bank savings accounts must pay at least the policy rate minus a spread on PLS de
 ## What to watch
 
 Inflation prints (monthly CPI), the rupee, and the IMF programme reviews shape the committee's decisions. Searchable tracks the rate history on the [SBP hub](/e/sbp).`,
-    sources: [{ title: "SBP — Monetary Policy Decisions", url: "https://www.sbp.org.pk", publisher: "State Bank of Pakistan" }],
+    sources: [{ title: "SBP: Monetary Policy Decisions", url: "https://www.sbp.org.pk", publisher: "State Bank of Pakistan" }],
   },
   {
     slug: "electricity-bill-slabs-why-crossing-200-units-costs-so-much",
@@ -125,7 +125,7 @@ Inflation prints (monthly CPI), the rupee, and the IMF programme reviews shape t
     dek: "Protected consumers pay a fraction of the unprotected tariff. One high-usage month can push you out of the protected category for six months.",
     publishedDaysAgo: 5,
     entities: ["nepra", "lesco", "k-electric"],
-    body: `NEPRA's residential tariff has two tracks. **Protected** consumers — those using 200 units or less for six consecutive months — pay subsidised slab rates. Everyone else is **unprotected**, with rates roughly three to four times higher per unit.
+    body: `NEPRA's residential tariff has two tracks. **Protected** consumers, those using 200 units or less for six consecutive months, pay subsidised slab rates. Everyone else is **unprotected**, with rates roughly three to four times higher per unit.
 
 ## The cliff
 
@@ -139,14 +139,14 @@ For unprotected consumers using more than 200 units, the **entire** consumption 
 
 - Read the meter mid-month; a small change in AC hours can keep you under a threshold.
 - Compare the all-in per-unit cost with the [Electricity Bill Calculator](/tools/utilities/electricity-bill-calculator).
-- If you regularly use 400+ units, a solar system pays back in 3–5 years at today's tariffs — see the [Solar Payback Calculator](/tools/solar/solar-payback-calculator) and [solar installers](/businesses/solar-companies).`,
-    sources: [{ title: "NEPRA — Consumer-end tariff", url: "https://nepra.org.pk", publisher: "NEPRA" }],
+- If you regularly use 400+ units, a solar system pays back in 3–5 years at today's tariffs, see the [Solar Payback Calculator](/tools/solar/solar-payback-calculator) and [solar installers](/businesses/solar-companies).`,
+    sources: [{ title: "NEPRA: Consumer-end tariff", url: "https://nepra.org.pk", publisher: "NEPRA" }],
   },
   {
     slug: "how-gold-prices-in-pakistan-are-quoted-and-why-they-differ-from-the-world-rate",
     category: "business",
     title: "How gold is priced in Pakistan and why the local rate differs from the international one",
-    dek: "Per tola, per 10 grams, 24k vs 22k — the Sarafa rate is derived from the world price, the rupee, and a local premium that widens when supply is tight.",
+    dek: "Per tola, per 10 grams, 24k vs 22k, the Sarafa rate is derived from the world price, the rupee, and a local premium that widens when supply is tight.",
     publishedDaysAgo: 6,
     entities: ["gold", "usd-pkr"],
     body: `Pakistan quotes gold **per tola** (11.664 g) and **per 10 grams**, in 24-karat and 22-karat. The All Pakistan Sarafa Gems and Jewellers Association publishes daily rates for Karachi and Lahore.
@@ -155,7 +155,7 @@ For unprotected consumers using more than 200 units, the **entire** consumption 
 
 Local rate ≈ (international spot price per ounce ÷ 31.1035 × 11.664) × USD/PKR + local premium.
 
-The premium reflects import duties, dealer margins and short-term demand — it is highest in wedding season and around Eid.
+The premium reflects import duties, dealer margins and short-term demand, it is highest in wedding season and around Eid.
 
 ## Zakat and gold
 
@@ -175,16 +175,16 @@ Searchable logs the daily Sarafa rate on the [gold hub](/e/gold).`,
 
 ## Where the gap bites
 
-- **Vehicle registration** (section 231B) — slabs by engine capacity; the non-filer rate is roughly double.
-- **Property purchase and sale** (236C/236K) — the difference on a Rs 20 million plot runs into hundreds of thousands of rupees.
-- **Cash withdrawals** above the daily threshold — a percentage for non-filers only.
-- **Profit on debt** — 15% for filers vs a much higher rate for non-filers.
-- **Dividends, prize bonds, mobile top-ups** — higher for non-filers.
+- **Vehicle registration** (section 231B), slabs by engine capacity; the non-filer rate is roughly double.
+- **Property purchase and sale** (236C/236K), the difference on a Rs 20 million plot runs into hundreds of thousands of rupees.
+- **Cash withdrawals** above the daily threshold, a percentage for non-filers only.
+- **Profit on debt**, 15% for filers vs a much higher rate for non-filers.
+- **Dividends, prize bonds, mobile top-ups**, higher for non-filers.
 
 ## The fix is cheap
 
 Registration on IRIS is free; filing a salaried return takes under an hour. Our [step-by-step guide](/guides/taxes/how-to-become-a-tax-filer-in-pakistan) walks through it, and [tax consultants](/businesses/tax-consultants) will do it for a few thousand rupees.`,
-    sources: [{ title: "Income Tax Ordinance 2001 — Tenth Schedule", publisher: "FBR" }],
+    sources: [{ title: "Income Tax Ordinance 2001: Tenth Schedule", publisher: "FBR" }],
   },
   {
     slug: "solar-boom-pakistan-what-a-5kw-system-costs-and-saves",
@@ -201,7 +201,7 @@ Installed quotes for a 5 kW on-grid system with tier-1 panels and a branded inve
 
 ## What it produces
 
-At 4.5 peak sun hours (Lahore average) and 80% system efficiency, a 5 kW system yields about 540 units a month — enough to offset most of a 500-unit household's consumption.
+At 4.5 peak sun hours (Lahore average) and 80% system efficiency, a 5 kW system yields about 540 units a month, enough to offset most of a 500-unit household's consumption.
 
 ## Payback
 
@@ -210,7 +210,7 @@ For a household paying Rs 40–48 per unit all-in, annual savings of Rs 200,000�
 ## Before you buy
 
 - Get three quotes from [listed installers](/businesses/solar-companies) and check AEDB certification.
-- Understand net metering — the [application guide](/guides/utilities/how-to-apply-for-net-metering-in-pakistan) explains costs and timelines.
+- Understand net metering, the [application guide](/guides/utilities/how-to-apply-for-net-metering-in-pakistan) explains costs and timelines.
 - Shift daytime loads (AC, pumps, laundry) to maximise self-consumption.`,
     sources: [{ title: "NEPRA State of Industry Report", url: "https://nepra.org.pk", publisher: "NEPRA" }],
   },
@@ -218,7 +218,7 @@ For a household paying Rs 40–48 per unit all-in, annual savings of Rs 200,000�
     slug: "lahore-food-guide-where-locals-actually-eat",
     category: "lifestyle",
     title: "Lahore food guide: where locals actually eat, from Mall Road to DHA",
-    dek: "Skip the tourist lists. These are the kitchens Lahoris queue at — barbecue on Mall Road, karahi in Gulberg, and the DHA cafés worth the drive.",
+    dek: "Skip the tourist lists. These are the kitchens Lahoris queue at, barbecue on Mall Road, karahi in Gulberg, and the DHA cafés worth the drive.",
     publishedDaysAgo: 11,
     city: "lahore",
     entities: ["lahore"],
@@ -226,18 +226,18 @@ For a household paying Rs 40–48 per unit all-in, annual savings of Rs 200,000�
 
 ## The classics
 
-- **Bundu Khan, Mall Road** — seekh kababs and tikkas since 1948. [Listing](/b/bundu-khan-lahore).
-- **Butt Karahi, Gulberg** — karahi by the kilo; go hungry and go in a group. [Listing](/b/butt-karahi-lahore).
-- **Phajja Siri Paye, Lakshmi Chowk** — for the brave, at dawn.
+- **Bundu Khan, Mall Road**, seekh kababs and tikkas since 1948. [Listing](/b/bundu-khan-lahore).
+- **Butt Karahi, Gulberg**, karahi by the kilo; go hungry and go in a group. [Listing](/b/butt-karahi-lahore).
+- **Phajja Siri Paye, Lakshmi Chowk**, for the brave, at dawn.
 
 ## Modern Lahore
 
-- **Café Aylanto, Gulberg** — the business-lunch standard. [Listing](/b/cafe-aylanto-lahore).
+- **Café Aylanto, Gulberg**, the business-lunch standard. [Listing](/b/cafe-aylanto-lahore).
 - The DHA Phase 5–6 café strip for coffee and brunch.
 
 ## Practical
 
-Most family restaurants run past midnight on weekends. Gulberg and DHA have easy parking; Mall Road does not — use a ride-hailing app.
+Most family restaurants run past midnight on weekends. Gulberg and DHA have easy parking; Mall Road does not, use a ride-hailing app.
 
 Browse all [restaurants in Lahore](/businesses/restaurants/lahore) on Searchable, with hours, phone and WhatsApp.`,
   },
@@ -259,12 +259,12 @@ Ride-hailing dominates. The Green Line BRT runs north–south through the centre
 
 ## Utilities
 
-Electricity is supplied by **K-Electric**, not a WAPDA DISCO — billing and complaints run through KE's app. Water is often tankered in newer schemes; ask before renting.
+Electricity is supplied by **K-Electric**, not a WAPDA DISCO, billing and complaints run through KE's app. Water is often tankered in newer schemes; ask before renting.
 
 ## Costs
 
 A two-bedroom apartment in Gulshan rents for far less than the same in DHA. Solar with [KE net metering](/businesses/solar-companies/karachi) is popular given load-shedding history.
 
-Explore [businesses in Karachi](/cities/karachi) — hospitals, schools, restaurants and services with contact details.`,
+Explore [businesses in Karachi](/cities/karachi), hospitals, schools, restaurants and services with contact details.`,
   },
 ];

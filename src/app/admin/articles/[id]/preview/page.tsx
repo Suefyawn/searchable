@@ -16,7 +16,7 @@ export default async function PreviewPage({ params }: { params: Promise<{ id: st
     <div className="-mx-5 lg:-mx-8">
       <div className="mb-4 flex items-center justify-between border-y border-amber-300 bg-amber-50 px-5 py-2 text-sm dark:bg-amber-950/30">
         <span>
-          Preview · status <strong>{a.status}</strong> — this is how the page will look when published.
+          Preview · status <strong>{a.status}</strong>, this is how the page will look when published.
         </span>
         <Link href={`/admin/articles/${a.id}`} className="font-medium underline underline-offset-4">
           Back to editor

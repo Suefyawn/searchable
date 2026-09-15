@@ -1,4 +1,4 @@
-# Searchable.pk — instructions for coding agents (Codex, Claude Code, etc.)
+# Searchable.pk: instructions for coding agents (Codex, Claude Code, etc.)
 
 Read `SEARCHABLE_MASTER_SPEC.md` first. Then the doc for the area you are touching in `docs/`.
 
@@ -25,5 +25,6 @@ npm run typecheck && npm run lint && npm run build
 6. **SEO:** every public page exports `generateMetadata` via `buildMetadata()` and renders JSON-LD via `<JsonLd/>`. Thin pages set `robots: noindex`.
 7. **Design:** use primitives from `src/components/ui`; tokens from `globals.css`. Readability first: 16–18px body, ≤ 70ch measure, generous spacing, strong hierarchy. No component library CLIs; no inline hex colours.
 8. **No client-side data fetching** on public pages. `"use client"` only for interactivity (search box, tool forms, editors).
-9. **Money & rates** live in versioned data files with sources — never inline constants in calculators.
-10. Keep files small and named by domain. Match surrounding style. Do not add dependencies without an ADR in `docs/DECISIONS.md`.
+9. **Money & rates** live in versioned data files with sources, never inline constants in calculators.
+10. **No em dashes, anywhere.** Not in site copy, tool text, docs, commit messages or UI strings. Use a comma, colon, full stop, parentheses or a plain hyphen. (Founder rule: em dashes read as machine-written.) Ranges may use a hyphen or en dash (2026-27, Rs 1.5-3 lakh).
+11. Keep files small and named by domain. Match surrounding style. Do not add dependencies without an ADR in `docs/DECISIONS.md`.

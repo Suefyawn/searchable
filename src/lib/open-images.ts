@@ -3,7 +3,7 @@ import { getDb, schema } from "@/db";
 import { storeImage } from "./storage";
 
 /**
- * Openly licensed photos via the Openverse API (openverse.org — aggregates Flickr, Wikimedia Commons, museums…).
+ * Openly licensed photos via the Openverse API (openverse.org, aggregates Flickr, Wikimedia Commons, museums…).
  * Only CC0, public-domain and CC BY / BY-SA results are requested; every import stores the creator, licence and
  * source page so the credit line can be rendered wherever the photo appears. No AI-generated imagery.
  *
@@ -94,7 +94,7 @@ export async function importOpenImage(img: OpenImage, variant: "article" | "cove
 }
 
 /**
- * First usable result for a query — used by the seed to give pages a real photo. Tries wide, then any
+ * First usable result for a query, used by the seed to give pages a real photo. Tries wide, then any
  * orientation, then a relaxed width; skips candidates whose file no longer downloads.
  */
 export async function findAndImport(query: string, variant: "article" | "cover" | "photo" = "article", alt?: string, opts: { orientation?: "landscape" | "portrait" | "square"; pick?: number; fallbackQuery?: string } = {}) {
@@ -110,7 +110,7 @@ export async function findAndImport(query: string, variant: "article" | "cover" 
       try {
         return await importOpenImage(candidate, variant, alt);
       } catch {
-        // dead link or unsupported file — try the next candidate
+        // dead link or unsupported file, try the next candidate
       }
     }
   }

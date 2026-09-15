@@ -56,7 +56,7 @@ export const PRODUCTS: Product[] = [
     pricePkr: 35_000,
     periodDays: null,
     blurb: "A useful article about your product or service, written to our standard, clearly labelled, with dofollow links.",
-    features: ["800–1,500 words, edited by our desk", "Up to 2 dofollow links to your site (rel=sponsored per Google policy)", "Stays live permanently, in the relevant section", "Shared in Searchable Daily once", "Labelled Sponsored — readers trust it because we say so"],
+    features: ["800–1,500 words, edited by our desk", "Up to 2 dofollow links to your site (rel=sponsored per Google policy)", "Stays live permanently, in the relevant section", "Shared in Searchable Daily once", "Labelled Sponsored, readers trust it because we say so"],
   },
   {
     code: "press-release",

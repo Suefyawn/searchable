@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import { ArticleListing } from "@/components/article-page";
 import { Img } from "@/components/img";
-import { Breadcrumbs, SectionHeader } from "@/components/ui";
+import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
 import { listArticlesByAuthor } from "@/db/queries/content";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, personJsonLd } from "@/lib/seo";
 
 export const revalidate = 600;
 type Props = { params: Promise<{ slug: string }> };
@@ -22,6 +22,7 @@ export default async function AuthorPage({ params }: Props) {
   const { author, items } = data;
   return (
     <div className="container-x py-8 sm:py-12">
+      <JsonLd data={personJsonLd({ name: author.name, slug, bio: author.bio })} />
       <Breadcrumbs items={[{ name: "News", path: "/news" }, { name: author.name, path: `/authors/${slug}` }]} className="mb-4" />
       <div className="flex items-start gap-5">
         {author.avatarUrl ? <Img src={author.avatarUrl} alt={author.name} aspect="1/1" className="size-20 shrink-0" sizes="80px" /> : null}

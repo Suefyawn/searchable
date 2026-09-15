@@ -5,7 +5,7 @@ import { articleUrl } from "@/components/cards";
 import { fetchPress } from "./press";
 
 /**
- * The live feed: everything that changed, newest first — our stories, press headlines, and data-hub readings.
+ * The live feed: everything that changed, newest first, our stories, press headlines, and data-hub readings.
  * Rendered in the home hero's LIVE panel and served by /api/feed for client refresh.
  */
 export type FeedItem = {

@@ -10,7 +10,7 @@
 export const GAS_TARIFF = {
   reviewedAt: "2026-09-15",
   effectiveFrom: "2025-07-01",
-  source: { title: "OGRA — Notified consumer gas prices for SNGPL and SSGC (29 June 2025; unchanged July 2026)", url: "https://ogra.org.pk/", publisher: "Oil & Gas Regulatory Authority" },
+  source: { title: "OGRA: Notified consumer gas prices for SNGPL and SSGC (29 June 2025; unchanged July 2026)", url: "https://ogra.org.pk/", publisher: "Oil & Gas Regulatory Authority" },
   /** MMBTU per m³ at the typical gross calorific value billed by SNGPL/SSGC (~ 950–1000 BTU/scf). */
   mmbtuPerM3: 0.0355,
   gst: 0.18,
@@ -49,7 +49,7 @@ export const GAS_TARIFF = {
 export const NSC = {
   reviewedAt: "2026-09-15",
   effectiveFrom: "2026-07-18",
-  source: { title: "Central Directorate of National Savings — latest profit rates (18 July 2026)", url: "https://savings.gov.pk/latest-profit-rates/", publisher: "National Savings" },
+  source: { title: "Central Directorate of National Savings: latest profit rates (18 July 2026)", url: "https://savings.gov.pk/latest-profit-rates/", publisher: "National Savings" },
   withholding: { filer: 0.15, nonFiler: 0.35 },
   schemes: {
     ric: { name: "Regular Income Certificate", rate: 0.1152, payout: "monthly", term: "5 years", min: 50_000, whtExempt: false, who: "Anyone; profit paid monthly" },

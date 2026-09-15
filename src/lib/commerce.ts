@@ -39,8 +39,8 @@ export async function createOrder(input: { productCode: string; userId?: string 
     .returning();
   await sendEmail({
     to: input.payer.email,
-    subject: `Invoice ${invoiceNo} — ${product.name} on ${SITE.name}`,
-    html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;padding:24px;line-height:1.6"><h1 style="font-size:20px">Invoice ${invoiceNo}</h1><p><strong>${product.name}</strong> — ${pkr(product.pricePkr)}${product.periodDays ? ` for ${product.periodDays} days` : ""}.</p><p>Pay by bank transfer, JazzCash or Easypaisa and reply with the transaction ID. Details and status: <a href="${SITE.url}/orders/${invoiceNo}">${SITE.url}/orders/${invoiceNo}</a></p></div>`,
+    subject: `Invoice ${invoiceNo}: ${product.name} on ${SITE.name}`,
+    html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;padding:24px;line-height:1.6"><h1 style="font-size:20px">Invoice ${invoiceNo}</h1><p><strong>${product.name}</strong>, ${pkr(product.pricePkr)}${product.periodDays ? ` for ${product.periodDays} days` : ""}.</p><p>Pay by bank transfer, JazzCash or Easypaisa and reply with the transaction ID. Details and status: <a href="${SITE.url}/orders/${invoiceNo}">${SITE.url}/orders/${invoiceNo}</a></p></div>`,
     text: `Invoice ${invoiceNo}: ${product.name} ${pkr(product.pricePkr)}. Details: ${SITE.url}/orders/${invoiceNo}`,
   });
   return order;
@@ -72,8 +72,8 @@ export async function markPaid(orderId: string, opts: { reference?: string; prov
   if (order.payerEmail) {
     await sendEmail({
       to: order.payerEmail,
-      subject: `Payment received — ${order.invoiceNo}`,
-      html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;padding:24px;line-height:1.6"><p>Thanks — payment for <strong>${order.productName}</strong> (${order.invoiceNo}) is confirmed.${endsAt ? ` It runs until ${endsAt.toDateString()}.` : ""}</p></div>`,
+      subject: `Payment received: ${order.invoiceNo}`,
+      html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;padding:24px;line-height:1.6"><p>Thanks, payment for <strong>${order.productName}</strong> (${order.invoiceNo}) is confirmed.${endsAt ? ` It runs until ${endsAt.toDateString()}.` : ""}</p></div>`,
       text: `Payment for ${order.productName} (${order.invoiceNo}) confirmed.`,
     });
   }

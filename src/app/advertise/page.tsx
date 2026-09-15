@@ -9,11 +9,11 @@ const FAQS = [
   { question: "Do paid listings affect reviews or rankings in editorial content?", answer: "No. Paid tiers change placement in directory listings and are labelled. Reviews, ratings, calculator results and news are never for sale, and sponsored articles are marked Sponsored." },
   { question: "What does a dofollow link mean for my site?", answer: "Free listings link to your website with rel=nofollow. Verified and higher tiers get a standard followed link from your profile page; sponsored articles link with rel=sponsored as Google requires. We do not sell links inside editorial articles." },
   { question: "Can I cancel?", answer: "Monthly plans simply lapse if you do not renew; annual Verified is non-refundable after activation. Sponsored articles are refunded in full if we decline the topic before editing starts." },
-  { question: "Is there a discount for multiple locations?", answer: "Yes — email ads@searchable.pk with the list of branches and we quote a bundle." },
+  { question: "Is there a discount for multiple locations?", answer: "Yes: email ads@searchable.pk with the list of branches and we quote a bundle." },
 ];
 
 export const metadata = buildMetadata({
-  title: "Advertise on Searchable — Verified & Premium Listings, Sponsored Articles, Category Sponsorship (Pricing)",
+  title: "Advertise on Searchable: Verified & Premium Listings, Sponsored Articles, Category Sponsorship (Pricing)",
   description: "Reach Pakistanis at the moment they are searching: verified and premium business listings from Rs 4,900, sponsored articles, press releases and category sponsorship. Transparent pricing, labelled placements.",
   path: "/advertise",
   kicker: "Advertise",
@@ -40,7 +40,7 @@ export default function AdvertisePage() {
             <p className="mt-1 text-sm text-2">Always</p>
             <ul className="mt-4 space-y-1.5 text-[15px]">
               {FREE_FEATURES.map((f) => (
-                <li key={f} className="flex gap-2"><span className="text-3">—</span>{f}</li>
+                <li key={f} className="flex gap-2"><span className="text-3">-</span>{f}</li>
               ))}
             </ul>
             <Link href="/add-business" className="mt-5 inline-block text-sm font-medium underline underline-offset-4">Add your business</Link>
@@ -53,7 +53,7 @@ export default function AdvertisePage() {
               <p className="mt-3 text-[15px]">{p.blurb}</p>
               <ul className="mt-4 space-y-1.5 text-[15px]">
                 {p.features.map((f) => (
-                  <li key={f} className="flex gap-2"><span className="text-3">—</span>{f}</li>
+                  <li key={f} className="flex gap-2"><span className="text-3">-</span>{f}</li>
                 ))}
               </ul>
               <Link href="/business" className="mt-5 inline-flex h-10 items-center bg-ink-900 px-4 text-sm font-medium text-white hover:bg-ink-800 dark:bg-white dark:text-ink-900">Upgrade from your dashboard</Link>
@@ -73,14 +73,14 @@ export default function AdvertisePage() {
               <p className="mt-3 text-[15px]">{p.blurb}</p>
               <ul className="mt-4 space-y-1.5 text-[15px]">
                 {p.features.map((f) => (
-                  <li key={f} className="flex gap-2"><span className="text-3">—</span>{f}</li>
+                  <li key={f} className="flex gap-2"><span className="text-3">-</span>{f}</li>
                 ))}
               </ul>
               <Link href={`/write-for-us?kind=${p.code === "press-release" ? "press_release" : "sponsored"}`} className="mt-5 inline-flex h-10 items-center bg-ink-900 px-4 text-sm font-medium text-white hover:bg-ink-800 dark:bg-white dark:text-ink-900">Submit a {p.name.toLowerCase()}</Link>
             </div>
           ))}
         </div>
-        <p className="mt-4 text-sm text-2">Prefer to contribute without paying? Genuinely useful guest articles are published free with a byline — see <Link href="/write-for-us" className="underline underline-offset-4">write for us</Link>.</p>
+        <p className="mt-4 text-sm text-2">Prefer to contribute without paying? Genuinely useful guest articles are published free with a byline: see <Link href="/write-for-us" className="underline underline-offset-4">write for us</Link>.</p>
       </section>
 
       <section className="mt-14">
@@ -93,7 +93,7 @@ export default function AdvertisePage() {
               <p className="mt-3 text-[15px]">{p.blurb}</p>
               <ul className="mt-4 space-y-1.5 text-[15px]">
                 {p.features.map((f) => (
-                  <li key={f} className="flex gap-2"><span className="text-3">—</span>{f}</li>
+                  <li key={f} className="flex gap-2"><span className="text-3">-</span>{f}</li>
                 ))}
               </ul>
             </div>

@@ -2,7 +2,7 @@ const pkrFormatter = new Intl.NumberFormat("en-PK", { maximumFractionDigits: 0 }
 
 /** "Rs 1,234,567" */
 export function pkr(value: number): string {
-  if (!Number.isFinite(value)) return "—";
+  if (!Number.isFinite(value)) return ", ";
   const rounded = Math.round(value);
   return `${rounded < 0 ? "−" : ""}Rs ${pkrFormatter.format(Math.abs(rounded))}`;
 }

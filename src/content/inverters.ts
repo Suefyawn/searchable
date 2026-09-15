@@ -1,6 +1,6 @@
 /**
  * Solar inverter market prices for Pakistan. Dealer / importer quotes (Hall Road Lahore, Saddar Karachi, online
- * retailers) collected 2026-09-15. REVIEW MONTHLY — prices track USD/PKR and container arrivals.
+ * retailers) collected 2026-09-15. REVIEW MONTHLY, prices track USD/PKR and container arrivals.
  * Price ranges are for the bare inverter with standard warranty; installation and net-metering kit are extra.
  */
 
@@ -32,7 +32,7 @@ export type Inverter = {
 };
 
 export const INVERTERS_REVIEWED_AT = "2026-09-15";
-export const INVERTERS_SOURCE = { title: "Searchable market survey — dealer & importer quotes, Lahore/Karachi and online retailers", publisher: "Searchable" };
+export const INVERTERS_SOURCE = { title: "Searchable market survey: dealer & importer quotes, Lahore/Karachi and online retailers", publisher: "Searchable" };
 
 export const INVERTER_TYPES: Record<InverterType, { name: string; blurb: string }> = {
   hybrid: { name: "Hybrid", blurb: "Runs on solar, grid and battery; keeps the house on during load-shedding and supports net metering. The default choice in Pakistan since 2023." },

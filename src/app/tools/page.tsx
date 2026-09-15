@@ -7,7 +7,7 @@ import { TOOL_CATEGORIES, type ToolCategory } from "@/tools/types";
 
 export const metadata = buildMetadata({
   title: "Calculators & tools for Pakistan",
-  description: "Income tax, PTA mobile tax, electricity bills, zakat, car loans, solar payback — sourced, dated and instant. Free calculators built for Pakistan.",
+  description: "Income tax, PTA mobile tax, electricity bills, zakat, car loans, solar payback, sourced, dated and instant. Free calculators built for Pakistan.",
   path: "/tools",
 });
 
@@ -15,7 +15,7 @@ export default function ToolsPage() {
   const cats = (Object.keys(TOOL_CATEGORIES) as ToolCategory[]).filter((c) => TOOLS.some((t) => t.category === c));
   return (
     <div className="container-x py-8 sm:py-12">
-      <SectionHeader as="h1" title="Calculators & tools" description="Every number shows its source and the date it was last reviewed. Calculations run in your browser — nothing you enter is stored." />
+      <SectionHeader as="h1" title="Calculators & tools" description="Every number shows its source and the date it was last reviewed. Calculations run in your browser: nothing you enter is stored." />
       <nav className="flex flex-wrap gap-2" aria-label="Tool categories">
         {cats.map((c) => (
           <Link key={c} href={`/tools/${c}`} className="border border-line px-3 py-1.5 text-sm text-2 hover:bg-surface-2 hover:text-[var(--text)]">

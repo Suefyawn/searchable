@@ -12,7 +12,7 @@ export const propertyTaxCalculator: ToolDefinition = {
   slug: "property-tax-calculator",
   category: "property",
   name: "Property Tax Calculator Pakistan 2026-27",
-  seoTitle: "Property Tax Calculator Pakistan 2026-27 — Tax on Buying & Selling Property (236K, 236C, Stamp Duty)",
+  seoTitle: "Property Tax Calculator Pakistan 2026-27: Tax on Buying & Selling Property (236K, 236C, Stamp Duty)",
   shortName: "Property Tax",
   description: "Calculate every tax on a property purchase or sale in Pakistan for 2026-27: FBR advance tax under 236K (buyer) and 236C (seller) for filers and non-filers, plus stamp duty, registration fee and transfer tax in Punjab, Sindh and Islamabad.",
   keywords: ["property tax calculator pakistan", "property tax in pakistan", "tax on property purchase pakistan", "236k tax", "236c tax", "advance tax on property", "stamp duty on property pakistan", "property transfer tax pakistan", "property registration charges", "fbr property tax 2026", "withholding tax on property filer non filer"],
@@ -53,7 +53,7 @@ export const propertyTaxCalculator: ToolDefinition = {
         { value: "nonfiler", label: "Non-filer" },
       ],
       default: "filer",
-      help: "The 'late filer' rate was abolished by Finance Act 2026 — you are either on the ATL or you are not.",
+      help: "The 'late filer' rate was abolished by Finance Act 2026, you are either on the ATL or you are not.",
     },
     { key: "custom", label: "Enter my own provincial rates", type: "boolean", default: false, help: "Stamp duty and fees vary by district and society. Turn this on to override the province defaults below." },
     { key: "stamp", label: "Stamp duty", type: "number", unit: "%", default: 1, min: 0, max: 10, step: 0.25 },
@@ -77,12 +77,12 @@ export const propertyTaxCalculator: ToolDefinition = {
       const other = Math.round(value * wht236C(!filer));
       return {
         headline: { label: `Advance tax on sale (s.236C, ${filer ? "filer" : "non-filer"})`, value: pkr(tax), primary: true },
-        summary: `Selling for ${pkr(value)} as a ${filer ? "filer" : "non-filer"}, the registrar withholds ${pct(rate, 2)} = ${pkr(tax)} under section 236C. ${filer ? "This is adjustable against your capital gains tax when you file." : `As a filer you would pay ${pkr(other)} — and could adjust it against CGT.`} Stamp duty and registration are normally paid by the buyer.`,
+        summary: `Selling for ${pkr(value)} as a ${filer ? "filer" : "non-filer"}, the registrar withholds ${pct(rate, 2)} = ${pkr(tax)} under section 236C. ${filer ? "This is adjustable against your capital gains tax when you file." : `As a filer you would pay ${pkr(other)}, and could adjust it against CGT.`} Stamp duty and registration are normally paid by the buyer.`,
         sections: [
           {
             title: "Seller pays",
             lines: [
-              { label: `s.236C advance tax — ${pct(rate, 2)} of ${pkr(value)}`, value: pkr(tax), primary: true },
+              { label: `s.236C advance tax: ${pct(rate, 2)} of ${pkr(value)}`, value: pkr(tax), primary: true },
               { label: "Capital gains tax", value: "See CGT calculator", note: "15% of the gain for filers on property bought after 1 July 2024; holding-period table for older property. 236C is deducted from it." },
             ],
           },
@@ -109,10 +109,10 @@ export const propertyTaxCalculator: ToolDefinition = {
     const filerTotal = Math.round(value * wht236K(value, true)) + provincial;
     const nonFilerTotal = Math.round(value * wht236K(value, false)) + provincial;
     const lines: ResultLine[] = [
-      { label: `s.236K advance tax (federal) — ${pct(rate, 2)} of ${pkr(value)}`, value: pkr(fed), note: filer ? "Adjustable against your income tax for the year." : "Non-filer rate; effectively a sunk cost unless you file and claim it." },
-      { label: `Stamp duty — ${pct(stamp, 2)}`, value: pkr(stampAmt) },
-      { label: `Registration fee — ${pct(reg, 2)}`, value: pkr(regAmt) },
-      ...(local ? [{ label: `${province.localTaxLabel} — ${pct(local, 2)}`, value: pkr(localAmt) }] : []),
+      { label: `s.236K advance tax (federal): ${pct(rate, 2)} of ${pkr(value)}`, value: pkr(fed), note: filer ? "Adjustable against your income tax for the year." : "Non-filer rate; effectively a sunk cost unless you file and claim it." },
+      { label: `Stamp duty: ${pct(stamp, 2)}`, value: pkr(stampAmt) },
+      { label: `Registration fee: ${pct(reg, 2)}`, value: pkr(regAmt) },
+      ...(local ? [{ label: `${province.localTaxLabel}: ${pct(local, 2)}`, value: pkr(localAmt) }] : []),
       { label: "Total taxes and duties", value: pkr(total), primary: true },
       { label: "Effective cost of taxes on the price", value: pct(value ? total / value : 0, 2), muted: true },
     ];
@@ -120,7 +120,7 @@ export const propertyTaxCalculator: ToolDefinition = {
 
     return {
       headline: { label: `Total tax on buying (${province.name}, ${filer ? "filer" : "non-filer"})`, value: pkr(total), primary: true },
-      summary: `On a ${pkr(value)} purchase in ${province.name} you pay ${pkr(fed)} federal advance tax (s.236K at ${pct(rate, 2)}) plus ${pkr(provincial)} in provincial stamp duty, registration and transfer charges — ${pct(value ? total / value : 0, 2)} on top of the price.`,
+      summary: `On a ${pkr(value)} purchase in ${province.name} you pay ${pkr(fed)} federal advance tax (s.236K at ${pct(rate, 2)}) plus ${pkr(provincial)} in provincial stamp duty, registration and transfer charges, ${pct(value ? total / value : 0, 2)} on top of the price.`,
       sections: [
         { title: "Buyer pays", lines },
         {
@@ -137,23 +137,23 @@ export const propertyTaxCalculator: ToolDefinition = {
   },
   methodology: `Two layers of tax apply when property changes hands in Pakistan.
 
-**Federal (FBR) — Income Tax Ordinance 2001, as amended by Finance Act 2026, from 1 July 2026:**
+**Federal (FBR), Income Tax Ordinance 2001, as amended by Finance Act 2026, from 1 July 2026:**
 - **Buyer, s.236K:** ${pct(WHT_236K.filer, 2)} of the fair market value for anyone on the Active Taxpayer List (a flat rate replacing last year's ${WHT_236K.previousFiler}). Non-filers pay ${pct(WHT_236K.nonFiler[0].rate)} up to Rs 50 million, ${pct(WHT_236K.nonFiler[1].rate)} to Rs 100 million and ${pct(WHT_236K.nonFiler[2].rate)} above. The "late filer" middle rate was abolished.
 - **Seller, s.236C:** ${pct(WHT_236C.filer, 2)} of the consideration for filers (was ${WHT_236C.previousFiler}); ${pct(WHT_236C.nonFiler)} for non-filers. Adjustable against capital gains tax.
 - Fair market value = the higher of the declared price and the FBR valuation table for the area.
 - The s.7E deemed-income tax (0.2% of value above Rs 25 million) was omitted by Finance Act 2026 after the Federal Constitutional Court struck it down; the 3% FED on sales went in Finance Act 2025.
 
-**Provincial — Stamp Act schedule, Registration Act and local-government levies, charged on the DC rate:**
+**Provincial, Stamp Act schedule, Registration Act and local-government levies, charged on the DC rate:**
 - **Punjab:** stamp duty 1% (uniform for urban and rural since the Stamp (Amendment) Ordinance of 10 April 2026), registration fee 1%, TMA transfer tax 1%.
 - **Islamabad (ICT):** conveyance stamp duty 1% (Finance Act 2025, down from 4%), registration fee 1%, CDA transfer fee 1% in CDA sectors (down from 3% on 10 April 2026).
 - **Sindh:** stamp duty 2% and registration fee 1% as commonly quoted; confirm at the sub-registrar. Society and DHA transfer fees are separate.
 
-Provincial figures are defaults — districts cap some fees and housing societies add their own charges — so the tool lets you type the rates your registrar quotes.`,
+Provincial figures are defaults, districts cap some fees and housing societies add their own charges, so the tool lets you type the rates your registrar quotes.`,
   faqs: [
     { question: "Who pays 236K and who pays 236C?", answer: "The buyer pays 236K at purchase; the seller pays 236C at sale. Both are collected by the registrar or housing society before the transfer is recorded and deposited with FBR against your CNIC." },
     { question: "Is 236K refundable?", answer: "For filers it is an advance tax: it is adjusted against your income tax for the year and any excess is refundable through your return. Non-filers pay a far higher rate and cannot adjust it unless they file." },
     { question: "What value is the tax charged on?", answer: "FBR taxes the higher of the price you declare and the FBR valuation-table value for that area. Provincial stamp duty and registration use the DC (District Collector) rate. In most cities the FBR value is now close to market." },
-    { question: "How much tax do I pay when buying a house in Lahore?", answer: "As a filer in 2026-27: 1.25% federal 236K plus roughly 3% Punjab charges (1% stamp duty, 1% registration, 1% TMA) — about 4.25% of the value. A non-filer pays 10.5% federal on the same house up to Rs 50 million, so 13.5% in total." },
+    { question: "How much tax do I pay when buying a house in Lahore?", answer: "As a filer in 2026-27: 1.25% federal 236K plus roughly 3% Punjab charges (1% stamp duty, 1% registration, 1% TMA): about 4.25% of the value. A non-filer pays 10.5% federal on the same house up to Rs 50 million, so 13.5% in total." },
     { question: "Does the property tax include annual property tax (UIPT)?", answer: "No. This tool covers the one-off taxes on a transfer. Annual urban immovable property tax is a separate provincial levy assessed by Excise & Taxation on the property's rental or capital value." },
     { question: "Is there still a 7E tax on property?", answer: "No. Section 7E (tax on deemed rental income of properties worth over Rs 25 million) was omitted by Finance Act 2026 following the Federal Constitutional Court's judgment, so no 7E certificate is needed for a transfer from 1 July 2026." },
   ],

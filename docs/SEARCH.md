@@ -1,6 +1,6 @@
 # Search
 
-Search is the product. One index, one query, one ranking function — every entity type flows through it.
+Search is the product. One index, one query, one ranking function, every entity type flows through it.
 
 ## Index: `search_documents`
 
@@ -14,12 +14,12 @@ Each searchable thing writes exactly one row (unique on `entity_type + entity_id
 | business | `indexBusiness` | `/b/[slug]` | 1.0 |
 | location | `indexLocation` | `/cities/[slug]` | 0.8 |
 | entity | `indexEntity` | `/e/[slug]` | 0.9 |
-| data series (Phase 6) | — | `/data/[slug]` | 1.1 |
+| data series (Phase 6) |: | `/data/[slug]` | 1.1 |
 
 Two generated `tsvector` columns:
 
-- `tsv` — weighted, English config: title + keywords (A), summary + category + city (B), body (C). GIN-indexed. Used for relevance.
-- `tsv_simple` — unstemmed `simple` config over the short fields. Used for **prefix matching** so "electri" finds "electricity" and "sol" finds "solar".
+- `tsv`, weighted, English config: title + keywords (A), summary + category + city (B), body (C). GIN-indexed. Used for relevance.
+- `tsv_simple`, unstemmed `simple` config over the short fields. Used for **prefix matching** so "electri" finds "electricity" and "sol" finds "solar".
 
 **Write-through rule:** every create/update/delete of an article, business, location or entity calls the matching indexer in the same request. `npm run search:reindex` rebuilds from scratch.
 
@@ -41,7 +41,7 @@ rank = greatest( ts_rank_cd(tsv, websearch_to_tsquery('english', q)),
 
 ## Presentation (`/search`)
 
-1. **Best match** — the top hit, whatever its type, in a highlighted card.
+1. **Best match**, the top hit, whatever its type, in a highlighted card.
 2. **Grouped sections** in intent order: Tools → Guides → Businesses → News → Places → Topics.
 3. Type filter chips; city filter (Phase 4).
 

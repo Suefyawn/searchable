@@ -33,7 +33,7 @@ export default async function BusinessDashboard() {
 
   return (
     <div className="container-x py-10">
-      <SectionHeader as="h1" title="Your businesses" description="Keep details current, answer enquiries and respond to reviews. Verified and Premium listings rank higher — see plans under Upgrade." />
+      <SectionHeader as="h1" title="Your businesses" description="Keep details current, answer enquiries and respond to reviews. Verified and Premium listings rank higher: see plans under Upgrade." />
       {!businesses.length && !pendingClaims.length ? (
         <div className="surface p-8 text-center">
           <p className="text-lg font-medium">No businesses yet</p>

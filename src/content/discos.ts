@@ -1,6 +1,6 @@
 /**
  * Electricity distribution companies. Powers /electricity and /electricity/[slug]
- * ("lesco bill check", "iesco bill", "mepco bill" — among the highest-volume queries in Pakistan).
+ * ("lesco bill check", "iesco bill", "mepco bill", among the highest-volume queries in Pakistan).
  * Bill portals are the official PITC/company portals; verify links quarterly.
  */
 export type Disco = {

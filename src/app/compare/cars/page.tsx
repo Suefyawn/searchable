@@ -14,12 +14,12 @@ const FAQS = [
   { question: "Which is the cheapest new car in Pakistan?", answer: "The Suzuki Every van (Rs 29.65 lakh) and Suzuki Alto (Rs 29.95 lakh) are the cheapest new vehicles; the Changan Karvaan is the cheapest 7-seater and the Changan Alsvin the cheapest sedan. Nothing new sells under Rs 25 lakh any more." },
   { question: "Which new car gives the best fuel economy?", answer: "Among petrol cars the Alto (18–22 km/l) and Cultus. The Toyota Corolla Cross and Haval H6 hybrids do 18–23 km/l in city traffic. Electric cars (MG4, BYD Atto 3) cost about Rs 3–5 per km on home charging against Rs 15–20 per km for petrol." },
   { question: "Are electric cars worth it in Pakistan?", answer: "On running cost, yes: at Rs 40–60 per unit an EV costs a fifth of petrol per km, and EVs pay reduced registration and token tax in several provinces. The trade-offs are the higher purchase price, charging at home (three-phase helps) and thinner resale data. The MG Binguo at Rs 57 lakh is the entry point." },
-  { question: "How much extra do non-filers pay when buying a car?", answer: "Withholding tax under section 231B is collected at registration and is far higher for non-filers — from about Rs 30,000 extra on an 850cc car to several lakh on a 2000cc+ SUV. Use the token tax calculator for the annual tax and get on the Active Taxpayer List before booking." },
+  { question: "How much extra do non-filers pay when buying a car?", answer: "Withholding tax under section 231B is collected at registration and is far higher for non-filers: from about Rs 30,000 extra on an 850cc car to several lakh on a 2000cc+ SUV. Use the token tax calculator for the annual tax and get on the Active Taxpayer List before booking." },
   { question: "Are these prices final?", answer: "They are the assemblers' published ex-factory prices on the review date. Assemblers revise prices with the rupee and the budget, dealers may charge premium (own) on short-supply models, and imported (CBU) cars move with duty changes. Confirm with the dealer before paying a booking amount." },
 ];
 
 export const metadata = buildMetadata({
-  title: "Car Prices in Pakistan 2026 — Compare New Cars: Alto, Swift, City, Corolla, Sportage, BYD & More",
+  title: "Car Prices in Pakistan 2026: Compare New Cars: Alto, Swift, City, Corolla, Sportage, BYD & More",
   description: "Every new car on sale in Pakistan with ex-factory prices, engine, gearbox, fuel economy, airbags and seats. Filter by body, fuel and budget, compare three side by side, and jump to the car loan and token tax calculators.",
   path: "/compare/cars",
   kicker: "Compare",
@@ -74,7 +74,7 @@ export default function CarsComparePage() {
 
           <section>
             <h2 className="font-serif text-2xl">All new cars</h2>
-            <p className="mt-2 mb-4 text-[15px] text-2">Ex-factory prices across variants. On-road cost adds registration, number plate, token tax and 231B withholding — use the calculators from the comparison.</p>
+            <p className="mt-2 mb-4 text-[15px] text-2">Ex-factory prices across variants. On-road cost adds registration, number plate, token tax and 231B withholding: use the calculators from the comparison.</p>
             <CarCompare cars={CARS} />
             <p className="mt-2 text-xs text-3">
               Source: <a href={CARS_SOURCE.url} rel="nofollow noopener" target="_blank" className="underline-offset-2 hover:underline">{CARS_SOURCE.title}</a>, reviewed {formatDate(CARS_REVIEWED_AT)}. Specs from assembler brochures; economy figures are typical city driving, not test-cycle claims.
@@ -84,11 +84,11 @@ export default function CarsComparePage() {
           <section>
             <h2 className="font-serif text-2xl">What the price does not include</h2>
             <ul className="mt-3 list-disc space-y-2 pl-5 text-[16px] leading-relaxed">
-              <li><strong>Registration and number plate</strong> — provincial Excise fee (roughly 1–4% of value by engine size) plus plate and smart-card charges.</li>
-              <li><strong>Withholding tax u/s 231B</strong> — collected at registration; non-filers pay about three times the filer rate. Getting on the ATL before booking is the single biggest saving.</li>
-              <li><strong>Token tax</strong> — annual for cars above 1000cc (a percentage of invoice value in Punjab and ICT since 2026), lifetime for ≤1000cc and motorcycles. See the <Link href="/tools/cars/token-tax-calculator" className="underline underline-offset-4">token tax calculator</Link>.</li>
-              <li><strong>Own / premium</strong> — dealer mark-up on short-supply models; refuse it or wait for delivery at list price.</li>
-              <li><strong>Insurance</strong> — 1.5–3% of value per year; mandatory for bank financing.</li>
+              <li><strong>Registration and number plate</strong>, provincial Excise fee (roughly 1–4% of value by engine size) plus plate and smart-card charges.</li>
+              <li><strong>Withholding tax u/s 231B</strong>, collected at registration; non-filers pay about three times the filer rate. Getting on the ATL before booking is the single biggest saving.</li>
+              <li><strong>Token tax</strong>: annual for cars above 1000cc (a percentage of invoice value in Punjab and ICT since 2026), lifetime for ≤1000cc and motorcycles. See the <Link href="/tools/cars/token-tax-calculator" className="underline underline-offset-4">token tax calculator</Link>.</li>
+              <li><strong>Own / premium</strong>, dealer mark-up on short-supply models; refuse it or wait for delivery at list price.</li>
+              <li><strong>Insurance</strong>, 1.5–3% of value per year; mandatory for bank financing.</li>
             </ul>
           </section>
 

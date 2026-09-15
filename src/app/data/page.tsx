@@ -8,8 +8,8 @@ import { Change } from "@/components/data/change";
 
 export const revalidate = 600;
 export const metadata = buildMetadata({
-  title: "Pakistan data — prices and rates, updated",
-  description: "Petrol and diesel prices, USD/PKR, gold rate, the SBP policy rate and more — with history, sources and dates. The numbers Pakistanis check every day.",
+  title: "Pakistan data: prices and rates, updated",
+  description: "Petrol and diesel prices, USD/PKR, gold rate, the SBP policy rate and more, with history, sources and dates. The numbers Pakistanis check every day.",
   path: "/data",
 });
 

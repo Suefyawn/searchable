@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props) {
   const n = await countBusinesses({ categoryId: cat.id, areaId: geo.area.id });
   const plural = cat.namePlural ?? cat.name;
   return buildMetadata({
-    title: `${plural} in ${geo.area.name}, ${geo.city.name}${n ? ` — ${n} listed` : ""}`,
+    title: `${plural} in ${geo.area.name}, ${geo.city.name}${n ? `: ${n} listed` : ""}`,
     description: `${plural} in ${geo.area.name}, ${geo.city.name}: phone, WhatsApp, hours, address and reviews. Verified listings first.`,
     path: `/businesses/${cat.slug}/${geo.city.slug}/${geo.area.slug}`,
     noindex: n < 5,

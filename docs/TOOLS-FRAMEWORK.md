@@ -7,7 +7,7 @@ A tool is one TypeScript file. The generic page renders it, the search index lis
 ```
 src/tools/
   types.ts                 ToolDefinition, Field, ToolResult, TOOL_CATEGORIES, helpers num()/str()/bool()
-  registry.ts              TOOLS[] — the only place a tool is registered
+  registry.ts              TOOLS[], the only place a tool is registered
   data/
     income-tax.ts          Slab tables per tax year + computeIncomeTax()
     rates.ts               PTA slabs, electricity tariff, zakat nisab, labour, reference market rates
@@ -56,19 +56,19 @@ export const fuelCostCalculator: ToolDefinition = {
 };
 ```
 
-2. **Register** it in `src/tools/registry.ts` (`TOOLS` array — order = listing order).
+2. **Register** it in `src/tools/registry.ts` (`TOOLS` array, order = listing order).
 3. **Rates** go in `src/tools/data/*.ts` with `reviewedAt`/`effectiveFrom` and a `source`.
 4. Run `npm run db:seed` (or `search:reindex`) with the dev server stopped to mirror metadata into `tools` and the search index.
 5. Visit `/tools/<category>/<slug>`.
 
 ## Rules
-- `compute()` must be **pure and synchronous** — it runs in the browser on every keystroke.
+- `compute()` must be **pure and synchronous**, it runs in the browser on every keystroke.
 - Never `throw` for bad input; clamp or return a warning in `warnings[]`.
 - Money formatting via `pkr()`, percentages via `pct()` (`src/lib/format.ts`).
 - Put the most useful figure in `headline`. Keep `sections` to what a person needs to trust the number.
-- `warnings` are for scope limits ("does not include withholding for non-filers") — always state what is excluded.
+- `warnings` are for scope limits ("does not include withholding for non-filers"), always state what is excluded.
 - `methodology` is Markdown, written for a smart non-expert.
-- `faqs` become `FAQPage` JSON-LD — write real questions people search.
+- `faqs` become `FAQPage` JSON-LD, write real questions people search.
 - Bump `version` and `lastReviewed` whenever a rate table changes.
 
 ## Field types

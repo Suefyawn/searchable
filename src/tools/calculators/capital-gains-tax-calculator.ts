@@ -11,7 +11,7 @@ export const capitalGainsTaxCalculator: ToolDefinition = {
   slug: "capital-gains-tax-calculator",
   category: "tax",
   name: "Capital Gains Tax on Property Calculator 2026-27",
-  seoTitle: "Capital Gains Tax on Property Calculator Pakistan 2026-27 — CGT on Plot, House & Flat Sale (Filer vs Non-Filer)",
+  seoTitle: "Capital Gains Tax on Property Calculator Pakistan 2026-27: CGT on Plot, House & Flat Sale (Filer vs Non-Filer)",
   shortName: "Property CGT",
   description: "Work out the capital gains tax when you sell a plot, house or flat in Pakistan: 15% flat for filers on property bought after 1 July 2024, the holding-period table for older property, the 236C tax withheld at transfer, and what you actually keep.",
   keywords: ["capital gain tax on property", "capital gains tax on property in pakistan", "cgt on property pakistan", "capital gains tax calculator pakistan", "tax on property sale pakistan", "section 37(1a)", "holding period property tax", "cgt on plot sale", "236c tax", "property sale tax calculator"],
@@ -79,7 +79,7 @@ export const capitalGainsTaxCalculator: ToolDefinition = {
       if (filer) {
         rate = CGT_POST_2024.filer;
         tax = Math.max(0, gain) * rate;
-        rateNote = "Flat 15% — no holding-period relief for property acquired on or after 1 July 2024 (s.37(1A), Finance Act 2024).";
+        rateNote = "Flat 15%, no holding-period relief for property acquired on or after 1 July 2024 (s.37(1A), Finance Act 2024).";
       } else {
         const slabTax = computeIncomeTax(Math.max(0, gain), CURRENT_TAX_YEAR, "nonSalaried").totalTax;
         const floor = Math.max(0, gain) * CGT_POST_2024.nonFilerMinimum;
@@ -92,12 +92,12 @@ export const capitalGainsTaxCalculator: ToolDefinition = {
       rate = cgtRatePre2024(kind, years);
       tax = Math.max(0, gain) * rate;
       const label = { plot: "open plot", constructed: "constructed property", flat: "flat" }[kind];
-      rateNote = rate === 0 ? `Held more than ${kind === "plot" ? 6 : kind === "constructed" ? 4 : 2} years — gain on a ${label} is exempt under the pre-2024 holding-period table.` : `${pct(rate)} for a ${label} held ${years} year${years === 1 ? "" : "s"} (Division VIII table that continues to apply to property acquired before 1 July 2024).`;
+      rateNote = rate === 0 ? `Held more than ${kind === "plot" ? 6 : kind === "constructed" ? 4 : 2} years, gain on a ${label} is exempt under the pre-2024 holding-period table.` : `${pct(rate)} for a ${label} held ${years} year${years === 1 ? "" : "s"} (Division VIII table that continues to apply to property acquired before 1 July 2024).`;
       if (!filer) warnings.push("For property bought before July 2024 the holding-period rates apply regardless of filer status; your 236C withholding is still higher as a non-filer.");
     }
     tax = Math.round(tax);
     if (gain <= 0) warnings.push("No gain, no CGT. A loss on immovable property cannot be set off against other income.");
-    if (sale > 0 && cost > 0 && sale < cost * 0.5) warnings.push("Sale price is far below cost — FBR will substitute the valuation-table value if it is higher than the declared price.");
+    if (sale > 0 && cost > 0 && sale < cost * 0.5) warnings.push("Sale price is far below cost, FBR will substitute the valuation-table value if it is higher than the declared price.");
 
     // 236C withheld
     const c236 = Math.round(sale * wht236C(filer));
@@ -159,19 +159,19 @@ export const capitalGainsTaxCalculator: ToolDefinition = {
 
 **Property acquired on or after 1 July 2024** (Finance Act 2024): no holding-period relief. Sellers on the Active Taxpayer List pay a flat **15%**. Sellers not on the ATL pay tax at the normal Division I slab rates on the gain, subject to a minimum of 15%.
 
-**Property acquired before 1 July 2024**: the Division VIII table inserted by Finance Act 2022 continues to apply —
+**Property acquired before 1 July 2024**: the Division VIII table inserted by Finance Act 2022 continues to apply, 
 - Open plots: 15% (≤1 yr), 12.5% (1–2), 10% (2–3), 7.5% (3–4), 5% (4–5), 2.5% (5–6), 0% after 6 years.
 - Constructed property: 15%, 10%, 7.5%, 5%, then 0% after 4 years.
 - Flats: 15% (≤1 yr), 7.5% (1–2), 0% after 2 years.
 
 **Advance tax at transfer (s.236C)**: the registrar or housing society collects ${pct(WHT_236C.filer, 2)} of the sale value from filers and ${pct(WHT_236C.nonFiler)} from non-filers (Finance Act 2026, from 1 July 2026; previously ${WHT_236C.previousFiler}). For filers this is adjustable against the CGT and any excess is refundable through the return. Section 7E deemed-income tax and the 3% FED on property sales no longer apply.`,
   faqs: [
-    { question: "Is there capital gains tax if I sell after 6 years?", answer: "Only if you bought the property before 1 July 2024 — then open plots are exempt after 6 years, houses after 4 and flats after 2. Property bought from 1 July 2024 onward is taxed at 15% for filers no matter how long you hold it." },
-    { question: "How is the holding period counted?", answer: "From the date of acquisition to the date of disposal. For allotted plots FBR generally counts from the allotment/possession letter; for purchased property from the registered transfer. Keep the documents — the rate can swing from 15% to 0%." },
+    { question: "Is there capital gains tax if I sell after 6 years?", answer: "Only if you bought the property before 1 July 2024: then open plots are exempt after 6 years, houses after 4 and flats after 2. Property bought from 1 July 2024 onward is taxed at 15% for filers no matter how long you hold it." },
+    { question: "How is the holding period counted?", answer: "From the date of acquisition to the date of disposal. For allotted plots FBR generally counts from the allotment/possession letter; for purchased property from the registered transfer. Keep the documents: the rate can swing from 15% to 0%." },
     { question: "Is 236C the same as capital gains tax?", answer: "No. 236C is an advance tax collected at the time of transfer on the full sale price. CGT is calculated on the gain when you file your return. Filers deduct the 236C already paid from their CGT; non-filers effectively lose it unless they file." },
     { question: "What counts as cost of acquisition?", answer: "The purchase price plus stamp duty, registration fees, transfer charges and the cost of documented construction or improvements. Loan interest is not included." },
     { question: "Do I pay CGT on property received as a gift or inheritance?", answer: "Not on receiving it. When you later sell, the cost is the fair market value on the date of death (inheritance, per Finance Act 2026) or the donor's cost (gift), and the holding period usually runs from the original acquisition." },
-    { question: "Can I set off a loss on property?", answer: "A capital loss on immovable property can only be set off against capital gains on immovable property — not against salary or business income." },
+    { question: "Can I set off a loss on property?", answer: "A capital loss on immovable property can only be set off against capital gains on immovable property: not against salary or business income." },
   ],
   related: { tools: ["property-tax-calculator", "income-tax-calculator", "plot-size-converter"], guides: ["how-to-file-income-tax-return-pakistan", "how-to-check-filer-status-atl-pakistan"], entities: ["fbr"], businessCategories: ["real-estate-agents"] },
 };

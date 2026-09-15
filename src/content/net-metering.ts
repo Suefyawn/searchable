@@ -1,5 +1,5 @@
 /**
- * Net metering / net billing in Pakistan under the NEPRA (Prosumer) Regulations — notified February 2026,
+ * Net metering / net billing in Pakistan under the NEPRA (Prosumer) Regulations, notified February 2026,
  * replacing the AR&E Distributed Generation and Net Metering Regulations 2015.
  * Regulation clauses below were read from the NEPRA text (nepra.org.pk); rupee rates are NEPRA determinations
  * as reported in the press and change annually. REVIEW QUARTERLY.
@@ -8,7 +8,7 @@
 export const NET_METERING_REVIEWED_AT = "2026-09-15";
 
 export const NET_METERING_SOURCES = [
-  { title: "NEPRA (Prosumer) Regulations — text as published by NEPRA", url: "https://www.nepra.org.pk/Admission%20Notices/2025/12%20Dec/NEPRA%20Prosumer%20Regulations.pdf", publisher: "National Electric Power Regulatory Authority", date: "2026-02-10" },
+  { title: "NEPRA (Prosumer) Regulations: text as published by NEPRA", url: "https://www.nepra.org.pk/Admission%20Notices/2025/12%20Dec/NEPRA%20Prosumer%20Regulations.pdf", publisher: "National Electric Power Regulatory Authority", date: "2026-02-10" },
   { title: "Nepra pulls the plug on net-metering", url: "https://www.dawn.com/news/1972203", publisher: "Dawn", date: "2026-02-11" },
   { title: "NEPRA protects existing solar net metering users, restricts system expansion benefits", url: "https://profit.pakistantoday.com.pk/2026/04/03/nepra-protects-existing-solar-net-metering-users-restricts-system-expansion-benefits/", publisher: "Profit by Pakistan Today", date: "2026-04-03" },
 ];
@@ -40,7 +40,7 @@ export const RULES = {
   commissionWithinMonths: 6,
   /** Reg 9 (interconnection standards). */
   standards: ["UL 1741 (inverters, converters and interconnection equipment for distributed energy resources)", "IEEE 1547-2003 (interconnection of distributed resources)", "IEC 61215 (PV module design qualification)", "IEC 62116 / anti-islanding protection (checked from the inverter certificate)"],
-  /** Reg 3 & 4 — working days at each step. */
+  /** Reg 3 & 4, working days at each step. */
   timeline: [
     { step: "DISCO acknowledges the application and confirms it is complete", days: 5, who: "DISCO", reg: "3(5)" },
     { step: "You supply any missing documents", days: 3, who: "You", reg: "3(5)" },
@@ -66,8 +66,8 @@ export type ApprovedInverter = {
 
 /**
  * Inverters that routinely pass DISCO technical review for net metering. No DISCO publishes a standing public
- * model list — the desk checks the datasheet and UL 1741 / IEC 62116 anti-islanding certificate submitted with
- * the application — so "routine" means the brand's paperwork is accepted without query across DISCOs, and
+ * model list, the desk checks the datasheet and UL 1741 / IEC 62116 anti-islanding certificate submitted with
+ * the application, so "routine" means the brand's paperwork is accepted without query across DISCOs, and
  * "with-certificates" means it is accepted when the installer attaches the test certificate.
  */
 export const APPROVED_INVERTERS: ApprovedInverter[] = [
@@ -87,11 +87,11 @@ export const APPROVED_INVERTERS: ApprovedInverter[] = [
   { brand: "Inverex", models: "Aerox (on-grid), Nitrox (hybrid)", type: "both", certs: "IEC 62109, IEC 62116 (Nitrox / Aerox datasheets)", status: "with-certificates", note: "Veyron and Yukon off-grid ranges are not eligible" },
   { brand: "Ziewnic", models: "Xtreme hybrid, Zi-Grid on-grid", type: "both", certs: "IEC 62109, IEC 62116", status: "with-certificates", note: "X-Core off-grid range is not eligible" },
   { brand: "Livoltek", models: "GT on-grid, HYT hybrids", type: "both", certs: "IEC 62109, IEC 62116", status: "with-certificates" },
-  { brand: "Sunlife / Tiger / Knox / Crown / Homage", models: "Hybrid models with grid-tie mode", type: "hybrid", certs: "Varies by model — ask for the IEC 62116 anti-islanding certificate", status: "with-certificates", note: "Some models are off-grid units with a grid pass-through and are refused; check before buying" },
+  { brand: "Sunlife / Tiger / Knox / Crown / Homage", models: "Hybrid models with grid-tie mode", type: "hybrid", certs: "Varies by model, ask for the IEC 62116 anti-islanding certificate", status: "with-certificates", note: "Some models are off-grid units with a grid pass-through and are refused; check before buying" },
 ];
 
 /** Not eligible under any DISCO. */
-export const NOT_ELIGIBLE = ["Off-grid inverters (Inverex Veyron/Yukon, Ziewnic X-Core, Crown Xavier, Knox Infini, Homage HVS and similar) — no anti-islanding or export control", "Micro-inverters and inverters without a UL 1741 / IEC 62116 certificate", "Second-hand imported inverters with region-locked grid codes that cannot be set to Pakistan / IEEE 1547 parameters"];
+export const NOT_ELIGIBLE = ["Off-grid inverters (Inverex Veyron/Yukon, Ziewnic X-Core, Crown Xavier, Knox Infini, Homage HVS and similar), no anti-islanding or export control", "Micro-inverters and inverters without a UL 1741 / IEC 62116 certificate", "Second-hand imported inverters with region-locked grid codes that cannot be set to Pakistan / IEEE 1547 parameters"];
 
 export type DiscoNetMetering = {
   slug: string;
@@ -114,6 +114,6 @@ export const DISCO_NET_METERING: DiscoNetMetering[] = [
   { slug: "hesco", apply: "HESCO headquarters (WAPDA Complex, Hussainabad, Hyderabad) or circle offices.", applyUrl: "https://www.hesco.gov.pk", meterCost: [30_000, 60_000], notes: [] },
   { slug: "sepco", apply: "SEPCO headquarters (Sukkur) or circle offices in Larkana and Khairpur.", applyUrl: "https://www.sepco.com.pk", meterCost: [30_000, 60_000], notes: [] },
   { slug: "qesco", apply: "QESCO headquarters (Zarghoon Road, Quetta).", applyUrl: "https://www.qesco.com.pk", meterCost: [30_000, 60_000], notes: ["Agricultural solarisation schemes in Balochistan run separately from net metering."] },
-  { slug: "tesco", apply: "TESCO headquarters (Peshawar) — very few residential approvals to date.", meterCost: [30_000, 60_000], notes: [] },
+  { slug: "tesco", apply: "TESCO headquarters (Peshawar), very few residential approvals to date.", meterCost: [30_000, 60_000], notes: [] },
   { slug: "k-electric", apply: "Online through the K-Electric net-metering portal / KE Live app, or the Distributed Generation cell at KE House (Sunset Boulevard, DHA Karachi).", applyUrl: "https://www.ke.com.pk", meterCost: [35_000, 65_000], notes: ["KE runs its own online tracking; installers upload the datasheet, IEC/UL certificates and AEDB certificate at application.", "KE's tariff is determined separately by NEPRA but the Prosumer Regulations apply to it in the same way."] },
 ];

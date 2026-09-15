@@ -15,7 +15,7 @@ export function articleUrl(a: Pick<ArticleListItem, "kind" | "slug" | "category"
 }
 
 /* ───────────── Article ─────────────
-   Newspaper items: label, serif headline, dek, meta. No boxes — hairlines from the parent. */
+   Newspaper items: label, serif headline, dek, meta. No boxes, hairlines from the parent. */
 export function ArticleCard({ article, variant = "default", className, thumb = false, index }: { article: ArticleListItem; variant?: "default" | "compact" | "feature"; className?: string; /** Compact variant: show a small photo on the right. */ thumb?: boolean; /** Compact variant: show a running number on the left. */ index?: number }) {
   const href = articleUrl(article);
   const isNews = article.kind === "news";
@@ -85,7 +85,7 @@ export function ArticleCard({ article, variant = "default", className, thumb = f
 }
 
 /* ───────────── Tool ───────────── */
-/** Headline number a tool produces with its default inputs — a concrete hook on cards. */
+/** Headline number a tool produces with its default inputs, a concrete hook on cards. */
 export function toolExample(tool: Pick<ToolDefinition, "fields" | "compute">): { label: string; value: string } | null {
   try {
     const input = Object.fromEntries(tool.fields.map((f) => [f.key, f.default as string | number | boolean]));

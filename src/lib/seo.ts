@@ -14,6 +14,8 @@ type MetaInput = {
   absoluteTitle?: boolean;
   /** Small label on the generated social card (category, section). */
   kicker?: string;
+  /** Path of a Markdown rendition (/api/md/...) for text-first crawlers and language models. */
+  markdownPath?: string;
 };
 
 export function ogImageUrl(title: string, kicker?: string) {
@@ -31,8 +33,9 @@ export function buildMetadata(input: MetaInput): Metadata {
   return {
     title: input.absoluteTitle ? { absolute: input.title } : input.title,
     description,
-    alternates: { canonical: url },
-    robots: input.noindex ? { index: false, follow: true } : { index: true, follow: true },
+    alternates: { canonical: url, ...(input.markdownPath ? { types: { "text/markdown": `${SITE.url}${input.markdownPath}` } } : {}) },
+    // Large previews unlock Google Discover; unlimited snippets let search and AI engines quote the page.
+    robots: input.noindex ? { index: false, follow: true } : { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
     openGraph: {
       title,
       description,
@@ -70,8 +73,14 @@ export function organizationJsonLd() {
     name: SITE.name,
     url: SITE.url,
     logo: `${SITE.url}/icon.svg`,
-    sameAs: [],
+    sameAs: [`https://twitter.com/${SITE.twitter.replace("@", "")}`],
+    contactPoint: { "@type": "ContactPoint", contactType: "editorial", email: "editorial@searchable.pk" },
+    knowsAbout: ["Pakistan taxes", "electricity tariffs", "solar energy", "car prices", "property tax", "exchange rates", "gold prices", "business directory"],
   };
+}
+
+export function personJsonLd(a: { name: string; slug: string; bio?: string | null }) {
+  return { "@context": "https://schema.org", "@type": "Person", name: a.name, url: `${SITE.url}/authors/${a.slug}`, description: a.bio ?? undefined, worksFor: { "@type": "Organization", name: SITE.name, url: SITE.url } };
 }
 
 export function websiteJsonLd() {

@@ -6,7 +6,7 @@ export const incomeTaxCalculator: ToolDefinition = {
   slug: "income-tax-calculator",
   category: "tax",
   name: "Income Tax Calculator Pakistan 2026-27",
-  seoTitle: "Income Tax Calculator Pakistan 2026-27 — Salary Tax Calculator (FBR Slabs)",
+  seoTitle: "Income Tax Calculator Pakistan 2026-27: Salary Tax Calculator (FBR Slabs)",
   shortName: "Income Tax",
   description: "Free salary tax calculator for Pakistan: enter your monthly salary and see income tax under the FBR 2026-27 slabs, your take-home, effective rate and slab.",
   keywords: ["income tax calculator pakistan", "salary tax calculator pakistan", "tax calculator pakistan", "income tax slabs 2026-27", "income tax slabs 2025-26", "fbr tax calculator", "salary tax slabs", "income tax on salary in pakistan", "tax on 100000 salary in pakistan", "tax on 200000 salary", "tax on 300000 salary in pakistan", "income tax rates in pakistan"],
@@ -44,7 +44,7 @@ export const incomeTaxCalculator: ToolDefinition = {
       summary:
         tax.totalTax === 0
           ? `Income up to ${pkr(600_000)} per year is exempt. You pay no income tax.`
-          : `On ${pkr(annual)} per year you pay ${pkr(tax.totalTax)} in tax — an effective rate of ${pct(tax.effectiveRate)}. Your marginal rate is ${pct(tax.marginalRate)}.`,
+          : `On ${pkr(annual)} per year you pay ${pkr(tax.totalTax)} in tax, an effective rate of ${pct(tax.effectiveRate)}. Your marginal rate is ${pct(tax.marginalRate)}.`,
       sections: [
         {
           title: "Annual",
@@ -84,7 +84,7 @@ For salaried individuals (where salary is more than 75% of total income) the Fin
 
 **Formula:** *tax = fixed amount for your slab + rate × (taxable income − slab floor)*.
 
-A **surcharge** applies to the tax amount when taxable income exceeds Rs 10 million — 10% for non-salaried individuals and AOPs. Finance Act 2026 withdrew the 9% salaried surcharge from 1 July 2026, and eased the middle slabs (23% → 20%, 30% → 25%, with new 29% and 32% bands before the 35% top rate now starting at Rs 7 million).
+A **surcharge** applies to the tax amount when taxable income exceeds Rs 10 million, 10% for non-salaried individuals and AOPs. Finance Act 2026 withdrew the 9% salaried surcharge from 1 July 2026, and eased the middle slabs (23% → 20%, 30% → 25%, with new 29% and 32% bands before the 35% top rate now starting at Rs 7 million).
 
 This calculator uses annual taxable income; monthly amounts are simply divided by 12, which is how employers compute the monthly deduction under section 149 of the Income Tax Ordinance 2001.`,
   faqs: [

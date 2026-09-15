@@ -8,7 +8,7 @@ export const fuelCostCalculator: ToolDefinition = {
   slug: "fuel-cost-calculator",
   category: "cars",
   name: "Fuel Cost Calculator",
-  seoTitle: "Fuel Cost Calculator Pakistan — Monthly Petrol Cost at Today’s Petrol Price",
+  seoTitle: "Fuel Cost Calculator Pakistan: Monthly Petrol Cost at Today’s Petrol Price",
   shortName: "Fuel Cost",
   description: "Monthly and per-kilometre fuel cost from your driving and mileage at today’s petrol or diesel price in Pakistan.",
   keywords: ["fuel cost calculator", "petrol cost calculator", "petrol cost per km", "monthly fuel expense", "petrol price in pakistan today", "car running cost", "fuel average calculator"],
@@ -30,7 +30,7 @@ export const fuelCostCalculator: ToolDefinition = {
     const perKm = price / kmpl;
     return {
       headline: { label: "Monthly fuel cost", value: pkr(monthly), primary: true },
-      summary: `${km.toLocaleString()} km at ${kmpl} km/l uses about ${litres.toFixed(0)} litres — ${pkr(perKm)} per kilometre, ${pkr(monthly * 12)} a year.`,
+      summary: `${km.toLocaleString()} km at ${kmpl} km/l uses about ${litres.toFixed(0)} litres, ${pkr(perKm)} per kilometre, ${pkr(monthly * 12)} a year.`,
       sections: [
         {
           title: "Breakdown",

@@ -8,6 +8,7 @@ import { getDb, schema } from "@/db";
 import { requireRole } from "@/lib/auth";
 import { readingMinutes } from "@/lib/format";
 import { indexArticle } from "@/lib/indexers";
+import { pingIndexNow } from "@/lib/indexnow";
 import { plainText } from "@/lib/markdown";
 import { slugify, uniqueSlug } from "@/lib/slug";
 
@@ -74,7 +75,7 @@ export async function saveArticle(raw: ArticleFormInput): Promise<{ ok: boolean;
   } else if (d.intent === "schedule") {
     const when = d.scheduledFor ? new Date(d.scheduledFor) : null;
     if (!when || Number.isNaN(when.getTime())) return { ok: false, error: "Pick a date and time to schedule." };
-    if (when.getTime() <= Date.now()) return { ok: false, error: "Scheduled time must be in the future — or just publish now." };
+    if (when.getTime() <= Date.now()) return { ok: false, error: "Scheduled time must be in the future, or just publish now." };
     status = "scheduled";
     scheduledFor = when;
   } else if (d.intent === "unpublish") {
@@ -159,6 +160,10 @@ export async function saveArticle(raw: ArticleFormInput): Promise<{ ok: boolean;
   revalidatePath(`/${section}/[category]`, "page");
   revalidatePath(`/${section}/[category]/[slug]`, "page");
   revalidatePath("/feed.xml");
+  if (d.intent === "publish") {
+    const cat = d.categoryId ? await db.query.categories.findFirst({ where: eq(schema.categories.id, d.categoryId), columns: { slug: true } }) : null;
+    void pingIndexNow([`/${section}/${cat?.slug ?? "general"}/${slug}`, `/${section}`, "/"]);
+  }
   return { ok: true, id };
 }
 
@@ -184,6 +189,7 @@ export async function publishDueArticles(): Promise<number> {
     await db.update(schema.articles).set({ status: "published", publishedAt: a.publishedAt ?? new Date(), scheduledFor: null, lastReviewedAt: new Date() }).where(eq(schema.articles.id, a.id));
     await db.insert(schema.articleRevisions).values({ articleId: a.id, title: a.title, body: a.body, note: "Published on schedule" });
     await indexArticle(a.id);
+    void pingIndexNow([`/${a.kind === "news" ? "news" : "guides"}`]);
     n++;
   }
   if (n) {

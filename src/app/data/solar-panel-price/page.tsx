@@ -17,12 +17,12 @@ const FAQS = [
   { question: "How much does a 5 kW solar system cost in Pakistan?", answer: "Rs 550,000–800,000 installed for an on-grid system with tier-1 panels and a branded inverter. Hybrid systems with a lithium battery add Rs 250,000–450,000." },
   { question: "How many panels do I need for 5 kW?", answer: "Nine 580 W panels give 5.2 kW. Use the Solar System Calculator to size from your monthly units instead of guessing." },
   { question: "Why do solar prices change every week?", answer: "Panels are imported and priced in dollars; the rupee rate and Chinese module prices move weekly. Import duties and sales-tax changes in the budget cause step changes." },
-  { question: "Longi vs Jinko — which is better in Pakistan?", answer: "Both are tier-1. Jinko's N-type modules lose slightly less output in extreme heat; Longi has the widest local availability and after-sales network. Price difference is usually under Rs 1 per watt." },
-  { question: "Is there tax on solar panels in Pakistan?", answer: "Panels have been exempt from sales tax under the Sixth Schedule since 2022, though inverters and batteries are taxed. The budget can change this — check the review date on this page." },
+  { question: "Longi vs Jinko: which is better in Pakistan?", answer: "Both are tier-1. Jinko's N-type modules lose slightly less output in extreme heat; Longi has the widest local availability and after-sales network. Price difference is usually under Rs 1 per watt." },
+  { question: "Is there tax on solar panels in Pakistan?", answer: "Panels have been exempt from sales tax under the Sixth Schedule since 2022, though inverters and batteries are taxed. The budget can change this: check the review date on this page." },
 ];
 
 export const metadata = buildMetadata({
-  title: "Solar Panel Price in Pakistan Today (2026) — Per Watt Rate, 5kW & 10kW System Cost",
+  title: "Solar Panel Price in Pakistan Today (2026): Per Watt Rate, 5kW & 10kW System Cost",
   description: "Latest solar panel prices in Pakistan per watt for Longi, Jinko, JA, Canadian and Trina, inverter and battery prices, and what a 3kW, 5kW, 10kW or 20kW system costs installed. Updated weekly with source.",
   path: "/data/solar-panel-price",
   kicker: "Solar",

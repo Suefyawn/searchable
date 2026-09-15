@@ -6,7 +6,7 @@ export const carRegistrationTaxCalculator: ToolDefinition = {
   slug: "car-registration-tax-calculator",
   category: "cars",
   name: "Car Registration Tax Calculator 2026-27 (231B)",
-  seoTitle: "Car Registration Tax Calculator Pakistan 2026-27 — 231B Withholding Tax on New Cars, Filer vs Non-Filer, On-Road Price",
+  seoTitle: "Car Registration Tax Calculator Pakistan 2026-27: 231B Withholding Tax on New Cars, Filer vs Non-Filer, On-Road Price",
   shortName: "Registration tax",
   description: "See what a new car really costs on the road: section 231B advance tax by engine size (filer vs non-filer), Punjab registration fee and number plate, so you know the total before you book.",
   keywords: ["car registration tax", "231b tax", "tax on car registration pakistan", "advance tax on vehicle registration", "on road price calculator pakistan", "filer non filer car tax", "new car registration charges punjab", "withholding tax on cars", "vehicle registration fee punjab"],
@@ -42,13 +42,13 @@ export const carRegistrationTaxCalculator: ToolDefinition = {
     const total = value + w.amount + reg + plate;
     return {
       headline: { label: `On-road cost (${filer ? "filer" : "non-filer"})`, value: pkr(total), primary: true },
-      summary: `A ${cc.toLocaleString()}cc car invoiced at ${pkr(value)} attracts ${pct(w.pct, 2)} = ${pkr(w.amount)} advance income tax under s.231B as a ${filer ? "filer" : "non-filer"}${includeReg ? `, plus ${pkr(reg + plate)} Punjab registration fee and plate` : ""}. ${filer ? `A non-filer would pay ${pkr(other.amount)} in 231B alone.` : `Getting on the ATL first would cut 231B to ${pkr(other.amount)} — a saving of ${pkr(w.amount - other.amount)}.`}`,
+      summary: `A ${cc.toLocaleString()}cc car invoiced at ${pkr(value)} attracts ${pct(w.pct, 2)} = ${pkr(w.amount)} advance income tax under s.231B as a ${filer ? "filer" : "non-filer"}${includeReg ? `, plus ${pkr(reg + plate)} Punjab registration fee and plate` : ""}. ${filer ? `A non-filer would pay ${pkr(other.amount)} in 231B alone.` : `Getting on the ATL first would cut 231B to ${pkr(other.amount)}, a saving of ${pkr(w.amount - other.amount)}.`}`,
       sections: [
         {
           title: "Breakdown",
           lines: [
             { label: "Invoice price", value: pkr(value) },
-            { label: `s.231B advance tax — ${pct(w.pct, 2)} (${filer ? "filer" : "non-filer"})`, value: pkr(w.amount), note: "Adjustable against your income tax for the year if you file." },
+            { label: `s.231B advance tax: ${pct(w.pct, 2)} (${filer ? "filer" : "non-filer"})`, value: pkr(w.amount), note: "Adjustable against your income tax for the year if you file." },
             ...(includeReg ? [{ label: `Registration fee (Punjab)`, value: pkr(reg) }, { label: "Number plate, smart card, processing", value: pkr(plate) }] : []),
             { label: "Total on the road", value: pkr(total), primary: true },
           ],
@@ -63,7 +63,7 @@ export const carRegistrationTaxCalculator: ToolDefinition = {
         },
       ],
       warnings: [
-        "Annual token tax and the lifetime token for ≤1000cc cars are separate — see the Token Tax Calculator.",
+        "Annual token tax and the lifetime token for ≤1000cc cars are separate, see the Token Tax Calculator.",
         "Registration fee shown is the Punjab schedule; Sindh, KP and Islamabad use their own percentages. Dealer 'own' premium is not included.",
       ],
     };
@@ -82,14 +82,14 @@ export const carRegistrationTaxCalculator: ToolDefinition = {
 | 2501–3000cc | 9% | 27% |
 | above 3000cc | 12% | 36% |
 
-Value is the invoice price including duties and taxes for locally assembled cars, or customs value plus duty, FED and sales tax for imports. The tax is **adjustable** — filers set it off against their income tax when they file — which is why the filer/non-filer gap is the single biggest saving in buying a car.
+Value is the invoice price including duties and taxes for locally assembled cars, or customs value plus duty, FED and sales tax for imports. The tax is **adjustable**, filers set it off against their income tax when they file, which is why the filer/non-filer gap is the single biggest saving in buying a car.
 
 **Registration fee** is provincial. Punjab charges 1% of value up to 1000cc, 2% to 2000cc and 4% above, plus number plate and smart-card charges. Token tax is charged separately and annually (or once, for ≤1000cc).`,
   faqs: [
     { question: "Is 231B refundable?", answer: "It is an advance tax. Filers adjust it against the income tax due on their return; if it exceeds the tax due the balance is refundable. Non-filers cannot adjust it unless they file for that year." },
     { question: "Does 231B apply to used cars?", answer: "Transfers of ownership attract a fixed amount by engine band, reduced by 10% for each year since first registration and nil after five years. This calculator covers new registrations." },
     { question: "What about electric cars?", answer: "EVs are banded by motor power (kW) rather than cc under the same section, and several provinces reduce registration and token tax for EVs. Ask the Excise office for the current EV band before booking." },
-    { question: "Can the dealer include these in the price?", answer: "Dealers often quote an on-road figure that bundles 231B, registration and plate — ask for the breakdown and check the 231B line against this calculator; some quote the non-filer rate to everyone." },
+    { question: "Can the dealer include these in the price?", answer: "Dealers often quote an on-road figure that bundles 231B, registration and plate: ask for the breakdown and check the 231B line against this calculator; some quote the non-filer rate to everyone." },
   ],
   related: { tools: ["token-tax-calculator", "car-loan-calculator", "income-tax-calculator"], guides: ["how-to-register-a-vehicle-in-punjab", "how-to-check-filer-status-atl-pakistan"], entities: ["fbr", "toyota", "suzuki", "honda"], businessCategories: ["car-dealers"] },
 };

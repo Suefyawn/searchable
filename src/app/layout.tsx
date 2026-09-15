@@ -13,7 +13,7 @@ const serif = Newsreader({ subsets: ["latin"], variable: "--font-serif", display
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
-  title: { default: `${SITE.name} — ${SITE.tagline}`, template: `%s · ${SITE.name}` },
+  title: { default: `${SITE.name}: ${SITE.tagline}`, template: `%s · ${SITE.name}` },
   description: SITE.description,
   applicationName: SITE.name,
   openGraph: { siteName: SITE.name, type: "website", locale: "en_PK" },

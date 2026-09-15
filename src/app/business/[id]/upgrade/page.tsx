@@ -45,7 +45,7 @@ export default async function UpgradePage({ params }: { params: Promise<{ id: st
             <p className="mt-3 text-[15px]">{p.blurb}</p>
             <ul className="mt-3 flex-1 space-y-1.5 text-[14px] text-2">
               {p.features.map((f) => (
-                <li key={f} className="flex gap-2"><span className="text-3">—</span>{f}</li>
+                <li key={f} className="flex gap-2"><span className="text-3">-</span>{f}</li>
               ))}
             </ul>
             <label className="mt-4 block text-xs text-3">
@@ -53,7 +53,7 @@ export default async function UpgradePage({ params }: { params: Promise<{ id: st
               <Input name="phone" className="mt-1 h-9 text-sm" placeholder="03xx-xxxxxxx" />
             </label>
             <Button type="submit" size="sm" className="mt-3 w-full" disabled={b.tier === p.tier && !!b.tierExpiresAt && b.tierExpiresAt > new Date()}>
-              {b.tier === p.tier && b.tierExpiresAt && b.tierExpiresAt > new Date() ? "Current plan" : `Get ${p.name} — invoice me`}
+              {b.tier === p.tier && b.tierExpiresAt && b.tierExpiresAt > new Date() ? "Current plan" : `Get ${p.name}, invoice me`}
             </Button>
           </form>
         ))}

@@ -33,13 +33,13 @@ export async function assembleIssue(frequency: Frequency = "daily") {
   const numbers = LEAD_SERIES.map((slug) => series.find((s) => s.slug === slug)).filter((s): s is NonNullable<typeof s> => !!s && !!s.latest);
   const numberLines = numbers.map((s) => {
     const change = s.previous ? s.latest!.value - s.previous.value : 0;
-    const arrow = change > 0 ? "▲" : change < 0 ? "▼" : "—";
+    const arrow = change > 0 ? "▲" : change < 0 ? "▼" : "=";
     const changeText = s.previous && change !== 0 ? ` (${arrow} ${number(Math.abs(change), s.unit === "%" ? 2 : 2)})` : "";
-    return `- **${s.name.replace(/ today$/i, "")}:** ${number(s.latest!.value, 2)} ${s.unit}${changeText} — [history](${SITE.url}/data/${s.slug === "solar-panel-per-watt" ? "solar-panel-price" : s.slug})`;
+    return `- **${s.name.replace(/ today$/i, "")}:** ${number(s.latest!.value, 2)} ${s.unit}${changeText}, [history](${SITE.url}/data/${s.slug === "solar-panel-per-watt" ? "solar-panel-price" : s.slug})`;
   });
 
   const headline = stories[0];
-  const subject = headline ? `${headline.title}` : `${SITE.name} ${frequency === "daily" ? "Daily" : "Weekly"} — ${formatDate(date)}`;
+  const subject = headline ? `${headline.title}` : `${SITE.name} ${frequency === "daily" ? "Daily" : "Weekly"}: ${formatDate(date)}`;
   const preheader = numbers.length ? numbers.map((s) => `${s.name.replace(/ in Pakistan.*$/i, "").replace(/ today$/i, "")} ${number(s.latest!.value, 0)}`).join(" · ") : SITE.tagline;
 
   const body = [
@@ -103,7 +103,7 @@ function escapeHtml(s: string) {
 function plainTextOf(body: string) {
   return body
     .replace(/^#+\s*/gm, "")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1 — $2")
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1, $2")
     .replace(/\*\*/g, "");
 }
 

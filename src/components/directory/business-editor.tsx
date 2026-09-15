@@ -83,7 +83,7 @@ export function BusinessEditor({ initial, categories, cities, areas, entities = 
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Category" htmlFor="primaryCategoryId">
               <Select id="primaryCategoryId" name="primaryCategoryId" defaultValue={initial.primaryCategoryId ?? ""}>
-                <option value="">—</option>
+                <option value="">None</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -94,10 +94,10 @@ export function BusinessEditor({ initial, categories, cities, areas, entities = 
             <Field label="Price level" htmlFor="priceRange">
               <Select id="priceRange" name="priceRange" defaultValue={String(initial.priceRange ?? 0)}>
                 <option value="0">Not set</option>
-                <option value="1">Rs — budget</option>
-                <option value="2">Rs Rs — moderate</option>
-                <option value="3">Rs Rs Rs — upmarket</option>
-                <option value="4">Rs Rs Rs Rs — premium</option>
+                <option value="1">Rs, budget</option>
+                <option value="2">Rs Rs, moderate</option>
+                <option value="3">Rs Rs Rs, upmarket</option>
+                <option value="4">Rs Rs Rs Rs, premium</option>
               </Select>
             </Field>
           </div>
@@ -108,7 +108,7 @@ export function BusinessEditor({ initial, categories, cities, areas, entities = 
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="City" htmlFor="cityId">
               <Select id="cityId" value={cityId} onChange={(e) => setCityId(e.target.value)}>
-                <option value="">—</option>
+                <option value="">None</option>
                 {cities.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -118,7 +118,7 @@ export function BusinessEditor({ initial, categories, cities, areas, entities = 
             </Field>
             <Field label="Area" htmlFor="areaId">
               <Select id="areaId" name="areaId" defaultValue={initial.areaId ?? ""} key={cityId}>
-                <option value="">—</option>
+                <option value="">None</option>
                 {cityAreas.map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.name}

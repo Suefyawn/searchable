@@ -6,7 +6,7 @@ export const solarPaybackCalculator: ToolDefinition = {
   slug: "solar-payback-calculator",
   category: "solar",
   name: "Solar System Size & Price Calculator Pakistan",
-  seoTitle: "Solar System Calculator Pakistan — 5kW / 10kW Price, Size & Payback with Net Metering",
+  seoTitle: "Solar System Calculator Pakistan: 5kW / 10kW Price, Size & Payback with Net Metering",
   shortName: "Solar Payback",
   description: "How many kW of solar you need, what a 5kW or 10kW system costs in Pakistan, your monthly saving with net metering and the payback period.",
   keywords: ["solar system price in pakistan", "5kw solar system price in pakistan", "10kw solar system price in pakistan", "solar panel price in pakistan", "solar calculator pakistan", "solar system size calculator", "net metering savings", "solar payback period", "solar for home pakistan"],

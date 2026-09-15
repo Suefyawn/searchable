@@ -86,7 +86,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ invoic
 
       {order.status === "active" || order.status === "paid" ? (
         <p className="mt-8 border-t border-line pt-6 text-[15px]">
-          Thank you. {order.kind === "business_plan" ? "Your plan is live — manage it from your " : order.kind === "sponsored_post" ? "Our desk is editing your article and will send it for approval before publication. " : ""}
+          Thank you. {order.kind === "business_plan" ? "Your plan is live, manage it from your " : order.kind === "sponsored_post" ? "Our desk is editing your article and will send it for approval before publication. " : ""}
           {order.kind === "business_plan" ? <Link href="/business" className="underline underline-offset-4">business dashboard</Link> : null}
         </p>
       ) : null}

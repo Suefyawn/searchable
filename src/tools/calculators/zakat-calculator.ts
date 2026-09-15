@@ -6,7 +6,7 @@ export const zakatCalculator: ToolDefinition = {
   slug: "zakat-calculator",
   category: "finance",
   name: "Zakat Calculator 2026",
-  seoTitle: "Zakat Calculator 2026 — Zakat on Gold, Cash & Savings with Today’s Nisab in Pakistan",
+  seoTitle: "Zakat Calculator 2026: Zakat on Gold, Cash & Savings with Today’s Nisab in Pakistan",
   shortName: "Zakat",
   description: "Calculate zakat on gold, silver, cash, savings and investments using today’s nisab in Pakistani rupees. Choose the silver or gold nisab and see exactly what is due.",
   keywords: ["zakat calculator", "zakat calculator pakistan", "zakat on gold", "nisab 2026", "nisab in pakistan", "zakat on savings", "zakat on cash", "how to calculate zakat", "zakat percentage", "nisab silver"],
@@ -21,7 +21,7 @@ export const zakatCalculator: ToolDefinition = {
     { key: "investments", label: "Investments, shares, business stock", type: "number", unit: "PKR", default: 0, min: 0, step: 1000 },
     { key: "receivables", label: "Money owed to you (expected back)", type: "number", unit: "PKR", default: 0, min: 0, step: 1000 },
     { key: "debts", label: "Debts due within the year", type: "number", unit: "PKR", default: 0, min: 0, step: 1000, help: "Deducted from your zakatable wealth." },
-    { key: "nisabBasis", label: "Nisab based on", type: "select", options: [{ value: "silver", label: "Silver (612.36 g) — standard in Pakistan" }, { value: "gold", label: "Gold (87.48 g)" }], default: "silver" },
+    { key: "nisabBasis", label: "Nisab based on", type: "select", options: [{ value: "silver", label: "Silver (612.36 g): standard in Pakistan" }, { value: "gold", label: "Gold (87.48 g)" }], default: "silver" },
     { key: "goldPrice", label: "Gold price per gram (24k)", type: "number", unit: "PKR", default: REFERENCE_RATES.goldPerGram24k, min: 0, step: 100 },
     { key: "silverPrice", label: "Silver price per gram", type: "number", unit: "PKR", default: REFERENCE_RATES.silverPerGram, min: 0, step: 1 },
   ],
@@ -59,7 +59,7 @@ export const zakatCalculator: ToolDefinition = {
           title: "Nisab",
           lines: [
             { label: `${basis === "gold" ? "Gold" : "Silver"} nisab today`, value: pkr(nisab) },
-            { label: "Status", value: owes ? "Above nisab — zakat due" : "Below nisab" },
+            { label: "Status", value: owes ? "Above nisab: zakat due" : "Below nisab" },
           ],
         },
       ],
@@ -72,9 +72,9 @@ Nisab is defined in gold (87.48 g ≈ 7.5 tola) or silver (612.36 g ≈ 52.5 tol
 
 Zakatable assets include cash, bank balances, gold and silver (including jewellery, per the majority Hanafi view), trade goods, shares held for trading, and money owed to you that you expect to receive. Debts due within the year are deducted.`,
   faqs: [
-    { question: "Is zakat due on jewellery I wear?", answer: "According to the Hanafi school followed by most Pakistanis, yes — gold and silver jewellery is zakatable at its metal value." },
+    { question: "Is zakat due on jewellery I wear?", answer: "According to the Hanafi school followed by most Pakistanis, yes: gold and silver jewellery is zakatable at its metal value." },
     { question: "What is the nisab in rupees this year?", answer: "It changes with silver and gold prices. This calculator computes it live from the prices entered; the State Bank also announces a silver-based figure each Ramadan for bank deductions." },
-    { question: "Do I pay zakat on my house or car?", answer: "No — assets for personal use are exempt. Property held for sale or rent income (the income, not the property) may be zakatable." },
+    { question: "Do I pay zakat on my house or car?", answer: "No: assets for personal use are exempt. Property held for sale or rent income (the income, not the property) may be zakatable." },
     { question: "Does the bank deduct zakat automatically?", answer: "Banks deduct zakat on savings and PLS accounts above nisab on the 1st of Ramadan unless you have filed a declaration (CZ-50) for exemption." },
   ],
   related: { tools: ["income-tax-calculator", "salary-breakdown-calculator"], entities: ["gold"] },

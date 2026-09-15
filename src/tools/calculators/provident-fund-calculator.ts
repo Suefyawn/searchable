@@ -5,7 +5,7 @@ export const providentFundCalculator: ToolDefinition = {
   slug: "provident-fund-calculator",
   category: "finance",
   name: "Provident Fund Calculator",
-  seoTitle: "Provident Fund Calculator Pakistan — PF Balance at Retirement with Employer Match, Profit Rate & Salary Growth",
+  seoTitle: "Provident Fund Calculator Pakistan: PF Balance at Retirement with Employer Match, Profit Rate & Salary Growth",
   shortName: "Provident fund",
   description: "Project your provident fund: monthly employee and employer contributions on basic salary, the fund's profit rate and annual raises, to see the lump sum at leaving or retirement year by year.",
   keywords: ["provident fund calculator", "pf calculator pakistan", "provident fund calculation", "gp fund calculator", "cp fund calculator", "employer contribution provident fund", "provident fund rules pakistan", "pf withdrawal", "retirement fund calculator pakistan"],
@@ -47,7 +47,7 @@ export const providentFundCalculator: ToolDefinition = {
     const profit = bal - mine - theirs - Math.max(0, num(input, "opening", 0));
     return {
       headline: { label: `Provident fund after ${years} years`, value: pkr(bal), primary: true },
-      summary: `Contributing ${pct(ep, 2)} of a ${pkr(basic0)} basic (${pkr(basic0 * ep)} a month) with a ${pct(rp, 2)} employer match, growing ${pct(raise)} a year and earning ${pct(r)} on the fund, you would have about ${pkr(bal)} — of which ${pkr(mine)} is your money, ${pkr(theirs)} the employer's and ${pkr(profit)} profit.`,
+      summary: `Contributing ${pct(ep, 2)} of a ${pkr(basic0)} basic (${pkr(basic0 * ep)} a month) with a ${pct(rp, 2)} employer match, growing ${pct(raise)} a year and earning ${pct(r)} on the fund, you would have about ${pkr(bal)}, of which ${pkr(mine)} is your money, ${pkr(theirs)} the employer's and ${pkr(profit)} profit.`,
       sections: [
         {
           title: "Where it comes from",

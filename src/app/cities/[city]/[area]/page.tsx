@@ -9,14 +9,14 @@ import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 export const revalidate = 3600;
 type Props = { params: Promise<{ city: string; area: string }> };
 
-/** Area hub, e.g. /cities/lahore/gulberg — categories with listings in the area plus the top-rated ones. */
+/** Area hub, e.g. /cities/lahore/gulberg, categories with listings in the area plus the top-rated ones. */
 export async function generateMetadata({ params }: Props) {
   const { city, area } = await params;
   const geo = await getArea(city, area);
   if (!geo) return {};
   const n = await countBusinesses({ areaId: geo.area.id });
   return buildMetadata({
-    title: `${geo.area.name}, ${geo.city.name} — businesses and services`,
+    title: `${geo.area.name}, ${geo.city.name}: businesses and services`,
     description: `Restaurants, doctors, schools, workshops and more in ${geo.area.name}, ${geo.city.name}, with phone numbers, hours and reviews.`,
     path: `/cities/${geo.city.slug}/${geo.area.slug}`,
     noindex: n < 5,

@@ -64,7 +64,7 @@ export default async function AdminData() {
                   <span className="font-mono text-xs">{r.slug}</span> · {r.status}
                   {r.value !== undefined ? ` · ${number(r.value, 2)}` : ""}
                   {r.previous !== undefined && r.status !== "unchanged" ? ` (was ${number(r.previous, 2)})` : ""}
-                  {r.message ? ` — ${r.message}` : ""}
+                  {r.message ? `, ${r.message}` : ""}
                 </li>
               ))}
               {last.errors.map((e) => (

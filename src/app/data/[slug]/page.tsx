@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Change } from "@/components/data/change";
 import { GoldExtras } from "@/components/data/gold-extras";
 import { LineChart } from "@/components/data/line-chart";
+import { CiteThis, KeyFacts } from "@/components/cite";
 import { ToolCard } from "@/components/cards";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
 import { getSeries, seriesStats } from "@/db/queries/data";
@@ -40,9 +41,10 @@ export async function generateMetadata({ params }: Props) {
   const latest = data.points[data.points.length - 1];
   const value = latest ? (data.series.unit === "%" ? `${number(latest.value, 2)}%` : `${number(latest.value, Number.isInteger(latest.value) ? 0 : 2)} ${data.series.unit}`) : "";
   return buildMetadata({
-    title: `${/today/i.test(data.series.name) ? data.series.name : `${data.series.name} today`}${value ? ` — ${value}` : ""}`,
+    title: `${/today/i.test(data.series.name) ? data.series.name : `${data.series.name} today`}${value ? `: ${value}` : ""}`,
     description: `${data.series.name} in Pakistan with history, source (${data.series.sourceName ?? "official"}) and the date of every change. Updated ${data.series.frequency}.`,
     path: `/data/${slug}`,
+    markdownPath: `/api/md/data/${slug}`,
   });
 }
 
@@ -85,7 +87,7 @@ export default async function SeriesPage({ params }: Props) {
           <div className="surface p-6">
             <p className="text-sm text-2">Latest{latest ? ` · ${formatDate(latest.date)}` : ""}</p>
             <p className="mt-1 flex flex-wrap items-baseline gap-3">
-              <span className="text-4xl font-semibold tabular tracking-tight sm:text-5xl">{latest ? fmt(latest.value) : "—"}</span>
+              <span className="text-4xl font-semibold tabular tracking-tight sm:text-5xl">{latest ? fmt(latest.value) : "-"}</span>
               {latest && series.unit !== "%" ? <span className="text-lg text-3">{series.unit}</span> : null}
               {latest && previous ? <Change latest={latest.value} previous={previous.value} unit={series.unit} /> : null}
             </p>
@@ -94,6 +96,18 @@ export default async function SeriesPage({ params }: Props) {
           <div className="surface p-5 text-brand-700">
             <LineChart points={points.map((p) => ({ date: p.date, value: p.value }))} unit={series.unit} />
           </div>
+          {latest ? (
+            <KeyFacts
+              asOf={latest.date}
+              facts={[
+                { label: series.name.replace(/ today$/i, ""), value: `${fmt(latest.value)} ${series.unit}` },
+                ...(previous ? [{ label: `Change since ${formatDate(previous.date)}`, value: `${latest.value - previous.value >= 0 ? "+" : ""}${fmt(latest.value - previous.value)} ${series.unit}` }] : []),
+                ...(stats ? [{ label: `Lowest on record (${formatDate(stats.first)} to ${formatDate(stats.last)})`, value: `${fmt(stats.min)} ${series.unit}` }, { label: "Highest on record", value: `${fmt(stats.max)} ${series.unit}` }] : []),
+                { label: "Source", value: series.sourceName ?? "Official" },
+                { label: "Updated", value: series.frequency },
+              ]}
+            />
+          ) : null}
           {(slug === "gold-24k-tola" || slug === "gold-22k-tola") && latest ? <GoldExtras slug={slug} latestPerTola={latest.value} date={latest.date} /> : null}
 
           <section>
@@ -131,6 +145,7 @@ export default async function SeriesPage({ params }: Props) {
               </table>
             </div>
           </section>
+          <CiteThis title={series.name} path={`/data/${slug}`} date={latest?.date} markdownPath={`/api/md/data/${slug}`} className="mt-8" />
         </div>
 
         <aside className="space-y-4 self-start lg:sticky lg:top-24">

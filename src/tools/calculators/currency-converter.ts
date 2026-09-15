@@ -13,15 +13,15 @@ const OPEN_MARKET_SELL = 0.008;
 export const currencyConverter: ToolDefinition = {
   slug: "currency-converter",
   category: "finance",
-  name: "USD to PKR Converter — Dollar, Dirham, Riyal, Pound, Euro",
-  seoTitle: "USD to PKR Converter Today — Dollar, Dirham (AED), Riyal (SAR), Pound & Euro to Pakistani Rupee at Interbank, Bank and Open Market Rates",
+  name: "USD to PKR Converter: Dollar, Dirham, Riyal, Pound, Euro",
+  seoTitle: "USD to PKR Converter Today: Dollar, Dirham (AED), Riyal (SAR), Pound & Euro to Pakistani Rupee at Interbank, Bank and Open Market Rates",
   shortName: "Currency converter",
   description: "Convert dollars, dirhams, riyals, pounds and euros to Pakistani rupees at today's interbank rate, and see what a bank remittance or the open market would actually give you.",
   keywords: ["usd to pkr", "dollar to pkr", "dollar rate today", "aed to pkr", "dirham to pkr", "sar to pkr", "riyal to pkr", "gbp to pkr", "pound to pkr", "euro to pkr", "currency converter pakistan", "interbank rate today", "open market dollar rate", "remittance rate"],
   version: "1.0.0",
   lastReviewed: "2026-09-15",
   featured: true,
-  sources: [{ title: "State Bank of Pakistan — daily interbank closing rates", url: "https://www.sbp.org.pk/ecodata/rates/m2m/M2M-Current.asp", publisher: "State Bank of Pakistan" }, { title: "Exchange Companies Association of Pakistan — open market rates", publisher: "ECAP" }],
+  sources: [{ title: "State Bank of Pakistan: daily interbank closing rates", url: "https://www.sbp.org.pk/ecodata/rates/m2m/M2M-Current.asp", publisher: "State Bank of Pakistan" }, { title: "Exchange Companies Association of Pakistan: open market rates", publisher: "ECAP" }],
   fields: [
     { key: "amount", label: "Amount", type: "number", default: 1000, min: 0, step: 10 },
     {
@@ -98,9 +98,9 @@ export const currencyConverter: ToolDefinition = {
   },
   methodology: `Rates come from the **data hub** (SBP interbank closing) and are injected on every page load; you can override them. Three numbers matter in Pakistan:
 
-- **Interbank** — the rate banks trade at and the SBP publishes daily. The benchmark in news and this converter's default.
-- **Bank remittance / TT** — what your bank credits for an inbound transfer; usually a fraction below interbank, sometimes above with government remittance incentives (Roshan Digital Account, Sohni Dharti points).
-- **Open market** — exchange-company counter rates for cash. Selling rate to you is typically 0.5–1.5% above interbank; the gap widens when the rupee is under pressure.
+- **Interbank**, the rate banks trade at and the SBP publishes daily. The benchmark in news and this converter's default.
+- **Bank remittance / TT**, what your bank credits for an inbound transfer; usually a fraction below interbank, sometimes above with government remittance incentives (Roshan Digital Account, Sohni Dharti points).
+- **Open market**, exchange-company counter rates for cash. Selling rate to you is typically 0.5–1.5% above interbank; the gap widens when the rupee is under pressure.
 
 The tool shows typical spreads (−0.25% for bank credits, +0.8% for open-market cash) so you can see the range, not just one number.`,
   faqs: [

@@ -9,7 +9,7 @@ export async function searchOpenImagesAction(query: string) {
   const user = await requireRole("editor");
   const q = z.string().trim().min(2).max(120).parse(query);
   const rl = await rateLimit(`open-images:${user.id}`, 15, 60_000);
-  if (!rl.ok) return { error: "Slow down — 15 searches a minute." as const, results: [] as OpenImage[] };
+  if (!rl.ok) return { error: "Slow down, 15 searches a minute." as const, results: [] as OpenImage[] };
   try {
     const results = await searchOpenImages(q, { limit: 18, minWidth: 900 });
     return { results };

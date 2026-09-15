@@ -39,7 +39,7 @@ export const acRunningCostCalculator: ToolDefinition = {
     const at24 = t.kw * t.dutyFactor * hours * days * rate;
     return {
       headline: { label: "Monthly cost of this AC", value: pkr(cost), primary: true },
-      summary: `A ${t.label} at ${str(input, "temp", "24")}°C uses about ${unitsPerHour.toFixed(2)} units per hour — ${Math.round(units)} units a month for ${hours} h/day.${tempFactor > 1 ? ` Setting 24°C instead would save about ${pkr(cost - at24)}.` : ""}`,
+      summary: `A ${t.label} at ${str(input, "temp", "24")}°C uses about ${unitsPerHour.toFixed(2)} units per hour, ${Math.round(units)} units a month for ${hours} h/day.${tempFactor > 1 ? ` Setting 24°C instead would save about ${pkr(cost - at24)}.` : ""}`,
       sections: [
         {
           title: "Usage",
@@ -64,14 +64,14 @@ export const acRunningCostCalculator: ToolDefinition = {
   methodology: `Units per hour = rated power (kW) × duty factor × temperature factor.
 
 - **Rated power** is the compressor's draw at full load (≈1.4 kW for a 1.5 ton inverter; ≈1.8 kW non-inverter).
-- **Duty factor** reflects that the compressor does not run flat out once the room is cool — around 60% for inverters (they modulate) and 75% for non-inverters (they cycle on/off).
+- **Duty factor** reflects that the compressor does not run flat out once the room is cool, around 60% for inverters (they modulate) and 75% for non-inverters (they cycle on/off).
 - **Temperature factor**: each degree below 24°C raises consumption by roughly 6%.
 
 Multiply by hours and days for monthly units, then by your all-in per-unit rate.`,
   faqs: [
     { question: "How many units does a 1.5 ton AC use per hour?", answer: "About 0.8–1.0 units for an inverter at 24°C and 1.3–1.5 units for a non-inverter, rising as you set the temperature lower." },
-    { question: "Is an inverter AC worth it?", answer: "At 8 hours a day, an inverter typically saves 35–45% versus a non-inverter — usually paying back the price difference within two summers." },
-    { question: "Does 26°C really save money?", answer: "Yes — each degree higher saves roughly 6%. 26°C with a fan is the cheapest comfortable setting." },
+    { question: "Is an inverter AC worth it?", answer: "At 8 hours a day, an inverter typically saves 35–45% versus a non-inverter: usually paying back the price difference within two summers." },
+    { question: "Does 26°C really save money?", answer: "Yes: each degree higher saves roughly 6%. 26°C with a fan is the cheapest comfortable setting." },
   ],
   related: { tools: ["electricity-bill-calculator", "solar-payback-calculator"], entities: ["nepra", "lesco", "k-electric"], businessCategories: ["electricians", "solar-companies"] },
 };

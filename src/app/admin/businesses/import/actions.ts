@@ -6,7 +6,7 @@ import { commitImport, previewImport, type PreviewRow } from "@/lib/import";
 
 export async function previewImportAction(csv: string) {
   await requireRole("editor");
-  if (csv.length > 2_000_000) return { rows: [], header: [], error: "File too large (2 MB max — split it)." };
+  if (csv.length > 2_000_000) return { rows: [], header: [], error: "File too large (2 MB max, split it)." };
   return previewImport(csv);
 }
 

@@ -1,5 +1,5 @@
 /**
- * Income tax slabs for individuals — Income Tax Ordinance 2001, First Schedule, Part I.
+ * Income tax slabs for individuals, Income Tax Ordinance 2001, First Schedule, Part I.
  * Rates live here (not in calculators) so a Finance Act change is a data edit + review date bump.
  *
  * REVIEW EVERY BUDGET (June). Verify against the Finance Act text and FBR's published slab table.
@@ -26,7 +26,7 @@ export const TAX_YEARS: TaxYear[] = [
     label: "Tax Year 2027 (FY 2026-27)",
     effectiveFrom: "2026-07-01",
     source: {
-      title: "Finance Act 2026 — First Schedule, Part I, Division I (salaried slabs revised; s.4AB surcharge withdrawn for salaried)",
+      title: "Finance Act 2026: First Schedule, Part I, Division I (salaried slabs revised; s.4AB surcharge withdrawn for salaried)",
       url: "https://fbr.gov.pk/",
       publisher: "Federal Board of Revenue",
     },
@@ -57,7 +57,7 @@ export const TAX_YEARS: TaxYear[] = [
     label: "Tax Year 2026 (FY 2025-26)",
     effectiveFrom: "2025-07-01",
     source: {
-      title: "Finance Act 2025 — First Schedule, Part I, Division I",
+      title: "Finance Act 2025: First Schedule, Part I, Division I",
       url: "https://fbr.gov.pk/",
       publisher: "Federal Board of Revenue",
     },
@@ -86,7 +86,7 @@ export const TAX_YEARS: TaxYear[] = [
     label: "Tax Year 2025 (FY 2024-25)",
     effectiveFrom: "2024-07-01",
     source: {
-      title: "Finance Act 2024 — First Schedule, Part I, Division I",
+      title: "Finance Act 2024: First Schedule, Part I, Division I",
       url: "https://fbr.gov.pk/",
       publisher: "Federal Board of Revenue",
     },

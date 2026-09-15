@@ -13,7 +13,7 @@ import { slugify, uniqueSlug } from "./slug";
 export const IMPORT_COLUMNS = ["name", "category", "city", "area", "address", "phone", "whatsapp", "website", "email", "description", "tagline", "lat", "lng", "opens", "closes", "closed_days", "services", "price_range"] as const;
 
 export const TEMPLATE_CSV = `${IMPORT_COLUMNS.join(",")}
-"Bundu Khan","restaurants","lahore","gulberg","MM Alam Road, Gulberg III","042-35878888","0300-1234567","https://bundukhan.com","","Lahore's classic barbecue — tikka, kebab and karahi since 1948.","Barbecue since 1948",31.5145,74.3483,"12:00","23:30","","Dine-in;Takeaway;Home delivery",3
+"Bundu Khan","restaurants","lahore","gulberg","MM Alam Road, Gulberg III","042-35878888","0300-1234567","https://bundukhan.com","","Lahore's classic barbecue, tikka, kebab and karahi since 1948.","Barbecue since 1948",31.5145,74.3483,"12:00","23:30","","Dine-in;Takeaway;Home delivery",3
 "Dr Amina Clinic","doctors","karachi","clifton","Block 2, Clifton","021-35837000","","","","Family physician, walk-in and appointments.","",24.8138,67.0304,"10:00","20:00","Sun","Consultation;Vaccination",2
 `;
 
@@ -122,7 +122,7 @@ export async function previewImport(csv: string): Promise<{ rows: PreviewRow[]; 
     const city = findCity(d.city);
     if (!city) problems.push(`Unknown city "${d.city}"`);
     const area = city && d.area ? (areasByCity.get(city.id) ?? []).find((a) => a.slug === slugify(d.area) || a.name.toLowerCase() === d.area.toLowerCase()) : undefined;
-    if (city && d.area && !area) problems.push(`Area "${d.area}" not found in ${city.name} — will import without area`);
+    if (city && d.area && !area) problems.push(`Area "${d.area}" not found in ${city.name}, will import without area`);
     const phone = normalizePhone(d.phone);
     if (d.phone && !phone) problems.push(`Phone "${d.phone}" is not a valid Pakistani number`);
     const whatsapp = normalizePhone(d.whatsapp);

@@ -6,13 +6,13 @@ Two tracks run every day. Track A builds the product; Track B fills it. Neither 
 
 | Block | Track | Work |
 |---|---|---|
-| Morning (90 min) | B — Research | Scan: Dawn/Tribune/Business Recorder/ProPakistani, FBR/SBP/PTA/OGRA/NEPRA notices, Google Trends PK, X/Reddit PK. Capture 5–10 candidate stories in `/admin/research`. |
-| Morning (2 h) | B — Publish | 3–5 news pieces (300–600 words, each linking to ≥ 1 tool/guide/entity) + 1 evergreen guide (or a refresh of an existing one). |
-| Midday (45 min) | B — Data/Tools | Update any changed rate (petrol, FX, gold, tariff). Ship or update 1 tool every 2 days. |
-| Afternoon (60 min) | B — Directory | Add 10 businesses, verify 5 by phone/WhatsApp, process claims/submissions, moderate reviews. |
-| Late afternoon (3 h) | A — Product | Feature work per roadmap; bugs; performance; SEO fixes from GSC. |
-| Evening (30 min) | B — Distribution | Social posts (X, Facebook, LinkedIn, WhatsApp channel) from today's content. |
-| Night (30 min) | B — Newsletter | Assemble tomorrow's Searchable Daily (auto-draft from the day's content; human edit). |
+| Morning (90 min) | B: Research | Scan: Dawn/Tribune/Business Recorder/ProPakistani, FBR/SBP/PTA/OGRA/NEPRA notices, Google Trends PK, X/Reddit PK. Capture 5–10 candidate stories in `/admin/research`. |
+| Morning (2 h) | B: Publish | 3–5 news pieces (300–600 words, each linking to ≥ 1 tool/guide/entity) + 1 evergreen guide (or a refresh of an existing one). |
+| Midday (45 min) | B: Data/Tools | Update any changed rate (petrol, FX, gold, tariff). Ship or update 1 tool every 2 days. |
+| Afternoon (60 min) | B: Directory | Add 10 businesses, verify 5 by phone/WhatsApp, process claims/submissions, moderate reviews. |
+| Late afternoon (3 h) | A: Product | Feature work per roadmap; bugs; performance; SEO fixes from GSC. |
+| Evening (30 min) | B: Distribution | Social posts (X, Facebook, LinkedIn, WhatsApp channel) from today's content. |
+| Night (30 min) | B: Newsletter | Assemble tomorrow's Searchable Daily (auto-draft from the day's content; human edit). |
 
 ## Weekly cadence
 
@@ -45,9 +45,9 @@ Traffic (organic / direct / referral / social) · GSC impressions, clicks, CTR, 
 Title (≤ 70 chars, specific, no clickbait)
 Dek (1 sentence: what changed and why it matters)
 What happened (2–3 short paragraphs)
-What it means for you (bullets — the useful part)
-Numbers (if any) — link to data series / tool
-What to do next — link to guide / tool / businesses
+What it means for you (bullets, the useful part)
+Numbers (if any), link to data series / tool
+What to do next, link to guide / tool / businesses
 Sources
 Related: 1 tool · 1 guide · 1 entity · 1 category × city page
 ```

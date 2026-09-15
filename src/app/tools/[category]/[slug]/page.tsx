@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { Suspense } from "react";
 import { ArticleCard, ToolCard } from "@/components/cards";
+import { CiteThis } from "@/components/cite";
 import { EmbedMode, EmbedSnippet } from "@/components/tools/embed";
 import { ToolRunner } from "@/components/tools/tool-runner";
 import { Badge, Breadcrumbs, JsonLd } from "@/components/ui";
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const tool = getTool(slug);
   if (!tool) return {};
-  return buildMetadata({ title: tool.seoTitle ?? tool.name, description: tool.description, path: toolUrl(tool), kicker: `${TOOL_CATEGORIES[tool.category].name} calculator` });
+  return buildMetadata({ title: tool.seoTitle ?? tool.name, description: tool.description, path: toolUrl(tool), kicker: `${TOOL_CATEGORIES[tool.category].name} calculator`, markdownPath: `/api/md${toolUrl(tool)}` });
 }
 
 export default async function ToolPage({ params }: Props) {
@@ -113,13 +114,14 @@ export default async function ToolPage({ params }: Props) {
                   ) : (
                     s.title
                   )}
-                  {s.publisher ? <span className="text-3"> — {s.publisher}</span> : null}
+                  {s.publisher ? <span className="text-3">: {s.publisher}</span> : null}
                 </li>
               ))}
             </ul>
             <p className="mt-4 text-3">
               Version {tool.version} · reviewed {formatDate(tool.lastReviewed)}. Rates change with the Federal Budget and regulator notifications; we update this tool when they do. Confirm with the primary source before making financial decisions.
             </p>
+            <CiteThis title={tool.name} path={toolUrl(tool)} date={tool.lastReviewed} markdownPath={`/api/md${toolUrl(tool)}`} className="mt-4" />
           </section>
 
           {entities.length ? (

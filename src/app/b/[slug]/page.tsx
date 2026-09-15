@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props) {
   const b = await getBusiness(slug);
   if (!b || b.status !== "active") return {};
   return buildMetadata({
-    title: `${b.name}${b.city ? ` — ${b.primaryCategory?.name ?? "Business"} in ${b.city.name}` : ""}`,
+    title: `${b.name}${b.city ? `: ${b.primaryCategory?.name ?? "Business"} in ${b.city.name}` : ""}`,
     description: b.tagline ?? b.description ?? `${b.name}: address, phone, WhatsApp, opening hours and reviews.`,
     path: `/b/${b.slug}`,
     image: b.coverUrl ?? b.logoUrl,
@@ -158,7 +158,7 @@ export default async function BusinessPage({ params }: Props) {
                 ))}
               </ul>
             ) : (
-              <p className="mt-2 text-[15px] text-2">No reviews yet. Be the first — reviews are checked before they appear and are never paid for.</p>
+              <p className="mt-2 text-[15px] text-2">No reviews yet. Be the first: reviews are checked before they appear and are never paid for.</p>
             )}
             <div className="mt-5 surface p-5">
               <h3 className="font-semibold">Write a review</h3>

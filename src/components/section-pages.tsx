@@ -11,8 +11,8 @@ import { fetchPress, groupBySource } from "@/lib/press";
 import { timeAgo } from "@/lib/format";
 
 const META: Record<"news" | "guide", { section: string; name: string; title: string; description: string }> = {
-  news: { section: "news", name: "News", title: "Pakistan news — with the useful context", description: "What changed, what it means for you, and what to do next. Business, economy, technology, cars, property and more." },
-  guide: { section: "guides", name: "Guides", title: "Guides — how things actually work in Pakistan", description: "Step-by-step guides for taxes, banking, cars, property, government processes and utilities. With fees, timelines and the mistakes to avoid." },
+  news: { section: "news", name: "News", title: "Pakistan news: with the useful context", description: "What changed, what it means for you, and what to do next. Business, economy, technology, cars, property and more." },
+  guide: { section: "guides", name: "Guides", title: "Guides: how things actually work in Pakistan", description: "Step-by-step guides for taxes, banking, cars, property, government processes and utilities. With fees, timelines and the mistakes to avoid." },
 };
 
 const PAGE_SIZE = 18;
@@ -20,7 +20,7 @@ const PAGE_SIZE = 18;
 /* ───────────── Section hub (/news, /guides) ───────────── */
 export function sectionMetadata(kind: "news" | "guide", page = 1): Metadata {
   const m = META[kind];
-  return buildMetadata({ title: page > 1 ? `${m.title} — page ${page}` : m.title, description: m.description, path: page > 1 ? `/${m.section}/page/${page}` : `/${m.section}` });
+  return buildMetadata({ title: page > 1 ? `${m.title}: page ${page}` : m.title, description: m.description, path: page > 1 ? `/${m.section}/page/${page}` : `/${m.section}` });
 }
 
 export async function SectionHub({ kind, page = 1 }: { kind: "news" | "guide"; page?: number }) {
@@ -81,7 +81,7 @@ export async function categoryMetadata(kind: "news" | "guide", slug: string, pag
   if (!cat) return {};
   const m = META[kind];
   const base = `/${m.section}/${cat.slug}`;
-  return buildMetadata({ title: `${cat.name} ${m.name.toLowerCase()}${page > 1 ? ` — page ${page}` : ""}`, description: cat.description ?? `${cat.name} — ${m.description}`, path: page > 1 ? `${base}/page/${page}` : base });
+  return buildMetadata({ title: `${cat.name} ${m.name.toLowerCase()}${page > 1 ? `: page ${page}` : ""}`, description: cat.description ?? `${cat.name}: ${m.description}`, path: page > 1 ? `${base}/page/${page}` : base });
 }
 
 export async function CategoryPage({ kind, slug, page = 1 }: { kind: "news" | "guide"; slug: string; page?: number }) {
@@ -98,7 +98,7 @@ export async function CategoryPage({ kind, slug, page = 1 }: { kind: "news" | "g
       <SectionHeader as="h1" title={cat.name} description={cat.description ?? undefined} />
       <CategoryNav section={m.section} categories={categories} active={slug} />
       <div className="mt-8">
-        <ArticleListing items={items} emptyText={`Nothing in ${cat.name} yet — check back soon.`} />
+        <ArticleListing items={items} emptyText={`Nothing in ${cat.name} yet, check back soon.`} />
       </div>
       <Pagination base={`/${m.section}/${cat.slug}`} page={page} total={total} />
     </div>
@@ -120,6 +120,7 @@ export async function articleMetadata(kind: "news" | "guide", category: string, 
     modifiedTime: a.updatedAt,
     noindex: a.noindex,
     kicker: a.category?.name ?? m.name,
+    markdownPath: `/api/md/${m.section}/${a.category?.slug ?? category}/${a.slug}`,
   });
 }
 

@@ -28,7 +28,7 @@ export type ToolInput = Record<string, number | string | boolean>;
 export type ResultLine = {
   label: string;
   value: string;
-  /** Visually emphasised — the headline number. */
+  /** Visually emphasised, the headline number. */
   primary?: boolean;
   /** Sub-detail, rendered smaller. */
   muted?: boolean;

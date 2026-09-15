@@ -22,7 +22,7 @@ function faqsFor(d: ReturnType<typeof getDisco> & object) {
     { question: `Where is the reference number on a ${d.short} bill?`, answer: "It is the 14-digit number at the top-left of the bill, usually labelled Reference No. It stays the same every month for your connection." },
     { question: `What is the ${d.short} helpline?`, answer: `Dial ${d.helpline} for outages, complaints and billing queries. Complaints can also be lodged through the company's website and the PITC complaint portal.` },
     { question: `Why is my ${d.short} bill so high this month?`, answer: "Above 200 units the entire consumption is billed at the higher slab rate; fuel price adjustment and quarterly adjustments are added on top. Use the bill calculator below to see exactly how your units turn into rupees." },
-    { question: `Is the ${d.short} per-unit price different from other companies?`, answer: "No — NEPRA sets a uniform residential tariff for all distribution companies. Only K-Electric's tariff is determined separately, and it tracks the same schedule." },
+    { question: `Is the ${d.short} per-unit price different from other companies?`, answer: "No: NEPRA sets a uniform residential tariff for all distribution companies. Only K-Electric's tariff is determined separately, and it tracks the same schedule." },
   ];
 }
 
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props) {
   const d = getDisco(disco);
   if (!d) return {};
   return buildMetadata({
-    title: `${d.short} Bill Check Online — Check ${d.short} Bill by Reference Number, Calculate & Pay`,
+    title: `${d.short} Bill Check Online: Check ${d.short} Bill by Reference Number, Calculate & Pay`,
     description: `Check your ${d.short} electricity bill online in seconds using the reference number, see the current per-unit price, calculate your bill from units, and find the ${d.short} helpline. Covers ${d.cities.slice(0, 4).join(", ")}.`,
     path: `/electricity/${d.slug}`,
     kicker: "Electricity",
@@ -77,7 +77,7 @@ export default async function DiscoPage({ params }: Props) {
 
           <section>
             <h2 className="font-serif text-2xl">{d.short} per-unit price (residential, {formatDate(ELECTRICITY.reviewedAt, { month: "long", year: "numeric" })})</h2>
-            <p className="mt-2 text-[15px] text-2">NEPRA’s uniform tariff applies to {d.short}. Energy charge only — GST ({ELECTRICITY.gstRate * 100}%), FC surcharge (Rs {ELECTRICITY.fcSurchargePerUnit}/unit), electricity duty and fuel price adjustment are added on the bill.</p>
+            <p className="mt-2 text-[15px] text-2">NEPRA’s uniform tariff applies to {d.short}. Energy charge only: GST ({ELECTRICITY.gstRate * 100}%), FC surcharge (Rs {ELECTRICITY.fcSurchargePerUnit}/unit), electricity duty and fuel price adjustment are added on the bill.</p>
             <div className="mt-4 grid gap-6 sm:grid-cols-2">
               <table className="w-full text-[15px]">
                 <caption className="mb-1 text-left text-xs font-bold uppercase tracking-[0.12em] text-3">Unprotected consumers</caption>

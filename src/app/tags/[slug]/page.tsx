@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const data = await listArticlesByTag(slug, 5);
   if (!data) return {};
-  return buildMetadata({ title: `${data.tag.name} — news and guides`, description: `Everything tagged ${data.tag.name} on Searchable.`, path: `/tags/${slug}`, noindex: data.items.length < 3, kicker: "Tag" });
+  return buildMetadata({ title: `${data.tag.name}: news and guides`, description: `Everything tagged ${data.tag.name} on Searchable.`, path: `/tags/${slug}`, noindex: data.items.length < 3, kicker: "Tag" });
 }
 
 export default async function TagPage({ params }: Props) {

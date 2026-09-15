@@ -1,6 +1,6 @@
-# Searchable.pk — 1,000-Day Roadmap
+# Searchable.pk: 1,000-Day Roadmap
 
-> Day 0 = 2026-09-15. Days are calendar days. Every phase has **deliverables**, **exit criteria**, and a **content track** that runs in parallel — the site is never empty while the product is being built.
+> Day 0 = 2026-09-15. Days are calendar days. Every phase has **deliverables**, **exit criteria**, and a **content track** that runs in parallel, the site is never empty while the product is being built.
 >
 > Guiding rule: *build the full architecture early, populate progressively.*
 
@@ -23,14 +23,14 @@
 
 ---
 
-## Phase 1 — Local prototype (Days 1–30)  ← **WE ARE HERE**
+## Phase 1: Local prototype (Days 1–30)  ← **WE ARE HERE**
 
 Everything runs on this machine with **PGlite** (embedded Postgres). No accounts, no hosting, no cost. The goal is a prototype good enough to judge the product, not a demo.
 
 ### Week 1 (Days 1–7): Foundation
 - [x] Repo, Next.js 16, TypeScript strict, Tailwind v4, ESLint
 - [x] Drizzle schema for all Phase 1–2 entities (content, tools, directory, locations, entities, newsletter, search, platform)
-- [x] DB client factory: `pglite://` locally, `postgres://` in production — same code
+- [x] DB client factory: `pglite://` locally, `postgres://` in production, same code
 - [x] Migrations + seed script with realistic Pakistani data
 - [x] better-auth (email/password) with `role` on users; admin gate
 - [x] Design system: tokens, typography, primitives (button, input, card, badge, nav, footer, empty/loading states)
@@ -70,7 +70,7 @@ Everything runs on this machine with **PGlite** (embedded Postgres). No accounts
 
 ---
 
-## Phase 2 — Go live (Days 31–45)
+## Phase 2: Go live (Days 31–45)
 
 | Day | Task |
 |---|---|
@@ -92,7 +92,7 @@ See `docs/LOCAL-TO-PRODUCTION.md` for the exact checklist.
 
 ---
 
-## Phase 3 — Content engines (Days 46–100)
+## Phase 3: Content engines (Days 46–100)
 
 **Product**
 - News categories: Pakistan · Politics · Business · Economy · Technology · AI · Science · Sports · Education · Health · Auto · Property · Lifestyle · World
@@ -110,7 +110,7 @@ See `docs/LOCAL-TO-PRODUCTION.md` for the exact checklist.
 
 ---
 
-## Phase 4 — Directory + locations (Days 101–200)
+## Phase 4: Directory + locations (Days 101–200)
 
 - Business owner accounts: add / claim / verify (phone OTP + document), owner dashboard (edit, hours, services, photos, respond to reviews, leads, analytics)
 - Location engine: full Pakistan hierarchy (provinces → 100+ cities → major areas), lat/lng, "near me"
@@ -123,7 +123,7 @@ See `docs/LOCAL-TO-PRODUCTION.md` for the exact checklist.
 
 ---
 
-## Phase 5 — Search intelligence + newsletter (Days 201–300)
+## Phase 5: Search intelligence + newsletter (Days 201–300)
 
 **Search**
 - Query understanding: intent (tool / place / explainer / number / story), entity + location extraction, category detection
@@ -131,7 +131,7 @@ See `docs/LOCAL-TO-PRODUCTION.md` for the exact checklist.
 - Result blending rules per intent (e.g. "tax" → tool first; "near me" → businesses first)
 - Search analytics dashboard: zero-result queries → content backlog
 
-**Newsletter — Searchable Daily**
+**Newsletter, Searchable Daily**
 - Issue builder in admin (auto-assembled from the day's content + data + tool of the day; human edits)
 - Preferences: daily/weekly, topics
 - Resend broadcast + tracking; double opt-in; unsubscribe; suppression list
@@ -141,7 +141,7 @@ See `docs/LOCAL-TO-PRODUCTION.md` for the exact checklist.
 
 ---
 
-## Phase 6 — Data · Compare · Local search · Trust (Days 301–500)
+## Phase 6: Data · Compare · Local search · Trust (Days 301–500)
 
 - **Data platform:** `data_series` for petrol/diesel/HSD, gold (24k/22k per tola/10g), FX (USD/GBP/EUR/AED/SAR), policy rate, CPI, electricity tariffs, gas tariffs; ingestion jobs; history charts; JSON API; every series feeds a page + tool + auto-article on change
 - **Compare:** cars, banks/accounts, credit cards, internet packages, mobile packages, universities, solar systems, insurance; structured spec tables + editorial verdict
@@ -153,19 +153,19 @@ See `docs/LOCAL-TO-PRODUCTION.md` for the exact checklist.
 
 ---
 
-## Phase 7 — Jobs · Events · Deals · Monetization (Days 501–700)
+## Phase 7: Jobs · Events · Deals · Monetization (Days 501–700)
 
 - `/jobs`: business posts job; filters (city, remote, salary, industry, experience); alerts
 - `/events`: categories, city pages, calendar, submissions
 - `/deals`: business-published promotions with expiry; deal alerts by city/category
 - Business tiers: Free → Verified → Premium → Sponsored; lead marketplace; newsletter sponsorship; category sponsorship
-- Billing (Stripe where possible; local gateways — Safepay / PayFast — for PKR)
+- Billing (Stripe where possible; local gateways, Safepay / PayFast, for PKR)
 
 **Exit criteria:** Recurring monthly revenue; 50,000 businesses; 250 tools; 3,000 articles.
 
 ---
 
-## Phase 8 — Ask Searchable + personalization (Days 701–850)
+## Phase 8: Ask Searchable + personalization (Days 701–850)
 
 - **Ask Searchable:** retrieval-grounded assistant over Searchable's own index; tool-calling (runs calculators), directory queries, data lookups, guide citations; refuses to answer outside the index
 - Accounts become useful: follow cities/topics/businesses/entities; saved tools/guides/businesses/jobs; "My Searchable" feed; personalised newsletter
@@ -174,12 +174,12 @@ See `docs/LOCAL-TO-PRODUCTION.md` for the exact checklist.
 
 ---
 
-## Phase 9 — Mobile · Scale · 1.0 (Days 851–1000)
+## Phase 9: Mobile · Scale · 1.0 (Days 851–1000)
 
 - PWA excellence (offline tools, installable, push for followed topics); evaluate native apps
 - Infra: Redis cache, queues/background workers, dedicated search engine if measured need, image CDN, read replicas, rate limiting, WAF, DR drills
 - Data/API products for businesses and developers
-- **Searchable 1.0** — the ecosystem in the spec, mature.
+- **Searchable 1.0**, the ecosystem in the spec, mature.
 
 ---
 

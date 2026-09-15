@@ -8,9 +8,9 @@ export const nationalSavingsCalculator: ToolDefinition = {
   slug: "national-savings-calculator",
   category: "finance",
   name: "National Savings Profit Calculator (Behbood, RIC, DSC)",
-  seoTitle: "National Savings Profit Calculator 2026 — Behbood, Regular Income, Defence Savings & Special Savings Certificates, Monthly Profit After Tax",
+  seoTitle: "National Savings Profit Calculator 2026: Behbood, Regular Income, Defence Savings & Special Savings Certificates, Monthly Profit After Tax",
   shortName: "National Savings",
-  description: "Monthly and yearly profit on National Savings certificates and accounts at the rates effective 18 July 2026 — Behbood, Pensioners' Benefit, Regular Income, Defence Savings, Special Savings — after withholding tax for filers and non-filers.",
+  description: "Monthly and yearly profit on National Savings certificates and accounts at the rates effective 18 July 2026, Behbood, Pensioners' Benefit, Regular Income, Defence Savings, Special Savings, after withholding tax for filers and non-filers.",
   keywords: ["national savings profit calculator", "behbood certificate profit calculator", "regular income certificate profit", "defence saving certificate calculator", "national savings rates 2026", "behbood profit rate", "ric profit rate", "national savings monthly profit", "qaumi bachat", "savings certificates pakistan"],
   version: "1.0.0",
   lastReviewed: NSC.reviewedAt,
@@ -22,7 +22,7 @@ export const nationalSavingsCalculator: ToolDefinition = {
       key: "scheme",
       label: "Scheme",
       type: "select",
-      options: (Object.keys(NSC.schemes) as SchemeKey[]).map((k) => ({ value: k, label: `${NSC.schemes[k].name} — ${pct(NSC.schemes[k].rate, 2)}` })),
+      options: (Object.keys(NSC.schemes) as SchemeKey[]).map((k) => ({ value: k, label: `${NSC.schemes[k].name}: ${pct(NSC.schemes[k].rate, 2)}` })),
       default: "ric",
     },
     {
@@ -49,13 +49,13 @@ export const nationalSavingsCalculator: ToolDefinition = {
     if (amount < sc.min) warnings.push(`Minimum investment in ${sc.name} is ${pkr(sc.min)}.`);
 
     if (key === "dsc") {
-      // Compounding to maturity; DSC pays at encashment with year-by-year tables — annual compounding approximates them.
+      // Compounding to maturity; DSC pays at encashment with year-by-year tables, annual compounding approximates them.
       const maturity = amount * Math.pow(1 + sc.rate, years);
       const profit = maturity - amount;
       const tax = profit * wht;
       return {
         headline: { label: `Value after ${years} years`, value: pkr(maturity - tax), primary: true },
-        summary: `${pkr(amount)} in Defence Savings Certificates grows to about ${pkr(maturity)} in ${years} years at ${pct(sc.rate, 2)} compounded — ${pkr(profit)} profit, ${pkr(tax)} withheld at encashment as a ${filer ? "filer" : "non-filer"}. Profit is not paid out until you encash.`,
+        summary: `${pkr(amount)} in Defence Savings Certificates grows to about ${pkr(maturity)} in ${years} years at ${pct(sc.rate, 2)} compounded, ${pkr(profit)} profit, ${pkr(tax)} withheld at encashment as a ${filer ? "filer" : "non-filer"}. Profit is not paid out until you encash.`,
         sections: [
           { title: "At encashment", lines: [{ label: "Invested", value: pkr(amount) }, { label: `Profit (${pct(sc.rate, 2)} compounded, ${years} years)`, value: pkr(profit) }, { label: `Withholding tax (${pct(wht)})`, value: `− ${pkr(tax)}` }, { label: "You receive", value: pkr(maturity - tax), primary: true }] },
           { title: "Growth", lines: Array.from({ length: Math.min(years, 10) }, (_, i) => ({ label: `After year ${i + 1}`, value: pkr(amount * Math.pow(1 + sc.rate, i + 1)), muted: true })) },
@@ -71,7 +71,7 @@ export const nationalSavingsCalculator: ToolDefinition = {
     const netPer = perPayout - taxPer;
     return {
       headline: { label: sc.payout === "monthly" ? "Monthly profit after tax" : sc.payout === "half-yearly" ? "Half-yearly profit after tax" : "Profit at maturity after tax", value: pkr(netPer), primary: true },
-      summary: `${pkr(amount)} in ${sc.name} earns ${pct(sc.rate, 2)} a year — ${pkr(yearly)} gross. ${sc.whtExempt ? "No withholding tax is deducted on this scheme." : `Withholding of ${pct(wht)} as a ${filer ? "filer" : "non-filer"} leaves ${pkr(yearly - yearly * wht)} a year`}, or ${pkr(netPer)} per ${sc.payout === "monthly" ? "month" : sc.payout === "half-yearly" ? "half-year" : "term"}. Over ${years} years: ${pkr((yearly - yearly * wht) * years)} net.`,
+      summary: `${pkr(amount)} in ${sc.name} earns ${pct(sc.rate, 2)} a year, ${pkr(yearly)} gross. ${sc.whtExempt ? "No withholding tax is deducted on this scheme." : `Withholding of ${pct(wht)} as a ${filer ? "filer" : "non-filer"} leaves ${pkr(yearly - yearly * wht)} a year`}, or ${pkr(netPer)} per ${sc.payout === "monthly" ? "month" : sc.payout === "half-yearly" ? "half-year" : "term"}. Over ${years} years: ${pkr((yearly - yearly * wht) * years)} net.`,
       sections: [
         {
           title: "Per payout",
@@ -91,7 +91,7 @@ export const nationalSavingsCalculator: ToolDefinition = {
         },
         { title: "Eligibility", lines: [{ label: sc.name, value: sc.who, muted: true }, { label: "Term", value: sc.term, muted: true }] },
       ],
-      warnings: [...warnings, "Profit on National Savings is taxable income; the withholding is adjustable for filers. Rates are revised by the government every few months — the date above is when this tool was checked."],
+      warnings: [...warnings, "Profit on National Savings is taxable income; the withholding is adjustable for filers. Rates are revised by the government every few months, the date above is when this tool was checked."],
     };
   },
   methodology: `National Savings (Qaumi Bachat) schemes pay fixed profit rates set by the Ministry of Finance, revised periodically with government bond yields. Rates effective **18 July 2026**:
@@ -110,7 +110,7 @@ export const nationalSavingsCalculator: ToolDefinition = {
 **Tax:** profit on debt is withheld at 15% for filers and 35% for non-filers (s.151), adjustable against your income tax. Behbood and Pensioners' Benefit are exempt from withholding and taxed at a concessional rate for filers.`,
   faqs: [
     { question: "What is the Behbood certificate profit on 10 lakh?", answer: "At 12.96% a Rs 10 lakh Behbood investment pays Rs 10,800 a month with no withholding tax. It is only open to people aged 60+, widows and persons with disabilities, capped at Rs 75 lakh." },
-    { question: "Which National Savings scheme pays the most?", answer: "Behbood, Pensioners' Benefit and Shuhada Family Welfare at 12.96% — but each is restricted to a group. For everyone else, Regular Income Certificates at 11.52% paid monthly are the highest general scheme." },
+    { question: "Which National Savings scheme pays the most?", answer: "Behbood, Pensioners' Benefit and Shuhada Family Welfare at 12.96%: but each is restricted to a group. For everyone else, Regular Income Certificates at 11.52% paid monthly are the highest general scheme." },
     { question: "Is National Savings profit taxable?", answer: "Yes. It counts as income; tax is withheld at source (15% filer / 35% non-filer) and adjusted when you file. Non-filers lose more than a third of their profit to withholding." },
     { question: "Can I withdraw early?", answer: "Certificates can be encashed early with a reduced rate or service charge depending on the scheme; Behbood and RIC charge a penalty in the first year. Savings accounts are withdrawable any time." },
   ],

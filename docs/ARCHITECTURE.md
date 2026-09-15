@@ -8,9 +8,9 @@ One Next.js 16 application serves everything: public site, admin, business dashb
 ┌─────────────────────────────────────────────────────────────┐
 │  Next.js 16 (App Router)                                    │
 │                                                             │
-│  src/app/(site)      public pages  — RSC, cached, SEO       │
-│  src/app/admin       CMS + ops     — server actions, auth   │
-│  src/app/api         JSON + auth   — route handlers         │
+│  src/app/(site)      public pages , RSC, cached, SEO       │
+│  src/app/admin       CMS + ops    , server actions, auth   │
+│  src/app/api         JSON + auth  , route handlers         │
 │                                                             │
 │  src/lib             domain logic (content, directory,      │
 │                      search, seo, newsletter, geo)          │
@@ -51,7 +51,7 @@ A `globalThis` singleton prevents duplicate PGlite instances across HMR. `@elect
 
 ## Caching
 
-- Public pages: `revalidate` (ISR) with tag-based invalidation — publishing an article calls `revalidateTag('articles')` and the specific path.
+- Public pages: `revalidate` (ISR) with tag-based invalidation, publishing an article calls `revalidateTag('articles')` and the specific path.
 - Search: no cache (personal, cheap in Postgres). Suggest endpoint: 60s.
 - Data series (Phase 2): cache until next ingestion.
 
@@ -68,7 +68,7 @@ A `globalThis` singleton prevents duplicate PGlite instances across HMR. `@elect
 
 ## SEO plumbing
 
-`src/lib/seo.ts` — `buildMetadata()` (title template, canonical, OG, Twitter), `jsonLd()` helpers per schema type, `breadcrumbs()`. `src/app/sitemap.ts` composes per-type sitemaps; `src/app/robots.ts`.
+`src/lib/seo.ts`, `buildMetadata()` (title template, canonical, OG, Twitter), `jsonLd()` helpers per schema type, `breadcrumbs()`. `src/app/sitemap.ts` composes per-type sitemaps; `src/app/robots.ts`.
 
 ## Observability
 

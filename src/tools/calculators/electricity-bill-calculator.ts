@@ -26,7 +26,7 @@ export const electricityBillCalculator: ToolDefinition = {
   slug: "electricity-bill-calculator",
   category: "utilities",
   name: "Electricity Bill Calculator (LESCO, IESCO, MEPCO, K-Electric)",
-  seoTitle: "LESCO Bill Calculator — Electricity Bill Calculator Pakistan with Per-Unit Price 2026",
+  seoTitle: "LESCO Bill Calculator: Electricity Bill Calculator Pakistan with Per-Unit Price 2026",
   shortName: "Electricity Bill",
   description: "Electricity bill calculator for LESCO, IESCO, MEPCO, GEPCO, FESCO, PESCO and K-Electric. Enter units to see your bill with the current per-unit price, GST, FC surcharge and duties.",
   keywords: ["lesco bill calculator", "electricity bill calculator", "electricity bill calculator pakistan", "iesco bill calculator", "mepco bill calculator", "k electric bill calculator", "per unit electricity price in pakistan", "electricity unit price in pakistan 2026", "electricity rates in pakistan", "lesco tariff", "units to bill", "bijli bill"],
@@ -83,13 +83,13 @@ export const electricityBillCalculator: ToolDefinition = {
       ],
       warnings: [
         "Quarterly tariff adjustments, income-tax withholding for non-filers, and arrears are not included. Treat this as a close estimate, not your exact bill.",
-        units > 200 && consumer === "unprotected" ? "Above 200 units the whole consumption is billed at the higher slab rate — reducing usage below a slab boundary can cut the bill sharply." : "",
+        units > 200 && consumer === "unprotected" ? "Above 200 units the whole consumption is billed at the higher slab rate, reducing usage below a slab boundary can cut the bill sharply." : "",
       ].filter(Boolean),
     };
   },
   methodology: `Your bill = **energy charge** (units × slab rate) + **fuel price adjustment** + **financing-cost surcharge** + **electricity duty** (provincial, 1.5% of the variable charge) + **GST** (17%) + fixed fees.
 
-NEPRA sets a uniform residential tariff for all distribution companies (LESCO, IESCO, GEPCO, FESCO, MEPCO, PESCO, HESCO, SEPCO, QESCO, TESCO and K-Electric). **Protected** consumers — those who have used 200 units or less for six consecutive months — pay heavily subsidised slab rates. Everyone else is **unprotected**.
+NEPRA sets a uniform residential tariff for all distribution companies (LESCO, IESCO, GEPCO, FESCO, MEPCO, PESCO, HESCO, SEPCO, QESCO, TESCO and K-Electric). **Protected** consumers, those who have used 200 units or less for six consecutive months, pay heavily subsidised slab rates. Everyone else is **unprotected**.
 
 For unprotected consumers using more than 200 units, the entire consumption is billed at the rate of the slab reached (the previous "slab benefit" no longer applies), which is why crossing 300 or 400 units produces a jump in the bill.`,
   faqs: [

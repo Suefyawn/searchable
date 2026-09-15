@@ -15,6 +15,6 @@ export async function assertDevServerStopped() {
       process.exit(1);
     }
   } catch {
-    /* nothing listening — safe to proceed */
+    /* nothing listening, safe to proceed */
   }
 }

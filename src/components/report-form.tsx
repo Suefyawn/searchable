@@ -27,7 +27,7 @@ export function ReportForm({ targetType, targetId, label = "Report a problem" }:
   const [open, setOpen] = React.useState(false);
   const [state, setState] = React.useState<"idle" | "saving" | "done" | "error">("idle");
   const [error, setError] = React.useState("");
-  if (state === "done") return <p className="text-sm text-2">Thanks — we will check it.</p>;
+  if (state === "done") return <p className="text-sm text-2">Thanks: we will check it.</p>;
   if (!open)
     return (
       <button type="button" onClick={() => setOpen(true)} className="text-sm text-3 underline underline-offset-4 hover:text-[var(--text)]">

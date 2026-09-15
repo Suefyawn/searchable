@@ -35,7 +35,7 @@ export const salaryBreakdownCalculator: ToolDefinition = {
 
     return {
       headline: { label: "Monthly take-home", value: pkr(net), primary: true },
-      summary: `Of your ${pkr(gross)} gross, ${pkr(gross - net)} (${pct((gross - net) / gross)}) goes to tax and deductions. Your provident fund still belongs to you — it is savings, not a cost.`,
+      summary: `Of your ${pkr(gross)} gross, ${pkr(gross - net)} (${pct((gross - net) / gross)}) goes to tax and deductions. Your provident fund still belongs to you, it is savings, not a cost.`,
       sections: [
         {
           title: "Monthly deductions",
@@ -62,7 +62,7 @@ export const salaryBreakdownCalculator: ToolDefinition = {
   },
   methodology: `Take-home = gross − income tax − provident fund − EOBI.
 
-**Income tax** is computed on annualised salary (gross × 12 + bonus) using the salaried slabs, then divided by 12 — the same method employers use for monthly withholding under section 149.
+**Income tax** is computed on annualised salary (gross × 12 + bonus) using the salaried slabs, then divided by 12, the same method employers use for monthly withholding under section 149.
 
 **Provident fund** is the employee's own contribution, typically a percentage of *basic* salary (not gross). The employer usually matches it; that match is not shown because it never passes through your salary.
 

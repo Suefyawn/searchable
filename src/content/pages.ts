@@ -2,18 +2,18 @@
 export const PAGES: Record<string, { title: string; description: string; body: string }> = {
   about: {
     title: "About Searchable",
-    description: "Searchable is Pakistan's information platform: news with context, step-by-step guides, calculators, a business directory and structured data — all searchable in one place.",
+    description: "Searchable is Pakistan's information platform: news with context, step-by-step guides, calculators, a business directory and structured data, all searchable in one place.",
     body: `Searchable exists to make useful information about Pakistan **easy to find, understand and use**.
 
 Most of what people need is scattered: a tax rate in a Finance Act PDF, a process buried in a government portal, a business's phone number on a Facebook page, a price in a news story from three weeks ago. Searchable brings it together and keeps it current.
 
 ## What we publish
 
-- **News** — with the useful context: what changed, what it means for you, what to do next.
-- **Guides** — step-by-step processes with fees, timelines and the mistakes to avoid.
-- **Tools** — calculators whose every number carries a source and a review date.
-- **Businesses** — a directory with verified listings, hours, phone and WhatsApp.
-- **Data** — the prices and rates Pakistanis check daily, with history.
+- **News**, with the useful context: what changed, what it means for you, what to do next.
+- **Guides**, step-by-step processes with fees, timelines and the mistakes to avoid.
+- **Tools**, calculators whose every number carries a source and a review date.
+- **Businesses**, a directory with verified listings, hours, phone and WhatsApp.
+- **Data**, the prices and rates Pakistanis check daily, with history.
 
 ## How we work
 
@@ -27,11 +27,11 @@ Every factual claim has a source. Money-affecting numbers show an effective date
     title: "Privacy policy",
     description: "What Searchable collects, why, and your choices.",
     body: `## What we collect
-- **Search queries** — stored without identifying you, to improve results and decide what to build.
-- **Calculator inputs** — stored in aggregate, anonymously, to understand usage. Calculations run in your browser.
-- **Newsletter** — your email and topic preferences, with double opt-in. Unsubscribe with one click.
-- **Account** — name, email and a password hash if you create an account.
-- **Business enquiries** — the name, phone and message you send to a business are passed to that business only.
+- **Search queries**, stored without identifying you, to improve results and decide what to build.
+- **Calculator inputs**, stored in aggregate, anonymously, to understand usage. Calculations run in your browser.
+- **Newsletter**, your email and topic preferences, with double opt-in. Unsubscribe with one click.
+- **Account**, name, email and a password hash if you create an account.
+- **Business enquiries**, the name, phone and message you send to a business are passed to that business only.
 
 ## What we do not do
 We do not sell personal data. We do not show behavioural advertising based on your searches.
@@ -49,10 +49,10 @@ privacy@searchable.pk`,
   },
   "editorial-policy": {
     title: "Editorial policy",
-    description: "How Searchable reports, sources, corrects and labels content — including sponsored content, guest posts and affiliate links.",
+    description: "How Searchable reports, sources, corrects and labels content, including sponsored content, guest posts and affiliate links.",
     body: `## Independence
 
-Editorial content — news, guides, calculator methodology and data — is produced by Searchable's desk and is never for sale. Advertisers and listing customers do not see, approve or influence it.
+Editorial content, news, guides, calculator methodology and data, is produced by Searchable's desk and is never for sale. Advertisers and listing customers do not see, approve or influence it.
 
 ## Sourcing
 

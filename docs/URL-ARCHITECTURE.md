@@ -31,7 +31,7 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /tools/[category]/[slug]                 Tool page (WebApplication JSON-LD)
 /tools/[category]/[slug]?…               Shareable pre-filled state (canonical = bare URL)
 
-/businesses                              Directory hub — categories + cities
+/businesses                              Directory hub, categories + cities
 /businesses/[category]                   Category hub (national)
 /businesses/[category]/[city]            Category × city listing  ← primary SEO page type
 /businesses/[category]/[city]/[area]     Category × area (Phase 4, gated)

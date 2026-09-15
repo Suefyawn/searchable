@@ -107,9 +107,9 @@ export async function submitPitchAction(raw: Record<string, string>): Promise<{ 
   await sendEmail({ to: process.env.EDITORIAL_EMAIL ?? "editorial@searchable.pk", subject: `[${d.kind}] ${d.title}`, html: `<p>${d.name} (${d.email}${d.company ? `, ${d.company}` : ""}) pitched: <strong>${d.title}</strong>. Review in <a href="${SITE.url}/admin/submissions">admin</a>.</p>`, text: `${d.name} pitched ${d.title}` });
   await sendEmail({
     to: d.email,
-    subject: d.kind === "guest" ? `We got your pitch — ${SITE.name}` : `Your ${d.kind === "sponsored" ? "sponsored article" : "press release"} — next steps`,
+    subject: d.kind === "guest" ? `We got your pitch: ${SITE.name}` : `Your ${d.kind === "sponsored" ? "sponsored article" : "press release"}: next steps`,
     html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;padding:24px;line-height:1.6"><p>Thanks, ${d.name}. We received “${d.title}”.</p>${invoiceNo ? `<p>Your invoice is <strong>${invoiceNo}</strong>. Payment details and status: <a href="${SITE.url}/orders/${invoiceNo}">${SITE.url}/orders/${invoiceNo}</a>. We start editing once payment is confirmed and publish within 5 working days.</p>` : `<p>An editor reads every pitch within 5 working days. If it fits, we reply with edits or a publication date; if not, we say so.</p>`}</div>`,
-    text: `Thanks — we received "${d.title}".${invoiceNo ? ` Invoice ${invoiceNo}: ${SITE.url}/orders/${invoiceNo}` : ""}`,
+    text: `Thanks, we received "${d.title}".${invoiceNo ? ` Invoice ${invoiceNo}: ${SITE.url}/orders/${invoiceNo}` : ""}`,
   });
   return { ok: true, id: row.id, invoiceNo };
 }

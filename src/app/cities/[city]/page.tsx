@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props) {
   const loc = await getCity(city);
   if (!loc) return {};
   return buildMetadata({
-    title: `${loc.name} — businesses, services and local news`,
+    title: `${loc.name}: businesses, services and local news`,
     description: `Everything Searchable knows about ${loc.name}: restaurants, doctors, solar installers, car dealers, schools and more, plus local news and guides.`,
     path: `/cities/${loc.slug}`,
   });

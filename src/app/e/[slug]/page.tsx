@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const e = await getEntity(slug);
   if (!e) return {};
-  return buildMetadata({ title: `${e.name} — news, tools and guides`, description: e.description ?? `Everything Searchable knows about ${e.name}.`, path: `/e/${e.slug}` });
+  return buildMetadata({ title: `${e.name}: news, tools and guides`, description: e.description ?? `Everything Searchable knows about ${e.name}.`, path: `/e/${e.slug}` });
 }
 
 export default async function EntityPage({ params }: Props) {

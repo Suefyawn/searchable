@@ -1,6 +1,6 @@
 /**
  * Miscellaneous rate tables used by the launch tools. Each block carries its source and review date.
- * These are INDICATIVE reference values for the prototype — verify each against the primary source
+ * These are INDICATIVE reference values for the prototype, verify each against the primary source
  * before go-live (tracked in docs/ROADMAP-1000-DAYS.md, Phase 3 "versioned rate tables").
  */
 
@@ -10,7 +10,7 @@ export type PtaSlab = { maxUsd: number | null; fixedPkr: number; pctOfValue: num
 
 export const PTA_MOBILE_TAX = {
   reviewedAt: "2026-09-15",
-  source: { title: "FBR — Mobile device duty & tax schedule (DIRBS)", url: "https://dirbs.pta.gov.pk/", publisher: "PTA / FBR" },
+  source: { title: "FBR: Mobile device duty & tax schedule (DIRBS)", url: "https://dirbs.pta.gov.pk/", publisher: "PTA / FBR" },
   /** Registered on a passport within 60 days of arrival. */
   passport: [
     { maxUsd: 30, fixedPkr: 1_230, pctOfValue: 0 },
@@ -34,7 +34,7 @@ export const PTA_MOBILE_TAX = {
 // ── Reference market rates (Phase 6 replaces these with the data platform) ──
 export const REFERENCE_RATES = {
   reviewedAt: "2026-09-15",
-  // Fallbacks only — live values come from the data hub (src/lib/ingest.ts) at render time.
+  // Fallbacks only, live values come from the data hub (src/lib/ingest.ts) at render time.
   usdPkr: 277.3,
   goldPerTola24k: 446_000,
   goldPerGram24k: 38_240,
@@ -55,7 +55,7 @@ export type TariffSlab = { from: number; to: number | null; rate: number };
 
 export const ELECTRICITY = {
   reviewedAt: "2026-09-15",
-  source: { title: "NEPRA — Schedule of Electricity Tariffs for residential consumers", url: "https://nepra.org.pk/", publisher: "NEPRA" },
+  source: { title: "NEPRA: Schedule of Electricity Tariffs for residential consumers", url: "https://nepra.org.pk/", publisher: "NEPRA" },
   /** Unprotected residential (A-1), consumption-based slabs. Rs per kWh. */
   unprotected: [
     { from: 1, to: 100, rate: 23.59 },

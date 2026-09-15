@@ -25,7 +25,7 @@ export function OpenImagePicker({ onPick, variant = "article", initialQuery = ""
     setError("");
     const r = await searchOpenImagesAction(q);
     setResults(r.results);
-    setError(r.error ?? (r.results.length ? "" : "No openly licensed photos found — try a broader or English query."));
+    setError(r.error ?? (r.results.length ? "" : "No openly licensed photos found, try a broader or English query."));
     setBusy(null);
   }
 

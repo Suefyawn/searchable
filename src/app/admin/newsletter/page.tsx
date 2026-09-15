@@ -62,7 +62,7 @@ export default async function AdminNewsletter() {
                 {i.status === "scheduled" && i.scheduledFor ? <span className="block text-xs text-3">{formatDate(i.scheduledFor, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span> : null}
                 {i.status === "sent" && i.sentAt ? <span className="block text-xs text-3">{formatDate(i.sentAt, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span> : null}
               </td>
-              <td className="py-2 pr-4 tabular">{i.recipientCount || "—"}</td>
+              <td className="py-2 pr-4 tabular">{i.recipientCount || "-"}</td>
               <td className="py-2 pr-4 text-sm text-3">{formatDate(i.createdAt)}</td>
             </tr>
           ))}

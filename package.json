@@ -2,7 +2,7 @@
   "name": "searchable",
   "version": "0.1.0",
   "private": true,
-  "description": "Searchable.pk — Pakistan's information platform. Find what you need. Know what matters.",
+  "description": "Searchable.pk, Pakistan's information platform. Find what you need. Know what matters.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

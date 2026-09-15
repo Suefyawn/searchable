@@ -1,11 +1,11 @@
 /**
  * Motor vehicle (token) tax schedules. Verified 2026-09-15.
  *
- * PUNJAB — official table at https://excise.punjab.gov.pk/motorvehicle_tax ("Rates of Token tax, Income Tax,
+ * PUNJAB, official table at https://excise.punjab.gov.pk/motorvehicle_tax ("Rates of Token tax, Income Tax,
  * Professional Tax for Motor Car", columns 2026-27 / 2025-26 / 2023-24), parsed directly.
- * ISLAMABAD — Finance Act 2026-27 amendments to the West Pakistan Motor Vehicles Taxation Act as reported by
+ * ISLAMABAD, Finance Act 2026-27 amendments to the West Pakistan Motor Vehicles Taxation Act as reported by
  * The News (thenews.pk/print/1420345) and consistent across independent calculators; effective 1 July 2026.
- * SINDH / KP / BALOCHISTAN — annual rates for cars above 1000cc are not published on the official portals in a
+ * SINDH / KP / BALOCHISTAN, annual rates for cars above 1000cc are not published on the official portals in a
  * verifiable form; deliberately omitted until confirmed.
  */
 
@@ -44,7 +44,7 @@ export const SCHEDULES: Record<Province, TokenSchedule> = {
   islamabad: {
     name: "Islamabad (ICT)",
     fiscalYear: "2026-27",
-    source: { title: "Finance Act 2026-27 — token tax on motor vehicles in ICT", url: "https://www.thenews.pk/print/1420345-token-tax-on-motor-vehicles-in-ict-raised", publisher: "Excise & Taxation Office, Islamabad Capital Territory" },
+    source: { title: "Finance Act 2026-27: token tax on motor vehicles in ICT", url: "https://www.thenews.pk/print/1420345-token-tax-on-motor-vehicles-in-ict-raised", publisher: "Excise & Taxation Office, Islamabad Capital Territory" },
     lifetimeUpTo1000: 20_000,
     motorcycleLifetime: 1_500,
     annualPct: [

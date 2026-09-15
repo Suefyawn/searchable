@@ -1,6 +1,6 @@
 # Local → Production
 
-The local prototype uses PGlite. Production uses Supabase Postgres + Vercel. **The application code does not change** — only environment variables and a few adapters.
+The local prototype uses PGlite. Production uses Supabase Postgres + Vercel. **The application code does not change**, only environment variables and a few adapters.
 
 ## What changes
 
@@ -18,11 +18,11 @@ The local prototype uses PGlite. Production uses Supabase Postgres + Vercel. **T
 ## Go-live checklist (Phase 2, Days 31–45)
 
 ### Accounts to create (in this order)
-1. GitHub — push the repo (private).
-2. Supabase — new project, region **Singapore (ap-southeast-1)** or **Mumbai** for Pakistan latency.
-3. Vercel — import the GitHub repo.
-4. PKNIC — confirm `searchable.pk` ownership; you will set nameservers or A/CNAME records.
-5. Resend — add domain `searchable.pk` (sending from `daily@searchable.pk`, `hello@searchable.pk`).
+1. GitHub, push the repo (private).
+2. Supabase, new project, region **Singapore (ap-southeast-1)** or **Mumbai** for Pakistan latency.
+3. Vercel, import the GitHub repo.
+4. PKNIC, confirm `searchable.pk` ownership; you will set nameservers or A/CNAME records.
+5. Resend, add domain `searchable.pk` (sending from `daily@searchable.pk`, `hello@searchable.pk`).
 6. Google Search Console + Bing Webmaster Tools.
 7. PostHog (EU or US cloud), Sentry.
 8. Cloudflare (optional but recommended for DNS + Turnstile + WAF).
@@ -35,7 +35,7 @@ export DATABASE_URL="postgres://postgres.[ref]:[password]@aws-0-ap-southeast-1.p
 # 2. Apply committed migrations
 npm run db:migrate
 
-# 3. Seed reference data ONLY (locations, categories, entities, tools metadata) — not sample articles/businesses
+# 3. Seed reference data ONLY (locations, categories, entities, tools metadata): not sample articles/businesses
 SEED_MODE=reference npm run db:seed
 
 # 4. Rebuild search index

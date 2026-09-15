@@ -35,7 +35,7 @@ function fromParams(fields: Field[], params: URLSearchParams): ToolInput {
 
 /**
  * Renders any ToolDefinition: form from `fields`, live `compute`, results, warnings.
- * Runs entirely in the browser — nothing personal is sent to the server.
+ * Runs entirely in the browser, nothing personal is sent to the server.
  */
 export function ToolRunner({ slug, live = {} }: { slug: string; live?: ToolInput }) {
   const tool = getTool(slug);

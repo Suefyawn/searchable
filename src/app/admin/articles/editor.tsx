@@ -106,7 +106,7 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
       return;
     }
     setDirty(false);
-    setMsg({ tone: "ok", text: { publish: "Published.", schedule: "Scheduled.", unpublish: "Unpublished — back to draft.", save: "Saved." }[intent] });
+    setMsg({ tone: "ok", text: { publish: "Published.", schedule: "Scheduled.", unpublish: "Unpublished, back to draft.", save: "Saved." }[intent] });
     if (!initial.id && res.id) router.replace(`/admin/articles/${res.id}`);
     else router.refresh();
   }
@@ -125,7 +125,7 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
         <Field label="Title" htmlFor="title">
           <Input id="title" name="title" defaultValue={initial.title} required className="h-12 text-lg font-medium" />
         </Field>
-        <Field label="Dek (one-sentence summary — shows under the title and in cards)" htmlFor="dek">
+        <Field label="Dek (one-sentence summary: shows under the title and in cards)" htmlFor="dek">
           <Textarea id="dek" name="dek" defaultValue={initial.dek ?? ""} className="min-h-20" maxLength={400} />
         </Field>
         <div>
@@ -330,7 +330,7 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
           </Field>
           <Field label="Category" htmlFor="categoryId">
             <Select id="categoryId" name="categoryId" defaultValue={initial.categoryId ?? ""}>
-              <option value="">—</option>
+              <option value="">None</option>
               {cats.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -340,7 +340,7 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
           </Field>
           <Field label="Author" htmlFor="authorId">
             <Select id="authorId" name="authorId" defaultValue={initial.authorId ?? ""}>
-              <option value="">—</option>
+              <option value="">None</option>
               {authors.map((a) => (
                 <option key={a.id} value={a.id}>
                   {a.name}
@@ -350,7 +350,7 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
           </Field>
           <Field label="City (local angle)" htmlFor="locationId">
             <Select id="locationId" name="locationId" defaultValue={initial.locationId ?? ""}>
-              <option value="">— National —</option>
+              <option value="">, National, </option>
               {cities.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}

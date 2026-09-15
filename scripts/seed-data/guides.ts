@@ -23,7 +23,7 @@ export const GUIDES: ArticleDef[] = [
     entities: ["fbr", "income-tax", "nadra"],
     body: `## Why it matters
 
-Pakistan taxes **non-filers** at roughly double the withholding rates of filers on vehicle registration, property purchase, cash withdrawals above the threshold, dividends and profit on debt. If you earn any taxable income — or plan to buy a car or plot — being on the **Active Taxpayer List (ATL)** saves real money.
+Pakistan taxes **non-filers** at roughly double the withholding rates of filers on vehicle registration, property purchase, cash withdrawals above the threshold, dividends and profit on debt. If you earn any taxable income, or plan to buy a car or plot, being on the **Active Taxpayer List (ATL)** saves real money.
 
 ## Summary
 
@@ -34,33 +34,33 @@ Pakistan taxes **non-filers** at roughly double the withholding rates of filers 
 | **Where** | FBR IRIS portal (iris.fbr.gov.pk) |
 | **You need** | CNIC, a mobile number registered in your name, an email address, and details of your income |
 
-## Step 1 — Register for an NTN on IRIS
+## Step 1: Register for an NTN on IRIS
 
 1. Go to the IRIS portal and choose **Registration for Unregistered Person**.
 2. Enter your CNIC, name as per CNIC, mobile number (must be registered in your own name), and email.
 3. You will receive separate codes by SMS and email. Enter both.
 4. Set a password. Your **NTN is your CNIC number** for individuals.
 
-## Step 2 — Complete your registration profile
+## Step 2: Complete your registration profile
 
 Log in, open **Registration → Form 181**, and fill in your address, employer (if salaried), business details (if any), and bank account. Submit. This step is often skipped and is why registrations show as incomplete.
 
-## Step 3 — File your income tax return
+## Step 3: File your income tax return
 
 Filing is what puts you on the ATL. From **Declaration → Income Tax Return**, pick the tax year and:
 
 - **Salaried individuals:** enter salary from your employer's annual certificate, tax already deducted, and any other income. Use our [Income Tax Calculator](/tools/tax/income-tax-calculator) to sanity-check the tax due.
 - **Business individuals:** enter revenue, expenses and net profit.
 
-Then complete the **Wealth Statement** — assets and liabilities at the end of the year, with a reconciliation against last year. Submit both.
+Then complete the **Wealth Statement**, assets and liabilities at the end of the year, with a reconciliation against last year. Submit both.
 
-## Step 4 — Check the Active Taxpayer List
+## Step 4: Check the Active Taxpayer List
 
 The ATL updates every Monday. Confirm your status by SMS: send **ATL (space) CNIC** to **9966**, or search the ATL on the FBR website.
 
 ## Deadlines
 
-The return for a tax year (July–June) is due by **30 September** for individuals. File late and you pay a surcharge to be added to the ATL — Rs 1,000 for individuals.
+The return for a tax year (July–June) is due by **30 September** for individuals. File late and you pay a surcharge to be added to the ATL, Rs 1,000 for individuals.
 
 ## Common problems
 
@@ -74,7 +74,7 @@ The return for a tax year (July–June) is due by **30 September** for individua
       { question: "What is the difference between filer and non-filer?", answer: "A filer appears on the Active Taxpayer List and pays lower withholding tax rates on many transactions. A non-filer pays the higher rates listed for persons not on the ATL." },
     ],
     sources: [
-      { title: "FBR — IRIS registration", url: "https://iris.fbr.gov.pk", publisher: "Federal Board of Revenue" },
+      { title: "FBR: IRIS registration", url: "https://iris.fbr.gov.pk", publisher: "Federal Board of Revenue" },
       { title: "Income Tax Ordinance 2001, section 114 and Tenth Schedule", publisher: "FBR" },
     ],
   },
@@ -103,8 +103,8 @@ Under **Employment → Salary**, enter total gross salary. Enter tax deducted by
 
 ## 3. Other income
 
-- **Profit on bank deposits** — under Other Sources; enter the profit and the tax withheld (from the bank certificate).
-- **Rental income**, **capital gains**, **dividends** — each has its own section.
+- **Profit on bank deposits**, under Other Sources; enter the profit and the tax withheld (from the bank certificate).
+- **Rental income**, **capital gains**, **dividends**, each has its own section.
 
 ## 4. Adjustable tax
 
@@ -133,13 +133,13 @@ Verify with the PIN sent to your mobile. Download the acknowledgement. Check the
       { question: "What if my employer did not deduct tax?", answer: "You still owe tax on your income. Pay the balance via a PSID generated in IRIS before submitting." },
       { question: "How do I revise a submitted return?", answer: "Within 60 days you can file a revised return without approval; after that, you need the Commissioner's permission." },
     ],
-    sources: [{ title: "FBR — Filing income tax return user guide", url: "https://fbr.gov.pk", publisher: "FBR" }],
+    sources: [{ title: "FBR: Filing income tax return user guide", url: "https://fbr.gov.pk", publisher: "FBR" }],
   },
   {
     slug: "how-to-register-phone-with-pta",
     category: "telecom",
     title: "How to register an imported phone with PTA (DIRBS) and pay the tax",
-    dek: "Bring a phone from abroad and you have 120 days of free use per passport. After that it must be registered on DIRBS — here is the process, the documents and how to pay.",
+    dek: "Bring a phone from abroad and you have 120 days of free use per passport. After that it must be registered on DIRBS, here is the process, the documents and how to pay.",
     featured: true,
     entities: ["pta", "fbr", "apple", "samsung"],
     body: `## What DIRBS is
@@ -151,25 +151,25 @@ The **Device Identification, Registration and Blocking System** checks every pho
 | | |
 |---|---|
 | **Time** | 10 minutes to apply; PSID usually within 24 hours |
-| **Cost** | Depends on phone value — use the [PTA Tax Calculator](/tools/telecom/pta-mobile-tax-calculator) |
+| **Cost** | Depends on phone value: use the [PTA Tax Calculator](/tools/telecom/pta-mobile-tax-calculator) |
 | **Where** | dirbs.pta.gov.pk or SMS to 8484 |
 | **You need** | IMEI(s), CNIC or passport, arrival date (for passport) |
 
-## Step 1 — Find your IMEI
+## Step 1: Find your IMEI
 
 Dial **\\*#06#**. Dual-SIM phones show two IMEIs; you will register both under one application.
 
-## Step 2 — Check the phone's status
+## Step 2: Check the phone's status
 
 SMS the 15-digit IMEI to **8484**. The reply says *compliant* (already registered), *non-compliant* (needs registration) or *blocked*.
 
-## Step 3 — Apply on DIRBS
+## Step 3: Apply on DIRBS
 
 1. Create an account at the DIRBS portal (local or overseas Pakistani / foreigner).
 2. Choose **Individual COC** (Certificate of Compliance).
-3. Enter IMEI(s), pick **passport** (if within 60 days of arrival — cheaper) or **CNIC**, and submit.
+3. Enter IMEI(s), pick **passport** (if within 60 days of arrival, cheaper) or **CNIC**, and submit.
 
-## Step 4 — Pay the PSID
+## Step 4: Pay the PSID
 
 FBR generates a **PSID** with the exact amount. Pay through any bank app, ATM, or branch under *FBR – Mobile Device Tax*. Registration completes within a day of payment.
 
@@ -179,13 +179,13 @@ Rates are lower on a passport but only within **60 days of arrival**; the arriva
 
 ## Buying a phone locally?
 
-Ask the seller to show the IMEI as **PTA approved** before paying. "Non-PTA" phones are cheaper because the tax has not been paid — you will pay it, or the phone will be blocked.`,
+Ask the seller to show the IMEI as **PTA approved** before paying. "Non-PTA" phones are cheaper because the tax has not been paid, you will pay it, or the phone will be blocked.`,
     faqs: [
       { question: "Can I use a non-PTA phone with WiFi only?", answer: "Yes. Blocking only affects SIM/network use; WiFi keeps working." },
       { question: "Is there any exemption?", answer: "Overseas Pakistanis get the 120-day temporary registration per passport visit, renewable on each entry. No permanent exemption exists." },
       { question: "What if I paid but it still shows blocked?", answer: "Allow 24 hours after payment. If still blocked, raise a complaint on the PTA CMS portal with the PSID and payment receipt." },
     ],
-    sources: [{ title: "PTA — DIRBS user guide", url: "https://dirbs.pta.gov.pk", publisher: "Pakistan Telecommunication Authority" }],
+    sources: [{ title: "PTA: DIRBS user guide", url: "https://dirbs.pta.gov.pk", publisher: "Pakistan Telecommunication Authority" }],
   },
   {
     slug: "how-to-apply-for-net-metering-in-pakistan",
@@ -198,7 +198,7 @@ Ask the seller to show the IMEI as **PTA approved** before paying. "Non-PTA" pho
 NEPRA notified the **Prosumer Regulations** on 10 February 2026, repealing the 2015 net-metering regulations. The new arrangement is **net billing**:
 
 - Units you **import** are billed at your normal slab tariff (Rs 37–55 before taxes).
-- Units you **export** are credited at the **National Average Energy Purchase Price (NAEPP)** — about **Rs 10–11 per unit** — instead of one-for-one.
+- Units you **export** are credited at the **National Average Energy Purchase Price (NAEPP)**, about **Rs 10–11 per unit**, instead of one-for-one.
 - Credits are settled **monthly**; a surplus rolls to the next bill or is paid quarterly.
 - New agreements run **5 years**, renewable.
 - Existing agreements keep their term and are credited at the higher **NAPPP (about Rs 25–26)** until expiry, then renew on the new terms.
@@ -207,11 +207,11 @@ Self-consumption is now worth four to five times more than export, so size the s
 
 ## Eligibility
 
-- **Three-phase 400 V (or 11 kV) connection** — domestic, commercial, industrial, agricultural or bulk. Single-phase houses must upgrade first.
+- **Three-phase 400 V (or 11 kV) connection**, domestic, commercial, industrial, agricultural or bulk. Single-phase houses must upgrade first.
 - System **1 kW to 1 MW**, and **not above your sanctioned load**.
 - Your distribution transformer must have room: the DISCO must refuse once solar on it reaches **80% of its rating**.
 - Installer certified by **AEDB/PPIB**; single-line diagram signed by a PEC-registered engineer.
-- **Grid-tied or hybrid inverter** with a UL 1741 / IEC 62116 anti-islanding certificate. Off-grid inverters never qualify — see the [approved inverter list](/electricity/net-metering#approved-inverters).
+- **Grid-tied or hybrid inverter** with a UL 1741 / IEC 62116 anti-islanding certificate. Off-grid inverters never qualify, see the [approved inverter list](/electricity/net-metering#approved-inverters).
 
 ## Documents
 
@@ -228,7 +228,7 @@ Self-consumption is now worth four to five times more than export, so size the s
 
 | # | Step | Who | Limit |
 |---|---|---|---|
-| 1 | Submit the application with documents | You | — |
+| 1 | Submit the application with documents | You |: |
 | 2 | DISCO acknowledges and confirms completeness | DISCO | 5 working days |
 | 3 | Supply anything missing | You | 3 working days |
 | 4 | Technical review (feasibility, transformer loading) | DISCO | 15 working days |
@@ -252,11 +252,11 @@ About **66 working days** end to end if nothing is returned. Billing under net b
 
 ## Where to apply
 
-- **LESCO** — Net Metering Cell, 22-A Queens Road, Lahore, or through your sub-division.
-- **IESCO** — Net Metering Section, Head Office, G-7/4 Islamabad, or the sub-division for Rawalpindi, Attock, Jhelum, Chakwal.
-- **MEPCO** — Net Metering Cell, Khanewal Road, Multan, or the circle office.
-- **K-Electric** — online through KE's net-metering portal / KE Live, or the Distributed Generation cell at KE House, DHA Karachi.
-- Other DISCOs: the headquarters net-metering cell or circle office — addresses on the [hub page](/electricity/net-metering#discos).
+- **LESCO**, Net Metering Cell, 22-A Queens Road, Lahore, or through your sub-division.
+- **IESCO**, Net Metering Section, Head Office, G-7/4 Islamabad, or the sub-division for Rawalpindi, Attock, Jhelum, Chakwal.
+- **MEPCO**, Net Metering Cell, Khanewal Road, Multan, or the circle office.
+- **K-Electric**, online through KE's net-metering portal / KE Live, or the Distributed Generation cell at KE House, DHA Karachi.
+- Other DISCOs: the headquarters net-metering cell or circle office, addresses on the [hub page](/electricity/net-metering#discos).
 
 ## If the DISCO stalls
 
@@ -300,7 +300,7 @@ Run your numbers in the [Solar System Calculator](/tools/solar/solar-payback-cal
 | Token tax | Annual, by engine size |
 | Number plate | Fixed fee |
 
-Filer vs non-filer differences alone can exceed Rs 100,000 on a 1,500 cc car — see [how to become a filer](/guides/taxes/how-to-become-a-tax-filer-in-pakistan).
+Filer vs non-filer differences alone can exceed Rs 100,000 on a 1,500 cc car, see [how to become a filer](/guides/taxes/how-to-become-a-tax-filer-in-pakistan).
 
 ## Steps
 
@@ -316,7 +316,7 @@ Filer vs non-filer differences alone can exceed Rs 100,000 on a 1,500 cc car —
 
 ## After registration
 
-Token tax is due annually — pay it through e-Pay to avoid a penalty. Selling the car requires a transfer of ownership at Excise; keep the original book safe.`,
+Token tax is due annually, pay it through e-Pay to avoid a penalty. Selling the car requires a transfer of ownership at Excise; keep the original book safe.`,
     faqs: [
       { question: "Can the dealer register the car for me?", answer: "Yes, most dealers offer registration as a service for a fee; the taxes are the same." },
       { question: "What is the difference between registration in Punjab and Islamabad?", answer: "Islamabad registration is handled by ICT Excise and often faster; token tax rates differ slightly." },
@@ -349,7 +349,7 @@ Non-resident Pakistanis (NRPs) and Pakistan-origin card holders, plus resident P
 
 ## What you can do
 
-- **Naya Pakistan Certificates** — USD and PKR, Islamic and conventional.
+- **Naya Pakistan Certificates**, USD and PKR, Islamic and conventional.
 - **Stocks** through a broker linked to your RDA.
 - **Property** purchase with funds from the RDA, with repatriation of sale proceeds.
 - **Car financing** and personal finance from some banks.
@@ -362,7 +362,7 @@ Profit on Naya Pakistan Certificates is subject to a final withholding tax (10%)
       { question: "Is RDA money repatriable?", answer: "Yes. Funds and profits can be transferred back abroad without prior SBP approval." },
       { question: "Can I open RDA while in Pakistan?", answer: "The applicant must be an NRP; some banks allow application while visiting with proof of foreign residence." },
     ],
-    sources: [{ title: "State Bank of Pakistan — Roshan Digital Account", url: "https://www.sbp.org.pk/RDA/", publisher: "SBP" }],
+    sources: [{ title: "State Bank of Pakistan: Roshan Digital Account", url: "https://www.sbp.org.pk/RDA/", publisher: "SBP" }],
   },
   {
     slug: "how-to-renew-cnic-online-nadra",
@@ -397,7 +397,7 @@ First-time CNIC, changes to name, date of birth, gender or father's name, and bi
       { question: "How long does online renewal take?", answer: "Normal: about 30 days; Urgent: 7–15 days; Executive: 3–7 days, plus courier time." },
       { question: "Can I keep using an expired CNIC?", answer: "Banks and NADRA verification will fail on an expired card. Renew before travel or transactions." },
     ],
-    sources: [{ title: "NADRA — Pak-Identity", url: "https://id.nadra.gov.pk", publisher: "NADRA" }],
+    sources: [{ title: "NADRA: Pak-Identity", url: "https://id.nadra.gov.pk", publisher: "NADRA" }],
   },
   {
     slug: "how-to-register-a-company-with-secp",
@@ -407,15 +407,15 @@ First-time CNIC, changes to name, date of birth, gender or father's name, and bi
     entities: ["secp", "fbr"],
     body: `## Choose the structure
 
-- **Sole proprietorship** — no SECP registration; just NTN and a bank account.
-- **Private Limited (Pvt) Ltd** — most common for startups and SMEs; limited liability; 1+ directors.
-- **SMC** — single-member company.
-- **LLP** — partnership with limited liability.
+- **Sole proprietorship**, no SECP registration; just NTN and a bank account.
+- **Private Limited (Pvt) Ltd**, most common for startups and SMEs; limited liability; 1+ directors.
+- **SMC**, single-member company.
+- **LLP**, partnership with limited liability.
 
 ## Steps for a Pvt Ltd
 
-1. **Name reservation** on eZfile — check availability, pay the fee; approval within a day.
-2. **Incorporation form** — directors' details, share capital, registered address, principal business.
+1. **Name reservation** on eZfile, check availability, pay the fee; approval within a day.
+2. **Incorporation form**, directors' details, share capital, registered address, principal business.
 3. Upload CNICs, a Memorandum & Articles (templates provided), and pay incorporation fees (based on authorised capital).
 4. Certificate of Incorporation is issued digitally.
 5. **NTN** is generated automatically and shared with FBR; register on IRIS to file returns.
@@ -430,12 +430,12 @@ First-time CNIC, changes to name, date of birth, gender or father's name, and bi
       { question: "How much does company registration cost?", answer: "Name reservation and incorporation fees together are typically Rs 3,000–10,000 for small authorised capital through eZfile." },
       { question: "Do I need a lawyer?", answer: "Not for a standard Pvt Ltd; eZfile templates are sufficient. Complex shareholding or foreign directors benefit from professional help." },
     ],
-    sources: [{ title: "SECP — eZfile", url: "https://ezfile.secp.gov.pk", publisher: "SECP" }],
+    sources: [{ title: "SECP: eZfile", url: "https://ezfile.secp.gov.pk", publisher: "SECP" }],
   },
   {
     slug: "fbr-iris-login-registration-and-filing-guide",
     category: "taxes",
-    title: "FBR IRIS: login, registration and filing your return — the complete guide",
+    title: "FBR IRIS: login, registration and filing your return: the complete guide",
     dek: "IRIS is FBR's online portal for NTN registration, income tax returns, wealth statements and notices. Here is how to log in, what each menu does, and how to fix the errors everyone hits.",
     featured: true,
     entities: ["fbr", "income-tax"],
@@ -455,10 +455,10 @@ First-time CNIC, changes to name, date of birth, gender or father's name, and bi
 ## FBR IRIS login
 
 1. Go to **iris.fbr.gov.pk** and click **Login**.
-2. Enter your **Registration No.** — for individuals this is your 13-digit CNIC without dashes — and your password.
+2. Enter your **Registration No.**, for individuals this is your 13-digit CNIC without dashes, and your password.
 3. Complete the captcha. On first login after registration you will be asked to change the password.
 
-**Forgot password?** Use *Forgot Password* on the login screen. Codes are sent to the mobile number and email on your registration — both must still be in your name and active.
+**Forgot password?** Use *Forgot Password* on the login screen. Codes are sent to the mobile number and email on your registration, both must still be in your name and active.
 
 ## Registration on IRIS (first time)
 
@@ -466,16 +466,16 @@ First-time CNIC, changes to name, date of birth, gender or father's name, and bi
 2. Enter CNIC, full name as per CNIC, a mobile number registered in your own name, and an email.
 3. Enter the verification codes sent by SMS and email.
 4. Set a password. Your NTN is now your CNIC.
-5. Log in and complete **Form 181** (Registration) — address, employer or business, bank account. Without Form 181 the registration stays incomplete.
+5. Log in and complete **Form 181** (Registration), address, employer or business, bank account. Without Form 181 the registration stays incomplete.
 
 ## The IRIS menus that matter
 
-- **Registration → Form 181** — your profile. Update it when you change job, address or bank.
-- **Declaration → 114(1) Return of Income** — the annual return. Choose the tax year (e.g. 2026 for income earned July 2025 – June 2026).
-- **Declaration → 116(2) Wealth Statement** — assets and liabilities; required with the return for individuals.
-- **Inbox** — notices from FBR (e.g. 114(4) for non-filing, 122 for audit). Replies are filed from here with a deadline shown.
-- **Refund → 170** — apply for a refund of excess withholding.
-- **MIS → Withholding Statements / Tax Deducted** — see what employers, banks and others have reported deducting from you. Use it to reconcile before filing.
+- **Registration → Form 181**, your profile. Update it when you change job, address or bank.
+- **Declaration → 114(1) Return of Income**, the annual return. Choose the tax year (e.g. 2026 for income earned July 2025 – June 2026).
+- **Declaration → 116(2) Wealth Statement**, assets and liabilities; required with the return for individuals.
+- **Inbox**, notices from FBR (e.g. 114(4) for non-filing, 122 for audit). Replies are filed from here with a deadline shown.
+- **Refund → 170**, apply for a refund of excess withholding.
+- **MIS → Withholding Statements / Tax Deducted**, see what employers, banks and others have reported deducting from you. Use it to reconcile before filing.
 
 ## Filing a salaried return in IRIS
 
@@ -483,17 +483,17 @@ First-time CNIC, changes to name, date of birth, gender or father's name, and bi
 2. **Salary**: enter total gross salary; tax deducted appears under *Adjustable tax → Salary u/s 149*.
 3. Add other income (profit on debt, rental, capital gains) and the tax withheld on each.
 4. Add adjustable withholdings you paid during the year (mobile, vehicle token, property, cash withdrawal).
-5. IRIS computes the tax — compare with the [Income Tax Calculator](/tools/tax/income-tax-calculator).
+5. IRIS computes the tax, compare with the [Income Tax Calculator](/tools/tax/income-tax-calculator).
 6. Complete the **Wealth Statement** and its reconciliation.
 7. **Verify** with the PIN sent to your mobile, then **Submit**. Download the acknowledgement.
 
 ## Common IRIS errors and fixes
 
-- **"Mobile number already registered"** — the number is tied to another CNIC; get it re-registered in your name with your operator first.
-- **"Form 181 pending"** — open Registration and submit the form; the return option stays greyed out until then.
-- **Wealth reconciliation does not balance** — every rupee of increase in net assets must be explained by income, gifts, loans or inheritance. Check bank balances at 30 June, not today.
-- **Session timeout** — IRIS logs out after inactivity; save each tab as you go.
-- **Cannot see 2026 return** — returns open after the FBR notification for the year; late July onward.
+- **"Mobile number already registered"**, the number is tied to another CNIC; get it re-registered in your name with your operator first.
+- **"Form 181 pending"**, open Registration and submit the form; the return option stays greyed out until then.
+- **Wealth reconciliation does not balance**, every rupee of increase in net assets must be explained by income, gifts, loans or inheritance. Check bank balances at 30 June, not today.
+- **Session timeout**, IRIS logs out after inactivity; save each tab as you go.
+- **Cannot see 2026 return**, returns open after the FBR notification for the year; late July onward.
 
 ## Deadlines and the ATL
 
@@ -501,13 +501,13 @@ Individuals file by **30 September** (extensions are announced most years). Fili
     faqs: [
       { question: "What is my FBR IRIS registration number?", answer: "For individuals it is your 13-digit CNIC without dashes. For companies and AOPs it is the 7-digit NTN issued at registration." },
       { question: "Is IRIS the same as Tax Asaan?", answer: "Tax Asaan is FBR's mobile app that covers registration, ATL check and simplified returns. Full returns, wealth statements and notices are handled on the IRIS web portal." },
-      { question: "Can I change my email or mobile number on IRIS?", answer: "Yes — under Registration → Form 181 → Modify. The new number must be registered in your own name." },
+      { question: "Can I change my email or mobile number on IRIS?", answer: "Yes: under Registration → Form 181 → Modify. The new number must be registered in your own name." },
       { question: "How do I reply to an FBR notice?", answer: "Open Inbox, select the notice, and use Reply. Attach documents as PDF. The deadline is shown on the notice; you can request an extension from the same screen." },
       { question: "Why does IRIS show tax deducted that I did not know about?", answer: "Banks, mobile operators and employers report withholding to FBR under your CNIC. MIS shows these; claim them in your return so they reduce your liability or create a refund." },
     ],
     sources: [
       { title: "FBR IRIS portal", url: "https://iris.fbr.gov.pk", publisher: "Federal Board of Revenue" },
-      { title: "Income Tax Ordinance 2001 — sections 114, 116, 149", publisher: "FBR" },
+      { title: "Income Tax Ordinance 2001: sections 114, 116, 149", publisher: "FBR" },
     ],
   },
   {
@@ -529,7 +529,7 @@ FBR publishes the complete ATL as a downloadable file every Monday. Useful for b
 
 ## What "filer" and "non-filer" mean
 
-A **filer** is a person whose name appears on the ATL because they filed the return for the latest tax year (or paid the surcharge to be added). A **non-filer** pays higher withholding rates under the Tenth Schedule — roughly double on vehicle registration, property transactions, bank profit and more. See [what non-filers pay extra](/news/economy/filer-vs-non-filer-what-you-pay-extra-on-cars-property-and-bank-transactions).
+A **filer** is a person whose name appears on the ATL because they filed the return for the latest tax year (or paid the surcharge to be added). A **non-filer** pays higher withholding rates under the Tenth Schedule, roughly double on vehicle registration, property transactions, bank profit and more. See [what non-filers pay extra](/news/economy/filer-vs-non-filer-what-you-pay-extra-on-cars-property-and-bank-transactions).
 
 ## Why you might show as inactive
 
@@ -540,20 +540,20 @@ A **filer** is a person whose name appears on the ATL because they filed the ret
 
 ## How to become active
 
-File the return for the latest tax year on IRIS — the [step-by-step guide](/guides/taxes/how-to-file-income-tax-return-pakistan) — or, if the deadline has passed, file and pay the surcharge through a PSID generated in IRIS. Status updates on the next Monday.
+File the return for the latest tax year on IRIS, the [step-by-step guide](/guides/taxes/how-to-file-income-tax-return-pakistan), or, if the deadline has passed, file and pay the surcharge through a PSID generated in IRIS. Status updates on the next Monday.
 
 ## Checking someone else's status
 
 Businesses routinely check vendors and buyers before applying withholding. The SMS and web checks work for any CNIC or NTN; no login is required.`,
     faqs: [
       { question: "How do I check filer status by CNIC?", answer: "SMS 'ATL <CNIC>' to 9966, or use Online Verifications → Active Taxpayer List on the FBR website. Both are free." },
-      { question: "What is the difference between ATL and NTN?", answer: "An NTN is your registration number with FBR (your CNIC for individuals). The ATL is the list of registered people who actually filed the latest return — only those on it are filers." },
+      { question: "What is the difference between ATL and NTN?", answer: "An NTN is your registration number with FBR (your CNIC for individuals). The ATL is the list of registered people who actually filed the latest return: only those on it are filers." },
       { question: "How long after filing does the ATL update?", answer: "The list is refreshed every Monday. File by Sunday to appear on Monday's list." },
-      { question: "I filed last year — why am I a non-filer now?", answer: "A new ATL based on the latest tax year is published every 1 March. You must file each year to stay active." },
+      { question: "I filed last year: why am I a non-filer now?", answer: "A new ATL based on the latest tax year is published every 1 March. You must file each year to stay active." },
     ],
     sources: [
-      { title: "FBR — Active Taxpayer List", url: "https://fbr.gov.pk", publisher: "Federal Board of Revenue" },
-      { title: "Income Tax Ordinance 2001 — section 182A and Tenth Schedule", publisher: "FBR" },
+      { title: "FBR: Active Taxpayer List", url: "https://fbr.gov.pk", publisher: "Federal Board of Revenue" },
+      { title: "Income Tax Ordinance 2001: section 182A and Tenth Schedule", publisher: "FBR" },
     ],
   },
 ];

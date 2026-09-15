@@ -114,7 +114,7 @@ export function InverterCompare({ inverters }: { inverters: Inverter[] }) {
                   <td className="py-2 pr-3 text-2">{INVERTER_TYPES[i.type].name}</td>
                   <td className="py-2 pr-3 text-right tabular">{i.kw}</td>
                   <td className="py-2 pr-3 text-right tabular">{i.phase === 3 ? "3-ph" : "1-ph"}</td>
-                  <td className="py-2 pr-3 text-right tabular">{i.batteryV ? `${i.batteryV} V` : "—"}</td>
+                  <td className="py-2 pr-3 text-right tabular">{i.batteryV ? `${i.batteryV} V` : "-"}</td>
                   <td className="py-2 pr-3 text-right tabular">{i.warrantyYears} yr</td>
                   <td className="py-2 text-right tabular whitespace-nowrap">
                     {pkr(i.price[0])} – {pkr(i.price[1])}

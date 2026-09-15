@@ -7,7 +7,7 @@ import { Img } from "@/components/img";
 import { LiveFeed } from "@/components/home/live-feed";
 import { PhotoTile } from "@/components/photo-tiles";
 import { activityFeed } from "@/lib/activity";
-import { fetchPress, groupBySource } from "@/lib/press";
+import { fetchPress, groupBySource, groupByTopic } from "@/lib/press";
 import { listArticles } from "@/db/queries/content";
 import { listSeriesWithLatest } from "@/db/queries/data";
 import { categoryCounts } from "@/db/queries/directory";
@@ -22,7 +22,7 @@ function Label({ children }: { children: React.ReactNode }) {
 }
 
 export default async function HomePage() {
-  const [featured, latest, guides, cities, categories, series, feed, pressItems] = await Promise.all([
+  const [featured, latest, guides, cities, categories, series, feed, pressItems, worldItems] = await Promise.all([
     listArticles({ kind: "news", featured: true, limit: 1 }),
     listArticles({ kind: "news", limit: 12 }),
     listArticles({ kind: "guide", limit: 5 }),
@@ -30,7 +30,8 @@ export default async function HomePage() {
     categoryCounts(),
     listSeriesWithLatest(),
     activityFeed(24),
-    fetchPress({ limit: 40, perFeed: 8, topics: ["general", "business"] }),
+    fetchPress({ limit: 40, perFeed: 8, region: "pk" }),
+    fetchPress({ limit: 120, perFeed: 8, region: "world" }),
   ]);
   const lead = featured[0] ?? latest[0];
   const ordered = lead ? [lead, ...latest.filter((a) => a.id !== lead.id)] : latest;
@@ -41,13 +42,19 @@ export default async function HomePage() {
   const slideIds = new Set(slides.map((s) => s.id));
   const headlines = ordered.filter((a) => !slideIds.has(a.id)).slice(0, 8);
   const press = groupBySource(pressItems, 5).slice(0, 4);
+  const world = groupByTopic(worldItems, [
+    { label: "World & US", topics: ["world", "us"] },
+    { label: "Markets & crypto", topics: ["markets", "crypto", "business"] },
+    { label: "Sport", topics: ["cricket", "mma", "snooker"] },
+    { label: "Tech & entertainment", topics: ["tech", "entertainment"] },
+  ]);
   const featuredTools = TOOLS.filter((t) => t.featured).slice(0, 6);
   const topCategories = categories.filter((c) => c.count > 0).slice(0, 10);
   const numbers = series.filter((s) => s.latest);
 
   return (
     <div className="container-x">
-      {/* Numbers ticker — thin, scrollable, above the fold */}
+      {/* Numbers ticker, thin, scrollable, above the fold */}
       {numbers.length ? (
         <section className="no-scrollbar -mx-5 overflow-x-auto border-b border-line px-5 sm:mx-0 sm:px-0" aria-label="Today's numbers">
           <div className="flex min-w-max divide-x divide-[var(--border)]">
@@ -85,6 +92,32 @@ export default async function HomePage() {
             {press.map((g) => (
               <div key={g.sourceSlug}>
                 <p className="rule pt-2 eyebrow">{g.source}</p>
+                <ul className="mt-1 divide-y divide-[var(--border)]">
+                  {g.items.map((it) => (
+                    <li key={it.url} className="py-2">
+                      <a href={it.url} target="_blank" rel="noopener" className="headline-link text-[15px] leading-snug">
+                        {it.title}
+                      </a>
+                      <span className="block text-[11px] text-3">{timeAgo(new Date(it.publishedAt))}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {world.length ? (
+        <section className="border-t border-line py-8">
+          <div className="flex items-baseline justify-between">
+            <h2 className="font-serif text-2xl">Around the world</h2>
+            <p className="text-xs text-3">World, US, markets, crypto, cricket, MMA, snooker, tech and entertainment, refreshed every 15 minutes</p>
+          </div>
+          <div className="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+            {world.map((g) => (
+              <div key={g.label}>
+                <p className="rule pt-2 eyebrow">{g.label}</p>
                 <ul className="mt-1 divide-y divide-[var(--border)]">
                   {g.items.map((it) => (
                     <li key={it.url} className="py-2">

@@ -12,6 +12,8 @@ import { addDataPoint } from "@/db/queries/data";
  *  - open.er-api.com: USD cross rates → AED, SAR, GBP, EUR against PKR (using SBP's USD/PKR so all FX is interbank-based)
  *  - PSO fuel prices page: Premier Euro 5 petrol and Hi-Cetane diesel, ex-depot Karachi
  *  - gold-api.com spot XAU/XAG → per-tola PKR via SBP USD/PKR (Sarafa quotes track spot within ~1%)
+ *  - PSX data portal: KSE-100 index level
+ *  - CoinGecko simple price: BTC and ETH in USD
  */
 
 const UA = "SearchablePK/0.1 (https://searchable.pk; data@searchable.pk)";
@@ -28,7 +30,7 @@ const NEWSWORTHY: Record<string, { title: (v: number, prev: number) => string; b
     category: "economy",
     tool: "/tools/cars/fuel-cost-calculator",
     title: (v, p) => `Petrol price ${v > p ? "raised" : "cut"} to Rs ${v.toFixed(2)} per litre, ${v > p ? "up" : "down"} Rs ${Math.abs(v - p).toFixed(2)}`,
-    body: (v, p, note) => `The ex-depot price of petrol (Premier Euro 5) is now **Rs ${v.toFixed(2)} per litre**, ${v > p ? "up" : "down"} from Rs ${p.toFixed(2)} — a change of Rs ${Math.abs(v - p).toFixed(2)} (${(((v - p) / p) * 100).toFixed(1)}%).
+    body: (v, p, note) => `The ex-depot price of petrol (Premier Euro 5) is now **Rs ${v.toFixed(2)} per litre**, ${v > p ? "up" : "down"} from Rs ${p.toFixed(2)}, a change of Rs ${Math.abs(v - p).toFixed(2)} (${(((v - p) / p) * 100).toFixed(1)}%).
 
 Source: ${note}.
 
@@ -38,7 +40,7 @@ Source: ${note}.
 - A car doing 1,000 km a month at 12 km/l spends about **Rs ${((1000 / 12) * v).toFixed(0)}** on petrol.
 - Check your own numbers with the [Fuel Cost Calculator](/tools/cars/fuel-cost-calculator) and see the [petrol price history](/data/petrol-price).
 
-*Draft generated automatically from the data hub — verify against the OGRA notification before publishing.*`,
+*Draft generated automatically from the data hub, verify against the OGRA notification before publishing.*`,
   },
   "diesel-price": {
     category: "economy",
@@ -47,7 +49,7 @@ Source: ${note}.
 
 Diesel moves transport and food prices: expect goods-transport rates to follow within days. History: [diesel price](/data/diesel-price).
 
-*Draft generated automatically from the data hub — verify against the OGRA notification before publishing.*`,
+*Draft generated automatically from the data hub, verify against the OGRA notification before publishing.*`,
   },
   "sbp-policy-rate": {
     category: "economy",
@@ -61,7 +63,7 @@ Diesel moves transport and food prices: expect goods-transport rates to follow w
 - Savings-account and NSC profit rates move the same way.
 - Model a loan at the new rate with the [Car Loan Calculator](/tools/cars/car-loan-calculator) or [Home Loan Calculator](/tools/finance/home-loan-calculator).
 
-*Draft generated automatically from the data hub — verify against the SBP monetary policy statement before publishing.*`,
+*Draft generated automatically from the data hub, verify against the SBP monetary policy statement before publishing.*`,
   },
 };
 
@@ -142,9 +144,9 @@ export async function collectReadings(): Promise<{ readings: Reading[]; errors: 
     usdPkr = s.usd;
     const note = `SBP snapshot${s.asOf ? `, as on ${s.asOf}` : ""} (auto)`;
     const url = "https://www.sbp.org.pk/ecodata/kibor_index.asp";
-    if (s.usd) readings.push({ slug: "usd-pkr", value: s.usd, date, note: `M2M revaluation rate — ${note}`, sourceUrl: url });
-    if (s.kibor12) readings.push({ slug: "kibor-1y", value: s.kibor12, date, note: `12-month KIBOR offer — ${note}`, sourceUrl: url });
-    if (s.policy) readings.push({ slug: "sbp-policy-rate", value: s.policy, date, note: `Policy rate — ${note}`, sourceUrl: url });
+    if (s.usd) readings.push({ slug: "usd-pkr", value: s.usd, date, note: `M2M revaluation rate, ${note}`, sourceUrl: url });
+    if (s.kibor12) readings.push({ slug: "kibor-1y", value: s.kibor12, date, note: `12-month KIBOR offer, ${note}`, sourceUrl: url });
+    if (s.policy) readings.push({ slug: "sbp-policy-rate", value: s.policy, date, note: `Policy rate, ${note}`, sourceUrl: url });
   } catch (e) {
     errors.push(`SBP: ${(e as Error).message}`);
   }
@@ -182,6 +184,25 @@ export async function collectReadings(): Promise<{ readings: Reading[]; errors: 
     errors.push(`Gold: ${(e as Error).message}`);
   }
 
+  try {
+    const t = strip(await text("https://dps.psx.com.pk/indices"));
+    const kse = t.match(/KSE100\s+([\d,]+\.\d+)/)?.[1];
+    if (kse) readings.push({ slug: "kse-100", value: Number(kse.replace(/,/g, "")), date, note: "PSX data portal, KSE-100 (auto)", sourceUrl: "https://dps.psx.com.pk/indices" });
+    else errors.push("PSX: KSE100 not found on page");
+  } catch (e) {
+    errors.push(`PSX: ${(e as Error).message}`);
+  }
+
+  try {
+    const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd", { headers: { "user-agent": UA }, cache: "no-store" });
+    if (!res.ok) throw new Error(`coingecko → ${res.status}`);
+    const d = (await res.json()) as { bitcoin?: { usd: number }; ethereum?: { usd: number } };
+    if (d.bitcoin?.usd) readings.push({ slug: "btc-usd", value: d.bitcoin.usd, date, note: "CoinGecko spot (auto)", sourceUrl: "https://www.coingecko.com/en/coins/bitcoin" });
+    if (d.ethereum?.usd) readings.push({ slug: "eth-usd", value: d.ethereum.usd, date, note: "CoinGecko spot (auto)", sourceUrl: "https://www.coingecko.com/en/coins/ethereum" });
+  } catch (e) {
+    errors.push(`Crypto: ${(e as Error).message}`);
+  }
+
   return { readings, errors };
 }
 
@@ -204,7 +225,7 @@ export async function runIngestion(opts: { maxJump?: number; only?: string[]; fo
       continue;
     }
     if (prev && !opts.force && Math.abs(r.value - prev.value) / Math.max(1, Math.abs(prev.value)) > maxJump) {
-      results.push({ slug: r.slug, status: "rejected", value: r.value, previous: prev.value, message: `Moved ${Math.round((Math.abs(r.value - prev.value) / Math.abs(prev.value)) * 100)}% from last reading — review and force if genuine` });
+      results.push({ slug: r.slug, status: "rejected", value: r.value, previous: prev.value, message: `Moved ${Math.round((Math.abs(r.value - prev.value) / Math.abs(prev.value)) * 100)}% from last reading, review and force if genuine` });
       continue;
     }
     try {

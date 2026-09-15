@@ -1,6 +1,6 @@
 # Searchable.pk
 
-**Find what you need. Know what matters.** — Pakistan's information platform: news with context, step-by-step guides, calculators, a business directory, and structured data — all searchable in one place.
+**Find what you need. Know what matters.**, Pakistan's information platform: news with context, step-by-step guides, calculators, a business directory, and structured data, all searchable in one place.
 
 > Plan and specification: [`SEARCHABLE_MASTER_SPEC.md`](SEARCHABLE_MASTER_SPEC.md) · Roadmap: [`docs/ROADMAP-1000-DAYS.md`](docs/ROADMAP-1000-DAYS.md)
 
@@ -14,7 +14,7 @@ npm run db:seed                 # reference data + sample content + admin user
 npm run dev                     # http://localhost:3000
 ```
 
-Admin: **http://localhost:3000/admin** — `admin@searchable.pk` / `searchable-admin-123` (from `.env.local`).
+Admin: **http://localhost:3000/admin**, `admin@searchable.pk` / `searchable-admin-123` (from `.env.local`).
 
 Newsletter confirmation emails are written to `.data/outbox/*.eml` locally.
 
@@ -54,7 +54,7 @@ Follow [`docs/LOCAL-TO-PRODUCTION.md`](docs/LOCAL-TO-PRODUCTION.md). Only enviro
 
 | | |
 |---|---|
-| [`SEARCHABLE_MASTER_SPEC.md`](SEARCHABLE_MASTER_SPEC.md) | Product, brand, pillars, architecture, policies — the source of truth |
+| [`SEARCHABLE_MASTER_SPEC.md`](SEARCHABLE_MASTER_SPEC.md) | Product, brand, pillars, architecture, policies: the source of truth |
 | [`docs/ROADMAP-1000-DAYS.md`](docs/ROADMAP-1000-DAYS.md) | Phases 0–9 with deliverables and exit criteria |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | App shape, data access rules, caching, layout |
 | [`docs/DATABASE.md`](docs/DATABASE.md) | Every table and why it exists |

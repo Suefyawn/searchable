@@ -37,7 +37,7 @@ export function AddBusinessForm({ categories, cities }: { categories: Opt[]; cit
   if (state === "done") {
     return (
       <div className="border border-brand-200 bg-brand-50 px-4 py-3 text-[15px] dark:border-brand-800 dark:bg-brand-950/40">
-        <p className="font-medium">Submitted — thank you.</p>
+        <p className="font-medium">Submitted: thank you.</p>
         <p className="mt-1 text-2">We will verify the details and publish the listing within two working days. You will get an email when it is live.</p>
       </div>
     );
@@ -74,7 +74,7 @@ export function AddBusinessForm({ categories, cities }: { categories: Opt[]; cit
           </Select>
         </Field>
       </div>
-      <Field label="Address" htmlFor="b-address" help="Street, area and landmark — enough for a customer to find you.">
+      <Field label="Address" htmlFor="b-address" help="Street, area and landmark: enough for a customer to find you.">
         <Input id="b-address" name="address" required maxLength={300} />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">

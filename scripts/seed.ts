@@ -268,7 +268,7 @@ async function main() {
   await linkToolsToEntities(entityIds);
   console.log(`  search index: ${JSON.stringify(counts)}`);
   const [{ n }] = await rawQuery<{ n: number }>(db, sql`select count(*)::int as n from search_documents`);
-  console.log(`✓ seed complete — ${n} search documents`);
+  console.log(`✓ seed complete, ${n} search documents`);
   process.exit(0);
 }
 

@@ -11,16 +11,16 @@ const FAQS = [
   { question: "Is net metering still available in Pakistan in 2026?", answer: "Not in its old one-for-one form. NEPRA's Prosumer Regulations, notified in February 2026, replaced net metering with net billing: units you import are billed at your normal tariff, units you export are credited at the National Average Energy Purchase Price (about Rs 10–11). Existing agreements keep the higher NAPPP rate (about Rs 25–26) until they expire." },
   { question: "Which inverters are approved for net metering?", answer: "Any grid-tied or hybrid inverter with a UL 1741 / IEC 62116 anti-islanding certificate and IEEE 1547 grid parameters. Huawei, Sungrow, Solis, GoodWe, Growatt, SMA, Fronius and SolarEdge pass without query; Deye, Inverex Aerox/Nitrox, Ziewnic Xtreme, Fox ESS, Sofar, SolaX and Kstar pass when the certificate is attached. Off-grid units never qualify." },
   { question: "Do I need a three-phase connection?", answer: "Yes. The regulations define an applicant as a three-phase 400 V or 11 kV consumer. If your house is on single phase, apply to the DISCO for a three-phase upgrade first (a separate demand notice, usually Rs 25,000–60,000 including the meter)." },
-  { question: "How big a system can I install?", answer: "Up to your sanctioned load — a house with a 10 kW sanctioned load cannot net-meter a 15 kW system. Ask the DISCO to raise the sanctioned load first if you need more. The DISCO must also refuse if solar on your transformer has reached 80% of its rating." },
-  { question: "How long does net metering take?", answer: "The regulations set working-day limits at every step: 5 days to acknowledge, 15 for technical review, 7 to sign the agreement, 7 to issue the meter estimate, 15 to install after you pay, and 7 for NEPRA’s concurrence — about 8–10 weeks if nothing bounces. In practice LESCO and IESCO take 1–3 months; meter shortages can add more." },
+  { question: "How big a system can I install?", answer: "Up to your sanctioned load: a house with a 10 kW sanctioned load cannot net-meter a 15 kW system. Ask the DISCO to raise the sanctioned load first if you need more. The DISCO must also refuse if solar on your transformer has reached 80% of its rating." },
+  { question: "How long does net metering take?", answer: "The regulations set working-day limits at every step: 5 days to acknowledge, 15 for technical review, 7 to sign the agreement, 7 to issue the meter estimate, 15 to install after you pay, and 7 for NEPRA’s concurrence: about 8–10 weeks if nothing bounces. In practice LESCO and IESCO take 1–3 months; meter shortages can add more." },
   { question: "What does net metering cost?", answer: "NEPRA’s concurrence fee of Rs 1,000 per kW (Rs 5,000 for a 5 kW system), the DISCO's connection-charge estimate for the bi-directional meter and interconnection (Rs 25,000–65,000 depending on the DISCO), an affidavit on Rs 50 stamp paper, and whatever your installer charges for processing (Rs 10,000–30,000)." },
   { question: "Is solar still worth it under net billing?", answer: "Yes, if you use most of it yourself. Every unit you consume directly saves the full tariff (Rs 37–55). Only the exported surplus earns Rs 10–11, so size the system to your daytime load rather than your roof, and run heavy loads (ACs, pumps, washing) in daylight. The Solar System Calculator models both." },
-  { question: "I already have net metering — what changes?", answer: "Your agreement and licence stand until they expire. Exports are credited at the NAPPP (about Rs 25–26) rather than one-for-one, credits are settled monthly rather than rolled over for three months, and if you increase the system's output you lose the old terms. On expiry you renew for five years on the new NAEPP rate." },
+  { question: "I already have net metering: what changes?", answer: "Your agreement and licence stand until they expire. Exports are credited at the NAPPP (about Rs 25–26) rather than one-for-one, credits are settled monthly rather than rolled over for three months, and if you increase the system's output you lose the old terms. On expiry you renew for five years on the new NAEPP rate." },
 ];
 
 export const metadata = buildMetadata({
-  title: "Net Metering in Pakistan 2026 — Approved Inverters List, New NEPRA Rules, How to Apply (LESCO, IESCO, MEPCO, K-Electric)",
-  description: "Net metering became net billing in February 2026. See the new NEPRA export rate, eligibility, step-by-step application with legal timelines, costs, the list of inverters approved for net metering, and how to apply at each DISCO — LESCO, IESCO, MEPCO, GEPCO, FESCO, PESCO, HESCO, SEPCO, QESCO and K-Electric.",
+  title: "Net Metering in Pakistan 2026: Approved Inverters List, New NEPRA Rules, How to Apply (LESCO, IESCO, MEPCO, K-Electric)",
+  description: "Net metering became net billing in February 2026. See the new NEPRA export rate, eligibility, step-by-step application with legal timelines, costs, the list of inverters approved for net metering, and how to apply at each DISCO, LESCO, IESCO, MEPCO, GEPCO, FESCO, PESCO, HESCO, SEPCO, QESCO and K-Electric.",
   path: "/electricity/net-metering",
   kicker: "Electricity",
 });
@@ -43,12 +43,12 @@ export default function NetMeteringHub() {
             <p className="eyebrow">What changed on {formatDate(RULES.notified)}</p>
             <dl className="mt-3 grid gap-x-8 gap-y-3 sm:grid-cols-2">
               <div>
-                <dt className="text-sm text-3">Export credit — new agreements</dt>
+                <dt className="text-sm text-3">Export credit: new agreements</dt>
                 <dd className="font-serif text-3xl tabular">Rs {RULES.exportRateNew.approx[0]}–{RULES.exportRateNew.approx[1]}<span className="text-base text-3"> /unit</span></dd>
                 <dd className="text-sm text-2">{RULES.exportRateNew.label}, set by NEPRA</dd>
               </div>
               <div>
-                <dt className="text-sm text-3">Export credit — existing agreements, until expiry</dt>
+                <dt className="text-sm text-3">Export credit: existing agreements, until expiry</dt>
                 <dd className="font-serif text-3xl tabular">Rs {RULES.exportRateExisting.approx[0]}–{RULES.exportRateExisting.approx[1]}<span className="text-base text-3"> /unit</span></dd>
                 <dd className="text-sm text-2">{RULES.exportRateExisting.label}</dd>
               </div>
@@ -77,10 +77,10 @@ export default function NetMeteringHub() {
           <section>
             <h2 className="font-serif text-2xl">Is solar still worth it?</h2>
             <p className="mt-2 text-[16px] leading-relaxed">
-              For a house using 800 units a month, a 6 kW system generating ~750 units in summer: if 60% is used directly you save roughly 450 × Rs 45 = {pkr(450 * 45)} on import plus 300 × Rs 11 = {pkr(300 * 11)} in export credit — about {pkr(450 * 45 + 300 * 11)} a month, a payback of 3–4 years on a Rs 900,000 system. The same system exporting 80% earns far less. Size to your daytime load and shift ACs, pumps and washing into daylight; a battery only makes sense for outages, not for export.
+              For a house using 800 units a month, a 6 kW system generating ~750 units in summer: if 60% is used directly you save roughly 450 × Rs 45 = {pkr(450 * 45)} on import plus 300 × Rs 11 = {pkr(300 * 11)} in export credit, about {pkr(450 * 45 + 300 * 11)} a month, a payback of 3–4 years on a Rs 900,000 system. The same system exporting 80% earns far less. Size to your daytime load and shift ACs, pumps and washing into daylight; a battery only makes sense for outages, not for export.
             </p>
             <p className="mt-2 text-[15px]">
-              Model your own numbers in the <Link href="/tools/solar/solar-payback-calculator" className="underline underline-offset-4">Solar System Calculator</Link> — its export rate now defaults to the net-billing rate.
+              Model your own numbers in the <Link href="/tools/solar/solar-payback-calculator" className="underline underline-offset-4">Solar System Calculator</Link>: its export rate now defaults to the net-billing rate.
             </p>
           </section>
 
@@ -97,7 +97,7 @@ export default function NetMeteringHub() {
           </section>
 
           <section id="apply">
-            <h2 className="font-serif text-2xl">How to apply — with the legal time limits</h2>
+            <h2 className="font-serif text-2xl">How to apply: with the legal time limits</h2>
             <p className="mt-2 text-[15px] text-2">Working days each step is allowed under regulations 3 and 4. Add them up and the process should take about {totalDays} working days ({Math.round(totalDays / 5)} weeks) if nothing is returned.</p>
             <ol className="mt-3 divide-y divide-[var(--border)] border-y border-line">
               <li className="grid gap-x-4 py-3 sm:grid-cols-[2.5rem_1fr_6rem_5rem]">
@@ -106,7 +106,7 @@ export default function NetMeteringHub() {
                   <strong>Install with a certified vendor</strong> and collect: CNIC, latest bill, ownership proof, AEDB/PPIB certificate, inverter datasheet and anti-islanding certificate, panel datasheets, single-line diagram, site photos. Submit the Schedule II application to your DISCO.
                 </span>
                 <span className="text-sm text-3">You</span>
-                <span className="text-sm text-3">—</span>
+                <span className="text-sm text-3">-</span>
               </li>
               {RULES.timeline.map((t, i) => (
                 <li key={`${t.reg}-${i}`} className="grid gap-x-4 py-3 sm:grid-cols-[2.5rem_1fr_6rem_5rem]">
@@ -128,7 +128,7 @@ export default function NetMeteringHub() {
             <h2 className="font-serif text-2xl">Costs</h2>
             <table className="mt-3 w-full text-[15px]">
               <tbody className="divide-y divide-[var(--border)] border-y border-line">
-                <tr><td className="py-2 pr-3">NEPRA concurrence fee (Schedule IV)</td><td className="py-2 text-right tabular">{pkr(RULES.nepraFeePerKw)} per kW — {pkr(RULES.nepraFeePerKw * 5)} for 5 kW, {pkr(RULES.nepraFeePerKw * 10)} for 10 kW</td></tr>
+                <tr><td className="py-2 pr-3">NEPRA concurrence fee (Schedule IV)</td><td className="py-2 text-right tabular">{pkr(RULES.nepraFeePerKw)} per kW: {pkr(RULES.nepraFeePerKw * 5)} for 5 kW, {pkr(RULES.nepraFeePerKw * 10)} for 10 kW</td></tr>
                 <tr><td className="py-2 pr-3">DISCO connection-charge estimate (bi-directional meter, interconnection)</td><td className="py-2 text-right tabular">{pkr(25_000)} – {pkr(65_000)} by DISCO</td></tr>
                 <tr><td className="py-2 pr-3">Affidavit (Schedule V)</td><td className="py-2 text-right tabular">Rs 50 stamp paper + oath commissioner</td></tr>
                 <tr><td className="py-2 pr-3">Three-phase upgrade, if needed</td><td className="py-2 text-right tabular">{pkr(25_000)} – {pkr(60_000)}</td></tr>
@@ -140,7 +140,7 @@ export default function NetMeteringHub() {
           <section id="approved-inverters">
             <h2 className="font-serif text-2xl">Approved inverters for net metering</h2>
             <p className="mt-2 text-[15px] leading-relaxed text-2">
-              No DISCO publishes a standing model list. The net-metering desk checks the datasheet and the UL 1741 / IEC 62116 anti-islanding certificate your installer attaches, and the same NEPRA standard applies at every DISCO and K-Electric. <strong>Routine</strong> means the brand’s paperwork is accepted without query nationwide; <strong>with certificates</strong> means it is accepted when the test certificate is attached — ask the seller for it before buying.
+              No DISCO publishes a standing model list. The net-metering desk checks the datasheet and the UL 1741 / IEC 62116 anti-islanding certificate your installer attaches, and the same NEPRA standard applies at every DISCO and K-Electric. <strong>Routine</strong> means the brand’s paperwork is accepted without query nationwide; <strong>with certificates</strong> means it is accepted when the test certificate is attached, ask the seller for it before buying.
             </p>
             <div className="overflow-x-auto">
               <table className="mt-3 w-full min-w-[640px] text-[15px]">
@@ -190,7 +190,7 @@ export default function NetMeteringHub() {
                 return (
                   <article key={n.slug} id={n.slug} className="py-4">
                     <h3 className="font-serif text-xl">
-                      <Link href={`/electricity/${d.slug}`} className="headline-link">{d.short} net metering</Link> <span className="text-base text-3">— {d.region}</span>
+                      <Link href={`/electricity/${d.slug}`} className="headline-link">{d.short} net metering</Link> <span className="text-base text-3">: {d.region}</span>
                     </h3>
                     <dl className="mt-2 grid gap-x-6 gap-y-1.5 text-[15px] sm:grid-cols-[9rem_1fr]">
                       <dt className="text-3">Apply at</dt>
@@ -253,7 +253,7 @@ export default function NetMeteringHub() {
             <ul className="mt-3 space-y-1.5 text-[15px]">
               {NET_METERING_SOURCES.map((s) => (
                 <li key={s.url}>
-                  <a href={s.url} rel="nofollow noopener" target="_blank" className="underline underline-offset-4">{s.title}</a> <span className="text-3">— {s.publisher}, {formatDate(s.date)}</span>
+                  <a href={s.url} rel="nofollow noopener" target="_blank" className="underline underline-offset-4">{s.title}</a> <span className="text-3">: {s.publisher}, {formatDate(s.date)}</span>
                 </li>
               ))}
             </ul>

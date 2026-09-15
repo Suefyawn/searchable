@@ -4,7 +4,7 @@
  */
 export const SOLAR_PRICES = {
   reviewedAt: "2026-09-15",
-  source: { title: "Searchable market survey — importer & dealer quotes, Lahore/Karachi (Hall Road, Saddar)", publisher: "Searchable" },
+  source: { title: "Searchable market survey: importer & dealer quotes, Lahore/Karachi (Hall Road, Saddar)", publisher: "Searchable" },
   /** Rs per watt for a full pallet / dealer price. Retail single-panel prices run 5–10% higher. */
   panels: [
     { brand: "Longi Hi-MO 6/7", tier: "Tier 1 (A-grade)", watts: 580, perWatt: 29, note: "Most common on rooftops in 2026" },

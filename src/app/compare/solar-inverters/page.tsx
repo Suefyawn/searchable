@@ -11,17 +11,17 @@ const FAQS = [
   { question: "What is the price of a 5 kW solar inverter in Pakistan?", answer: "A 5–6 kW hybrid inverter from Inverex, Ziewnic, Deye or Solis costs Rs 160,000–275,000 in 2026. A 5 kW on-grid inverter (Solis, Growatt, Sungrow, GoodWe) is Rs 90,000–135,000. Off-grid 5–6 kW units are Rs 85,000–135,000 but cannot be net-metered." },
   { question: "What is the price of a 10 kW inverter in Pakistan?", answer: "Three-phase 10 kW on-grid inverters cost Rs 160,000–240,000 (Growatt, Solis, Sungrow) and Rs 235,000–280,000 for Huawei. 10–12 kW hybrids run Rs 310,000–500,000 depending on brand." },
   { question: "Which is the best solar inverter in Pakistan?", answer: "For most homes a 6 kW hybrid with two MPPTs, 48 V lithium support and a 5-year warranty backed by a local service centre. Inverex and Ziewnic win on price and service coverage; Solis, Deye and Huawei on build quality and grid compliance. Avoid brands without a service centre in your city." },
-  { question: "Hybrid vs on-grid inverter — which should I buy?", answer: "If your area has load-shedding or you want backup at night, buy a hybrid and add a battery later. If the grid is reliable and you only want to cut the bill, an on-grid inverter is roughly half the price for the same kW and qualifies for net metering." },
+  { question: "Hybrid vs on-grid inverter: which should I buy?", answer: "If your area has load-shedding or you want backup at night, buy a hybrid and add a battery later. If the grid is reliable and you only want to cut the bill, an on-grid inverter is roughly half the price for the same kW and qualifies for net metering." },
   { question: "Can I get net metering with an off-grid inverter?", answer: "No. DISCOs only approve grid-tied or hybrid inverters with the required anti-islanding and grid-code certification. Off-grid units are for sites without a WAPDA connection." },
   { question: "How much inverter do I need for a 5 kW system?", answer: "Match the inverter to your load, not the panel count: a 5–6 kW single-phase inverter runs two 1.5-ton inverter ACs plus normal load. Inverters accept 30–50% more panel capacity than their rated output, so 6.5–8 kW of panels on a 6 kW inverter is normal." },
-  { question: "Is there sales tax on inverters in Pakistan?", answer: "Yes — unlike panels, inverters and batteries attract sales tax and customs duty at import, which is why prices move with the dollar and the budget. Check the review date on this page." },
+  { question: "Is there sales tax on inverters in Pakistan?", answer: "Yes: unlike panels, inverters and batteries attract sales tax and customs duty at import, which is why prices move with the dollar and the budget. Check the review date on this page." },
 ];
 
 const TYPE_ORDER: InverterType[] = ["hybrid", "on-grid", "off-grid"];
 
 export const metadata = buildMetadata({
-  title: "Solar Inverter Price in Pakistan 2026 — Compare Hybrid, On-Grid & Off-Grid Inverters (3kW, 5kW, 10kW)",
-  description: "Compare solar inverter prices in Pakistan for Inverex, Ziewnic, Solis, Deye, Growatt, Sungrow, Huawei and more. Hybrid, on-grid and off-grid inverters from 3 kW to 12 kW with warranty, MPPT, battery voltage and dealer prices — updated monthly.",
+  title: "Solar Inverter Price in Pakistan 2026: Compare Hybrid, On-Grid & Off-Grid Inverters (3kW, 5kW, 10kW)",
+  description: "Compare solar inverter prices in Pakistan for Inverex, Ziewnic, Solis, Deye, Growatt, Sungrow, Huawei and more. Hybrid, on-grid and off-grid inverters from 3 kW to 12 kW with warranty, MPPT, battery voltage and dealer prices, updated monthly.",
   path: "/compare/solar-inverters",
   kicker: "Compare",
 });
@@ -84,7 +84,7 @@ export default function SolarInverterComparePage() {
                     <td className="py-2 pr-3 font-medium">{r.label}</td>
                     {TYPE_ORDER.map((t) => {
                       const list = INVERTERS.filter((i) => i.type === t && r.test(i.kw));
-                      if (!list.length) return <td key={t} className="py-2 pr-3 text-right text-3">—</td>;
+                      if (!list.length) return <td key={t} className="py-2 pr-3 text-right text-3">-</td>;
                       const [lo, hi] = range(list);
                       return (
                         <td key={t} className="py-2 pr-3 text-right tabular whitespace-nowrap">
@@ -159,10 +159,10 @@ export default function SolarInverterComparePage() {
             <ol className="mt-3 list-decimal space-y-2 pl-5 text-[16px] leading-relaxed">
               <li><strong>Size to your load, not your roof.</strong> Add up what runs at once on a summer evening (each 1.5-ton inverter AC ≈ 1.2–1.8 kW). A 6 kW single-phase hybrid covers most 5–10 marla houses; go three-phase above 8 kW or if your meter is three-phase.</li>
               <li><strong>Two MPPTs minimum.</strong> Roofs facing two directions, or partial shade, need independent strings. Budget off-grid units have one.</li>
-              <li><strong>48 V battery bus</strong> for anything hybrid — the standard for lithium packs from every brand. Huawei uses its own high-voltage LUNA battery.</li>
+              <li><strong>48 V battery bus</strong> for anything hybrid, the standard for lithium packs from every brand. Huawei uses its own high-voltage LUNA battery.</li>
               <li><strong>Check net-metering approval.</strong> Your DISCO’s list of approved inverters matters more than the spec sheet. All hybrid and on-grid units here are commonly approved; off-grid never is. See the <Link href="/electricity/net-metering#approved-inverters" className="underline underline-offset-4">approved inverter list</Link>.</li>
               <li><strong>Warranty is only as good as the service centre.</strong> Ask where the nearest one is and whether the warranty is replacement or repair. Five years is standard; Huawei gives ten.</li>
-              <li><strong>Get three quotes</strong> for the installed system, not the inverter alone — installers bundle margin into structure and wiring. Use the <Link href="/tools/solar/solar-payback-calculator" className="underline underline-offset-4">Solar System Calculator</Link> to size from your bill first.</li>
+              <li><strong>Get three quotes</strong> for the installed system, not the inverter alone: installers bundle margin into structure and wiring. Use the <Link href="/tools/solar/solar-payback-calculator" className="underline underline-offset-4">Solar System Calculator</Link> to size from your bill first.</li>
             </ol>
           </section>
 

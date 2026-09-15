@@ -7,7 +7,7 @@ import { getTool } from "@/tools/registry";
 
 export const revalidate = 86400;
 export const metadata = buildMetadata({
-  title: "Electricity Bill Check Online — LESCO, IESCO, MEPCO, K-Electric & All DISCOs",
+  title: "Electricity Bill Check Online: LESCO, IESCO, MEPCO, K-Electric & All DISCOs",
   description: "Check any electricity bill online in Pakistan by reference number, see the current per-unit price, and calculate your bill from units. Official portals for LESCO, IESCO, MEPCO, GEPCO, FESCO, PESCO, HESCO, SEPCO, QESCO, TESCO and K-Electric.",
   path: "/electricity",
   kicker: "Electricity",
@@ -33,7 +33,7 @@ export default function ElectricityHub() {
         <p className="mt-1 font-serif text-xl">
           <Link href="/electricity/net-metering" className="headline-link">Net metering in 2026: new NEPRA rules, approved inverters and how to apply at your DISCO</Link>
         </p>
-        <p className="mt-1 text-sm text-2">Net billing replaced net metering in February 2026 — export credit, eligibility, time limits and costs explained.</p>
+        <p className="mt-1 text-sm text-2">Net billing replaced net metering in February 2026: export credit, eligibility, time limits and costs explained.</p>
       </div>
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <ToolCard tool={getTool("electricity-bill-calculator")!} />

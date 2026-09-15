@@ -12,7 +12,7 @@ const INTERVAL = 7000;
 
 /**
  * Lead-story carousel. Auto-advances, pauses on hover/focus, honours prefers-reduced-motion, keyboard arrows.
- * Photo left, headline stack right; a thin progress rule shows the timer — no fades, no overlays (ADR-15/20).
+ * Photo left, headline stack right; a thin progress rule shows the timer, no fades, no overlays (ADR-15/20).
  */
 export function HeroCarousel({ slides }: { slides: Slide[] }) {
   const [i, setI] = React.useState(0);

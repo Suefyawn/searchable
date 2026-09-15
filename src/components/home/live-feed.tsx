@@ -18,7 +18,7 @@ function day(iso: string) {
 }
 
 /**
- * LIVE panel: a log of what changed — our stories, press headlines, data readings — refreshed from /api/feed.
+ * LIVE panel: a log of what changed, our stories, press headlines, data readings, refreshed from /api/feed.
  * Mono timestamps, a pulsing dot, nothing else moving.
  */
 export function LiveFeed({ initial, limit = 12, className }: { initial: FeedItem[]; limit?: number; className?: string }) {

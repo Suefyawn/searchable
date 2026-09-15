@@ -10,15 +10,15 @@ export const revalidate = 3600;
 
 const FAQS = [
   { question: "Do you pay for guest posts?", answer: "No, and we do not charge for them either. A guest article is published free with your name and a short bio (one nofollow link to your organisation). If you want followed links to a commercial site, that is a sponsored article." },
-  { question: "What do you accept?", answer: "Practical, specific, Pakistan-focused pieces: how a process actually works, what something costs, what changed and what to do about it. Written from real experience — a tax practitioner on filing, an installer on solar sizing, an HR manager on EOBI. Not accepted: generic listicles, rewritten press coverage, AI-written filler, anything promotional dressed as advice." },
+  { question: "What do you accept?", answer: "Practical, specific, Pakistan-focused pieces: how a process actually works, what something costs, what changed and what to do about it. Written from real experience: a tax practitioner on filing, an installer on solar sizing, an HR manager on EOBI. Not accepted: generic listicles, rewritten press coverage, AI-written filler, anything promotional dressed as advice." },
   { question: "How long until it is published?", answer: "Pitches get a reply within 5 working days. Accepted drafts are edited and published within 2 weeks; sponsored articles within 5 working days of payment." },
   { question: "Will you edit my article?", answer: "Yes. We edit for clarity, structure and accuracy, add sources and links to our tools where they help the reader, and send you the final version before it goes live." },
   { question: "Can I republish it on my own site?", answer: "After 30 days, with a canonical link back to Searchable." },
 ];
 
 export const metadata = buildMetadata({
-  title: "Write for Searchable — Guest Posts, Sponsored Articles & Press Releases (Guidelines & Submission)",
-  description: "Contribute a practical guide about taxes, banking, cars, property, utilities or business in Pakistan — free with a byline — or submit a sponsored article or press release. Guidelines, what we accept, and the form.",
+  title: "Write for Searchable: Guest Posts, Sponsored Articles & Press Releases (Guidelines & Submission)",
+  description: "Contribute a practical guide about taxes, banking, cars, property, utilities or business in Pakistan, free with a byline, or submit a sponsored article or press release. Guidelines, what we accept, and the form.",
   path: "/write-for-us",
   kicker: "Write for us",
 });
@@ -34,7 +34,7 @@ export default async function WriteForUsPage({ searchParams }: { searchParams: P
     <div className="container-x py-8 sm:py-12">
       <JsonLd data={[breadcrumbJsonLd(crumbs), faqJsonLd(FAQS)]} />
       <Breadcrumbs items={crumbs} className="mb-4" />
-      <SectionHeader as="h1" eyebrow="Write for us" title="Know how something really works in Pakistan? Write it up." description="We publish practical guides from people who do the thing for a living — tax practitioners, installers, bankers, lawyers, teachers. Guest articles are free and carry your byline. Companies can also submit sponsored articles and press releases, clearly labelled." />
+      <SectionHeader as="h1" eyebrow="Write for us" title="Know how something really works in Pakistan? Write it up." description="We publish practical guides from people who do the thing for a living: tax practitioners, installers, bankers, lawyers, teachers. Guest articles are free and carry your byline. Companies can also submit sponsored articles and press releases, clearly labelled." />
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-10">

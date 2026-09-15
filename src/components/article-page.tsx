@@ -8,6 +8,7 @@ import { getArticle, getArticlesByIds, getTagsForArticle, listArticles } from "@
 import { entitiesForTarget } from "@/db/queries/entities";
 import { formatDate } from "@/lib/format";
 import { AdSlot } from "@/components/ads";
+import { CiteThis } from "@/components/cite";
 import { extractToc, renderMarkdown } from "@/lib/markdown";
 import { articleJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { TOOLS } from "@/tools/registry";
@@ -73,7 +74,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
             </Link>
           ) : null}
           {article.isSponsored ? <Badge tone="warning">Sponsored</Badge> : null}
-          {article.publishedAt ? <span>{kind === "news" ? "Published" : "Updated"} {formatDate(article.lastReviewedAt ?? article.publishedAt)}</span> : null}
+          {article.publishedAt ? <span>{kind === "news" ? "Published" : "Updated"} <time dateTime={(article.lastReviewedAt ?? article.publishedAt).toISOString()}>{formatDate(article.lastReviewedAt ?? article.publishedAt)}</time></span> : null}
           <span>{article.readingMinutes ?? 3} min read</span>
         </div>
       </header>
@@ -150,6 +151,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
 
           <div className="mt-8 max-w-[68ch]">
             <ReportForm targetType="article" targetId={article.id} label="Spotted an error? Report it" />
+            <CiteThis title={article.title} path={path} date={article.updatedAt ?? article.publishedAt} markdownPath={`/api/md${path}`} className="mt-3" />
           </div>
 
           {article.sources.length ? (
@@ -163,7 +165,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
                     ) : (
                       s.title
                     )}
-                    {s.publisher ? <span className="text-3"> — {s.publisher}</span> : null}
+                    {s.publisher ? <span className="text-3">: {s.publisher}</span> : null}
                   </li>
                 ))}
               </ul>

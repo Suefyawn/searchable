@@ -5,7 +5,7 @@ import { INVERTERS } from "@/content/inverters";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Compare — Cars, Solar Inverters and More, Side by Side",
+  title: "Compare: Cars, Solar Inverters and More, Side by Side",
   description: "Structured comparisons with prices and the specs that matter: new cars in Pakistan, solar inverters, and more to come. Filter, pick three, compare.",
   path: "/compare",
   kicker: "Compare",

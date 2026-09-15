@@ -25,49 +25,49 @@ src/db/schema/
 | `sessions`, `accounts`, `verifications` | better-auth internals (sessions in DB, password hash in `accounts.password`) |
 
 ## Geography
-`locations(id, parent_id, kind, slug, name, name_urdu, city_id, province_id, lat, lng, population)` — one tree. `city_id`/`province_id` are denormalised for fast filtering. Unique on `(kind, slug)`.
+`locations(id, parent_id, kind, slug, name, name_urdu, city_id, province_id, lat, lng, population)`, one tree. `city_id`/`province_id` are denormalised for fast filtering. Unique on `(kind, slug)`.
 
 ## Content
-- `categories(kind, slug, name)` — scoped by article kind so `/news/technology` and `/guides/technology` coexist.
-- `articles` — `kind` (news | guide | explainer | page), `status` workflow (draft → research → editing → fact_check → scheduled → published → archived), Markdown `body`, `dek`, `excerpt`, `sources[]` and `faqs[]` as JSONB, SEO overrides, `noindex`, `is_featured`, `location_id` for a local angle, view counter, `published_at`, `last_reviewed_at`. Unique on `(kind, slug)`.
-- `article_revisions` — snapshot on every publish (auditable corrections).
-- `authors` — display identity, optionally linked to a user.
+- `categories(kind, slug, name)`, scoped by article kind so `/news/technology` and `/guides/technology` coexist.
+- `articles`, `kind` (news | guide | explainer | page), `status` workflow (draft → research → editing → fact_check → scheduled → published → archived), Markdown `body`, `dek`, `excerpt`, `sources[]` and `faqs[]` as JSONB, SEO overrides, `noindex`, `is_featured`, `location_id` for a local angle, view counter, `published_at`, `last_reviewed_at`. Unique on `(kind, slug)`.
+- `article_revisions`, snapshot on every publish (auditable corrections).
+- `authors`, display identity, optionally linked to a user.
 
 ## Tools
-- `tools` — metadata mirrored from the code registry (`src/tools/registry.ts`) by the seed/indexer; `run_count`, `last_reviewed_at`, `version`.
-- `tool_runs` — anonymous inputs per run, for product decisions (which tools, which ranges).
+- `tools`, metadata mirrored from the code registry (`src/tools/registry.ts`) by the seed/indexer; `run_count`, `last_reviewed_at`, `version`.
+- `tool_runs`, anonymous inputs per run, for product decisions (which tools, which ranges).
 
 ## Directory
-- `business_categories` — tree (parent_id), `name`, `name_plural`, `icon`.
-- `businesses` — NAP, WhatsApp, website, socials, geo, `status` (pending | active | closed | rejected | duplicate), `tier` (free | verified | premium | sponsored), rating aggregates, `is_verified` + dates, `owner_user_id`.
-- `business_category_links` — many-to-many (primary category also stored on the business).
-- `business_hours` — one row per weekday (`opens`/`closes` as "HH:MM").
-- `business_services`, `business_photos` — owner-managed.
-- `business_reviews` — with moderation `status` and `owner_response`.
-- `business_claims` — user ↔ business ownership requests with review trail.
-- `business_leads` — enquiries from profile/category pages.
+- `business_categories`, tree (parent_id), `name`, `name_plural`, `icon`.
+- `businesses`, NAP, WhatsApp, website, socials, geo, `status` (pending | active | closed | rejected | duplicate), `tier` (free | verified | premium | sponsored), rating aggregates, `is_verified` + dates, `owner_user_id`.
+- `business_category_links`, many-to-many (primary category also stored on the business).
+- `business_hours`, one row per weekday (`opens`/`closes` as "HH:MM").
+- `business_services`, `business_photos`, owner-managed.
+- `business_reviews`, with moderation `status` and `owner_response`.
+- `business_claims`, user ↔ business ownership requests with review trail.
+- `business_leads`, enquiries from profile/category pages.
 
 ## Knowledge graph
-- `entities(kind, slug, name, name_urdu, aliases[], description, website, facts{})` — FBR, NADRA, Toyota, Gold, USD/PKR, Lahore…
-- `entity_links(entity_id, target_type, target_id, relation)` — polymorphic edges to article | tool | business | location | data_series | comparison.
+- `entities(kind, slug, name, name_urdu, aliases[], description, website, facts{})`, FBR, NADRA, Toyota, Gold, USD/PKR, Lahore…
+- `entity_links(entity_id, target_type, target_id, relation)`, polymorphic edges to article | tool | business | location | data_series | comparison.
 
 ## Data platform
 - `data_series(slug, name, unit, frequency, source)` and `data_points(series_id, date, value)` unique per day.
 
 ## Audience
-- `newsletter_subscribers` — `status` (pending | active | unsubscribed | bounced), `frequency`, `topics[]`, confirm/unsubscribe tokens, `source`.
-- `newsletter_issues` — assembled issues (Phase 5).
+- `newsletter_subscribers`, `status` (pending | active | unsubscribed | bounced), `frequency`, `topics[]`, confirm/unsubscribe tokens, `source`.
+- `newsletter_issues`, assembled issues (Phase 5).
 
 ## Search
-- `search_documents` — one row per searchable thing: `entity_type`, `entity_id`, `url`, `title`, `summary`, `body`, `keywords`, `category`, `city`, `boost`, `popularity`, `published_at`, and two generated columns: `tsv` (weighted, English-stemmed, GIN) and `tsv_simple` (unstemmed, for prefix matching). Unique on `(entity_type, entity_id)`.
-- `search_queries` — every search with `result_count` (zero-result queries = content backlog).
-- `search_synonyms` — term → synonyms (Phase 5 query expansion).
+- `search_documents`, one row per searchable thing: `entity_type`, `entity_id`, `url`, `title`, `summary`, `body`, `keywords`, `category`, `city`, `boost`, `popularity`, `published_at`, and two generated columns: `tsv` (weighted, English-stemmed, GIN) and `tsv_simple` (unstemmed, for prefix matching). Unique on `(entity_type, entity_id)`.
+- `search_queries`, every search with `result_count` (zero-result queries = content backlog).
+- `search_synonyms`, term → synonyms (Phase 5 query expansion).
 
 ## Platform
-- `redirects` — old path → new path (URL changes must add a row).
-- `media` — uploaded assets metadata.
-- `analytics_events` — first-party events (`page_view`, `search`, `tool_run`, `business_click`, `business_lead`, `newsletter_subscribe`).
-- `settings` — key/JSON site settings editable in admin.
+- `redirects`, old path → new path (URL changes must add a row).
+- `media`, uploaded assets metadata.
+- `analytics_events`, first-party events (`page_view`, `search`, `tool_run`, `business_click`, `business_lead`, `newsletter_subscribe`).
+- `settings`, key/JSON site settings editable in admin.
 
 ## Conventions
 - Never hand-edit files in `drizzle/`; generate them.

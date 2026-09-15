@@ -1,4 +1,4 @@
-# SEO keyword map — Pakistan (Semrush, 2026-09-15)
+# SEO keyword map: Pakistan (Semrush, 2026-09-15)
 
 Volumes are monthly Google searches in the Pakistan database; KD = keyword difficulty (0–100). Intent: I informational, T transactional, N navigational, C commercial.
 
@@ -7,7 +7,7 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 1. **Daily-number pages are the largest opportunity by far.** Gold, petrol, dollar and silver rates dwarf everything else. They need to be *the* page for that query: number first, city variants, history, source, updated daily. The data hub already has the structure; the job is daily discipline and naming.
 2. **Utility "check" queries are enormous and under-served.** "lesco bill check" 246k, "iesco bill" 246k, "mepco bill" 1.2M, "electricity bill check online" 135k. Built `/electricity/[disco]` for all 11 DISCOs.
 3. **Calculators with low difficulty:** PTA (KD16), LESCO bill (KD15), zakat (KD33 but CPC Rs 4+), marla converter, salary tax. Titles now lead with the exact phrase.
-4. **Our own phrasings were wrong in places** — "bijli bill calculator" (20/mo), "solar calculator pakistan" (140/mo), "net metering in pakistan" (50/mo). People search "solar panel price in pakistan" (49.5k) and "solar system price in pakistan".
+4. **Our own phrasings were wrong in places**, "bijli bill calculator" (20/mo), "solar calculator pakistan" (140/mo), "net metering in pakistan" (50/mo). People search "solar panel price in pakistan" (49.5k) and "solar system price in pakistan".
 
 ## Keyword → page map
 
@@ -17,7 +17,7 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 | gold price in pakistan | 823,000 | 43 | /data/gold-24k-tola | ✅ renamed "Gold rate in Pakistan today (24K per tola)" |
 | gold rate in pakistan today | 550,000 | 46 | same | ✅ |
 | gold rate today | 246,000 | 34 | same | ✅ |
-| gold rate today karachi / lahore | 60,500 / 22,200 | 30 / 28 | same — city sections with anchors (#karachi, #lahore) | ✅ |
+| gold rate today karachi / lahore | 60,500 / 22,200 | 30 / 28 | same: city sections with anchors (#karachi, #lahore) | ✅ |
 | 1 tola gold price in pakistan | 60,500 | 34 | same | ✅ |
 | 22k gold rate today | 3,600 | 21 | /data/gold-22k-tola | ✅ new |
 | silver rate today | 74,000 | 32 | /data/silver-tola | ✅ new |
@@ -42,9 +42,9 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 |---|---|---|---|
 | alto car price in pakistan / alto price in pakistan | 60,500 / 40,500 | 29 | /compare/cars (#suzuki-alto) ✅ |
 | swift price in pakistan / suzuki swift price | 27,100 / 12,100 | 21 / 27 | same ✅ |
-| wagon r price in pakistan | 18,100 | 22 | discontinued — mention only |
+| wagon r price in pakistan | 18,100 | 22 | discontinued: mention only |
 | suzuki every price in pakistan | 14,800 | 21 | same ✅ |
-| car price in pakistan | — | — | same ✅ |
+| car price in pakistan |: |: | same ✅ |
 
 ### Electricity (`/electricity/[disco]`)
 | Keyword | Vol | KD | Page |
@@ -62,9 +62,9 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 ### Net metering (`/electricity/net-metering`)
 | Keyword | Vol | KD | Page |
 |---|---|---|---|
-| net metering in pakistan / net metering | — | — | /electricity/net-metering (hub: 2026 NEPRA Prosumer Regulations, approved inverter list, per-DISCO sections with anchors) |
-| lesco / iesco / k electric net metering | — | — | same, #lesco #iesco #k-electric |
-| net metering approved inverters | — | — | same, #approved-inverters |
+| net metering in pakistan / net metering |: |: | /electricity/net-metering (hub: 2026 NEPRA Prosumer Regulations, approved inverter list, per-DISCO sections with anchors) |
+| lesco / iesco / k electric net metering |: |: | same, #lesco #iesco #k-electric |
+| net metering approved inverters |: |: | same, #approved-inverters |
 
 ### Tools
 | Keyword | Vol | KD | Page |
@@ -89,7 +89,7 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 ### Guides
 | Keyword | Vol | KD | Page |
 |---|---|---|---|
-| fbr iris | 165,000 | 43 | ❌ write "FBR IRIS: login, registration, and filing — complete guide" |
+| fbr iris | 165,000 | 43 | ❌ write "FBR IRIS: login, registration, and filing: complete guide" |
 | fbr login / iris login | 49,500 / 40,500 | 44 | same guide |
 | filer status check / atl status check | 9,900 / 2,900 | 30 / 29 | ❌ write "How to check filer status (ATL) by SMS and online" |
 | ntn number check | 6,600 | 37 | same |
@@ -107,9 +107,9 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 pta imei check 74k · pta check 60k · pta dirbs 60k · pta tax 22k · pta approved check 18k · pta imei check online 18k · pta mobile registration 12k · pta approved 8k · pta registration 8k · pta tax check online 6.6k → ✅ `/pta` hub built: IMEI check by SMS (8484), tax list by slab, tax on popular phones at today’s dollar rate, DIRBS steps, FAQs.
 
 ## Title conventions (applied)
-- Tool: `<exact head keyword> — <secondary keyword> (<qualifier/year>)`, ≤ 70 chars where possible.
-- Data: `<name as searched> today — <value> <unit>` (value injected at render).
-- DISCO: `<SHORT> Bill Check Online — Check <SHORT> Bill by Reference Number, Calculate & Pay`.
+- Tool: `<exact head keyword>, <secondary keyword> (<qualifier/year>)`, ≤ 70 chars where possible.
+- Data: `<name as searched> today, <value> <unit>` (value injected at render).
+- DISCO: `<SHORT> Bill Check Online, Check <SHORT> Bill by Reference Number, Calculate & Pay`.
 - News explainer on slabs: keep "FY2025-26 salary tax slabs" phrasing.
 
 ## Content backlog from this research (priority order)

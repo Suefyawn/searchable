@@ -6,7 +6,7 @@ export const eobiCalculator: ToolDefinition = {
   slug: "eobi-calculator",
   category: "finance",
   name: "EOBI Contribution Calculator 2026-27",
-  seoTitle: "EOBI Contribution Calculator 2026-27 — Employer 5% & Employee 1% on Minimum Wage Rs 40,700, Monthly and Annual",
+  seoTitle: "EOBI Contribution Calculator 2026-27: Employer 5% & Employee 1% on Minimum Wage Rs 40,700, Monthly and Annual",
   shortName: "EOBI",
   description: "Work out EOBI contributions for one employee or a whole payroll: employer 5% and employee 1% of the federal minimum wage (Rs 40,700 from July 2026), monthly and per year, plus who must register and when pension starts.",
   keywords: ["eobi calculator", "eobi contribution", "eobi contribution rate 2026", "eobi employer contribution", "eobi employee contribution", "eobi minimum wage", "eobi pension", "eobi registration", "minimum wage pakistan 2026", "payroll pakistan"],
@@ -37,7 +37,7 @@ export const eobiCalculator: ToolDefinition = {
     const monthly = perHead * n;
     return {
       headline: { label: `EOBI per month for ${n} employee${n > 1 ? "s" : ""}`, value: pkr(monthly), primary: true },
-      summary: `Per employee: employer ${pkr(employer)} (5%) and employee ${pkr(employee)} (1%) of the ${pkr(wage)} minimum wage — ${pkr(employer + employee)} a month, ${pkr((employer + employee) * 12)} a year. ${n >= EOBI.employeeThreshold ? "With 5 or more employees, registration is mandatory." : "Registration becomes mandatory at 5 employees; voluntary before that."}`,
+      summary: `Per employee: employer ${pkr(employer)} (5%) and employee ${pkr(employee)} (1%) of the ${pkr(wage)} minimum wage, ${pkr(employer + employee)} a month, ${pkr((employer + employee) * 12)} a year. ${n >= EOBI.employeeThreshold ? "With 5 or more employees, registration is mandatory." : "Registration becomes mandatory at 5 employees; voluntary before that."}`,
       sections: [
         {
           title: "Per employee",
@@ -65,7 +65,7 @@ export const eobiCalculator: ToolDefinition = {
 
 - **Employer contribution: 5%** of the minimum wage per insured employee per month (s.9).
 - **Employee contribution: 1%** of the minimum wage, deducted from salary (s.9B).
-- The base is the **federal minimum wage** — Rs ${EOBI.minimumWage.toLocaleString()} from 1 July 2026 under Finance Act 2026 — **not** the employee's actual pay.
+- The base is the **federal minimum wage**, Rs ${EOBI.minimumWage.toLocaleString()} from 1 July 2026 under Finance Act 2026, **not** the employee's actual pay.
 - Employers with **${EOBI.employeeThreshold} or more employees** must register (many register earlier voluntarily so staff accrue service).
 - Pension is payable at **60 (men) / 55 (women)** after at least **15 years** of insurable service, at a minimum monthly pension set by the government; invalidity and survivors' pensions also exist.
 

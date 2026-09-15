@@ -7,7 +7,7 @@ import { buildMetadata } from "@/lib/seo";
 
 export const revalidate = 3600;
 export const metadata = buildMetadata({
-  title: "Business directory — Pakistan",
+  title: "Business directory: Pakistan",
   description: "Find restaurants, doctors, lawyers, solar companies, car dealers and more across Pakistani cities, with hours, phone and WhatsApp.",
   path: "/businesses",
 });

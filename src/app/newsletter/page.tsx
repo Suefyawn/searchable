@@ -2,14 +2,14 @@ import { NewsletterForm } from "@/components/newsletter-form";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Searchable Daily — the useful morning email about Pakistan",
+  title: "Searchable Daily: the useful morning email about Pakistan",
   description: "Top stories, what changed, one useful number and a tool of the day. Two minutes to read, every morning at 7. Free.",
   path: "/newsletter",
 });
 
 const ITEMS = [
   ["Top stories", "Three things that matter today, with the useful context."],
-  ["What changed", "Prices, rates, rules, deadlines — the numbers that moved."],
+  ["What changed", "Prices, rates, rules, deadlines, the numbers that moved."],
   ["Useful number", "One figure worth knowing: petrol, dollar, gold, policy rate."],
   ["Tool of the day", "A calculator that answers a question people asked yesterday."],
   ["Business spotlight", "A verified business worth knowing about in your city."],
@@ -23,7 +23,7 @@ export default function NewsletterPage() {
         <div>
           <p className="eyebrow">Searchable Daily</p>
           <h1 className="mt-2 font-display text-5xl font-bold leading-[1.02] tracking-tight sm:text-6xl">The useful morning email about Pakistan</h1>
-          <p className="mt-4 text-lg text-2 leading-relaxed">Not a news dump. A short, practical briefing on what changed and what it means for you — with the tool or guide that helps you act on it.</p>
+          <p className="mt-4 text-lg text-2 leading-relaxed">Not a news dump. A short, practical briefing on what changed and what it means for you: with the tool or guide that helps you act on it.</p>
           <dl className="mt-8 space-y-4">
             {ITEMS.map(([t, d]) => (
               <div key={t} className="flex gap-3">

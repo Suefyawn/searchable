@@ -1,4 +1,4 @@
-# Monetization plan — how Searchable earns
+# Monetization plan: how Searchable earns
 
 Goal: profitable from organic traffic and business customers, without ever selling editorial content or calculator results. Three revenue lines, in the order they arrive.
 
@@ -6,19 +6,19 @@ Goal: profitable from organic traffic and business customers, without ever selli
 
 | Stage | Trigger | Revenue line | What is already built |
 |---|---|---|---|
-| **0. Now (local)** | — | Nothing yet. Build inventory: pages, tools, listings. | Everything in this doc except the card gateway |
+| **0. Now (local)** |: | Nothing yet. Build inventory: pages, tools, listings. | Everything in this doc except the card gateway |
 | **1. Go-live → Day 90** | Site live on searchable.pk, 200+ indexed pages, AdSense approval | **AdSense** on articles, guides, data pages, DISCO pages | `AdSlot` component, ads.txt route, editorial-policy/privacy/about/contact pages (AdSense requires them) |
 | **2. Day 60 onwards** | 500+ business listings, first claims | **Business plans**: Verified Rs 9,900/yr · Premium Rs 4,900/mo · Sponsored Rs 19,900/mo · Category sponsor Rs 14,900/mo | Pricing (`src/content/pricing.ts`), owner Upgrade page, invoices, `/admin/orders`, tier placement + dofollow entitlement, cron expiry |
 | **3. Day 90 onwards** | Domain authority visible in Semrush (DA/AS > 15) | **Sponsored articles Rs 35,000 · Press releases Rs 12,000** (the "backlink" product, done properly) + free guest posts for content volume | `/write-for-us`, `/advertise`, submissions queue, convert-to-draft with Sponsored label and `rel=sponsored` |
 | **4. Day 180+** | Newsletter > 3,000 subscribers | Newsletter sponsorship (1 sponsor/issue) | Issue builder; sponsor slot is a markdown block for now |
 | **5. Day 300+** | Traffic on comparison pages | Affiliate: banks (car/home loans), insurance, solar, e-commerce (PTA-approved phones) | Tracked links + `rel=sponsored` pattern; disclosure line in editorial policy |
 
-## 1. AdSense — what it takes and what it pays
+## 1. AdSense: what it takes and what it pays
 
 **Approval checklist** (all present):
 - Original content, 30+ substantial pages ✅ (20 seed articles + 14 tools + hubs; needs real daily publishing after go-live)
 - About, Contact, Privacy, Terms, Editorial policy pages ✅
-- No placeholder/thin pages indexed — category × city pages `noindex` below 5 listings ✅
+- No placeholder/thin pages indexed, category × city pages `noindex` below 5 listings ✅
 - Fast, mobile-first, no intrusive interstitials ✅
 - `ads.txt` served at `/ads.txt` (route added; fill in the publisher id) ✅
 
@@ -28,7 +28,7 @@ Goal: profitable from organic traffic and business customers, without ever selli
 
 **Turn it on:** set `NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-…` and the slot ids `NEXT_PUBLIC_ADSENSE_SLOT_{LEADERBOARD,IN_ARTICLE,SIDEBAR,FOOTER}` in Vercel env; redeploy. Off by default so local and staging never load Google scripts.
 
-## 2. Business plans — the main line
+## 2. Business plans: the main line
 
 Directory listings are free forever (address, phone, hours, reviews, claim). What we sell is **placement and trust signals**:
 
@@ -39,17 +39,17 @@ Directory listings are free forever (address, phone, hours, reviews, claim). Wha
 | Sponsored | Rs 19,900 / month | First nationally in the category, labelled Sponsored; mentioned in relevant guides where genuinely useful | Category leaders (banks, telcos, solar brands) |
 | Category sponsor (city) | Rs 14,900 / month | Pinned first on one category × city page; one per page | Exclusive, scarce, simple to explain |
 
-**How the money flows (built):** owner clicks *Upgrade* → picks plan → invoice `SP-2026-000123` created and emailed with bank / JazzCash / Easypaisa details → payer submits transaction ID on the invoice page → admin sees it in `/admin/orders`, clicks *Mark paid* → tier, expiry, verified badge set automatically; expiry cron downgrades when it lapses. A card gateway (Safepay or PayFast — both Pakistani, both support cards + wallets) plugs in as another `provider` on the same order.
+**How the money flows (built):** owner clicks *Upgrade* → picks plan → invoice `SP-2026-000123` created and emailed with bank / JazzCash / Easypaisa details → payer submits transaction ID on the invoice page → admin sees it in `/admin/orders`, clicks *Mark paid* → tier, expiry, verified badge set automatically; expiry cron downgrades when it lapses. A card gateway (Safepay or PayFast, both Pakistani, both support cards + wallets) plugs in as another `provider` on the same order.
 
-**Sales motion for the first 100 paying businesses:** the click-tracking data is the pitch. Every claimed business sees "this month: 43 call clicks, 12 WhatsApp, 9 website" in its dashboard. Emailing owners of unclaimed listings with their numbers ("people are already calling you from Searchable — claim it, then get verified") is the cheapest funnel we have. `/admin/leads` + the monthly performance email (Sponsored tier) are the tools.
+**Sales motion for the first 100 paying businesses:** the click-tracking data is the pitch. Every claimed business sees "this month: 43 call clicks, 12 WhatsApp, 9 website" in its dashboard. Emailing owners of unclaimed listings with their numbers ("people are already calling you from Searchable, claim it, then get verified") is the cheapest funnel we have. `/admin/leads` + the monthly performance email (Sponsored tier) are the tools.
 
 **Targets:** 50 paying businesses by Day 200 (≈ Rs 350k/month mixed), 300 by Day 500 (≈ Rs 2M/month). At that point plans out-earn AdSense 10:1.
 
-## 3. Sponsored content and backlinks — done without poisoning the site
+## 3. Sponsored content and backlinks: done without poisoning the site
 
 Everyone selling "guest posts" in Pakistan sells hidden dofollow links in filler articles. That gets sites penalised and readers leave. We sell the same outcome (a link on a trusted site) **openly**:
 
-- **Sponsored article, Rs 35,000:** useful article about the product, edited to our standard, labelled *Sponsored*, up to 2 links with `rel="sponsored"` (Google's required attribute — still passes brand, traffic and legitimacy; still what serious buyers want). Shared once in the newsletter.
+- **Sponsored article, Rs 35,000:** useful article about the product, edited to our standard, labelled *Sponsored*, up to 2 links with `rel="sponsored"` (Google's required attribute, still passes brand, traffic and legitimacy; still what serious buyers want). Shared once in the newsletter.
 - **Press release, Rs 12,000:** published in Business within 2 working days, one link.
 - **Guest article, free:** practitioners write real guides, get a byline and one nofollow link. This is a content-volume engine: 4–8 free guides a month from tax practitioners, installers and lawyers who want the visibility.
 
@@ -59,7 +59,7 @@ Everyone selling "guest posts" in Pakistan sells hidden dofollow links in filler
 
 ## 4. What is deliberately not for sale
 
-- Calculator results, rate tables, data series — ever.
+- Calculator results, rate tables, data series, ever.
 - Reviews or ratings. Moderation is for spam and abuse only.
 - Position in news or guides listings. Sponsored articles live in their section, never in the lead slot.
 - Hidden links of any kind.

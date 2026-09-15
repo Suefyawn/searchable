@@ -1,7 +1,7 @@
-# SEARCHABLE.PK — MASTER SPECIFICATION
+# SEARCHABLE.PK: MASTER SPECIFICATION
 
 > **Status:** Living document. Source of truth for product, content, and engineering.
-> **Version:** 0.1 — Day 0 (2026-09-15)
+> **Version:** 0.1, Day 0 (2026-09-15)
 > **Owner:** Founder
 > **Companion docs:** `docs/ROADMAP-1000-DAYS.md` · `docs/ARCHITECTURE.md` · `docs/DATABASE.md` · `docs/URL-ARCHITECTURE.md` · `docs/TOOLS-FRAMEWORK.md` · `docs/SEARCH.md` · `docs/CONTENT-OPERATIONS.md` · `docs/LOCAL-TO-PRODUCTION.md` · `docs/DECISIONS.md`
 
@@ -16,11 +16,11 @@
 | **Tagline** | Find what you need. Know what matters. |
 | **One-liner** | Pakistan's information platform. |
 | **Mission** | Make useful information about Pakistan easy to find, understand and use. |
-| **Vision** | Become Pakistan's most useful digital information platform — the searchable information layer for the country. |
+| **Vision** | Become Pakistan's most useful digital information platform: the searchable information layer for the country. |
 | **Category** | Media + data + local discovery + utility platform. **Not** a blog. **Not** a news site. **Not** a directory. All of them, unified by search. |
 
 ### Brand promise
-Someone types a real question — *"PTA tax on iPhone 17"*, *"restaurants in DHA Lahore"*, *"income tax on 250,000 salary"*, *"how to become a filer"* — and Searchable answers it with the right **kind** of answer: a tool, a business, a guide, a number, or a story.
+Someone types a real question, *"PTA tax on iPhone 17"*, *"restaurants in DHA Lahore"*, *"income tax on 250,000 salary"*, *"how to become a filer"*, and Searchable answers it with the right **kind** of answer: a tool, a business, a guide, a number, or a story.
 
 ### Two-level branding
 ```
@@ -84,7 +84,7 @@ SEARCHABLE                       ← master brand
 | Compare | `/compare` | `comparisons` | Phase 2 |
 | Jobs / Events / Deals | `/jobs` `/events` `/deals` | own tables | Phase 3 |
 | Newsletter | `/newsletter` | `newsletter_subscribers` | ✅ Day 1 (capture) |
-| Search | `/search` | `search_documents` | ✅ Day 1 — **the center** |
+| Search | `/search` | `search_documents` | ✅ Day 1: **the center** |
 | Ask Searchable | `/ask` | RAG over everything | Phase 4 |
 
 ---
@@ -111,7 +111,7 @@ Later intelligence: intent detection (*tool / place / explainer / number / story
 
 ## 4. Entities are the foundation (knowledge graph)
 
-Every important noun in Pakistan becomes an **entity** row: `Apple`, `Toyota`, `FBR`, `NADRA`, `PTA`, `Meezan Bank`, `Lahore`, `Gold`, `USD`, `K-Electric`. Articles, tools, guides, businesses, data series, and comparisons link to entities via `entity_links`. An entity page (`/e/fbr`) aggregates everything Searchable knows about it. This is what eventually makes Searchable infrastructure rather than a website — and what makes "Ask Searchable" possible without hallucination.
+Every important noun in Pakistan becomes an **entity** row: `Apple`, `Toyota`, `FBR`, `NADRA`, `PTA`, `Meezan Bank`, `Lahore`, `Gold`, `USD`, `K-Electric`. Articles, tools, guides, businesses, data series, and comparisons link to entities via `entity_links`. An entity page (`/e/fbr`) aggregates everything Searchable knows about it. This is what eventually makes Searchable infrastructure rather than a website, and what makes "Ask Searchable" possible without hallucination.
 
 ---
 
@@ -146,7 +146,7 @@ Rules: lowercase, hyphenated slugs; no dates in URLs; no trailing slashes; categ
 | Language | TypeScript (strict) | |
 | Styling | Tailwind v4 + hand-rolled component primitives (shadcn-compatible) | |
 | ORM | **Drizzle** | SQL-shaped, type-safe, generates real migrations |
-| Database (local) | **PGlite** — real Postgres compiled to WASM, embedded, zero install | Docker is not on this machine; PGlite gives genuine Postgres semantics (tsvector, generated columns, JSONB) with nothing to run |
+| Database (local) | **PGlite**: real Postgres compiled to WASM, embedded, zero install | Docker is not on this machine; PGlite gives genuine Postgres semantics (tsvector, generated columns, JSONB) with nothing to run |
 | Database (prod) | **Supabase Postgres** | Same schema, same migrations, same Drizzle code; only `DATABASE_URL` changes |
 | Auth | **better-auth** (email/password, roles) | Works identically against PGlite and Supabase; keeps auth out of the DB vendor |
 | Email | Resend (prod) / file outbox (local) | |
@@ -225,7 +225,7 @@ A generic `/tools/[category]/[slug]` page renders the form from `fields`, runs `
 
 ---
 
-## 11. Newsletter — Searchable Daily
+## 11. Newsletter: Searchable Daily
 
 Capture from Day 1 (email + topic prefs). Send from Day ~300. Structure: top stories · what changed · useful number · business spotlight · tool of the day · trending · one thing worth knowing. Provider: Resend (prod). Local: emails written to `.data/outbox/`.
 
@@ -245,7 +245,7 @@ Built-in from Day 1: canonical URLs, dynamic sitemaps per entity type, `robots.t
 
 ## 14. AI policy
 
-**Internal employee first, public chatbot later.** Internal uses (Phase 1–2): research briefs, news monitoring, article drafts *for human editing*, fact extraction, SEO suggestions, internal-link suggestions, business categorisation/enrichment, translation (EN ⇄ UR), newsletter assembly, search-query classification, moderation. Public **Ask Searchable** (Phase 4) is a retrieval interface over Searchable's own structured data — it calls tools, queries the directory, cites guides and data series. It never answers from model memory alone.
+**Internal employee first, public chatbot later.** Internal uses (Phase 1–2): research briefs, news monitoring, article drafts *for human editing*, fact extraction, SEO suggestions, internal-link suggestions, business categorisation/enrichment, translation (EN ⇄ UR), newsletter assembly, search-query classification, moderation. Public **Ask Searchable** (Phase 4) is a retrieval interface over Searchable's own structured data, it calls tools, queries the directory, cites guides and data series. It never answers from model memory alone.
 
 ---
 
@@ -268,8 +268,8 @@ Full plan with exit criteria per phase: `docs/ROADMAP-1000-DAYS.md`.
 
 ```
 Day 0        Master spec (this document)
-Day 1–30     LOCAL PROTOTYPE — foundation, schema, design system, core pages, search, CMS, 6 tools, seed data
-Day 31–45    Go-live prep: Supabase, Vercel, domain, email, analytics — first public deploy
+Day 1–30     LOCAL PROTOTYPE, foundation, schema, design system, core pages, search, CMS, 6 tools, seed data
+Day 31–45    Go-live prep: Supabase, Vercel, domain, email, analytics, first public deploy
 Day 46–100   News + Guides + Tools engine hardened; first 50 tools; first 500 businesses
 Day 101–200  Business directory + owner accounts; location engine
 Day 201–300  Search intelligence; newsletter launch
@@ -283,8 +283,8 @@ Day 851–1000 Mobile/PWA; scale; Searchable 1.0
 
 ## 17. Daily operating system (two tracks, every day)
 
-**Track A — Product:** develop → test → SEO → performance → security → data → automation.
-**Track B — Media/Growth:** research → news → guide → tool/data → social → newsletter → business acquisition.
+**Track A, Product:** develop → test → SEO → performance → security → data → automation.
+**Track B, Media/Growth:** research → news → guide → tool/data → social → newsletter → business acquisition.
 
 Weekly cadence: Mon content planning · Tue tools/data · Wed directory · Thu evergreen SEO · Fri newsletter · Sat product · Sun analytics + planning. Monthly KPI review. Details in `docs/CONTENT-OPERATIONS.md`.
 

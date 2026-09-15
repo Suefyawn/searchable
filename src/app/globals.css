@@ -13,7 +13,7 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Brand: a deep, quiet green used sparingly. */
-  /* "brand" is a neutral ramp — the palette is black, white and grey only (ADR-23). */
+  /* "brand" is a neutral ramp, the palette is black, white and grey only (ADR-23). */
   --color-brand-50: oklch(0.975 0.004 85);
   --color-brand-100: oklch(0.95 0.005 85);
   --color-brand-200: oklch(0.9 0.006 85);
@@ -86,7 +86,7 @@
   color-scheme: light;
 }
 
-/* Dark palette is opt-in only (data-theme="dark" on <html>); the site ships light — white base, near-black type (ADR-20). */
+/* Dark palette is opt-in only (data-theme="dark" on <html>); the site ships light, white base, near-black type (ADR-20). */
 :root[data-theme="dark"] {
     --bg: oklch(0.16 0.008 85);
     --surface: oklch(0.18 0.008 85);
@@ -237,7 +237,7 @@
     color: var(--color-brand-300);
   }
 }
-/* Carousel timer rule and the live dot — the only two things that move on the front page. */
+/* Carousel timer rule and the live dot, the only two things that move on the front page. */
 @utility hero-progress {
   width: 0;
   animation: hero-progress linear forwards;

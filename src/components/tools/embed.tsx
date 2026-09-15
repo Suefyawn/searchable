@@ -20,13 +20,13 @@ export function EmbedMode({ toolName, toolPath }: { toolName: string; toolPath: 
         <a href={`${SITE.url}${toolPath}`} target="_blank" rel="noopener" className="font-medium underline underline-offset-4">
           {toolName}
         </a>{" "}
-        by {SITE.name} — free calculators, guides and data for Pakistan.
+        by {SITE.name}, free calculators, guides and data for Pakistan.
       </p>
     </>
   );
 }
 
-/** "Embed this calculator" — an iframe snippet with a followed attribution link underneath (the backlink). */
+/** "Embed this calculator", an iframe snippet with a followed attribution link underneath (the backlink). */
 export function EmbedSnippet({ toolName, toolPath }: { toolName: string; toolPath: string }) {
   const [open, setOpen] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
@@ -51,7 +51,7 @@ export function EmbedSnippet({ toolName, toolPath }: { toolName: string; toolPat
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
               } catch {
-                /* clipboard blocked — the textarea is selectable */
+                /* clipboard blocked, the textarea is selectable */
               }
             }}
           >

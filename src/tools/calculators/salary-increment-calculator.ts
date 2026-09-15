@@ -6,7 +6,7 @@ export const salaryIncrementCalculator: ToolDefinition = {
   slug: "salary-increment-calculator",
   category: "finance",
   name: "Salary Increment Calculator (with Tax Impact)",
-  seoTitle: "Salary Increment Calculator Pakistan 2026-27 — New Salary, Tax on the Raise and Real Take-Home Increase",
+  seoTitle: "Salary Increment Calculator Pakistan 2026-27: New Salary, Tax on the Raise and Real Take-Home Increase",
   shortName: "Salary increment",
   description: "Enter your salary and the raise (percent or amount) to see the new gross, how much extra income tax you'll pay under the 2026-27 slabs, and what actually lands in your account.",
   keywords: ["salary increment calculator", "increment calculator pakistan", "salary raise calculator", "new salary after increment", "percentage increase salary", "tax on salary increment", "take home after increment", "annual increment calculator", "how to calculate increment percentage"],
@@ -44,7 +44,7 @@ export const salaryIncrementCalculator: ToolDefinition = {
     const realPct = (1 + raisePct) / (1 + inflation) - 1;
     return {
       headline: { label: "New monthly salary (gross)", value: pkr(newSalary), primary: true },
-      summary: `A ${pct(raisePct)} raise takes you from ${pkr(salary)} to ${pkr(newSalary)} gross. Income tax rises by ${pkr(extraTaxMonthly)} a month, so take-home goes from ${pkr(netBefore)} to ${pkr(netAfter)} — ${pkr(netAfter - netBefore)} more in hand (${pct(netBefore ? (netAfter - netBefore) / netBefore : 0)}). Against ${pct(inflation)} inflation the real increase is ${pct(realPct)}.`,
+      summary: `A ${pct(raisePct)} raise takes you from ${pkr(salary)} to ${pkr(newSalary)} gross. Income tax rises by ${pkr(extraTaxMonthly)} a month, so take-home goes from ${pkr(netBefore)} to ${pkr(netAfter)}, ${pkr(netAfter - netBefore)} more in hand (${pct(netBefore ? (netAfter - netBefore) / netBefore : 0)}). Against ${pct(inflation)} inflation the real increase is ${pct(realPct)}.`,
       sections: [
         {
           title: "Gross",
@@ -66,7 +66,7 @@ export const salaryIncrementCalculator: ToolDefinition = {
             { label: "Marginal tax rate on the raise", value: pct(after.marginalRate), muted: true },
           ],
         },
-        { title: "Real terms", lines: [{ label: `Raise vs ${pct(inflation)} inflation`, value: `${pct(realPct)} real`, note: realPct < 0 ? "Below inflation — your purchasing power falls." : "Above inflation — a genuine increase." }] },
+        { title: "Real terms", lines: [{ label: `Raise vs ${pct(inflation)} inflation`, value: `${pct(realPct)} real`, note: realPct < 0 ? "Below inflation: your purchasing power falls." : "Above inflation: a genuine increase." }] },
       ],
       warnings: ["Tax is computed on salary alone under the salaried slabs; other income, tax credits and provident-fund deductions change the exact figure. EOBI and PF deductions are not included."],
     };
@@ -74,7 +74,7 @@ export const salaryIncrementCalculator: ToolDefinition = {
   methodology: `New salary = current × (1 + increment%) or current + amount. The tax impact applies the **${CURRENT_TAX_YEAR.label} salaried slabs** to the annualised salary before and after the raise; the difference is the extra tax, and the marginal rate shows how much of every extra rupee goes to FBR (1% to 35% depending on the slab). The real-terms line deflates the raise by the CPI figure: real = (1 + raise) ÷ (1 + inflation) − 1.`,
   faqs: [
     { question: "How do I calculate increment percentage?", answer: "(New salary − old salary) ÷ old salary × 100. A raise from Rs 150,000 to Rs 165,000 is 10%." },
-    { question: "Why is my take-home increase smaller than the raise?", answer: "Because the extra income is taxed at your marginal slab rate — 11% in the Rs 1.2–2.2M band, rising to 35% above Rs 7M a year — and a raise can push part of your income into a higher slab." },
+    { question: "Why is my take-home increase smaller than the raise?", answer: "Because the extra income is taxed at your marginal slab rate (11% in the Rs 1.2–2.2M band, rising to 35% above Rs 7M a year), and a raise can push part of your income into a higher slab." },
     { question: "What is a good increment in Pakistan?", answer: "Anything above inflation (about 4–6% in 2026) is a real increase; market moves for skilled roles run 20–40%. Compare the real-terms line here, not the headline percentage." },
     { question: "Does the increment affect EOBI or provident fund?", answer: "EOBI is fixed on the minimum wage, so no. Provident fund is usually a percentage of basic salary, so it rises with the raise." },
   ],

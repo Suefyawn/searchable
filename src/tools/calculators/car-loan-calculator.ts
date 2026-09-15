@@ -6,7 +6,7 @@ export const carLoanCalculator: ToolDefinition = {
   slug: "car-loan-calculator",
   category: "cars",
   name: "Car Financing Calculator Pakistan",
-  seoTitle: "Car Financing Calculator Pakistan — Monthly Installment for Bank & Meezan Car Loans",
+  seoTitle: "Car Financing Calculator Pakistan: Monthly Installment for Bank & Meezan Car Loans",
   shortName: "Car Loan",
   description: "Work out your monthly car loan installment, total mark-up and total cost for bank car financing or Meezan car Ijarah at KIBOR-linked rates.",
   keywords: ["car financing calculator", "car loan calculator pakistan", "meezan car finance calculator", "car installment calculator", "car finance pakistan", "bank car loan installment", "car lease calculator", "auto loan calculator pakistan", "kibor car financing"],
@@ -45,7 +45,7 @@ export const carLoanCalculator: ToolDefinition = {
 
     return {
       headline: { label: "Monthly instalment", value: pkr(instalment), primary: true },
-      summary: `Financing ${pkr(principal)} over ${n} months at ${pct(annualRate)} costs ${pkr(markup)} in mark-up. The car ends up costing ${pkr(totalCost)} — ${pct(markup / price)} more than the cash price.`,
+      summary: `Financing ${pkr(principal)} over ${n} months at ${pct(annualRate)} costs ${pkr(markup)} in mark-up. The car ends up costing ${pkr(totalCost)}, ${pct(markup / price)} more than the cash price.`,
       sections: [
         {
           title: "Loan",

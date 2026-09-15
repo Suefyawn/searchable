@@ -74,7 +74,7 @@ export default async function AdminArticles({ searchParams }: { searchParams: Pr
                   </Link>
                 </td>
                 <td className="px-4 py-2.5 text-2">{a.kind}</td>
-                <td className="px-4 py-2.5 text-2">{a.category?.name ?? "—"}</td>
+                <td className="px-4 py-2.5 text-2">{a.category?.name ?? "-"}</td>
                 <td className="px-4 py-2.5">
                   <Badge tone={a.status === "published" ? "success" : a.status === "draft" ? "neutral" : "warning"}>{a.status}</Badge>
                 </td>

@@ -1,4 +1,4 @@
-# Gap audit — plan vs. built (updated 2026-09-15, evening)
+# Gap audit: plan vs. built (updated 2026-09-15, evening)
 
 Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day plan + `docs/ROADMAP-1000-DAYS.md`. Money: see `docs/MONETIZATION.md`.
 
@@ -7,7 +7,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 |---|---|---|
 | Repo, Next.js 16, TS strict, Tailwind v4, Drizzle, PGlite locally | ✅ | |
 | UI primitives | ✅ | Hand-rolled, ADR-12/15 (minimal newspaper) |
-| Supabase / Vercel / staging / production | ❌ | Deliberately deferred — founder will say when (`docs/LOCAL-TO-PRODUCTION.md`) |
+| Supabase / Vercel / staging / production | ❌ | Deliberately deferred: founder will say when (`docs/LOCAL-TO-PRODUCTION.md`) |
 | CI | ✅ | GitHub Actions: typecheck, lint, build |
 | Env management | ✅ | `.env.example`; ads/Openverse/billing keys documented |
 | Error monitoring | ❌ | Sentry at go-live |
@@ -92,6 +92,8 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | Card gateway (Safepay / PayFast) | ❌ | plug-in `provider` on orders |
 | Affiliate links + disclosure | 🟡 policy written; no partner links yet |
 | SEO: Semrush keyword map, keyword-led titles, metadata, JSON-LD (9 types), sitemap, robots, canonicals, redirects, noindex rules, OG images, real credited photos | ✅ |
+| AI and search readiness: llms.txt + llms-full.txt, Markdown renditions (/api/md), key facts + cite blocks, AI-crawler allow list, news sitemap, IndexNow, Discover robots meta, Person JSON-LD (docs/SEO-AI.md) | ✅ |
+| World coverage: 30 press feeds (PK, world, US, markets, crypto, cricket, MMA, snooker, tech, entertainment), matching news categories, /admin/ideas one-click drafts, KSE-100/BTC/ETH series | ✅ |
 | Search Console / Position Tracking | ❌ | after go-live |
 
 ## Design
@@ -108,4 +110,4 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 2. More compare pages (cars, bank accounts, mobile packages) on the inverter-compare pattern.
 3. Tools to 30: ✅ sales tax, 231B, EOBI, FX converter, personal loan, increment, age · next: stamp duty per province, savings/NSC, car import duty, gas bill, freelancer tax, provident fund
 4. ✅ Typo tolerance + intent blending in search.
-5. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md`) — then AdSense, Resend, Search Console, Position Tracking.
+5. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md`), then AdSense, Resend, Search Console, Position Tracking.

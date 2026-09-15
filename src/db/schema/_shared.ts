@@ -15,7 +15,7 @@ export const updatedAt = () =>
     .notNull()
     .$onUpdate(() => new Date());
 
-/** Postgres tsvector — used by the federated search index. */
+/** Postgres tsvector, used by the federated search index. */
 export const tsvector = customType<{ data: string }>({
   dataType() {
     return "tsvector";

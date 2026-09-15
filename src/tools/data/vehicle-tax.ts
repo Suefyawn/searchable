@@ -1,14 +1,14 @@
 /**
  * Taxes and fees at new-vehicle registration. Verified 2026-09-15.
  *
- * s.231B advance income tax (Income Tax Ordinance 2001, First Schedule Part IV Div VII) — value-based since Finance Act
+ * s.231B advance income tax (Income Tax Ordinance 2001, First Schedule Part IV Div VII), value-based since Finance Act
  * 2025; Finance Act 2026 left the vehicle bands unchanged (it amended only the property and remittance divisions).
  * Non-filers pay 3× the filer rate. Value = invoice price inclusive of duties and taxes (local), or customs value +
  * duty + FED + sales tax (imported).
  */
 export const WHT_231B = {
   effectiveFrom: "2025-07-01",
-  source: { title: "Income Tax Ordinance 2001, First Schedule, Part IV, Division VII (s.231B) — Finance Act 2025, unchanged by Finance Act 2026", url: "https://www.fbr.gov.pk/", publisher: "Federal Board of Revenue" },
+  source: { title: "Income Tax Ordinance 2001, First Schedule, Part IV, Division VII (s.231B): Finance Act 2025, unchanged by Finance Act 2026", url: "https://www.fbr.gov.pk/", publisher: "Federal Board of Revenue" },
   nonFilerMultiple: 3,
   bands: [
     { maxCc: 850, pct: 0.005 },
@@ -34,7 +34,7 @@ export function wht231B(cc: number, value: number, filer: boolean): { pct: numbe
  * charges. Sindh and ICT schedules are similar in shape but differ in figures; the tool labels this block Punjab.
  */
 export const REGISTRATION_FEE_PUNJAB = {
-  source: { title: "Registration fee schedule — Motor Vehicle Registration", url: "https://excise.punjab.gov.pk/registration", publisher: "Excise, Taxation & Narcotics Control Department, Punjab" },
+  source: { title: "Registration fee schedule: Motor Vehicle Registration", url: "https://excise.punjab.gov.pk/registration", publisher: "Excise, Taxation & Narcotics Control Department, Punjab" },
   bands: [
     { maxCc: 1000, pct: 0.01 },
     { maxCc: 2000, pct: 0.02 },
@@ -65,7 +65,7 @@ export const SALES_TAX = {
   furtherTaxUnregistered: 0.04,
 };
 
-/** EOBI contributions — Employees' Old-Age Benefits Act 1976; rates are on the federal minimum wage, not actual salary. */
+/** EOBI contributions, Employees' Old-Age Benefits Act 1976; rates are on the federal minimum wage, not actual salary. */
 export const EOBI = {
   reviewedAt: "2026-09-15",
   source: { title: "EOBI contribution rates; federal minimum wage Rs 40,700 (Finance Act 2026, from 1 July 2026)", url: "https://www.eobi.gov.pk/", publisher: "EOBI / Ministry of Finance" },

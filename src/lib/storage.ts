@@ -16,7 +16,7 @@ const VARIANT_MAX: Record<Variant, number> = { article: 1800, logo: 512, cover: 
  * stores it, and records it in the `media` table.
  *
  * STORAGE_PROVIDER=local (default) writes to public/uploads/YYYY/MM/. Production swaps this for
- * Supabase Storage by implementing `putObject` for that provider — the rest is unchanged.
+ * Supabase Storage by implementing `putObject` for that provider, the rest is unchanged.
  */
 export async function storeImage(input: Buffer, opts: { variant: Variant; alt?: string; credit?: string; originalName?: string }): Promise<StoredImage> {
   const max = VARIANT_MAX[opts.variant];

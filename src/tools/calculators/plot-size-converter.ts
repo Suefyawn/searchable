@@ -2,8 +2,8 @@ import { num, str, type ToolDefinition } from "../types";
 import { number } from "@/lib/format";
 
 /**
- * Pakistan uses two marla standards: 272.25 sq ft (Punjab, KP, Islamabad — the "big marla",
- * 1 marla = 9 sq karam of 5.5 ft) and 225 sq ft (Karachi/Sindh and many DHA phases — 15 ft × 15 ft).
+ * Pakistan uses two marla standards: 272.25 sq ft (Punjab, KP, Islamabad, the "big marla",
+ * 1 marla = 9 sq karam of 5.5 ft) and 225 sq ft (Karachi/Sindh and many DHA phases, 15 ft × 15 ft).
  */
 const MARLA_SQFT = { punjab: 272.25, karachi: 225 };
 const SQFT_PER_SQM = 10.7639;
@@ -13,13 +13,13 @@ export const plotSizeConverter: ToolDefinition = {
   slug: "plot-size-converter",
   category: "property",
   name: "Marla to Square Feet Converter",
-  seoTitle: "Marla to Square Feet Converter — 1 Kanal in Marla, 5 Marla in Sq Ft, Sq Yards to Marla",
+  seoTitle: "Marla to Square Feet Converter: 1 Kanal in Marla, 5 Marla in Sq Ft, Sq Yards to Marla",
   shortName: "Plot Size",
-  description: "Convert marla, kanal, square feet, square yards (gaz) and square metres instantly — 1 kanal = 20 marla; 5 marla = 1,125 or 1,361 sq ft depending on the standard.",
+  description: "Convert marla, kanal, square feet, square yards (gaz) and square metres instantly, 1 kanal = 20 marla; 5 marla = 1,125 or 1,361 sq ft depending on the standard.",
   keywords: ["marla to square feet", "1 kanal in marla", "5 marla in square feet", "10 marla in square feet", "1 marla in square feet", "kanal to square feet", "square yards to marla", "marla to sq ft converter", "plot size converter", "gaz to marla"],
   version: "1.0.0",
   lastReviewed: "2026-09-15",
-  sources: [{ title: "Board of Revenue Punjab — land measurement units", publisher: "Government of Punjab" }, { title: "Karachi Development Authority plot standards", publisher: "KDA" }],
+  sources: [{ title: "Board of Revenue Punjab: land measurement units", publisher: "Government of Punjab" }, { title: "Karachi Development Authority plot standards", publisher: "KDA" }],
   fields: [
     { key: "value", label: "Size", type: "number", default: 5, min: 0, step: 0.5 },
     {
@@ -41,8 +41,8 @@ export const plotSizeConverter: ToolDefinition = {
       label: "Marla standard",
       type: "select",
       options: [
-        { value: "punjab", label: "Punjab / KP / Islamabad — 272.25 sq ft" },
-        { value: "karachi", label: "Karachi / Sindh (and most DHAs) — 225 sq ft" },
+        { value: "punjab", label: "Punjab / KP / Islamabad: 272.25 sq ft" },
+        { value: "karachi", label: "Karachi / Sindh (and most DHAs): 225 sq ft" },
       ],
       default: "punjab",
     },
@@ -76,7 +76,7 @@ export const plotSizeConverter: ToolDefinition = {
           lines: [{ label: std === "punjab" ? "Marla at 225 sq ft" : "Marla at 272.25 sq ft", value: f(sqft / (std === "punjab" ? MARLA_SQFT.karachi : MARLA_SQFT.punjab)), muted: true }],
         },
       ],
-      warnings: ["Always confirm the standard used in the society's own documents — a '5 marla' plot can be 1,125 or 1,361 sq ft."],
+      warnings: ["Always confirm the standard used in the society's own documents, a '5 marla' plot can be 1,125 or 1,361 sq ft."],
     };
   },
   methodology: `1 kanal = 20 marla; 1 acre = 8 kanal = 160 marla. The size of a marla differs by region:

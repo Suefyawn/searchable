@@ -3,7 +3,7 @@ import { Img } from "@/components/img";
 import { cn } from "@/lib/utils";
 
 /**
- * Photo tiles for cities and business categories. A real, credited photo with a plain caption below —
+ * Photo tiles for cities and business categories. A real, credited photo with a plain caption below, 
  * no gradients or text-over-image, so it stays legible and quiet (ADR-15).
  */
 export function PhotoTile({ href, title, meta, imageUrl, aspect = "4/3", className, sizes = "(min-width: 1024px) 300px, 50vw" }: { href: string; title: string; meta?: string; imageUrl: string | null; aspect?: string; className?: string; sizes?: string }) {

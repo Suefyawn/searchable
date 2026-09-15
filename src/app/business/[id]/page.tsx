@@ -41,7 +41,7 @@ export default async function OwnerEditBusiness({ params }: { params: Promise<{ 
 
       <section className="mt-12 max-w-3xl">
         <h2 className="text-xl font-semibold">Reviews</h2>
-        <p className="mt-1 text-sm text-2">Responding publicly to reviews — especially critical ones — is the single biggest trust signal on a listing.</p>
+        <p className="mt-1 text-sm text-2">Responding publicly to reviews: especially critical ones: is the single biggest trust signal on a listing.</p>
         {reviews.length ? (
           <ul className="mt-4 space-y-3">
             {reviews.map((r) => (

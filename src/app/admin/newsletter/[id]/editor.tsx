@@ -76,7 +76,7 @@ export function IssueEditor({ issue, previewHtml, userEmail, isAdmin, activeCoun
         {msg ? <Alert tone={msg.tone} className="mb-4">{msg.text}</Alert> : null}
         {tab === "edit" ? (
           <div className="space-y-4">
-            <Field label="Subject" help={`${subject.length}/160 — the headline story usually works`}>
+            <Field label="Subject" help={`${subject.length}/160: the headline story usually works`}>
               <Input value={subject} onChange={(e) => setSubject(e.target.value)} disabled={sent} maxLength={160} />
             </Field>
             <Field label="Preheader" help="Shown after the subject in inboxes; the day's numbers by default">

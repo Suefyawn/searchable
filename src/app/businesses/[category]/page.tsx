@@ -60,7 +60,7 @@ export default async function CategoryPage({ params }: Props) {
           </div>
         </section>
       ) : (
-        <EmptyState title={`No ${plural.toLowerCase()} listed yet`} description="Know one? Add it in a minute — it is free." action={<Link href="/add-business" className="text-sm font-medium text-brand-700">Add a business →</Link>} />
+        <EmptyState title={`No ${plural.toLowerCase()} listed yet`} description="Know one? Add it in a minute: it is free." action={<Link href="/add-business" className="text-sm font-medium text-brand-700">Add a business →</Link>} />
       )}
     </div>
   );

@@ -26,7 +26,7 @@ export function ContactForm({ about }: { about?: string }) {
     }
   }
 
-  if (state === "done") return <p className="border border-brand-200 bg-brand-50 px-4 py-3 text-[15px] dark:border-brand-800 dark:bg-brand-950/40">Thanks — your message is in. We reply to everything that needs a reply.</p>;
+  if (state === "done") return <p className="border border-brand-200 bg-brand-50 px-4 py-3 text-[15px] dark:border-brand-800 dark:bg-brand-950/40">Thanks: your message is in. We reply to everything that needs a reply.</p>;
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">

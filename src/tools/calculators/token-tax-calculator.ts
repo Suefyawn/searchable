@@ -12,9 +12,9 @@ export const tokenTaxCalculator: ToolDefinition = {
   slug: "token-tax-calculator",
   category: "cars",
   name: "Token Tax Calculator 2026-27",
-  seoTitle: "Token Tax Calculator 2026-27 — Punjab & Islamabad Vehicle Token Tax (Filer vs Non-Filer)",
+  seoTitle: "Token Tax Calculator 2026-27: Punjab & Islamabad Vehicle Token Tax (Filer vs Non-Filer)",
   shortName: "Token Tax",
-  description: "Calculate the annual token tax on your car or bike for FY2026-27 in Punjab and Islamabad — token tax by engine capacity and invoice value, income tax under section 234 for filers and non-filers, professional tax and the 10% early-payment rebate.",
+  description: "Calculate the annual token tax on your car or bike for FY2026-27 in Punjab and Islamabad, token tax by engine capacity and invoice value, income tax under section 234 for filers and non-filers, professional tax and the 10% early-payment rebate.",
   keywords: ["token tax calculator", "token tax", "vehicle token tax", "token tax punjab", "token tax islamabad", "car token tax 2026", "motor vehicle tax pakistan", "excise token tax", "token tax rates 2026-27", "lifetime token tax 1000cc", "e-pay punjab token tax"],
   version: "1.0.0",
   lastReviewed: REVIEWED,
@@ -34,7 +34,7 @@ export const tokenTaxCalculator: ToolDefinition = {
         { value: "islamabad", label: "Islamabad (ICT)" },
       ],
       default: "punjab",
-      help: "Sindh, KP and Balochistan are not included yet — their annual schedules are not published in a verifiable form.",
+      help: "Sindh, KP and Balochistan are not included yet, their annual schedules are not published in a verifiable form.",
     },
     {
       key: "vehicle",
@@ -89,7 +89,7 @@ export const tokenTaxCalculator: ToolDefinition = {
       const total = token + it + prof;
       const lines: ResultLine[] = [
         { label: "Lifetime token (paid once at registration)", value: pkr(token) },
-        { label: `Income tax u/s 234 — lump sum, ${filer ? "filer" : "non-filer"}`, value: pkr(it) },
+        { label: `Income tax u/s 234: lump sum, ${filer ? "filer" : "non-filer"}`, value: pkr(it) },
         ...(prof ? [{ label: "Professional tax (per year)", value: pkr(prof) }] : []),
         { label: "Payable at registration", value: pkr(total), primary: true },
       ];
@@ -115,9 +115,9 @@ export const tokenTaxCalculator: ToolDefinition = {
     const itOther = incomeTax234(cc, !filer);
     const prof = s.professionalTax;
     const total = token + it + prof;
-    if (!invoice) warnings.push("Enter the invoice value — token tax for cars above 1000cc is a percentage of it.");
+    if (!invoice) warnings.push("Enter the invoice value, token tax for cars above 1000cc is a percentage of it.");
     if (early && !s.earlyRebate) warnings.push(`${s.name} does not publish an early-payment rebate; none has been applied.`);
-    warnings.push("Excise offices use the invoice value recorded at first registration. Vehicles registered before 1 July 2024 in Punjab may be assessed on a different basis — confirm on ePay Punjab.");
+    warnings.push("Excise offices use the invoice value recorded at first registration. Vehicles registered before 1 July 2024 in Punjab may be assessed on a different basis, confirm on ePay Punjab.");
 
     const band = cc <= 2000 ? "1001–2000cc" : "above 2000cc";
     return {
@@ -127,9 +127,9 @@ export const tokenTaxCalculator: ToolDefinition = {
         {
           title: "Breakdown",
           lines: [
-            { label: `Token tax — ${(pct * 100).toFixed(2)}% of ${pkr(invoice)}`, value: pkr(tokenGross) },
+            { label: `Token tax: ${(pct * 100).toFixed(2)}% of ${pkr(invoice)}`, value: pkr(tokenGross) },
             ...(rebate ? [{ label: "Early-payment rebate (10%)", value: `− ${pkr(rebate)}` }] : []),
-            { label: `Income tax u/s 234 — ${filer ? "filer" : "non-filer"}`, value: pkr(it) },
+            { label: `Income tax u/s 234: ${filer ? "filer" : "non-filer"}`, value: pkr(it) },
             ...(prof ? [{ label: "Professional tax", value: pkr(prof) }] : []),
             { label: "Total payable this year", value: pkr(total), primary: true },
             { label: "Per month, for budgeting", value: pkr(total / 12), muted: true },
@@ -168,8 +168,8 @@ Sindh, KP and Balochistan run their own schedules. Sindh's lifetime rule for ≤
     { question: "What is lifetime token tax?", answer: "A one-time payment at registration that replaces the annual token for the life of the vehicle. It applies to motorcycles and to cars up to 1000cc in Punjab, Islamabad and Sindh. If the vehicle is sold within 10 years, the buyer pays it again with a 10% reduction for each year already elapsed." },
     { question: "Why is my token tax higher as a non-filer?", answer: "The token itself is the same, but the income tax collected with it under section 234 is 300% of the filer rate. Getting onto the Active Taxpayer List before paying saves Rs 3,000–20,000 a year depending on engine size." },
     { question: "When is token tax due?", answer: "The financial year runs July–June. Punjab gives a 10% rebate if you pay the full year by 31 August; paying late attracts a penalty and the vehicle can be impounded at checkpoints." },
-    { question: "How do I pay token tax online?", answer: "Punjab: ePay Punjab app or e-Pay portal — enter the registration number, generate a PSID and pay through any bank app, ATM or 1Link. Islamabad: the Excise ICT portal (islamabadexcise.gov.pk) and City Islamabad app. Sindh: excise.gos.pk e-services." },
-    { question: "Is there token tax on electric vehicles?", answer: "Punjab charges EVs on a kW-equivalent band and has offered concessions in some years; Islamabad has waived token tax on EVs in some budgets. Check the current year's notification — this calculator covers petrol and diesel vehicles." },
+    { question: "How do I pay token tax online?", answer: "Punjab: ePay Punjab app or e-Pay portal: enter the registration number, generate a PSID and pay through any bank app, ATM or 1Link. Islamabad: the Excise ICT portal (islamabadexcise.gov.pk) and City Islamabad app. Sindh: excise.gos.pk e-services." },
+    { question: "Is there token tax on electric vehicles?", answer: "Punjab charges EVs on a kW-equivalent band and has offered concessions in some years; Islamabad has waived token tax on EVs in some budgets. Check the current year's notification: this calculator covers petrol and diesel vehicles." },
   ],
   related: { tools: ["car-loan-calculator", "fuel-cost-calculator", "income-tax-calculator"], guides: ["how-to-register-a-vehicle-in-punjab", "how-to-check-filer-status-atl-pakistan"], entities: ["fbr", "toyota", "suzuki"], businessCategories: ["car-dealers"] },
 };
