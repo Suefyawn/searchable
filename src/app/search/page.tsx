@@ -15,13 +15,14 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   return { title: q ? `“${q}”` : "Search", robots: { index: false, follow: true } };
 }
 
-const TYPE_ORDER: SearchEntityType[] = ["tool", "guide", "business", "news", "location", "entity", "data_series", "comparison"];
+const TYPE_ORDER: SearchEntityType[] = ["tool", "data_series", "guide", "business", "news", "location", "entity", "comparison"];
 const FILTERS: { value: string; label: string }[] = [
   { value: "", label: "All" },
   { value: "tool", label: "Tools" },
   { value: "guide", label: "Guides" },
   { value: "business", label: "Businesses" },
   { value: "news", label: "News" },
+  { value: "data_series", label: "Data" },
   { value: "location", label: "Places" },
 ];
 
@@ -82,7 +83,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   if (!list.length) return null;
                   return (
                     <section key={t}>
-                      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-3">{TYPE_LABEL[t]}s</h2>
+                      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-3">{t === "data_series" ? "Data" : `${TYPE_LABEL[t]}s`}</h2>
                       <ol className="divide-y divide-[var(--border)] surface px-5">
                         {list.map((h) => (
                           <Hit key={h.entityType + h.entityId} hit={h} />

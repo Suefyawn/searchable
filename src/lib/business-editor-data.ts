@@ -1,0 +1,43 @@
+import { asc, eq } from "drizzle-orm";
+import { getDb, schema } from "@/db";
+import type { BusinessFormInput } from "@/lib/business-schema";
+
+/** Loads a business plus the option lists the editor needs. Shared by admin and owner pages. */
+export async function loadBusinessEditor(id: string) {
+  const db = await getDb();
+  const b = await db.query.businesses.findFirst({ where: eq(schema.businesses.id, id), with: { hours: true, services: { orderBy: [asc(schema.businessServices.sortOrder)] }, city: true, primaryCategory: true } });
+  if (!b) return null;
+  const [categories, cities, areas] = await Promise.all([
+    db.query.businessCategories.findMany({ orderBy: [asc(schema.businessCategories.name)] }),
+    db.query.locations.findMany({ where: eq(schema.locations.kind, "city"), orderBy: [asc(schema.locations.name)] }),
+    db.query.locations.findMany({ where: eq(schema.locations.kind, "area"), orderBy: [asc(schema.locations.name)] }),
+  ]);
+  const initial: BusinessFormInput = {
+    id: b.id,
+    name: b.name,
+    tagline: b.tagline ?? undefined,
+    description: b.description ?? undefined,
+    primaryCategoryId: b.primaryCategoryId ?? undefined,
+    cityId: b.cityId ?? undefined,
+    areaId: b.areaId ?? undefined,
+    address: b.address ?? undefined,
+    phone: b.phone ?? undefined,
+    whatsapp: b.whatsapp ?? undefined,
+    email: b.email ?? undefined,
+    website: b.website ?? undefined,
+    facebook: b.social.facebook,
+    instagram: b.social.instagram,
+    priceRange: b.priceRange ?? undefined,
+    logoUrl: b.logoUrl ?? undefined,
+    coverUrl: b.coverUrl ?? undefined,
+    hours: b.hours.map((h) => ({ dayOfWeek: h.dayOfWeek, opens: h.opens, closes: h.closes, isClosed: h.isClosed })),
+    services: b.services.map((s) => ({ name: s.name, description: s.description ?? undefined, priceFrom: s.priceFrom ?? undefined })),
+  };
+  return {
+    business: b,
+    initial,
+    categories: categories.map((c) => ({ id: c.id, name: c.namePlural ?? c.name })),
+    cities: cities.map((c) => ({ id: c.id, name: c.name })),
+    areas: areas.map((a) => ({ id: a.id, name: a.name, cityId: a.cityId })),
+  };
+}

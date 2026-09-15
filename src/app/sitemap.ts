@@ -9,7 +9,7 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const db = await getDb();
-  const [articles, businesses, cities, entities, categories, bcats] = await Promise.all([
+  const [articles, businesses, cities, entities, categories, bcats, series] = await Promise.all([
     db
       .select({ kind: schema.articles.kind, slug: schema.articles.slug, updatedAt: schema.articles.updatedAt, cat: schema.categories.slug })
       .from(schema.articles)
@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     db.select({ slug: schema.entities.slug, updatedAt: schema.entities.updatedAt }).from(schema.entities),
     db.select({ kind: schema.categories.kind, slug: schema.categories.slug }).from(schema.categories),
     db.select({ slug: schema.businessCategories.slug }).from(schema.businessCategories),
+    db.select({ slug: schema.dataSeries.slug, updatedAt: schema.dataSeries.updatedAt }).from(schema.dataSeries),
   ]);
   const u = (path: string, lastModified?: Date, priority = 0.6, changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] = "weekly") => ({ url: `${SITE.url}${path}`, lastModified, priority, changeFrequency });
   return [
@@ -29,7 +30,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u("/tools", new Date(), 0.9, "weekly"),
     u("/businesses", new Date(), 0.8, "weekly"),
     u("/cities", new Date(), 0.7, "monthly"),
+    u("/data", new Date(), 0.8, "daily"),
     u("/newsletter", undefined, 0.5, "monthly"),
+    ...series.map((d) => u(`/data/${d.slug}`, d.updatedAt, 0.8, "daily")),
     ...categories.map((c) => u(`/${c.kind === "news" ? "news" : "guides"}/${c.slug}`, undefined, 0.7, "daily")),
     ...Object.keys(TOOL_CATEGORIES).map((c) => u(`/tools/${c}`, undefined, 0.7)),
     ...TOOLS.map((t) => u(toolUrl(t), new Date(t.lastReviewed), 0.9, "monthly")),

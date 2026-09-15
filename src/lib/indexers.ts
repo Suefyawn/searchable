@@ -93,6 +93,22 @@ export async function indexEntity(entityId: string) {
   });
 }
 
+export async function indexDataSeries(seriesId: string) {
+  const db = await getDb();
+  const s = await db.query.dataSeries.findFirst({ where: eq(schema.dataSeries.id, seriesId) });
+  if (!s) return;
+  await syncSearchDocument({
+    entityType: "data_series",
+    entityId: s.id,
+    url: `/data/${s.slug}`,
+    title: `${s.name} today`,
+    summary: s.description ?? `${s.name} in Pakistan — latest value, history and source (${s.sourceName ?? "official"}).`,
+    keywords: [s.slug.replace(/-/g, " "), "today", "rate", "price", "history"].join(" "),
+    category: "Data",
+    categorySlug: "data",
+  });
+}
+
 /** Mirror the code registry into the `tools` table and the search index. */
 export async function indexTools() {
   const db = await getDb();
@@ -133,16 +149,18 @@ export async function indexTools() {
 export async function reindexAll() {
   const db = await getDb();
   await db.delete(schema.searchDocuments);
-  const [articles, businesses, locations, entities] = await Promise.all([
+  const [articles, businesses, locations, entities, series] = await Promise.all([
     db.select({ id: schema.articles.id }).from(schema.articles),
     db.select({ id: schema.businesses.id }).from(schema.businesses),
     db.select({ id: schema.locations.id }).from(schema.locations),
     db.select({ id: schema.entities.id }).from(schema.entities),
+    db.select({ id: schema.dataSeries.id }).from(schema.dataSeries),
   ]);
   for (const a of articles) await indexArticle(a.id);
   for (const b of businesses) await indexBusiness(b.id);
   for (const l of locations) await indexLocation(l.id);
   for (const e of entities) await indexEntity(e.id);
+  for (const d of series) await indexDataSeries(d.id);
   await indexTools();
-  return { articles: articles.length, businesses: businesses.length, locations: locations.length, entities: entities.length, tools: TOOLS.length };
+  return { articles: articles.length, businesses: businesses.length, locations: locations.length, entities: entities.length, series: series.length, tools: TOOLS.length };
 }

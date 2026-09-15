@@ -13,9 +13,10 @@ export function AuthLinks() {
   if (isPending) return <span className={cls} aria-hidden />;
   if (user) {
     const isEditor = EDITOR_ROLES.has(user.role ?? "");
+    const isOwner = user.role === "business_owner";
     return (
-      <Link href={isEditor ? "/admin" : "/account"} className={cls}>
-        {isEditor ? "Admin" : "Account"}
+      <Link href={isEditor ? "/admin" : isOwner ? "/business" : "/account"} className={cls}>
+        {isEditor ? "Admin" : isOwner ? "My business" : "Account"}
       </Link>
     );
   }

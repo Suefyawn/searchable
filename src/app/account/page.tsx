@@ -33,10 +33,10 @@ export default async function AccountPage() {
             <p className="font-semibold">Saved items</p>
             <p className="mt-1 text-[15px] text-2">Saving tools, guides and businesses arrives with personalisation (Phase 8).</p>
           </div>
-          <div className="surface p-5">
+          <Link href="/business" className="surface p-5 hover:border-brand-300">
             <p className="font-semibold">Your businesses</p>
-            <p className="mt-1 text-[15px] text-2">Claim a listing from its page to manage hours, photos and enquiries.</p>
-          </div>
+            <p className="mt-1 text-[15px] text-2">Manage listings you own: details, hours, services, enquiries and review responses.</p>
+          </Link>
           <div className="surface p-5">
             <p className="font-semibold">Newsletter</p>
             <p className="mt-1 text-[15px] text-2">

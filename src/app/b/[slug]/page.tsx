@@ -8,6 +8,7 @@ import { getBusiness, listBusinesses } from "@/db/queries/directory";
 import { formatDate } from "@/lib/format";
 import { breadcrumbJsonLd, buildMetadata, localBusinessJsonLd } from "@/lib/seo";
 import { LeadForm } from "./lead-form";
+import { ReviewForm } from "@/components/directory/review-form";
 
 export const revalidate = 3600;
 type Props = { params: Promise<{ slug: string }> };
@@ -116,9 +117,9 @@ export default async function BusinessPage({ params }: Props) {
             </section>
           ) : null}
 
-          {b.reviews.length ? (
-            <section>
-              <h2 className="text-xl font-semibold">Reviews</h2>
+          <section id="write-review">
+            <h2 className="text-xl font-semibold">Reviews</h2>
+            {b.reviews.length ? (
               <ul className="mt-3 space-y-3">
                 {b.reviews.map((r) => (
                   <li key={r.id} className="surface p-5">
@@ -138,13 +139,16 @@ export default async function BusinessPage({ params }: Props) {
                   </li>
                 ))}
               </ul>
-            </section>
-          ) : (
-            <section className="surface p-5">
-              <h2 className="text-lg font-semibold">No reviews yet</h2>
-              <p className="mt-1 text-[15px] text-2">Reviews open to signed-in users in the next release. Verified purchases and visits will be labelled.</p>
-            </section>
-          )}
+            ) : (
+              <p className="mt-2 text-[15px] text-2">No reviews yet. Be the first — reviews are checked before they appear and are never paid for.</p>
+            )}
+            <div className="mt-5 surface p-5">
+              <h3 className="font-semibold">Write a review</h3>
+              <div className="mt-3">
+                <ReviewForm businessId={b.id} businessSlug={b.slug} />
+              </div>
+            </div>
+          </section>
 
           {entities.length ? (
             <section className="flex flex-wrap items-center gap-2 text-sm">

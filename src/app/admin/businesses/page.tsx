@@ -41,9 +41,10 @@ export default async function AdminBusinesses({ searchParams }: { searchParams: 
           <div key={b.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <Link href={`/b/${b.slug}`} className="font-medium hover:text-brand-700">
+                <Link href={`/admin/businesses/${b.id}`} className="font-medium hover:text-brand-700">
                   {b.name}
                 </Link>
+                <Link href={`/b/${b.slug}`} className="text-xs text-3 hover:text-brand-700" target="_blank">view ↗</Link>
                 <Badge tone={b.status === "active" ? "success" : b.status === "pending" ? "warning" : "neutral"}>{b.status}</Badge>
                 {b.isVerified ? <Badge tone="brand">verified</Badge> : null}
               </div>

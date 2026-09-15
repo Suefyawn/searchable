@@ -11,7 +11,7 @@ const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
       { href: "/news/business", label: "Business" },
       { href: "/news/technology", label: "Technology" },
       { href: "/guides", label: "Guides" },
-      { href: "/guides/taxes", label: "Tax guides" },
+      { href: "/data", label: "Data & prices" },
     ],
   },
   {

@@ -11,7 +11,7 @@ async function count(where?: ReturnType<typeof eq>) {
 
 export default async function AdminDashboard() {
   const db = await getDb();
-  const [published, drafts, businesses, pending, verified, subs, activeSubs, searches, zeroResult, toolRuns, leads] = await Promise.all([
+  const [published, drafts, businesses, pending, verified, subs, activeSubs, searches, zeroResult, toolRuns, leads, pendingReviews] = await Promise.all([
     count(eq(schema.articles.status, "published")),
     count(eq(schema.articles.status, "draft")),
     db.$count(schema.businesses, eq(schema.businesses.status, "active")),
@@ -23,6 +23,7 @@ export default async function AdminDashboard() {
     db.$count(schema.searchQueries, eq(schema.searchQueries.resultCount, 0)),
     db.$count(schema.toolRuns),
     db.$count(schema.businessLeads),
+    db.$count(schema.businessReviews, eq(schema.businessReviews.status, "pending")),
   ]);
   const [recent, topSearches, topTools] = await Promise.all([
     db.query.articles.findMany({ orderBy: [desc(schema.articles.updatedAt)], limit: 8, with: { category: true } }),
@@ -40,6 +41,7 @@ export default async function AdminDashboard() {
     ["Searches (zero-result)", `${searches} (${zeroResult})`, "/admin/search-log"],
     ["Tool runs", toolRuns, "/tools"],
     ["Leads", leads, "/admin/leads"],
+    ["Reviews to moderate", pendingReviews, "/admin/reviews"],
   ] as const;
 
   return (
