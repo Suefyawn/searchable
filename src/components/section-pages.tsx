@@ -50,7 +50,7 @@ export async function SectionHub({ kind, page = 1 }: { kind: "news" | "guide"; p
       <Pagination base={`/${m.section}`} page={page} total={total} />
       {press.length ? (
         <section className="mt-12 border-t border-line pt-8">
-          <div className="flex items-baseline justify-between">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
             <h2 className="font-serif text-2xl">From Pakistan’s press</h2>
             <p className="text-xs text-3">Headlines refresh every 15 minutes · links open at the publisher</p>
           </div>

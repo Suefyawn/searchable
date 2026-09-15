@@ -90,7 +90,7 @@ export default async function HomePage() {
       {/* From the press */}
       {press.length ? (
         <section className="border-t border-line py-8">
-          <div className="flex items-baseline justify-between">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
             <h2 className="font-serif text-2xl">From Pakistan’s press</h2>
             <p className="text-xs text-3">Headlines refresh every 15 minutes · links open at the publisher</p>
           </div>
@@ -116,7 +116,7 @@ export default async function HomePage() {
 
       {world.length ? (
         <section className="border-t border-line py-8">
-          <div className="flex items-baseline justify-between">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
             <h2 className="font-serif text-2xl">Around the world</h2>
             <p className="text-xs text-3">World, US, markets, crypto, cricket, MMA, snooker, tech and entertainment, refreshed every 15 minutes</p>
           </div>
@@ -143,7 +143,7 @@ export default async function HomePage() {
       {/* Latest: photo grid */}
       {headlines.length ? (
         <section className="border-t border-line py-8">
-          <div className="flex items-baseline justify-between">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
             <h2 className="font-serif text-2xl">Latest</h2>
             <Link href="/news" className="text-sm font-medium text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
               All news →
