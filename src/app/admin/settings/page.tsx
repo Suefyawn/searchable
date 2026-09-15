@@ -15,8 +15,7 @@ export default async function AdminSettings() {
   await requireRole("admin");
   const [s, series] = await Promise.all([readSiteSettings(), listSeriesWithLatest()]);
   const toggles: { key: keyof typeof s.features; label: string; help: string }[] = [
-    { key: "homePress", label: "Homepage: Pakistan press strip", help: "Headlines from the press feeds, grouped by paper." },
-    { key: "homeWorld", label: "Homepage: world, markets, sport, tech strip", help: "The four world columns from the feeds." },
+    { key: "homeWorld", label: "Homepage: world, markets, sport, tech desks", help: "Four columns of our own stories by desk." },
     { key: "homeCommunity", label: "Homepage: community strip", help: "Latest posts, jobs and questions." },
     { key: "homeProfessionals", label: "Homepage: professionals strip", help: "Recent professional profiles." },
     { key: "newsletterCapture", label: "Newsletter boxes", help: "The sign-up box on the homepage and under articles." },

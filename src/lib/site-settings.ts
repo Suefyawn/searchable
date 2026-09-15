@@ -56,7 +56,6 @@ export const SiteSettings = z.object({
       homeCommunity: z.boolean().default(true),
       homeProfessionals: z.boolean().default(true),
       homeWorld: z.boolean().default(true),
-      homePress: z.boolean().default(true),
       /** The newsletter box on the homepage and under articles. */
       newsletterCapture: z.boolean().default(true),
     })

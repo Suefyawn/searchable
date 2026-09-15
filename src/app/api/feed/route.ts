@@ -4,7 +4,7 @@ import { runDueJobs } from "@/lib/jobs";
 
 export const revalidate = 300;
 
-/** Live feed for the home hero panel: our stories, press headlines, data readings. */
+/** Live feed for the home hero panel: our stories, guides and data readings. */
 export async function GET() {
   // Piggyback: this route regenerates at most every 5 minutes, and a visitor on the home page is the
   // cheapest scheduler we have. Awaited so a serverless instance is not torn down mid-publish.

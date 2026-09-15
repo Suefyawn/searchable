@@ -60,7 +60,7 @@ export async function saveFront(_prev: Result, formData: FormData): Promise<Resu
 export async function saveFeatures(_prev: Result, formData: FormData): Promise<Result> {
   await requireRole("admin");
   const on = (k: string) => formData.get(k) === "on";
-  const parsed = SiteSettings.shape.features.safeParse({ homeCommunity: on("homeCommunity"), homeProfessionals: on("homeProfessionals"), homeWorld: on("homeWorld"), homePress: on("homePress"), newsletterCapture: on("newsletterCapture") });
+  const parsed = SiteSettings.shape.features.safeParse({ homeCommunity: on("homeCommunity"), homeProfessionals: on("homeProfessionals"), homeWorld: on("homeWorld"), newsletterCapture: on("newsletterCapture") });
   if (!parsed.success) return { ok: false, error: "Check the switches" };
   await writeSiteSettings("features", parsed.data);
   revalidateAll();

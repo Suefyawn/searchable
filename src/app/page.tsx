@@ -14,7 +14,6 @@ import { ProCard } from "@/components/professionals/pro-card";
 import { listPosts } from "@/lib/community";
 import { listProfessionals } from "@/lib/professionals";
 import { activityFeed } from "@/lib/activity";
-import { fetchPress, groupBySource, groupByTopic } from "@/lib/press";
 import { listArticles, listArticlesByIds } from "@/db/queries/content";
 import { listSeriesWithLatest } from "@/db/queries/data";
 import { categoryCounts } from "@/db/queries/directory";
@@ -30,7 +29,7 @@ function Label({ children }: { children: React.ReactNode }) {
 
 export default async function HomePage() {
   const [front, site] = await Promise.all([readFrontPage(), readSiteSettings()]);
-  const [pinned, latest, guides, cities, categories, series, feed, pressItems, worldItems, community, pros] = await Promise.all([
+  const [pinned, latest, guides, cities, categories, series, feed, wider, community, pros] = await Promise.all([
     listArticlesByIds([...(front.leadId ? [front.leadId] : []), ...front.pins]),
     listArticles({ kind: "news", limit: 12 }),
     listArticles({ kind: "guide", limit: 5 }),
@@ -38,8 +37,7 @@ export default async function HomePage() {
     categoryCounts(),
     listSeriesWithLatest(),
     activityFeed(24),
-    fetchPress({ limit: 40, perFeed: 8, region: "pk" }),
-    fetchPress({ limit: 120, perFeed: 8, region: "world" }),
+    listArticles({ kind: "news", limit: 80 }),
     listPosts({ limit: 6 }),
     listProfessionals({ limit: 4 }),
   ]);
@@ -51,13 +49,14 @@ export default async function HomePage() {
     .map((a) => ({ id: a.id, href: articleUrl(a), title: a.title, dek: a.dek, imageUrl: a.featuredImageUrl, label: a.category?.name ?? "News", meta: a.publishedAt ? timeAgo(a.publishedAt) : "" }));
   const slideIds = new Set(slides.map((s) => s.id));
   const headlines = ordered.filter((a) => !slideIds.has(a.id)).slice(0, 8);
-  const press = groupBySource(pressItems, 5).slice(0, 4);
-  const world = groupByTopic(worldItems, [
-    { label: "World & US", topics: ["world", "us"] },
-    { label: "Markets & crypto", topics: ["markets", "crypto", "business"] },
-    { label: "Sport", topics: ["cricket", "mma", "snooker"] },
-    { label: "Tech & entertainment", topics: ["tech", "entertainment"] },
-  ]);
+  // Desks: our own stories by category group, four each, only groups that have something.
+  const DESKS: { label: string; slugs: string[] }[] = [
+    { label: "World & US", slugs: ["world", "us", "politics"] },
+    { label: "Markets & crypto", slugs: ["markets", "crypto", "business"] },
+    { label: "Sport", slugs: ["cricket", "mma", "snooker", "sports"] },
+    { label: "Tech & entertainment", slugs: ["technology", "ai", "science", "entertainment", "viral"] },
+  ];
+  const world = DESKS.map((d) => ({ label: d.label, items: wider.filter((a) => a.category && d.slugs.includes(a.category.slug)).slice(0, 4) })).filter((g) => g.items.length);
   const featuredTools = TOOLS.filter((t) => t.featured).slice(0, 6);
   const topCategories = categories.filter((c) => c.count > 0).slice(0, 10);
   const TICKER_ORDER = site.front.tickerOrder;
@@ -91,38 +90,12 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      {/* From the press */}
-      {press.length && site.features.homePress ? (
-        <section className="border-t border-line py-8">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-            <h2 className="font-serif text-2xl">From Pakistan’s press</h2>
-            <p className="text-xs text-3">Headlines refresh every 15 minutes · links open at the publisher</p>
-          </div>
-          <div className="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
-            {press.map((g) => (
-              <div key={g.sourceSlug}>
-                <p className="rule pt-2 eyebrow">{g.source}</p>
-                <ul className="mt-1 divide-y divide-[var(--border)]">
-                  {g.items.map((it) => (
-                    <li key={it.url} className="py-2">
-                      <a href={it.url} target="_blank" rel="noopener" className="headline-link text-[15px] leading-snug">
-                        {it.title}
-                      </a>
-                      <span className="block text-[11px] text-3">{timeAgo(new Date(it.publishedAt))}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
-      ) : null}
 
       {world.length && site.features.homeWorld ? (
         <section className="border-t border-line py-8">
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
             <h2 className="font-serif text-2xl">Around the world</h2>
-            <p className="text-xs text-3">World, US, markets, crypto, cricket, MMA, snooker, tech and entertainment, refreshed every 15 minutes</p>
+            <p className="text-xs text-3">World, markets, sport and tech from a Pakistani reader&rsquo;s side, in our own words</p>
           </div>
           <div className="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
             {world.map((g) => (
@@ -130,11 +103,14 @@ export default async function HomePage() {
                 <p className="rule pt-2 eyebrow">{g.label}</p>
                 <ul className="mt-1 divide-y divide-[var(--border)]">
                   {g.items.map((it) => (
-                    <li key={it.url} className="py-2">
-                      <a href={it.url} target="_blank" rel="noopener" className="headline-link text-[15px] leading-snug">
+                    <li key={it.id} className="py-2">
+                      <Link href={articleUrl(it)} className="headline-link text-[15px] leading-snug">
                         {it.title}
-                      </a>
-                      <span className="block text-[11px] text-3">{timeAgo(new Date(it.publishedAt))}</span>
+                      </Link>
+                      <span className="block text-[11px] text-3">
+                        {it.category?.name}
+                        {it.publishedAt ? ` · ${timeAgo(it.publishedAt)}` : ""}
+                      </span>
                     </li>
                   ))}
                 </ul>

@@ -2,14 +2,13 @@ import { desc, eq, gt } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import { listArticles } from "@/db/queries/content";
 import { articleUrl } from "@/components/cards";
-import { fetchPress } from "./press";
 
 /**
- * The live feed: everything that changed, newest first, our stories, press headlines, and data-hub readings.
+ * The live feed: everything that changed, newest first: our stories, guides and data-hub readings.
  * Rendered in the home hero's LIVE panel and served by /api/feed for client refresh.
  */
 export type FeedItem = {
-  kind: "news" | "guide" | "press" | "data";
+  kind: "news" | "guide" | "data";
   title: string;
   url: string;
   at: string;
@@ -21,11 +20,11 @@ export type FeedItem = {
 export async function activityFeed(limit = 24): Promise<FeedItem[]> {
   const db = await getDb();
   const since = new Date(Date.now() - 3 * 86_400_000);
-  const [news, guides, press, points] = await Promise.all([
-    listArticles({ kind: "news", limit: 8 }),
-    listArticles({ kind: "guide", limit: 3 }),
-    // Pakistan-first: the world feeds publish ten times as much, so they are capped separately.
-    Promise.all([fetchPress({ limit: 10, perFeed: 6, region: "pk" }), fetchPress({ limit: 5, perFeed: 3, region: "world" })]).then(([pk, world]) => [...pk, ...world]),
+  // Our own things only: stories, guides, data readings. Press headlines feed the story-ideas desk, not
+  // readers (the founder's call, 2026-09-16: a homepage should not be a list of links to other papers).
+  const [news, guides, points] = await Promise.all([
+    listArticles({ kind: "news", limit: 14 }),
+    listArticles({ kind: "guide", limit: 5 }),
     db
       .select({ value: schema.dataPoints.value, date: schema.dataPoints.date, note: schema.dataPoints.note, createdAt: schema.dataPoints.createdAt, name: schema.dataSeries.name, slug: schema.dataSeries.slug, unit: schema.dataSeries.unit })
       .from(schema.dataPoints)
@@ -37,7 +36,6 @@ export async function activityFeed(limit = 24): Promise<FeedItem[]> {
   const items: FeedItem[] = [
     ...news.filter((a) => a.publishedAt).map((a) => ({ kind: "news" as const, title: a.title, url: articleUrl(a), at: a.publishedAt!.toISOString(), label: a.category?.name ?? "News" })),
     ...guides.filter((a) => a.publishedAt).map((a) => ({ kind: "guide" as const, title: a.title, url: articleUrl(a), at: a.publishedAt!.toISOString(), label: "Guide" })),
-    ...press.map((p) => ({ kind: "press" as const, title: p.title, url: p.url, at: p.publishedAt, label: p.source, external: true })),
     ...points.map((p) => ({
       kind: "data" as const,
       title: `${p.name.replace(/ in Pakistan.*$/i, "").replace(/ today$/i, "")}: ${Number(p.value).toLocaleString("en-PK", { maximumFractionDigits: 2 })} ${p.unit}`,
