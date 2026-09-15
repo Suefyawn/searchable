@@ -40,19 +40,19 @@ export async function SectionHub({ kind, page = 1 }: { kind: "news" | "guide"; p
     <div className="container-x py-8 sm:py-12">
       <SectionHeader as="h1" title={m.name} description={m.description} />
       <CategoryNav section={m.section} categories={categories} />
+      {/* The lead with its photo; beside it the next four as compact rows with thumbnails, so the two columns
+          land at about the same height and the grid below starts right under them. */}
       {featured.length ? (
-        <div className="mt-8 grid gap-x-10 gap-y-6 border-b border-line pb-6 lg:grid-cols-[1.6fr_1fr]">
+        <div className="mt-8 grid gap-x-10 gap-y-6 pb-8 lg:grid-cols-[1.6fr_1fr]">
           <ArticleCard article={featured[0]} variant="feature" />
-          <div className="divide-y divide-[var(--border)] lg:border-l lg:border-line lg:pl-8">
-            {rest.slice(0, 2).map((a) => (
-              <ArticleCard key={a.id} article={a} />
+          <div className="divide-y divide-[var(--border)] self-start lg:border-l lg:border-line lg:pl-8">
+            {rest.slice(0, 4).map((a) => (
+              <ArticleCard key={a.id} article={a} variant="compact" thumb />
             ))}
           </div>
         </div>
       ) : null}
-      <div className="mt-8">
-        <ArticleListing items={page === 1 ? rest.slice(2) : rest} emptyText={`No ${m.name.toLowerCase()} published yet.`} />
-      </div>
+      <ArticleListing items={page === 1 ? rest.slice(4) : rest} emptyText={`No ${m.name.toLowerCase()} published yet.`} />
       <Pagination base={`/${m.section}`} page={page} total={total} />
     </div>
   );
