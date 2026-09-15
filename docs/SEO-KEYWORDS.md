@@ -37,6 +37,15 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 | 5kw / 10kw / hybrid inverter price in pakistan | 1,600 / 880 / 1,600 | 10 / 8 / 12 | same (size table) | ✅ |
 | best solar inverter in pakistan | 1,300 | 12 | same (how to choose + FAQ) | ✅ |
 
+### Cars (`/compare/cars`)
+| Keyword | Vol | KD | Page |
+|---|---|---|---|
+| alto car price in pakistan / alto price in pakistan | 60,500 / 40,500 | 29 | /compare/cars (#suzuki-alto) ✅ |
+| swift price in pakistan / suzuki swift price | 27,100 / 12,100 | 21 / 27 | same ✅ |
+| wagon r price in pakistan | 18,100 | 22 | discontinued — mention only |
+| suzuki every price in pakistan | 14,800 | 21 | same ✅ |
+| car price in pakistan | — | — | same ✅ |
+
 ### Electricity (`/electricity/[disco]`)
 | Keyword | Vol | KD | Page |
 |---|---|---|---|

@@ -11,6 +11,7 @@ export const NAV = [
   { href: "/tools", label: "Tools" },
   { href: "/businesses", label: "Businesses" },
   { href: "/data", label: "Data" },
+  { href: "/compare", label: "Compare" },
   { href: "/cities", label: "Cities" },
 ];
 

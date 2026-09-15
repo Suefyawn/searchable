@@ -36,6 +36,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u("/pta", undefined, 0.9, "weekly"),
     u("/data/solar-panel-price", new Date(), 0.9, "weekly"),
     u("/compare/solar-inverters", new Date(), 0.8, "monthly"),
+    u("/compare/cars", new Date(), 0.9, "monthly"),
+    u("/compare", undefined, 0.7, "monthly"),
     u("/electricity/net-metering", new Date(), 0.9, "monthly"),
     ...DISCOS.map((d) => u(`/electricity/${d.slug}`, undefined, 0.8, "monthly")),
     u("/newsletter", undefined, 0.5, "monthly"),

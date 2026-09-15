@@ -136,6 +136,17 @@ export async function indexStaticPages() {
   });
   await syncSearchDocument({
     entityType: "guide",
+    entityId: "hub:cars",
+    url: "/compare/cars",
+    title: "Car prices in Pakistan — compare every new car",
+    summary: "Ex-factory prices, engine, gearbox, fuel economy and airbags for Suzuki, Toyota, Honda, Hyundai, Kia, Changan, MG, Haval and BYD, with filters by body, fuel and budget.",
+    keywords: "car price in pakistan, car prices in pakistan, alto price in pakistan, alto car price, swift price in pakistan, wagon r price, suzuki every price, corolla price, city price, civic price, sportage price, tucson price, byd price pakistan, new cars pakistan, cheapest car in pakistan, electric car price pakistan",
+    category: "Cars",
+    categorySlug: "cars",
+    boost: 1.4,
+  });
+  await syncSearchDocument({
+    entityType: "guide",
     entityId: "hub:solar-inverters",
     url: "/compare/solar-inverters",
     title: "Solar inverter price in Pakistan — compare hybrid, on-grid and off-grid",
