@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { formatDate } from "@/lib/format";
 import { SITE } from "@/lib/utils";
+import { Wordmark } from "@/components/brand";
 import { getMegaNav } from "@/lib/mega-nav";
 import { AuthLinks } from "./auth-links";
 import { MegaMenu } from "./mega-menu";
@@ -19,12 +20,7 @@ export const NAV = [
 ];
 
 export function Logo({ className = "" }: { className?: string }) {
-  return (
-    <Link href="/" className={`inline-flex items-baseline font-serif text-[26px] font-medium tracking-tight ${className}`} aria-label={`${SITE.name} home`}>
-      {SITE.name}
-      <span className="text-ink-500">.pk</span>
-    </Link>
-  );
+  return <Wordmark size={26} className={className} />;
 }
 
 export async function Header({ showSearch = true }: { showSearch?: boolean }) {

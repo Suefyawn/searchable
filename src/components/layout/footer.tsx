@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE } from "@/lib/utils";
+import { Wordmark } from "@/components/brand";
 import { NewsletterForm } from "@/components/newsletter-form";
 
 const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
@@ -59,10 +60,7 @@ export function Footer() {
       <div className="container-x py-12">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
           <div className="max-w-sm">
-            <p className="font-serif text-2xl">
-              {SITE.name}
-              <span className="text-brand-700 dark:text-brand-300">.pk</span>
-            </p>
+            <Wordmark size={24} href={null} />
             <p className="mt-2 font-serif text-[15px] italic text-2">{SITE.tagline}</p>
             <p className="mt-6 text-[13px] font-semibold uppercase tracking-[0.12em] text-3">Searchable Daily</p>
             <p className="mb-3 mt-1 text-sm text-2">The useful morning email. Two minutes, every day.</p>
