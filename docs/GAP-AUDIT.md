@@ -107,6 +107,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | Skeletons, error states | 🟡 public routes deliberately have no loading skeletons (streaming turned every notFound into a soft 404); error pages basic |
 | Mega menu (full-width panels per section, mobile expanders) | ✅ |
 | Upload fields (`src/components/upload`): drop, paste or browse; instant preview with real progress and cancel; browser-side downscale; replace, remove, retry; multi-image gallery with parallel uploads, cover, reorder by drag or arrows, captions; PDF field; CSV picker; touch-visible controls; container-aware hints | ✅ |
+| Users (`/admin/users`, admin only): list with search and role filter, inline role change, create with password, edit, set password, sign out everywhere, community ban, footprint of what they own, delete with the last-admin and own-account guards | ✅ |
 | Admin shell: grouped sidebar with queue counts, dashboard KPIs with weekly deltas and 14-day bars, needs-attention queue, consistent tabs/tables/rows, pagination, system status, editor autosave + Ctrl+S + crash recovery | ✅ |
 | Free-tier architecture (docs/FREE-TIER.md, ADR-24): R2 images with renditions, no image optimiser, session hint cookie, email budget, daily-only crons with opportunistic jobs, pruning | ✅ |
 
