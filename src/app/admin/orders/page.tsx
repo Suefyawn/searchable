@@ -15,7 +15,7 @@ export default async function AdminOrders({ searchParams }: { searchParams: Prom
   const { status = "" } = await searchParams;
   const db = await getDb();
   const [orders, totals] = await Promise.all([
-    db.query.orders.findMany({ where: status ? eq(schema.orders.status, status as "pending") : undefined, orderBy: [desc(schema.orders.createdAt)], limit: 200, with: { business: { columns: { name: true, slug: true } } } }),
+    db.query.orders.findMany({ where: status ? eq(schema.orders.status, status as "pending") : undefined, orderBy: [desc(schema.orders.createdAt)], limit: 200, with: { business: { columns: { name: true, slug: true } }, professional: { columns: { name: true, slug: true } } } }),
     db
       .select({ status: schema.orders.status, n: sql<number>`count(*)::int`, sum: sql<number>`coalesce(sum(${schema.orders.amountPkr}),0)::int`, month: sql<number>`coalesce(sum(case when ${schema.orders.paidAt} > now() - interval '30 days' then ${schema.orders.amountPkr} else 0 end),0)::int` })
       .from(schema.orders)
@@ -51,6 +51,12 @@ export default async function AdminOrders({ searchParams }: { searchParams: Prom
                   <span className="block text-[12.5px] text-2">
                     <Link href={`/b/${o.business.slug}`} className="underline-offset-4 hover:underline">
                       {o.business.name}
+                    </Link>
+                  </span>
+                ) : o.professional ? (
+                  <span className="block text-[12.5px] text-2">
+                    <Link href={`/p/${o.professional.slug}`} className="underline-offset-4 hover:underline">
+                      {o.professional.name}
                     </Link>
                   </span>
                 ) : o.notes ? (

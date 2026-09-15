@@ -3,6 +3,7 @@ import { listArticles, listCategories } from "@/db/queries/content";
 import { listSeriesWithLatest } from "@/db/queries/data";
 import { categoryCounts } from "@/db/queries/directory";
 import { citiesWithCounts } from "@/db/queries/geo";
+import { professionCounts } from "./professionals";
 import { articleUrl } from "@/components/cards";
 import { number } from "./format";
 import { TOOLS, toolUrl } from "@/tools/registry";
@@ -21,7 +22,7 @@ const NEWS_GROUPS: { title: string; slugs: string[] }[] = [
 ];
 
 async function build(): Promise<MegaSection[]> {
-  const [newsCats, guideCats, latestNews, guides, bizCats, cities, series] = await Promise.all([
+  const [newsCats, guideCats, latestNews, guides, bizCats, cities, series, pros] = await Promise.all([
     listCategories("news"),
     listCategories("guide"),
     listArticles({ kind: "news", limit: 4 }),
@@ -29,6 +30,7 @@ async function build(): Promise<MegaSection[]> {
     categoryCounts(),
     citiesWithCounts(12),
     listSeriesWithLatest(),
+    professionCounts(),
   ]);
   const catLink = (section: "news" | "guides", slug: string, name: string): MegaLink => ({ href: `/${section}/${slug}`, label: name });
 
@@ -74,6 +76,7 @@ async function build(): Promise<MegaSection[]> {
       { title: "Popular", links: topCats.slice(0, 8).map((c) => ({ href: `/businesses/${c.slug}`, label: c.namePlural ?? c.name, meta: String(c.count) })) },
       { title: "More categories", links: topCats.slice(8, 16).map((c) => ({ href: `/businesses/${c.slug}`, label: c.namePlural ?? c.name, meta: String(c.count) })) },
       { title: "By city", links: cities.slice(0, 8).map((c) => ({ href: `/cities/${c.slug}`, label: c.name, meta: c.count ? String(c.count) : undefined })) },
+      { title: "Professionals", href: "/professionals", links: [...[...pros].sort((a, b) => b.count - a.count).slice(0, 6).map((p) => ({ href: `/professionals/${p.slug}`, label: p.plural, meta: p.count ? String(p.count) : undefined })), { href: "/professionals/join", label: "Create your profile" }] },
       { title: "For owners", links: [{ href: "/add-business", label: "Add your business (free)" }, { href: "/business", label: "Owner dashboard" }, { href: "/advertise", label: "Verified & Premium plans" }] },
     ],
     footer: { href: "/businesses", label: "Browse the directory" },

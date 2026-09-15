@@ -50,6 +50,13 @@
       "when": 1789462556780,
       "tag": "0006_claims_outreach",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789464303923,
+      "tag": "0007_professionals",
+      "breakpoints": true
     }
   ]
 }

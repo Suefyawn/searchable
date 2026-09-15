@@ -3,6 +3,7 @@ import { createdAt, id, updatedAt } from "./_shared";
 import { users } from "./auth";
 import { articles } from "./content";
 import { businesses } from "./directory";
+import { professionals } from "./professionals";
 
 /**
  * Revenue: paid business plans (verified / premium / sponsored placements) and paid sponsored posts.
@@ -10,7 +11,7 @@ import { businesses } from "./directory";
  * A card gateway (Safepay / PayFast / Stripe) plugs in as another `provider` without touching the rest.
  */
 
-export const orderKind = pgEnum("order_kind", ["business_plan", "sponsored_post", "placement"]);
+export const orderKind = pgEnum("order_kind", ["business_plan", "sponsored_post", "placement", "professional_plan"]);
 export const orderStatus = pgEnum("order_status", ["pending", "paid", "active", "expired", "cancelled", "refunded"]);
 
 export const orders = pgTable(
@@ -24,6 +25,7 @@ export const orders = pgTable(
     productName: text("product_name").notNull(),
     userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
     businessId: text("business_id").references(() => businesses.id, { onDelete: "set null" }),
+    professionalId: text("professional_id").references(() => professionals.id, { onDelete: "set null" }),
     submissionId: text("submission_id"),
     amountPkr: integer("amount_pkr").notNull(),
     status: orderStatus("status").default("pending").notNull(),

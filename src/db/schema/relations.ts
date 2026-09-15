@@ -6,6 +6,7 @@ import { dataPoints, dataSeries } from "./data";
 import { locations } from "./geo";
 import { users } from "./auth";
 import { orders, submissions } from "./commerce";
+import { professionalLeads, professionals } from "./professionals";
 
 export const locationsRelations = relations(locations, ({ one, many }) => ({
   parent: one(locations, { fields: [locations.parentId], references: [locations.id], relationName: "parent" }),
@@ -101,10 +102,21 @@ export const dataPointsRelations = relations(dataPoints, ({ one }) => ({
 
 export const ordersRelations = relations(orders, ({ one }) => ({
   business: one(businesses, { fields: [orders.businessId], references: [businesses.id] }),
+  professional: one(professionals, { fields: [orders.professionalId], references: [professionals.id] }),
   user: one(users, { fields: [orders.userId], references: [users.id] }),
 }));
 
 export const submissionsRelations = relations(submissions, ({ one }) => ({
   article: one(articles, { fields: [submissions.articleId], references: [articles.id] }),
   order: one(orders, { fields: [submissions.orderId], references: [orders.id] }),
+}));
+
+export const professionalsRelations = relations(professionals, ({ one, many }) => ({
+  owner: one(users, { fields: [professionals.ownerUserId], references: [users.id] }),
+  city: one(locations, { fields: [professionals.cityId], references: [locations.id], relationName: "professionalCity" }),
+  area: one(locations, { fields: [professionals.areaId], references: [locations.id], relationName: "professionalArea" }),
+  leads: many(professionalLeads),
+}));
+export const professionalLeadsRelations = relations(professionalLeads, ({ one }) => ({
+  professional: one(professionals, { fields: [professionalLeads.professionalId], references: [professionals.id] }),
 }));

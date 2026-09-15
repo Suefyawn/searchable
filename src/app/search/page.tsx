@@ -19,14 +19,15 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   return { title: q ? `“${q}”` : "Search", robots: { index: false, follow: true } };
 }
 
-const TYPE_ORDER: SearchEntityType[] = ["tool", "data_series", "guide", "comparison", "business", "news", "location", "entity"];
-const PLURAL: Record<SearchEntityType, string> = { tool: "Calculators", guide: "Guides", news: "News", business: "Businesses", entity: "Topics", location: "Places", data_series: "Data", comparison: "Comparisons" };
+const TYPE_ORDER: SearchEntityType[] = ["tool", "data_series", "guide", "comparison", "professional", "business", "news", "location", "entity"];
+const PLURAL: Record<SearchEntityType, string> = { tool: "Calculators", guide: "Guides", news: "News", business: "Businesses", entity: "Topics", location: "Places", data_series: "Data", comparison: "Comparisons", professional: "Professionals" };
 const FILTERS: { value: SearchEntityType | ""; label: string }[] = [
   { value: "", label: "All" },
   { value: "tool", label: "Calculators" },
   { value: "guide", label: "Guides" },
   { value: "data_series", label: "Data" },
   { value: "business", label: "Businesses" },
+  { value: "professional", label: "Professionals" },
   { value: "news", label: "News" },
   { value: "location", label: "Places" },
 ];
@@ -312,9 +313,9 @@ function Answer({ hit }: { hit: SearchHit }) {
           {hit.headline ? <p className="mt-2 text-[15px] text-2 [&_mark]:bg-transparent [&_mark]:font-medium [&_mark]:text-[var(--text)]" dangerouslySetInnerHTML={{ __html: hit.headline }} /> : hit.summary ? <p className="mt-2 text-[15px] text-2">{hit.summary}</p> : null}
           <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-3">
             {[hit.category, hit.city].filter(Boolean).join(" · ")}
-            {hit.entityType === "business" && typeof meta.rating === "number" && meta.ratingCount ? <Rating avg={meta.rating} count={meta.ratingCount} /> : null}
-            {hit.entityType === "business" && meta.phone ? <span className="tabular">{meta.phone}</span> : null}
-            {hit.entityType === "business" && meta.verified ? <span className="font-medium text-[var(--text)]">Verified</span> : null}
+            {(hit.entityType === "business" || hit.entityType === "professional") && typeof meta.rating === "number" && meta.ratingCount ? <Rating avg={meta.rating} count={meta.ratingCount} /> : null}
+            {(hit.entityType === "business" || hit.entityType === "professional") && meta.phone ? <span className="tabular">{meta.phone}</span> : null}
+            {(hit.entityType === "business" || hit.entityType === "professional") && meta.verified ? <span className="font-medium text-[var(--text)]">Verified</span> : null}
           </p>
         </div>
         {figure ? (
@@ -335,7 +336,7 @@ function newsDate(d: Date): string {
 
 function Hit({ hit }: { hit: SearchHit }) {
   const meta = hit.meta as { latest?: { date: string; value: number } | null; unit?: string; rating?: number; ratingCount?: number; verified?: boolean };
-  const thumb = hit.imageUrl && (hit.entityType === "news" || hit.entityType === "business" || hit.entityType === "guide");
+  const thumb = hit.imageUrl && (hit.entityType === "news" || hit.entityType === "business" || hit.entityType === "guide" || hit.entityType === "professional");
   const when = hit.entityType === "news" && hit.publishedAt ? newsDate(hit.publishedAt) : null;
   return (
     <li>
@@ -349,8 +350,8 @@ function Hit({ hit }: { hit: SearchHit }) {
           {hit.headline ? <p className="mt-1 text-[14.5px] text-2 line-clamp-2 [&_mark]:bg-transparent [&_mark]:font-medium [&_mark]:text-[var(--text)]" dangerouslySetInnerHTML={{ __html: hit.headline }} /> : hit.summary ? <p className="mt-1 text-[14.5px] text-2 line-clamp-2">{hit.summary}</p> : null}
           <p className="mt-1 flex flex-wrap items-center gap-x-2 text-[12.5px] text-3">
             <span>{[hit.category, hit.city, when].filter(Boolean).join(" · ")}</span>
-            {hit.entityType === "business" && typeof meta.rating === "number" && meta.ratingCount ? <Rating avg={meta.rating} count={meta.ratingCount} /> : null}
-            {hit.entityType === "business" && meta.verified ? <span className="font-medium text-[var(--text)]">Verified</span> : null}
+            {(hit.entityType === "business" || hit.entityType === "professional") && typeof meta.rating === "number" && meta.ratingCount ? <Rating avg={meta.rating} count={meta.ratingCount} /> : null}
+            {(hit.entityType === "business" || hit.entityType === "professional") && meta.verified ? <span className="font-medium text-[var(--text)]">Verified</span> : null}
             {hit.fuzzy ? <span>close match</span> : null}
           </p>
         </div>

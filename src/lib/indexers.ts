@@ -5,6 +5,7 @@ import { removeSearchDocument, syncSearchDocument } from "./search";
 import { TOOLS, toolUrl } from "@/tools/registry";
 import { TOOL_CATEGORIES } from "@/tools/types";
 import { DISCOS } from "@/content/discos";
+import { indexProfessional } from "./professionals";
 
 /** Article → search document (or removal when unpublished). */
 export async function indexArticle(articleId: string) {
@@ -214,19 +215,21 @@ export async function indexTools() {
 export async function reindexAll() {
   const db = await getDb();
   await db.delete(schema.searchDocuments);
-  const [articles, businesses, locations, entities, series] = await Promise.all([
+  const [articles, businesses, locations, entities, series, pros] = await Promise.all([
     db.select({ id: schema.articles.id }).from(schema.articles),
     db.select({ id: schema.businesses.id }).from(schema.businesses),
     db.select({ id: schema.locations.id }).from(schema.locations),
     db.select({ id: schema.entities.id }).from(schema.entities),
     db.select({ id: schema.dataSeries.id }).from(schema.dataSeries),
+    db.select({ id: schema.professionals.id }).from(schema.professionals),
   ]);
   for (const a of articles) await indexArticle(a.id);
   for (const b of businesses) await indexBusiness(b.id);
   for (const l of locations) await indexLocation(l.id);
   for (const e of entities) await indexEntity(e.id);
   for (const d of series) await indexDataSeries(d.id);
+  for (const p of pros) await indexProfessional(p.id);
   await indexTools();
   await indexStaticPages();
-  return { articles: articles.length, businesses: businesses.length, locations: locations.length, entities: entities.length, series: series.length, tools: TOOLS.length };
+  return { articles: articles.length, businesses: businesses.length, locations: locations.length, entities: entities.length, series: series.length, professionals: pros.length, tools: TOOLS.length };
 }

@@ -14,7 +14,7 @@ export async function nextInvoiceNo() {
   return `SP-${year}-${String(n).padStart(6, "0")}`;
 }
 
-export async function createOrder(input: { productCode: string; userId?: string | null; businessId?: string | null; submissionId?: string | null; payer: { name: string; email: string; phone?: string }; notes?: string; meta?: Record<string, unknown> }) {
+export async function createOrder(input: { productCode: string; userId?: string | null; businessId?: string | null; professionalId?: string | null; submissionId?: string | null; payer: { name: string; email: string; phone?: string }; notes?: string; meta?: Record<string, unknown> }) {
   const product = getProduct(input.productCode);
   if (!product) throw new Error("Unknown product");
   const db = await getDb();
@@ -29,6 +29,7 @@ export async function createOrder(input: { productCode: string; userId?: string 
       amountPkr: product.pricePkr,
       userId: input.userId ?? null,
       businessId: input.businessId ?? null,
+      professionalId: input.professionalId ?? null,
       submissionId: input.submissionId ?? null,
       payerName: input.payer.name,
       payerEmail: input.payer.email,
@@ -63,6 +64,9 @@ export async function markPaid(orderId: string, opts: { reference?: string; prov
   if (order.kind === "business_plan" && order.businessId && product?.tier) {
     await db.update(schema.businesses).set({ tier: product.tier, tierExpiresAt: endsAt, isVerified: true, verifiedAt: now, lastVerifiedAt: now }).where(eq(schema.businesses.id, order.businessId));
   }
+  if (order.kind === "professional_plan" && order.professionalId) {
+    await db.update(schema.professionals).set({ tier: "verified", tierExpiresAt: endsAt, isVerified: true, verifiedAt: now }).where(eq(schema.professionals.id, order.professionalId));
+  }
   if (order.kind === "placement" && order.businessId) {
     await db.update(schema.businesses).set({ tier: "sponsored", tierExpiresAt: endsAt }).where(eq(schema.businesses.id, order.businessId));
   }
@@ -91,6 +95,10 @@ export async function expireLapsedPlans() {
       // Only downgrade if no other active order keeps the tier.
       const other = await db.query.orders.findFirst({ where: and(eq(schema.orders.businessId, o.businessId), eq(schema.orders.status, "active")) });
       if (!other) await db.update(schema.businesses).set({ tier: "free", tierExpiresAt: null }).where(eq(schema.businesses.id, o.businessId));
+    }
+    if (o.professionalId) {
+      const other = await db.query.orders.findFirst({ where: and(eq(schema.orders.professionalId, o.professionalId), eq(schema.orders.status, "active")) });
+      if (!other) await db.update(schema.professionals).set({ tier: "free", tierExpiresAt: null, isVerified: false }).where(eq(schema.professionals.id, o.professionalId));
     }
   }
   return lapsed.length;

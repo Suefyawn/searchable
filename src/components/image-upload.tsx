@@ -4,7 +4,7 @@ import { ImagePlus, Trash2 } from "lucide-react";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-type Variant = "article" | "logo" | "cover" | "photo" | "evidence";
+type Variant = "article" | "logo" | "cover" | "photo" | "evidence" | "avatar";
 
 export type UploadedImage = { url: string; width: number; height: number };
 

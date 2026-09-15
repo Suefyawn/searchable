@@ -114,5 +114,6 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 2. More compare pages (cars, bank accounts, mobile packages) on the inverter-compare pattern.
 3. Tools to 30: ✅ sales tax, 231B, EOBI, FX converter, personal loan, increment, age · next: stamp duty per province, savings/NSC, car import duty, gas bill, freelancer tax, provident fund
 4. ✅ Typo tolerance + intent blending in search.
-5. Professional profiles (doctors, electricians, engineers, architects…): profile with handles, experience, CV, contact; claim and verify like businesses.
-6. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md` + `docs/FREE-TIER.md`), then AdSense, Resend, Search Console, Position Tracking.
+5. ✅ Professional profiles (ADR-26): hub, profession and city lists, profile page, editor with CV upload, owner dashboard, Verified plan, admin approval.
+6. Community: member profiles, posts (jobs, listings, auctions, anything) with admin approval, comments, replies, likes on posts and articles, moderation queue.
+7. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md` + `docs/FREE-TIER.md`), then AdSense, Resend, Search Console, Position Tracking.

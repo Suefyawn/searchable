@@ -6,7 +6,7 @@ type MetaInput = {
   description?: string | null;
   path: string;
   image?: string | null;
-  type?: "website" | "article";
+  type?: "website" | "article" | "profile";
   publishedTime?: Date | null;
   modifiedTime?: Date | null;
   noindex?: boolean;

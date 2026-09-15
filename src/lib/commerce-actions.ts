@@ -28,6 +28,21 @@ export async function buyPlanAction(formData: FormData) {
   redirect(`/orders/${order.invoiceNo}`);
 }
 
+const BuyProPlan = z.object({ professionalId: z.string().min(1), productCode: z.string().min(1), phone: z.string().trim().max(20).optional() });
+
+/** Verified professional plan: only the profile's owner can buy it. */
+export async function buyProfessionalPlanAction(formData: FormData) {
+  const user = await requireUser("/professional");
+  const d = BuyProPlan.parse(Object.fromEntries(formData));
+  const product = getProduct(d.productCode);
+  if (!product || product.kind !== "professional_plan") throw new Error("Unknown plan");
+  const db = await getDb();
+  const pro = await db.query.professionals.findFirst({ where: and(eq(schema.professionals.id, d.professionalId), eq(schema.professionals.ownerUserId, user.id)) });
+  if (!pro) throw new Error("You do not manage this profile");
+  const order = await createOrder({ productCode: product.code, userId: user.id, professionalId: pro.id, payer: { name: user.name ?? user.email, email: user.email, phone: d.phone }, notes: `${product.name} for ${pro.name}` });
+  redirect(`/orders/${order.invoiceNo}`);
+}
+
 /* ───────────── Payer: attach a payment reference ───────────── */
 const Reference = z.object({ invoiceNo: z.string().min(5), reference: z.string().trim().min(3).max(120), provider: z.enum(["manual", "jazzcash", "easypaisa"]).default("manual") });
 

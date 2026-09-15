@@ -62,6 +62,7 @@ export default async function AdminDashboard() {
       sql`select
         (select count(*) from businesses where status = 'pending')::int as businesses,
         (select count(*) from business_claims where status = 'pending')::int as claims,
+        (select count(*) from professionals where status = 'pending')::int as professionals,
         (select count(*) from business_reviews where status = 'pending')::int as reviews,
         (select count(*) from orders where status = 'pending')::int as orders,
         (select count(*) from submissions where status in ('new', 'reviewing'))::int as submissions,
@@ -74,6 +75,7 @@ export default async function AdminDashboard() {
   const attention = [
     { n: q.businesses, label: "businesses awaiting approval", href: "/admin/businesses?status=pending" },
     { n: q.claims, label: "ownership claims to verify", href: "/admin/claims" },
+    { n: q.professionals, label: "professional profiles to approve", href: "/admin/professionals" },
     { n: q.reviews, label: "reviews to moderate", href: "/admin/reviews" },
     { n: q.orders, label: "invoices awaiting payment", href: "/admin/orders?status=pending" },
     { n: q.submissions, label: "pitches to read", href: "/admin/submissions" },

@@ -7,6 +7,8 @@ import { RENDITION_WIDTHS } from "./images";
 
 export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 export const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]);
+export const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024;
+export const DOCUMENT_TYPES = new Set(["application/pdf"]);
 
 export type StoredImage = { id: string; url: string; width: number; height: number; bytes: number; mimeType: string };
 
@@ -39,6 +41,17 @@ export async function storeImage(input: Buffer, opts: { variant: Variant; alt?: 
     .values({ url, storageKey: key, mimeType: "image/webp", width: out.info.width, height: out.info.height, bytes: out.info.size, alt: opts.alt ?? opts.originalName?.replace(/\.[a-z0-9]+$/i, "") ?? null, credit: opts.credit ?? null })
     .returning({ id: schema.media.id });
   return { id: row.id, url, width: out.info.width, height: out.info.height, bytes: out.info.size, mimeType: "image/webp" };
+}
+
+/** Stores a document as is (CVs are PDFs). Same providers as images; served from an unguessable key. */
+export async function storeDocument(input: Buffer, opts: { mimeType: string; originalName?: string; folder?: string }): Promise<{ id: string; url: string; bytes: number }> {
+  if (!DOCUMENT_TYPES.has(opts.mimeType)) throw new Error("Only PDF documents are accepted");
+  const id = crypto.randomUUID();
+  const key = `uploads/${opts.folder ?? "documents"}/${id}.pdf`;
+  const url = await putObject(key, input, opts.mimeType);
+  const db = await getDb();
+  await db.insert(schema.media).values({ url, storageKey: key, mimeType: opts.mimeType, width: 0, height: 0, bytes: input.length, alt: opts.originalName?.replace(/\.[a-z0-9]+$/i, "") ?? null, credit: null });
+  return { id, url, bytes: input.length };
 }
 
 /** Writes `<stem>-480.webp` and `<stem>-960.webp` for any rendition narrower than the master. */

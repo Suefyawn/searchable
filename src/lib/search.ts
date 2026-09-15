@@ -32,6 +32,7 @@ export const TYPE_BOOST: Record<SearchEntityType, number> = {
   location: 0.8,
   data_series: 1.1,
   comparison: 1.1,
+  professional: 1.0,
 };
 
 export const TYPE_LABEL: Record<SearchEntityType, string> = {
@@ -43,17 +44,19 @@ export const TYPE_LABEL: Record<SearchEntityType, string> = {
   location: "Place",
   data_series: "Data",
   comparison: "Compare",
+  professional: "Professional",
 };
 
 /**
  * Query intent → per-type rank multipliers (blended on top of TYPE_BOOST). Cheap keyword rules; the log
  * of zero-result and low-click queries in /admin/search-log is where new rules come from.
  */
-export type Intent = "tool" | "place" | "explainer" | "number" | "story" | "general";
+export type Intent = "tool" | "place" | "person" | "explainer" | "number" | "story" | "general";
 
 const INTENT_RULES: { intent: Intent; re: RegExp }[] = [
   { intent: "tool", re: /\b(calculat|calculator|convert|converter|kitna|kitni|how much|tax on|emi|instal?ment|zakat on|salary of|take.?home)\b/i },
-  { intent: "place", re: /\b(near me|nearby|in (karachi|lahore|islamabad|rawalpindi|faisalabad|multan|peshawar|quetta|hyderabad|gujranwala|sialkot)|restaurants?|hospitals?|doctors?|dentists?|lawyers?|schools?|gyms?|salons?|hotels?|dealers?|workshops?|companies|installers?|shops?|contact|phone number|address)\b/i },
+  { intent: "place", re: /\b(near me|nearby|in (karachi|lahore|islamabad|rawalpindi|faisalabad|multan|peshawar|quetta|hyderabad|gujranwala|sialkot)|restaurants?|hospitals?|schools?|gyms?|salons?|hotels?|dealers?|workshops?|companies|installers?|shops?|contact|phone number|address)\b/i },
+  { intent: "person", re: /\b(doctors?|dentists?|lawyers?|advocates?|electricians?|plumbers?|engineers?|architects?|tutors?|teachers?|physio|psychologists?|accountants?|consultants?|designers?|photographers?|mechanics?|technicians?|freelancers?|hire|book an? appointment|dr\.?)\b/i },
   { intent: "explainer", re: /\b(how to|how do|kaise|kese|tarika|process|procedure|register|apply|renew|check status|requirements?|documents?|guide|step)\b/i },
   { intent: "number", re: /\b(rate|rates|price|prices|today|aaj|history|chart|kibor|inflation|per tola|per litre|exchange)\b/i },
   { intent: "story", re: /\b(news|latest|update|announce|budget|nepra|ecc|cabinet|why|when will)\b/i },
@@ -66,7 +69,8 @@ export function detectIntent(q: string): Intent {
 
 const INTENT_BOOST: Record<Intent, Partial<Record<SearchEntityType, number>>> = {
   tool: { tool: 1.6, guide: 1.1, data_series: 1.1 },
-  place: { business: 1.8, location: 1.4, tool: 0.7, news: 0.7 },
+  place: { business: 1.8, location: 1.4, professional: 1.3, tool: 0.7, news: 0.7 },
+  person: { professional: 1.9, business: 1.3, guide: 0.9, news: 0.7 },
   explainer: { guide: 1.6, tool: 1.1, news: 0.8 },
   number: { data_series: 1.8, tool: 1.2, news: 0.9 },
   story: { news: 1.6, entity: 1.1, tool: 0.8 },

@@ -16,8 +16,8 @@ type Suggestion = { entityType: string; url: string; title: string; meta?: strin
 type IndexEntry = { t: string; u: string; k: string; y: string; c?: string; m?: string };
 type SuggestIndex = { entries: IndexEntry[]; popular: string[] };
 
-const TYPE_LABEL: Record<string, string> = { tool: "Calculator", guide: "Guide", news: "News", business: "Business", location: "Place", entity: "Topic", data_series: "Data", comparison: "Compare" };
-const TYPE_ORDER = ["tool", "data_series", "guide", "comparison", "business", "location", "entity", "news"];
+const TYPE_LABEL: Record<string, string> = { tool: "Calculator", guide: "Guide", news: "News", business: "Business", professional: "Professional", location: "Place", entity: "Topic", data_series: "Data", comparison: "Compare" };
+const TYPE_ORDER = ["tool", "data_series", "guide", "comparison", "professional", "business", "location", "entity", "news"];
 const RECENT_KEY = "sp:recent-searches";
 
 let indexPromise: Promise<SuggestIndex> | null = null;

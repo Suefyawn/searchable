@@ -5,7 +5,7 @@
 
 export type Product = {
   code: string;
-  kind: "business_plan" | "sponsored_post" | "placement";
+  kind: "business_plan" | "sponsored_post" | "placement" | "professional_plan";
   name: string;
   pricePkr: number;
   /** Billing period in days; null = one-off. */
@@ -66,6 +66,16 @@ export const PRODUCTS: Product[] = [
     periodDays: null,
     blurb: "Your announcement published in Business news, lightly edited, with one link.",
     features: ["Published within 2 working days", "One link to your site", "Labelled as a press release"],
+  },
+  {
+    code: "pro-verified-annual",
+    kind: "professional_plan",
+    name: "Verified professional",
+    pricePkr: 4_900,
+    periodDays: 365,
+    tier: "verified",
+    blurb: "For doctors, engineers, architects, lawyers, tutors and tradespeople: the checked badge on your profile.",
+    features: ["Verified badge after we check your registration number and identity", "Ranked above free profiles in your profession and city", "Dofollow link to your website or portfolio", "CV and contact details shown with a verified mark", "Enquiry analytics in your dashboard"],
   },
   {
     code: "category-city-sponsor",

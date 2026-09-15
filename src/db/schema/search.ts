@@ -11,6 +11,7 @@ export const searchEntityType = pgEnum("search_entity_type", [
   "entity",
   "data_series",
   "comparison",
+  "professional",
 ]);
 
 /**
