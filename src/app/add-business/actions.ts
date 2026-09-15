@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
 import { getSessionUser } from "@/lib/auth";
+import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { slugify, uniqueSlug } from "@/lib/slug";
 
 const Input = z.object({
@@ -20,6 +21,8 @@ const Input = z.object({
 });
 
 export async function submitBusiness(input: z.infer<typeof Input>): Promise<{ ok: boolean; error?: string; slug?: string }> {
+  const rl = await rateLimit("submitBusiness", LIMITS.submitBusiness.limit, LIMITS.submitBusiness.windowMs);
+  if (!rl.ok) return { ok: false, error: "You have submitted several businesses recently. Please try again in an hour." };
   const parsed = Input.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Please check the highlighted fields — name, category, city, address, phone and a short description are required." };
   const d = parsed.data;

@@ -57,7 +57,7 @@ export default async function CategoryCityPage({ params, searchParams }: Props) 
           ) : (
             <EmptyState title={`No ${plural.toLowerCase()} listed in ${loc.name} yet`} description="Know one? Add it in a minute — it is free." action={<Link href="/add-business" className="text-sm font-medium text-brand-700">Add a business →</Link>} />
           )}
-          <Pagination base={`/businesses/${cat.slug}/${loc.slug}`} page={page} total={total} pageSize={PAGE_SIZE} />
+          <Pagination base={`/businesses/${cat.slug}/${loc.slug}`} page={page} total={total} pageSize={PAGE_SIZE} hrefFor={(n) => (n === 1 ? `/businesses/${cat.slug}/${loc.slug}` : `/businesses/${cat.slug}/${loc.slug}?page=${n}`)} labels={["← Previous", "Next →"]} />
         </div>
         <aside className="space-y-6 self-start lg:sticky lg:top-24">
           <div className="surface p-5">

@@ -59,7 +59,10 @@ Everything runs on this machine with **PGlite** (embedded Postgres). No accounts
 - [ ] Founder review: is this the product? Adjust the spec.
 - [ ] Verify every rate table in `src/tools/data/` against its primary source (PTA slabs, NEPRA tariff, EOBI) before go-live
 - [ ] Replace sample news (`scripts/seed-data/news.ts`) with real daily pieces written in the CMS
-- [ ] Pagination on `/news` and `/guides` uses `?page=` (dynamic); move to `/news/page/2` paths for full static caching
+- [x] Path-based pagination (`/news/page/2`) so hubs are fully cacheable
+- [x] RSS feed at `/feed.xml`
+- [x] Rate limiting on newsletter, tool-run, lead, submission, contact and search endpoints
+- [x] 11 tools (added home loan, fuel cost, AC running cost, plot size converter)
 
 **Exit criteria:** `npm run db:reset && npm run dev` gives a browsable site with search returning mixed results, 6 working calculators, 10+ articles, 20+ businesses across 3 cities, and an admin where a new article can be published without touching code.
 

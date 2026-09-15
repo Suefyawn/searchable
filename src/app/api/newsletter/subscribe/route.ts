@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { subscribe } from "@/lib/newsletter";
+import { LIMITS, rateLimit } from "@/lib/rate-limit";
 
 const Body = z.object({
   email: z.email(),
@@ -11,6 +12,8 @@ const Body = z.object({
 });
 
 export async function POST(req: Request) {
+  const rl = await rateLimit("newsletter", LIMITS.newsletter.limit, LIMITS.newsletter.windowMs);
+  if (!rl.ok) return NextResponse.json({ error: "Too many attempts. Please try again later." }, { status: 429, headers: { "retry-after": String(rl.retryAfterSeconds) } });
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
   try {

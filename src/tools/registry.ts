@@ -1,6 +1,10 @@
+import { acRunningCostCalculator } from "./calculators/ac-running-cost-calculator";
 import { carLoanCalculator } from "./calculators/car-loan-calculator";
 import { electricityBillCalculator } from "./calculators/electricity-bill-calculator";
+import { fuelCostCalculator } from "./calculators/fuel-cost-calculator";
+import { homeLoanCalculator } from "./calculators/home-loan-calculator";
 import { incomeTaxCalculator } from "./calculators/income-tax-calculator";
+import { plotSizeConverter } from "./calculators/plot-size-converter";
 import { ptaMobileTaxCalculator } from "./calculators/pta-mobile-tax-calculator";
 import { salaryBreakdownCalculator } from "./calculators/salary-breakdown-calculator";
 import { solarPaybackCalculator } from "./calculators/solar-payback-calculator";
@@ -16,6 +20,10 @@ export const TOOLS: ToolDefinition[] = [
   zakatCalculator,
   carLoanCalculator,
   solarPaybackCalculator,
+  homeLoanCalculator,
+  fuelCostCalculator,
+  acRunningCostCalculator,
+  plotSizeConverter,
 ];
 
 const bySlug = new Map(TOOLS.map((t) => [t.slug, t]));

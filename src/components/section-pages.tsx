@@ -16,14 +16,15 @@ const META: Record<"news" | "guide", { section: string; name: string; title: str
 const PAGE_SIZE = 18;
 
 /* ───────────── Section hub (/news, /guides) ───────────── */
-export function sectionMetadata(kind: "news" | "guide"): Metadata {
+export function sectionMetadata(kind: "news" | "guide", page = 1): Metadata {
   const m = META[kind];
-  return buildMetadata({ title: m.title, description: m.description, path: `/${m.section}` });
+  return buildMetadata({ title: page > 1 ? `${m.title} — page ${page}` : m.title, description: m.description, path: page > 1 ? `/${m.section}/page/${page}` : `/${m.section}` });
 }
 
 export async function SectionHub({ kind, page = 1 }: { kind: "news" | "guide"; page?: number }) {
   const m = META[kind];
   const [categories, items, total] = await Promise.all([listCategories(kind), listArticles({ kind, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }), countArticles(kind)]);
+  if (page > 1 && !items.length) notFound();
   const featured = page === 1 ? items.slice(0, 1) : [];
   const rest = page === 1 ? items.slice(1) : items;
   return (
@@ -49,11 +50,12 @@ export async function SectionHub({ kind, page = 1 }: { kind: "news" | "guide"; p
 }
 
 /* ───────────── Category (/news/[category]) ───────────── */
-export async function categoryMetadata(kind: "news" | "guide", slug: string): Promise<Metadata> {
+export async function categoryMetadata(kind: "news" | "guide", slug: string, page = 1): Promise<Metadata> {
   const cat = await getCategory(kind, slug);
   if (!cat) return {};
   const m = META[kind];
-  return buildMetadata({ title: `${cat.name} ${m.name.toLowerCase()}`, description: cat.description ?? `${cat.name} — ${m.description}`, path: `/${m.section}/${cat.slug}` });
+  const base = `/${m.section}/${cat.slug}`;
+  return buildMetadata({ title: `${cat.name} ${m.name.toLowerCase()}${page > 1 ? ` — page ${page}` : ""}`, description: cat.description ?? `${cat.name} — ${m.description}`, path: page > 1 ? `${base}/page/${page}` : base });
 }
 
 export async function CategoryPage({ kind, slug, page = 1 }: { kind: "news" | "guide"; slug: string; page?: number }) {
@@ -61,6 +63,7 @@ export async function CategoryPage({ kind, slug, page = 1 }: { kind: "news" | "g
   const cat = await getCategory(kind, slug);
   if (!cat) notFound();
   const [categories, items, total] = await Promise.all([listCategories(kind), listArticles({ kind, categorySlug: slug, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }), countArticles(kind, slug)]);
+  if (page > 1 && !items.length) notFound();
   const crumbs = [{ name: m.name, path: `/${m.section}` }, { name: cat.name, path: `/${m.section}/${cat.slug}` }];
   return (
     <div className="container-x py-8 sm:py-12">
@@ -121,14 +124,15 @@ function CategoryNav({ section, categories, active }: { section: string; categor
   );
 }
 
-export function Pagination({ base, page, total, pageSize = PAGE_SIZE }: { base: string; page: number; total: number; pageSize?: number }) {
+export function Pagination({ base, page, total, pageSize = PAGE_SIZE, hrefFor, labels = ["← Newer", "Older →"] }: { base: string; page: number; total: number; pageSize?: number; hrefFor?: (page: number) => string; labels?: [string, string] }) {
   const pages = Math.ceil(total / pageSize);
   if (pages <= 1) return null;
+  const href = hrefFor ?? ((n: number) => (n === 1 ? base : `${base}/page/${n}`));
   return (
     <nav className="mt-10 flex items-center justify-between text-sm" aria-label="Pagination">
-      {page > 1 ? <Link href={`${base}?page=${page - 1}`} className="font-medium text-brand-700 dark:text-brand-300">← Newer</Link> : <span />}
+      {page > 1 ? <Link href={href(page - 1)} className="font-medium text-brand-700 dark:text-brand-300">{labels[0]}</Link> : <span />}
       <span className="text-3">Page {page} of {pages}</span>
-      {page < pages ? <Link href={`${base}?page=${page + 1}`} className="font-medium text-brand-700 dark:text-brand-300">Older →</Link> : <span />}
+      {page < pages ? <Link href={href(page + 1)} className="font-medium text-brand-700 dark:text-brand-300">{labels[1]}</Link> : <span />}
     </nav>
   );
 }

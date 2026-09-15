@@ -2,10 +2,13 @@
 
 import { z } from "zod";
 import { sendEmail } from "@/lib/email";
+import { LIMITS, rateLimit } from "@/lib/rate-limit";
 
 const Msg = z.object({ name: z.string().trim().min(2).max(80), email: z.email(), subject: z.string().trim().min(2).max(120), message: z.string().trim().min(10).max(4000), about: z.string().max(120).optional() });
 
 export async function sendContact(input: z.infer<typeof Msg>): Promise<{ ok: boolean; error?: string }> {
+  const rl = await rateLimit("contact", LIMITS.contact.limit, LIMITS.contact.windowMs);
+  if (!rl.ok) return { ok: false, error: "Too many messages. Please try again later." };
   const parsed = Msg.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Please complete every field." };
   const d = parsed.data;

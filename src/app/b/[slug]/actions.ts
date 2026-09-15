@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { getDb, schema } from "@/db";
+import { LIMITS, rateLimit } from "@/lib/rate-limit";
 
 const Lead = z.object({
   businessId: z.string().min(1),
@@ -11,6 +12,8 @@ const Lead = z.object({
 });
 
 export async function sendLead(input: z.infer<typeof Lead>): Promise<{ ok: boolean; error?: string }> {
+  const rl = await rateLimit("lead", LIMITS.lead.limit, LIMITS.lead.windowMs);
+  if (!rl.ok) return { ok: false, error: "Too many enquiries sent. Please try again later." };
   const parsed = Lead.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Please fill in your name, phone and message." };
   const db = await getDb();
