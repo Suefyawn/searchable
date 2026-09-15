@@ -78,7 +78,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | Item | Status |
 |---|---|
 | 14 data series, history, charts, stats, API, admin entry, city sections (gold), inflation | ✅ |
-| Automated ingestion (scrapers/APIs) | ❌ |
+| Automated ingestion (SBP, er-api, PSO, spot gold/silver → 12 of 14 series; daily cron + Fetch now; 30% jump guard) | ✅ |
 | Data → auto-drafted article on change | ❌ |
 | Compare pages | 🟡 2 of 8 (new cars, solar inverters) + /compare hub; banks/packages next |
 | Reviews + moderation + owner response + report | ✅ |

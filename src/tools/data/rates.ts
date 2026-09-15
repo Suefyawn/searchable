@@ -34,11 +34,12 @@ export const PTA_MOBILE_TAX = {
 // ── Reference market rates (Phase 6 replaces these with the data platform) ──
 export const REFERENCE_RATES = {
   reviewedAt: "2026-09-15",
-  usdPkr: 281,
-  goldPerTola24k: 372_000,
-  goldPerGram24k: 31_900,
-  silverPerGram: 380,
-  kibor1y: 11.0,
+  // Fallbacks only — live values come from the data hub (src/lib/ingest.ts) at render time.
+  usdPkr: 277.3,
+  goldPerTola24k: 446_000,
+  goldPerGram24k: 38_240,
+  silverPerGram: 563,
+  kibor1y: 12.3,
 };
 
 // ── Zakat ───────────────────────────────────────────────────────────────────
