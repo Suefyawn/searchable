@@ -34,6 +34,8 @@ export async function citiesWithCounts(limit = 12) {
       slug: schema.locations.slug,
       name: schema.locations.name,
       population: schema.locations.population,
+      imageUrl: schema.locations.imageUrl,
+      imageCredit: schema.locations.imageCredit,
       count: sql<number>`count(${schema.businesses.id})::int`,
     })
     .from(schema.locations)

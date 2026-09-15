@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { ToolCard } from "@/components/cards";
+import { ToolCard, toolExample } from "@/components/cards";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { getToolsByCategory, isToolCategory } from "@/tools/registry";
@@ -27,7 +27,7 @@ export default async function Page({ params }: Props) {
       <SectionHeader as="h1" title={`${c.name} tools`} description={c.description} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {tools.map((t) => (
-          <ToolCard key={t.slug} tool={t} />
+          <ToolCard key={t.slug} tool={t} example={toolExample(t)} />
         ))}
       </div>
     </div>

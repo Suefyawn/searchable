@@ -198,7 +198,7 @@ export default async function BusinessPage({ params }: Props) {
             {b.website ? (
               <p className="flex gap-2.5">
                 <Globe className="mt-1 size-4 shrink-0 text-3" />
-                <TrackedLink businessId={b.id} kind="website" href={b.website} target="_blank" rel="noopener nofollow" className="truncate text-brand-700 dark:text-brand-300 hover:underline">
+                <TrackedLink businessId={b.id} kind="website" href={b.website} target="_blank" rel={b.tier === "free" ? "noopener nofollow" : "noopener"} className="truncate text-brand-700 dark:text-brand-300 hover:underline">
                   {b.website.replace(/^https?:\/\//, "")}
                 </TrackedLink>
               </p>

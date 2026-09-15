@@ -1,0 +1,80 @@
+/**
+ * Openly licensed photo queries for seed content. Resolved against Openverse at seed time
+ * (scripts/seed-images.ts); the first CC0 / public-domain / CC BY / CC BY-SA landscape result wide enough
+ * is imported through the storage adapter with its credit line. Queries are English, concrete and Pakistani
+ * so the photo is actually about the subject. No AI-generated imagery anywhere.
+ */
+
+export const ARTICLE_IMAGES: Record<string, { q: string; alt: string; pick?: number; fallback?: string }> = {
+  "what-the-2025-26-salary-tax-slabs-mean-for-your-take-home": { q: "Pakistan rupee notes", alt: "Pakistani rupee notes", fallback: "Pakistani currency" },
+  "how-petrol-prices-are-set-in-pakistan-every-fortnight": { q: "petrol pump Pakistan", alt: "A petrol station in Pakistan" },
+  "pta-tax-on-iphone-17-what-you-will-actually-pay": { q: "iPhone hand smartphone", alt: "An iPhone held in a hand" },
+  "sbp-policy-rate-explained-what-11-percent-means-for-loans-and-savings": { q: "State Bank of Pakistan", alt: "State Bank of Pakistan", fallback: "Karachi I.I. Chundrigar Road" },
+  "electricity-bill-slabs-why-crossing-200-units-costs-so-much": { q: "electricity meter", alt: "Electricity meters on a wall", fallback: "power lines pylon Pakistan" },
+  "how-gold-prices-in-pakistan-are-quoted-and-why-they-differ-from-the-world-rate": { q: "gold jewellery bangles", alt: "Gold jewellery", fallback: "gold bars bullion" },
+  "filer-vs-non-filer-what-you-pay-extra-on-cars-property-and-bank-transactions": { q: "Islamabad Constitution Avenue", alt: "Constitution Avenue, Islamabad", fallback: "Islamabad city" },
+  "solar-boom-pakistan-what-a-5kw-system-costs-and-saves": { q: "rooftop solar panels", alt: "Rooftop solar panels", fallback: "solar panels" },
+  "lahore-food-guide-where-locals-actually-eat": { q: "Lahore food street Fort Road", alt: "Food Street, Lahore" },
+  "karachi-guide-getting-around-the-city": { q: "Karachi street traffic bus", alt: "Traffic on a Karachi road" },
+  "how-to-become-a-tax-filer-in-pakistan": { q: "tax documents calculator desk", alt: "Tax paperwork on a desk" },
+  "how-to-file-income-tax-return-pakistan": { q: "laptop typing form office", alt: "Filing a form on a laptop" },
+  "how-to-register-phone-with-pta": { q: "mobile phone shop market", alt: "A mobile phone market", fallback: "smartphones display shop" },
+  "how-to-apply-for-net-metering-in-pakistan": { q: "solar panels house roof", alt: "Rooftop solar system on a house", fallback: "solar panel roof" },
+  "how-to-register-a-vehicle-in-punjab": { q: "car number plate Pakistan", alt: "A car with a Pakistani number plate" },
+  "how-to-open-a-roshan-digital-account": { q: "online banking phone app", alt: "Banking on a phone" },
+  "how-to-renew-cnic-online-nadra": { q: "NADRA office Pakistan", alt: "A NADRA office" },
+  "how-to-register-a-company-with-secp": { q: "Blue Area Islamabad", alt: "Blue Area, Islamabad", fallback: "Islamabad skyline" },
+  "fbr-iris-login-registration-and-filing-guide": { q: "laptop keyboard typing close up", alt: "Typing on a laptop" },
+  "how-to-check-filer-status-atl-pakistan": { q: "smartphone SMS text message", alt: "Sending an SMS" },
+};
+
+export const CITY_IMAGES: Record<string, { q: string; alt: string; pick?: number; fallback?: string }> = {
+  karachi: { q: "Karachi skyline Clifton", alt: "Karachi skyline" },
+  lahore: { q: "Badshahi Mosque Lahore", alt: "Badshahi Mosque, Lahore" },
+  islamabad: { q: "Faisal Mosque Islamabad", alt: "Faisal Mosque, Islamabad" },
+  rawalpindi: { q: "Rawalpindi Raja Bazar", alt: "Raja Bazar, Rawalpindi" },
+  faisalabad: { q: "Faisalabad clock tower", alt: "Clock Tower, Faisalabad", fallback: "Faisalabad Pakistan" },
+  multan: { q: "Multan shrine Shah Rukn-e-Alam", alt: "Shrine of Shah Rukn-e-Alam, Multan" },
+  gujranwala: { q: "Gujranwala", alt: "Gujranwala", fallback: "Gujranwala Punjab street" },
+  sialkot: { q: "Sialkot", alt: "Sialkot", fallback: "Iqbal Manzil Sialkot" },
+  bahawalpur: { q: "Noor Mahal Bahawalpur", alt: "Noor Mahal, Bahawalpur" },
+  sargodha: { q: "Sargodha Pakistan", alt: "Sargodha" },
+  hyderabad: { q: "Hyderabad Sindh Pakka Qila", alt: "Hyderabad, Sindh" },
+  sukkur: { q: "Sukkur Lansdowne Bridge", alt: "Lansdowne Bridge over the Indus, Sukkur", fallback: "Sukkur Pakistan" },
+  peshawar: { q: "Peshawar Bala Hisar Fort", alt: "Bala Hisar Fort, Peshawar", fallback: "Peshawar Pakistan" },
+  abbottabad: { q: "Abbottabad city view", alt: "Abbottabad", fallback: "Ilyasi Mosque Abbottabad" },
+  mardan: { q: "Takht-i-Bahi", alt: "Takht-i-Bahi, Mardan", fallback: "Mardan Pakistan" },
+  quetta: { q: "Quetta Pakistan mountains city", alt: "Quetta" },
+  gwadar: { q: "Gwadar beach", alt: "Gwadar", fallback: "Gwadar Balochistan" },
+  muzaffarabad: { q: "Muzaffarabad Neelum river", alt: "Muzaffarabad" },
+  gilgit: { q: "Gilgit city", alt: "Gilgit", fallback: "Gilgit Baltistan mountains" },
+  skardu: { q: "Skardu Shangrila lake", alt: "Skardu" },
+};
+
+export const CATEGORY_IMAGES: Record<string, { q: string; alt: string; pick?: number; fallback?: string }> = {
+  restaurants: { q: "Pakistani food karahi", alt: "A Pakistani restaurant", fallback: "restaurant Lahore" },
+  cafes: { q: "coffee cafe cup table", alt: "A café" },
+  doctors: { q: "doctor patient clinic", alt: "A doctor's clinic", fallback: "stethoscope" },
+  hospitals: { q: "hospital Lahore", alt: "A hospital", fallback: "hospital building" },
+  pharmacies: { q: "pharmacy", alt: "A pharmacy", fallback: "medicine shelves pharmacy" },
+  dentists: { q: "dentist", alt: "A dental clinic", fallback: "dental clinic chair" },
+  lawyers: { q: "Lahore High Court", alt: "Lahore High Court", fallback: "courthouse gavel law books" },
+  "tax-consultants": { q: "accountant calculator documents", alt: "An accountant at work" },
+  "solar-companies": { q: "solar panel installation workers roof", alt: "Solar panel installation" },
+  electricians: { q: "electrician", alt: "An electrician at work", fallback: "electrical wiring" },
+  plumbers: { q: "plumber pipe wrench", alt: "A plumber at work" },
+  "car-dealers": { q: "car showroom", alt: "A car showroom", fallback: "Toyota Corolla Pakistan" },
+  "car-workshops": { q: "car mechanic workshop garage", alt: "A car workshop" },
+  "mobile-shops": { q: "mobile phone shop", alt: "A mobile phone market", fallback: "smartphone store" },
+  "real-estate-agents": { q: "DHA Lahore", alt: "A housing society", fallback: "house for sale keys" },
+  schools: { q: "school children classroom Pakistan", alt: "A classroom in Pakistan" },
+  universities: { q: "University of the Punjab", alt: "A university campus", fallback: "university campus" },
+  gyms: { q: "gym weights", alt: "A gym", fallback: "fitness gym equipment" },
+  salons: { q: "barber shop", alt: "A salon", fallback: "hair salon interior" },
+  hotels: { q: "hotel lobby", alt: "A hotel", fallback: "Pearl Continental hotel" },
+  banks: { q: "bank building Karachi", alt: "A bank", fallback: "Habib Bank Plaza" },
+  photographers: { q: "photographer camera wedding", alt: "A photographer" },
+  "wedding-halls": { q: "Pakistani wedding", alt: "A wedding hall", fallback: "wedding hall decoration" },
+  tailors: { q: "tailor sewing machine shop", alt: "A tailor's shop" },
+  "it-companies": { q: "software developers office", alt: "A software office", fallback: "programmer laptop code" },
+};

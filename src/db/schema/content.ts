@@ -72,12 +72,20 @@ export const articles = pgTable(
     locationId: text("location_id").references(() => locations.id, { onDelete: "set null" }),
     featuredImageUrl: text("featured_image_url"),
     featuredImageAlt: text("featured_image_alt"),
+    /** Attribution line for openly licensed photos, e.g. "Kamran Aslam / Wikimedia Commons, CC BY-SA 4.0". */
+    featuredImageCredit: text("featured_image_credit"),
+    featuredImageSourceUrl: text("featured_image_source_url"),
     sources: jsonb("sources").$type<ArticleSource[]>().default([]).notNull(),
     /** Hand-picked related article ids (shown before automatic same-category picks). */
     relatedIds: jsonb("related_ids").$type<string[]>().default([]).notNull(),
     faqs: jsonb("faqs").$type<ArticleFaq[]>().default([]).notNull(),
     seoTitle: text("seo_title"),
     seoDescription: text("seo_description"),
+    /** Paid / sponsored content: disclosure shown, outbound links rel="sponsored". */
+    isSponsored: boolean("is_sponsored").default(false).notNull(),
+    /** Guest contributor byline when the author is not a staff author. */
+    contributorName: text("contributor_name"),
+    contributorBio: text("contributor_bio"),
     canonicalUrl: text("canonical_url"),
     noindex: boolean("noindex").default(false).notNull(),
     isFeatured: boolean("is_featured").default(false).notNull(),

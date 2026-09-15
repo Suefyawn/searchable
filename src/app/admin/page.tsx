@@ -2,7 +2,7 @@ import { desc, eq, sql } from "drizzle-orm";
 import Link from "next/link";
 import { getDb, rawQuery, schema } from "@/db";
 import { Badge, SectionHeader } from "@/components/ui";
-import { formatDate, timeAgo } from "@/lib/format";
+import { formatDate, pkr, timeAgo } from "@/lib/format";
 
 async function count(where?: ReturnType<typeof eq>) {
   const db = await getDb();
@@ -25,6 +25,11 @@ export default async function AdminDashboard() {
     db.$count(schema.businessLeads),
     db.$count(schema.businessReviews, eq(schema.businessReviews.status, "pending")),
   ]);
+  const [pendingOrders, newSubmissions, [rev]] = await Promise.all([
+    db.$count(schema.orders, eq(schema.orders.status, "pending")),
+    db.$count(schema.submissions, eq(schema.submissions.status, "new")),
+    rawQuery<{ month: number; total: number }>(db, sql`select coalesce(sum(case when paid_at > now() - interval '30 days' then amount_pkr else 0 end),0)::int as month, coalesce(sum(case when status in ('paid','active','expired') then amount_pkr else 0 end),0)::int as total from orders`),
+  ]);
   const [recent, topSearches, topTools] = await Promise.all([
     db.query.articles.findMany({ orderBy: [desc(schema.articles.updatedAt)], limit: 8, with: { category: true } }),
     rawQuery<{ query: string; n: number; zero: number }>(db, sql`select normalized as query, count(*)::int as n, sum(case when result_count = 0 then 1 else 0 end)::int as zero from search_queries where created_at > now() - interval '30 days' group by normalized order by n desc limit 10`),
@@ -42,6 +47,9 @@ export default async function AdminDashboard() {
     ["Tool runs", toolRuns, "/tools"],
     ["Leads", leads, "/admin/leads"],
     ["Reviews to moderate", pendingReviews, "/admin/reviews"],
+    ["Revenue (30 days / total)", `${pkr(rev?.month ?? 0)} / ${pkr(rev?.total ?? 0)}`, "/admin/orders"],
+    ["Invoices awaiting payment", pendingOrders, "/admin/orders?status=pending"],
+    ["New pitches", newSubmissions, "/admin/submissions?status=new"],
   ] as const;
 
   return (

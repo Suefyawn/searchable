@@ -1,174 +1,110 @@
-# Gap audit — plan vs. built (2026-09-15)
+# Gap audit — plan vs. built (updated 2026-09-15, evening)
 
-Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day plan + `docs/ROADMAP-1000-DAYS.md`.
+Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day plan + `docs/ROADMAP-1000-DAYS.md`. Money: see `docs/MONETIZATION.md`.
 
-## Foundation (Days 1–7)
+## Foundation
 | Item | Status | Note |
 |---|---|---|
-| Repo, Next.js, TS, Tailwind | ✅ | |
-| shadcn/ui | 🟡 | Hand-rolled primitives, shadcn-compatible (ADR-12) |
-| Supabase / Vercel / staging / production | ❌ | Deliberately deferred — founder will say when |
-| CI/CD | ❌ | Add GitHub Actions: typecheck, lint, build, migration check |
-| Env management | ✅ | `.env.example`, docs |
-
-## Database entities (plan list)
-| Entity | Status | Note |
-|---|---|---|
-| users, sessions | ✅ | |
-| profiles, organizations | ❌ | Not needed until business teams / multi-editor |
-| authors, editors | 🟡 | `authors` table exists; no author pages, no author picker in editor |
-| articles, categories | ✅ | |
-| tags | 🟡 | Table exists; no UI, not rendered |
-| topics | ✅ | As `entities` (knowledge graph) |
-| businesses + sub-tables | ✅ | categories, hours, services, photos, reviews, claims, leads |
-| locations (province/city/area) | ✅ | Area pages not yet routed |
-| tools, tool_usage | ✅ | `tool_versions` folded into `version` field |
-| guides, guide_sections | ✅ | `articles.kind = guide`; sections = Markdown headings + TOC |
-| events, jobs, deals | ❌ | Phase 7 |
-| media | ✅ | Uploads |
-| newsletters, subscribers, campaigns | 🟡 | Subscribers ✅; issues table ✅; no builder/sender |
-| search_queries / logs | ✅ | |
-| seo_metadata | ✅ | Fields on `articles`; `redirects` table exists but not applied |
-| analytics_events | 🟡 | Table + a few events; no page-view/click tracking |
-
-## Design system (plan list)
-| Item | Status |
-|---|---|
-| Typography, colours, buttons, forms, badges, alerts, nav, mobile nav, search UI | ✅ |
-| Cards: business, article, tool | ✅ |
-| Author cards, location cards | ❌ |
-| Tables component | 🟡 (ad hoc) |
-| Modals | ❌ |
-| Empty states | ✅ |
-| Loading states / skeletons | ❌ |
-| Error states | 🟡 (global error + 404 only) |
-
-## Core platform (Days 15–30)
-| Item | Status | Note |
-|---|---|---|
-| Homepage = search | ✅ | |
-| Global search, categories, locations | ✅ | |
-| Auth, accounts, admin auth, admin dashboard | ✅ | |
-| CMS | ✅ | See editor gaps below |
-| Media management | 🟡 | Uploads ✅; no library page |
-| SEO management | 🟡 | Per-article fields ✅; redirects not enforced; no admin UI |
-| Sitemap, robots, canonicals, OG, JSON-LD, breadcrumbs | ✅ | `og-default.png` referenced but missing → dynamic OG images needed |
-| 404 / 500 | ✅ | |
+| Repo, Next.js 16, TS strict, Tailwind v4, Drizzle, PGlite locally | ✅ | |
+| UI primitives | ✅ | Hand-rolled, ADR-12/15 (minimal newspaper) |
+| Supabase / Vercel / staging / production | ❌ | Deliberately deferred — founder will say when (`docs/LOCAL-TO-PRODUCTION.md`) |
+| CI | ✅ | GitHub Actions: typecheck, lint, build |
+| Env management | ✅ | `.env.example`; ads/Openverse/billing keys documented |
 | Error monitoring | ❌ | Sentry at go-live |
 
-## Content engine (Days 31–45)
-| Editor field / feature | Status |
-|---|---|
-| title, slug, excerpt/dek, body, featured image, category, sources, FAQs, SEO title/description, noindex, featured flag | ✅ |
-| author selection | ❌ |
-| tags | ❌ |
-| topics (entities) | ✅ |
-| publication date / scheduling | ❌ (`scheduled_for` column exists) |
-| canonical override | ❌ (column exists) |
-| social image | 🟡 (uses featured image) |
-| related articles (manual) | ❌ (automatic by category) |
-| workflow: draft → research → editing → fact-check → scheduled → published → updated | 🟡 enum exists; UI only draft/published |
-| revisions | ✅ |
-| preview of drafts | ❌ |
-| autosave | ❌ |
+## Database
+| Entity | Status | Note |
+|---|---|---|
+| users, sessions, roles | ✅ | user · business_owner · editor · admin |
+| authors | ✅ | Author pages `/authors/[slug]`, picker in editor |
+| articles, categories, tags, revisions, related | ✅ | Tags rendered at `/tags/[slug]`; manual related + automatic |
+| topics | ✅ | `entities` (knowledge graph) `/e/[slug]` |
+| businesses + hours/services/photos/reviews/claims/leads | ✅ | |
+| locations (province/city/area) | ✅ | Area pages not routed (Phase 4) |
+| tools, tool_runs | ✅ | Registry mirrored into `tools` table |
+| media | ✅ | With licence + source for open-licence imports; `/admin/media` |
+| newsletter subscribers + issues | ✅ | Builder, preview, test, send, schedule, cron |
+| search_documents, synonyms, queries | ✅ | |
+| redirects, reports, messages, settings, analytics_events | ✅ | |
+| **orders, submissions** | ✅ | Plans, invoices, guest/sponsored pitches (`src/db/schema/commerce.ts`) |
+| events, jobs, deals | ❌ | Phase 7 |
 
-## News / Guides (Days 46–75)
+## Content engine (CMS)
+| Feature | Status |
+|---|---|
+| Title, slug, dek, body (Markdown), category, author, city, entities, tags, sources, FAQs, SEO title/description, canonical, noindex, featured | ✅ |
+| Featured image: upload **or openly licensed photo search (Openverse)** with credit + source saved and rendered | ✅ |
+| Workflow draft → research → editing → fact-check → scheduled → published; revisions; draft preview | ✅ |
+| Scheduling via cron; autosave | 🟡 scheduling ✅, autosave ❌ |
+| Related articles (manual + automatic) | ✅ |
+| **Sponsored flag, contributor byline/bio, `rel=sponsored` rewriting, disclosure block** | ✅ |
+| OG images (dynamic) | ✅ |
+| Internal AI assistant | ❌ | Phase 3 later |
+
+## News / Guides / Tools
 | Item | Status |
 |---|---|
-| Categories per plan | ✅ |
-| Guides link to tools/businesses/news/related | 🟡 auto via entities and links in body |
-| RSS | ✅ |
-
-## Tools (Days 76–150)
-| Item | Status |
-|---|---|
-| Framework: inputs, validation, engine, results, explanation, methodology, sources, version, SEO | ✅ |
-| First 50 tools | 🟡 11 of 50 |
-| Calculator defaults from live data (petrol, USD, gold) | ❌ — the "one number, seven products" link |
+| Section, category, article routes with pagination, RSS | ✅ |
+| Tools framework: fields, compute, methodology, sources, versions, JSON-LD, share URLs, live defaults from data | ✅ |
+| Tools built | 🟡 14 of 50 (tax 3 · finance 3 · cars 3 · property 2 · utilities 1 · solar 1 · telecom 1) |
 | Embeddable widgets | ❌ |
+| Hubs: `/pta`, `/electricity` + 11 DISCOs, `/electricity/net-metering`, `/data/solar-panel-price`, `/compare/solar-inverters` | ✅ |
 
-## Directory (Days 151–250)
+## Directory
 | Item | Status |
 |---|---|
-| Public listing pages, profile, claim, add, edit, photos, services, respond to reviews, leads, dashboard | ✅ |
-| Owner analytics | 🟡 views only; **no click tracking** (call/WhatsApp/website) |
-| Area pages | ❌ |
-| Duplicate detection | ❌ |
-| Report business / review | ❌ |
-| Verification workflow (phone/document) | 🟡 manual toggle |
-| Bulk import | ❌ |
-| Maps | ❌ (directions link only) |
+| Listings, profiles, claim, add, owner editor (hours/services/photos/logo/cover), reviews + owner replies, leads, click tracking, dashboard analytics | ✅ |
+| **Paid tiers: Verified / Premium / Sponsored / category sponsor; upgrade flow; invoices; admin mark-paid; expiry cron; dofollow for paid** | ✅ |
+| Report business / review / article | ✅ |
+| Verification workflow (phone/document) | 🟡 manual + paid Verified |
+| Area pages, duplicate detection, bulk import, maps, "near me" | ❌ | Phase 4 — next big build |
 
-## Search (Days 251–300)
+## Search
 | Item | Status |
 |---|---|
-| Federated, ranked, prefix, autocomplete, popular | ✅ |
-| Synonyms | ❌ table seeded, not used |
-| Typo tolerance | ❌ |
-| Intent / entity / location detection | ❌ |
-| City filter UI | ❌ (param exists) |
-| Trending | ❌ |
+| Federated, ranked, prefix, autocomplete, popular, trending, city filter, synonyms (EN/Roman Urdu), search log + zero-result backlog | ✅ |
+| Typo tolerance (`pg_trgm`), intent detection, result blending per intent | ❌ | Phase 5 |
 
-## Newsletter (Days 301–350)
+## Newsletter
 | Item | Status |
 |---|---|
-| Capture, topics, frequency, double opt-in, unsubscribe | ✅ |
-| Manage preferences page (existing subscriber) | ❌ |
-| Issue builder (auto-assembled daily) | ❌ |
-| Sending + tracking | ❌ (Resend at go-live) |
+| Capture, topics, frequency, double opt-in, unsubscribe, manage page | ✅ |
+| Issue builder (numbers, stories, guide, tool of the day, trending), preview, test, send, schedule, cron | ✅ |
+| Resend delivery + open/click tracking | 🟡 adapter ready; Resend at go-live |
+| Sponsor slot | 🟡 markdown block; no product/booking yet |
 
-## Data (Days 351–400) · Compare (401–450) · Local search (451–500) · Trust (501–550)
+## Data · Compare · Trust
 | Item | Status |
 |---|---|
-| Data series, history, chart, API, admin entry | ✅ |
-| Automated ingestion | ❌ |
-| Data → auto-drafted article | ❌ |
-| Comparisons | ❌ |
-| "Near me" / map search | ❌ |
-| Reviews + moderation + owner response | ✅ |
-| Report / duplicate / closed flows | 🟡 closed only |
+| 14 data series, history, charts, stats, API, admin entry, city sections (gold), inflation | ✅ |
+| Automated ingestion (scrapers/APIs) | ❌ |
+| Data → auto-drafted article on change | ❌ |
+| Compare pages | 🟡 1 of 8 (solar inverters); cars/banks/packages next |
+| Reviews + moderation + owner response + report | ✅ |
 
-## Later phases
-Jobs · Events · Deals · billing tiers · Ask Searchable (AI) · follows/saved · PWA · scale — ❌ as planned (Phases 7–9). PWA manifest is cheap and should come earlier.
-
-## Operations (daily system)
+## Monetization & SEO
 | Item | Status |
 |---|---|
-| Research capture (`/admin/research`) | ❌ |
-| KPI dashboard | 🟡 counts only; no trends |
-| Social posting | ❌ |
-| Content backlog from zero-result searches | ✅ |
+| AdSense integration (script, slots, placement policy, ads.txt), required policy pages | ✅ (off until env set) |
+| Business plans + invoices + admin orders + revenue KPIs | ✅ |
+| `/advertise` pricing page, `/write-for-us` guest/sponsored/press-release submissions, `/admin/submissions`, convert-to-draft | ✅ |
+| Card gateway (Safepay / PayFast) | ❌ | plug-in `provider` on orders |
+| Affiliate links + disclosure | 🟡 policy written; no partner links yet |
+| SEO: Semrush keyword map, keyword-led titles, metadata, JSON-LD (9 types), sitemap, robots, canonicals, redirects, noindex rules, OG images, real credited photos | ✅ |
+| Search Console / Position Tracking | ❌ | after go-live |
 
----
+## Design
+| Item | Status |
+|---|---|
+| Minimal newspaper system (ADR-15): serif headlines, hairlines, no radius | ✅ |
+| Real photography: 20 articles, 20 cities, 25 categories seeded from Openverse with credits | ✅ |
+| Homepage hero (lead story + numbered headlines with thumbnails + city photo strip) | ✅ |
+| Photo banners on city / category hubs; photo tiles on hubs | ✅ |
+| Skeletons, error states | 🟡 skeletons ✅; error pages basic |
 
-# Polish & detail backlog (ordered)
-
-**A. Correctness / must-have before anyone sees it**
-1. Dynamic Open Graph images (`/og/…`) — `og-default.png` is referenced and missing
-2. Apply the `redirects` table (proxy/middleware) + admin UI
-3. Loading skeletons for every section route; per-section error boundaries
-4. Business click tracking (call / WhatsApp / website / directions) → `analytics_events` + `click_count`; owner analytics
-5. Calculator defaults from the data hub (petrol, diesel, USD/PKR, gold) — server-supplied overrides
-6. Editor: author picker, tags, scheduled publish (+ cron endpoint), canonical, manual related articles, draft preview, workflow states
-7. Author pages `/authors/[slug]`; tag pages `/tags/[slug]`
-8. Newsletter preferences page (token link in emails)
-9. Report business / report review flows → admin queue
-10. Media library `/admin/media` (reuse, alt text, credit)
-11. Search: synonyms expansion, city filter UI, trending searches on home
-12. PWA manifest + icons; skip-to-content link; print stylesheet for guides
-13. Contact messages → table + admin inbox (not just email)
-14. Business editor: entity tagging; duplicate warning on add-business (same phone / similar name in city)
-15. CI: GitHub Actions (typecheck, lint, build)
-
-**B. Design detailing**
-16. Consistent spacing rhythm and type scale audit page by page (hubs, tool page, business page, admin)
-17. Table styles (data history, admin lists) — hairline rows, right-aligned numbers, sticky header
-18. Article page: pull-quotes, figure/caption style, "Key numbers" box, share bar, updated/corrections block
-19. Business page: hours table with today highlighted, map placeholder, breadcrumb polish
-20. Admin: denser tables, keyboard-friendly forms, unsaved-changes guard
-21. Dark mode contrast pass
-
-**C. Content and data**
-22. Verify every rate table against primary sources; 39 more tools to reach 50
-23. Real daily content replaces sample seed
-24. Area pages for Lahore/Karachi/Islamabad once ≥ 5 listings each
+## Next builds (in order)
+1. Directory volume: bulk import pipeline (CSV → validate → categorise → review queue), duplicate detection, area pages, maps.
+2. More compare pages (cars, bank accounts, mobile packages) on the inverter-compare pattern.
+3. Tools to 30: sales tax, withholding 231B on cars, EOBI, stamp duty per province, FX converter, remittance, savings/NSC, car import duty.
+4. Typo tolerance + intent blending in search.
+5. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md`) — then AdSense, Resend, Search Console, Position Tracking.

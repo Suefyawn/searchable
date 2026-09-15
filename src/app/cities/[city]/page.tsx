@@ -2,6 +2,7 @@ import { and, desc, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleCard, BusinessCard } from "@/components/cards";
+import { HubBanner, PhotoTile } from "@/components/photo-tiles";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
 import { getDb, schema } from "@/db";
 import { categoryCounts, listBusinesses } from "@/db/queries/directory";
@@ -60,21 +61,17 @@ export default async function CityPage({ params }: Props) {
     <div className="container-x py-8 sm:py-12">
       <JsonLd data={breadcrumbJsonLd(crumbs)} />
       <Breadcrumbs items={crumbs} className="mb-4" />
-      <SectionHeader as="h1" title={loc.name} description={loc.description ?? subtitle} />
+      <HubBanner imageUrl={loc.imageUrl} credit={loc.imageCredit} alt={loc.name} className="mb-10">
+        <SectionHeader as="h1" title={loc.name} description={loc.description ?? subtitle} className="mb-0" />
+      </HubBanner>
 
       <section>
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-3">Find in {loc.name}</h2>
         {withCount.length ? (
-          <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4">
             {withCount.map((c) => (
               <li key={c.id}>
-                <Link href={`/businesses/${c.slug}/${loc.slug}`} className="surface surface-hover flex items-center justify-between px-5 py-3.5">
-                  <span className="flex items-center gap-2">
-                    <span aria-hidden>{c.icon}</span>
-                    {c.namePlural ?? c.name}
-                  </span>
-                  <span className="text-sm tabular text-3">{c.count}</span>
-                </Link>
+                <PhotoTile href={`/businesses/${c.slug}/${loc.slug}`} title={c.namePlural ?? c.name} meta={`${c.count} in ${loc.name}`} imageUrl={c.imageUrl} aspect="3/2" />
               </li>
             ))}
           </ul>

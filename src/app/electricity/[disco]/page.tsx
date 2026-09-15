@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdSlot } from "@/components/ads";
 import { notFound } from "next/navigation";
 import { ToolCard } from "@/components/cards";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
@@ -52,6 +53,7 @@ export default async function DiscoPage({ params }: Props) {
     <div className="container-x py-8 sm:py-12">
       <JsonLd data={[breadcrumbJsonLd(crumbs), faqJsonLd(faqs)]} />
       <Breadcrumbs items={crumbs} className="mb-4" />
+      <AdSlot name="leaderboard" className="my-4" />
       <SectionHeader as="h1" eyebrow={d.name} title={`${d.short} bill check online`} description={`Check your ${d.short} bill by reference number, see the per-unit price, and calculate a bill from units. Serves ${d.region}: ${d.cities.join(", ")}.`} />
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">

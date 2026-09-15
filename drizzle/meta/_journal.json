@@ -22,6 +22,20 @@
       "when": 1789447716463,
       "tag": "0002_reports_messages_related",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789452562564,
+      "tag": "0003_image_credits",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789453781863,
+      "tag": "0004_commerce",
+      "breakpoints": true
     }
   ]
 }

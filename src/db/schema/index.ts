@@ -8,4 +8,5 @@ export * from "./data";
 export * from "./newsletter";
 export * from "./search";
 export * from "./platform";
+export * from "./commerce";
 export * from "./relations";

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SectionHeader } from "@/components/ui";
-import { listSeriesWithLatest } from "@/db/queries/data";
+import { listSeriesWithLatest, recentPointsBySeries } from "@/db/queries/data";
+import { Sparkline } from "@/components/data/sparkline";
 import { formatDate, number } from "@/lib/format";
 import { buildMetadata } from "@/lib/seo";
 import { Change } from "@/components/data/change";
@@ -13,7 +14,7 @@ export const metadata = buildMetadata({
 });
 
 export default async function DataPage() {
-  const series = await listSeriesWithLatest();
+  const [series, recent] = await Promise.all([listSeriesWithLatest(), recentPointsBySeries(30)]);
   return (
     <div className="container-x py-8 sm:py-12">
       <SectionHeader as="h1" title="Data" description="The numbers Pakistanis check every day, recorded with their source and date. Each series has a history chart and feeds the relevant calculator." />
@@ -35,9 +36,12 @@ export default async function DataPage() {
             ) : (
               <p className="mt-1 text-2">No data yet</p>
             )}
-            <p className="mt-3 text-xs text-3">
-              {s.frequency} · {s.sourceName}
-            </p>
+            <div className="mt-3 flex items-end justify-between gap-3">
+              <p className="text-xs text-3">
+                {s.frequency} · {s.sourceName}
+              </p>
+              {recent[s.id]?.length > 1 ? <Sparkline values={recent[s.id]} className="shrink-0 text-2" /> : null}
+            </div>
           </Link>
         ))}
       </div>

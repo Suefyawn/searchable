@@ -39,6 +39,18 @@ export async function listSeriesWithLatest(): Promise<SeriesSummary[]> {
   }));
 }
 
+/** Last `n` values for every series, oldest → newest. For sparklines on hubs. */
+export async function recentPointsBySeries(n = 30): Promise<Record<string, number[]>> {
+  const db = await getDb();
+  const rows = await rawQuery<{ series_id: string; value: number }>(
+    db,
+    sql`select series_id, value from (select series_id, value, date, row_number() over (partition by series_id order by date desc) as rn from data_points) t where rn <= ${n} order by series_id, date asc`,
+  );
+  const out: Record<string, number[]> = {};
+  for (const r of rows) (out[r.series_id] ??= []).push(Number(r.value));
+  return out;
+}
+
 export async function getSeries(slug: string, limit = 365) {
   const db = await getDb();
   const series = await db.query.dataSeries.findFirst({ where: eq(schema.dataSeries.slug, slug) });

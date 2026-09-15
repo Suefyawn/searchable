@@ -19,6 +19,11 @@ export const media = pgTable("media", {
   bytes: integer("bytes"),
   alt: text("alt"),
   credit: text("credit"),
+  /** SPDX-like licence id for openly licensed imports: cc0 | by | by-sa | pdm | uploaded. */
+  license: text("license"),
+  licenseVersion: text("license_version"),
+  /** Page the image came from (Flickr photo page, Commons file page). */
+  sourceUrl: text("source_url"),
   createdAt: createdAt(),
 });
 

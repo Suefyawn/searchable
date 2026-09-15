@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PhotoTile } from "@/components/photo-tiles";
 import { SectionHeader } from "@/components/ui";
 import { citiesWithCounts, listCities, listProvinces } from "@/db/queries/geo";
 import { buildMetadata } from "@/lib/seo";
@@ -17,15 +18,12 @@ export default async function CitiesPage() {
           const list = cities.filter((c) => c.provinceId === p.id);
           if (!list.length) return null;
           return (
-            <section key={p.id} className="surface p-5">
-              <h2 className="font-semibold">{p.name}</h2>
-              <ul className="mt-2 divide-y divide-[var(--border)]">
+            <section key={p.id} className="lg:col-span-3">
+              <h2 className="rule pt-3 font-serif text-2xl">{p.name}</h2>
+              <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-5">
                 {list.map((c) => (
                   <li key={c.id}>
-                    <Link href={`/cities/${c.slug}`} className="flex items-center justify-between py-2 hover:text-brand-700 dark:hover:text-brand-300">
-                      <span>{c.name}</span>
-                      <span className="text-sm tabular text-3">{countBy.get(c.id) ? `${countBy.get(c.id)} listed` : ""}</span>
-                    </Link>
+                    <PhotoTile href={`/cities/${c.slug}`} title={c.name} meta={countBy.get(c.id) ? `${countBy.get(c.id)} businesses` : undefined} imageUrl={c.imageUrl ?? null} aspect="4/3" sizes="(min-width: 1024px) 220px, 50vw" />
                   </li>
                 ))}
               </ul>

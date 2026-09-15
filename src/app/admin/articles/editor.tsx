@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { ImageUpload } from "@/components/image-upload";
+import { OpenImagePicker } from "@/components/open-image-picker";
 import { Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { saveArticle, type ArticleFormInput } from "./actions";
@@ -38,6 +39,9 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
   const [relatedIds, setRelatedIds] = React.useState<string[]>(initial.relatedIds ?? []);
   const [relatedQuery, setRelatedQuery] = React.useState("");
   const [featuredImageUrl, setFeaturedImageUrl] = React.useState(initial.featuredImageUrl ?? "");
+  const [featuredImageCredit, setFeaturedImageCredit] = React.useState(initial.featuredImageCredit ?? "");
+  const [featuredImageSourceUrl, setFeaturedImageSourceUrl] = React.useState(initial.featuredImageSourceUrl ?? "");
+  const [featuredImageAlt, setFeaturedImageAlt] = React.useState(initial.featuredImageAlt ?? "");
   const [workflow, setWorkflow] = React.useState<"draft" | "research" | "editing" | "fact_check">(WORKFLOW.some((w) => w.value === initial.status) ? (initial.status as "draft") : "draft");
   const [scheduledFor, setScheduledFor] = React.useState(toLocalInput(initial.scheduledFor));
   const [busy, setBusy] = React.useState<null | ArticleFormInput["intent"]>(null);
@@ -75,12 +79,17 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
       authorId: get("authorId") || undefined,
       locationId: get("locationId") || undefined,
       featuredImageUrl: featuredImageUrl || undefined,
-      featuredImageAlt: get("featuredImageAlt") || undefined,
+      featuredImageAlt: featuredImageAlt || undefined,
+      featuredImageCredit: featuredImageCredit || undefined,
+      featuredImageSourceUrl: featuredImageSourceUrl || undefined,
       seoTitle: get("seoTitle") || undefined,
       seoDescription: get("seoDescription") || undefined,
       canonicalUrl: get("canonicalUrl") || undefined,
       isFeatured: fd.get("isFeatured") === "on",
       noindex: fd.get("noindex") === "on",
+      isSponsored: fd.get("isSponsored") === "on",
+      contributorName: get("contributorName") || undefined,
+      contributorBio: get("contributorBio") || undefined,
       sources: sources.filter((s) => s.title.trim()),
       faqs: faqs.filter((f) => f.question.trim() && f.answer.trim()),
       entitySlugs,
@@ -153,7 +162,22 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
             variant="article"
             label="Upload featured image"
           />
-          <Input name="featuredImageAlt" defaultValue={initial.featuredImageAlt ?? ""} placeholder="Caption / alt text (shown under the image)" className="mt-3 h-9 text-sm" maxLength={300} />
+          <OpenImagePicker
+            className="mt-3"
+            initialQuery={initial.title ?? ""}
+            onPick={(img) => {
+              setFeaturedImageUrl(img.url);
+              setFeaturedImageCredit(img.credit);
+              setFeaturedImageSourceUrl(img.sourceUrl);
+              if (!featuredImageAlt) setFeaturedImageAlt(img.alt);
+              setDirty(true);
+            }}
+          />
+          <Input name="featuredImageAlt" value={featuredImageAlt} onChange={(e) => { setFeaturedImageAlt(e.target.value); setDirty(true); }} placeholder="Caption / alt text (shown under the image)" className="mt-3 h-9 text-sm" maxLength={300} />
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            <Input value={featuredImageCredit} onChange={(e) => { setFeaturedImageCredit(e.target.value); setDirty(true); }} placeholder="Photo credit, e.g. Name / Wikimedia Commons, CC BY-SA 4.0" className="h-9 text-sm" maxLength={200} />
+            <Input value={featuredImageSourceUrl} onChange={(e) => { setFeaturedImageSourceUrl(e.target.value); setDirty(true); }} placeholder="Source page URL (credit links here)" className="h-9 text-sm" maxLength={500} />
+          </div>
         </fieldset>
 
         <fieldset className="border border-line p-4">
@@ -343,6 +367,13 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" name="noindex" defaultChecked={!!initial.noindex} className="accent-brand-700" /> noindex (thin / temporary)
           </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="isSponsored" defaultChecked={!!initial.isSponsored} className="accent-brand-700" /> Sponsored (disclosure + rel=sponsored links)
+          </label>
+          <Field label="Guest contributor" help="Shown as the byline instead of a staff author; bio appears at the end.">
+            <Input name="contributorName" defaultValue={initial.contributorName ?? ""} placeholder="Name, Company" className="h-9 text-sm" maxLength={120} />
+            <Input name="contributorBio" defaultValue={initial.contributorBio ?? ""} placeholder="One-line bio (optional)" className="mt-2 h-9 text-sm" maxLength={300} />
+          </Field>
         </div>
 
         <div className="border border-line p-4">

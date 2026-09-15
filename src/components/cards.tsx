@@ -16,7 +16,7 @@ export function articleUrl(a: Pick<ArticleListItem, "kind" | "slug" | "category"
 
 /* ───────────── Article ─────────────
    Newspaper items: label, serif headline, dek, meta. No boxes — hairlines from the parent. */
-export function ArticleCard({ article, variant = "default", className }: { article: ArticleListItem; variant?: "default" | "compact" | "feature"; className?: string }) {
+export function ArticleCard({ article, variant = "default", className, thumb = false, index }: { article: ArticleListItem; variant?: "default" | "compact" | "feature"; className?: string; /** Compact variant: show a small photo on the right. */ thumb?: boolean; /** Compact variant: show a running number on the left. */ index?: number }) {
   const href = articleUrl(article);
   const isNews = article.kind === "news";
   const label = article.category?.name ?? (isNews ? "News" : "Guide");
@@ -24,14 +24,22 @@ export function ArticleCard({ article, variant = "default", className }: { artic
 
   if (variant === "compact") {
     return (
-      <article className={cn("py-3.5", className)}>
-        <p className="eyebrow">{label}</p>
-        <h3 className="mt-1 font-serif text-[19px] font-medium leading-snug">
-          <Link href={href} className="headline-link">
-            {article.title}
+      <article className={cn("flex gap-4 py-3.5", className)}>
+        {index !== undefined ? <span className="w-6 shrink-0 pt-0.5 font-serif text-2xl leading-none text-ink-300 tabular dark:text-ink-600">{index}</span> : null}
+        <div className="min-w-0 flex-1">
+          <p className="eyebrow">{label}</p>
+          <h3 className="mt-1 font-serif text-[19px] font-medium leading-snug">
+            <Link href={href} className="headline-link">
+              {article.title}
+            </Link>
+          </h3>
+          <p className="mt-1 text-xs text-3">{meta}</p>
+        </div>
+        {thumb && article.featuredImageUrl ? (
+          <Link href={href} className="shrink-0" tabIndex={-1} aria-hidden>
+            <Img src={article.featuredImageUrl} alt="" aspect="1/1" className="size-[72px]" sizes="72px" />
           </Link>
-        </h3>
-        <p className="mt-1 text-xs text-3">{meta}</p>
+        ) : null}
       </article>
     );
   }
@@ -77,12 +85,29 @@ export function ArticleCard({ article, variant = "default", className }: { artic
 }
 
 /* ───────────── Tool ───────────── */
-export function ToolCard({ tool, className }: { tool: Pick<ToolDefinition, "slug" | "category" | "name" | "shortName" | "description">; className?: string }) {
+/** Headline number a tool produces with its default inputs — a concrete hook on cards. */
+export function toolExample(tool: Pick<ToolDefinition, "fields" | "compute">): { label: string; value: string } | null {
+  try {
+    const input = Object.fromEntries(tool.fields.map((f) => [f.key, f.default as string | number | boolean]));
+    const r = tool.compute(input);
+    return { label: r.headline.label, value: r.headline.value };
+  } catch {
+    return null;
+  }
+}
+
+export function ToolCard({ tool, className, example }: { tool: Pick<ToolDefinition, "slug" | "category" | "name" | "shortName" | "description">; className?: string; example?: { label: string; value: string } | null }) {
   return (
     <Link href={toolUrl(tool)} className={cn("group surface surface-hover flex flex-col p-5", className)}>
       <p className="eyebrow">{TOOL_CATEGORIES[tool.category].name}</p>
       <h3 className="mt-2 font-serif text-xl font-medium leading-snug group-hover:underline underline-offset-4 decoration-1 decoration-ink-400">{tool.shortName ?? tool.name}</h3>
       <p className="mt-1.5 text-[14.5px] leading-relaxed text-2 line-clamp-2">{tool.description}</p>
+      {example ? (
+        <p className="mt-3 border-t border-line pt-3 text-[13px] text-3">
+          <span className="block truncate">{example.label}</span>
+          <span className="font-serif text-xl text-[var(--text)] tabular">{example.value}</span>
+        </p>
+      ) : null}
       <p className="mt-auto pt-4 text-[13px] font-medium text-3">Calculator →</p>
     </Link>
   );

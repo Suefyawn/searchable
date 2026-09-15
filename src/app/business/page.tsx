@@ -33,7 +33,7 @@ export default async function BusinessDashboard() {
 
   return (
     <div className="container-x py-10">
-      <SectionHeader as="h1" title="Your businesses" description="Keep details current, answer enquiries and respond to reviews. Verified listings rank higher." />
+      <SectionHeader as="h1" title="Your businesses" description="Keep details current, answer enquiries and respond to reviews. Verified and Premium listings rank higher — see plans under Upgrade." />
       {!businesses.length && !pendingClaims.length ? (
         <div className="surface p-8 text-center">
           <p className="text-lg font-medium">No businesses yet</p>
@@ -65,9 +65,14 @@ export default async function BusinessDashboard() {
                   </span>
                 </p>
               </div>
-              <Link href={`/business/${b.id}`} className="inline-flex h-9 items-center bg-ink-900 px-3.5 text-sm font-medium text-white hover:bg-ink-800 dark:bg-white dark:text-ink-900">
-                Edit listing
-              </Link>
+              <div className="flex gap-2">
+                <Link href={`/business/${b.id}/upgrade`} className="inline-flex h-9 items-center border border-line px-3.5 text-sm font-medium hover:bg-surface-2">
+                  {b.tier === "free" ? "Upgrade" : `Plan: ${b.tier}`}
+                </Link>
+                <Link href={`/business/${b.id}`} className="inline-flex h-9 items-center bg-ink-900 px-3.5 text-sm font-medium text-white hover:bg-ink-800 dark:bg-white dark:text-ink-900">
+                  Edit listing
+                </Link>
+              </div>
             </div>
             <div className="mt-5 grid gap-5 md:grid-cols-2">
               <div>

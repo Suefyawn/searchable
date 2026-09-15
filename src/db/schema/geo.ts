@@ -13,6 +13,8 @@ export const locations = pgTable(
     slug: text("slug").notNull(),
     name: text("name").notNull(),
     nameUrdu: text("name_urdu"),
+    imageUrl: text("image_url"),
+    imageCredit: text("image_credit"),
     /** Denormalised for fast lookups: the city this row belongs to (itself for cities). */
     cityId: text("city_id"),
     provinceId: text("province_id"),

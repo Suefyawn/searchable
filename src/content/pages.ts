@@ -23,27 +23,6 @@ Every factual claim has a source. Money-affecting numbers show an effective date
 
 [hello@searchable.pk](mailto:hello@searchable.pk) or the [contact form](/contact).`,
   },
-  "editorial-policy": {
-    title: "Editorial policy",
-    description: "How Searchable researches, publishes, corrects and labels content.",
-    body: `## Sources
-Every factual claim has a source, listed on the page. Primary sources (laws, regulator notifications, official portals) take precedence over secondary reporting.
-
-## Numbers
-Any figure that affects money — tax rates, tariffs, fees, prices — shows the date it took effect and the date we last reviewed it. Calculators carry a version number; changes are logged.
-
-## Corrections
-Corrections are appended to the article with a date. We do not silently rewrite published claims. Report an error via the [contact form](/contact).
-
-## AI
-We use AI internally for research, monitoring, drafting outlines and suggesting links. **No AI-generated page is published without human review.** Public AI features, when they arrive, will cite Searchable's own sources and decline to answer outside them.
-
-## Directory
-Business listings display a verification badge and last-verified date when we have confirmed details with the business. Unverified listings are labelled. Reviews are never paid for. Businesses can respond to reviews but cannot remove them.
-
-## Sponsorship and advertising
-Sponsored listings and content are labelled. Advertisers have no influence on editorial content, rankings or calculator results.`,
-  },
   privacy: {
     title: "Privacy policy",
     description: "What Searchable collects, why, and your choices.",
@@ -68,19 +47,39 @@ privacy@searchable.pk`,
     description: "Terms for using Searchable.pk.",
     body: `Searchable provides information for general guidance. Calculators are estimates; confirm figures with the primary source before acting. Business listings are provided by businesses and the public; we verify what we can and label what we have not. By using Searchable you agree not to scrape, misuse or misrepresent its content. Content is © Searchable unless stated.`,
   },
-  advertise: {
-    title: "Advertise on Searchable",
-    description: "Reach Pakistanis at the moment they are looking for what you offer.",
-    body: `Searchable reaches people with **intent** — they are calculating a tax, comparing a loan, looking for a solar installer, reading a guide before buying a car.
+  "editorial-policy": {
+    title: "Editorial policy",
+    description: "How Searchable reports, sources, corrects and labels content — including sponsored content, guest posts and affiliate links.",
+    body: `## Independence
 
-## Options (from Phase 6)
-- **Verified & Premium listings** — enhanced profile, featured placement in your category and city, enquiry analytics.
-- **Category sponsorship** — your brand across a category's pages.
-- **Newsletter sponsorship** — Searchable Daily, one sponsor per issue.
-- **Leads** — pay per qualified enquiry.
+Editorial content — news, guides, calculator methodology and data — is produced by Searchable's desk and is never for sale. Advertisers and listing customers do not see, approve or influence it.
 
-All sponsored placements are labelled. Editorial content and calculator results are never for sale.
+## Sourcing
 
-Email [ads@searchable.pk](mailto:ads@searchable.pk).`,
+Every number carries a source and a review date. Guides cite the law, notification, tariff or official page they rely on. We link primary sources wherever they exist.
+
+## Corrections
+
+Errors are corrected in the article with a note and date. Report one from the "Report a problem" link on any page or email [editorial@searchable.pk](mailto:editorial@searchable.pk).
+
+## Sponsored content
+
+Sponsored articles and press releases are paid for by the company named in them. They are labelled **Sponsored** at the top, written or edited to our standards, and any links to the sponsor carry \`rel="sponsored"\`. They never appear in the news feed's lead position or in calculator results.
+
+## Guest posts
+
+Guest articles are unpaid contributions by practitioners, published with a byline and a short bio. They are edited and fact-checked like any other guide. Contributors may link once to their organisation (nofollow). We do not accept guest posts that exist to place links.
+
+## Directory listings
+
+Paid tiers (Verified, Premium, Sponsored) change **placement** in directory listings and are labelled. They do not change ratings, reviews or the facts on a profile. Reviews are moderated for spam and abuse only.
+
+## Affiliate links
+
+Where we use affiliate links (for example to a bank or an online store) we say so on the page. They never determine which product we recommend.
+
+## Advertising
+
+Display advertising is served by Google AdSense and labelled "Advertisement". Ads never appear inside calculators or above calculator results.`,
   },
 };

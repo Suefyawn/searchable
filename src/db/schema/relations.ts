@@ -5,6 +5,7 @@ import { entities, entityLinks } from "./entities";
 import { dataPoints, dataSeries } from "./data";
 import { locations } from "./geo";
 import { users } from "./auth";
+import { orders, submissions } from "./commerce";
 
 export const locationsRelations = relations(locations, ({ one, many }) => ({
   parent: one(locations, { fields: [locations.parentId], references: [locations.id], relationName: "parent" }),
@@ -96,4 +97,14 @@ export const dataSeriesRelations = relations(dataSeries, ({ many }) => ({
 }));
 export const dataPointsRelations = relations(dataPoints, ({ one }) => ({
   series: one(dataSeries, { fields: [dataPoints.seriesId], references: [dataSeries.id] }),
+}));
+
+export const ordersRelations = relations(orders, ({ one }) => ({
+  business: one(businesses, { fields: [orders.businessId], references: [businesses.id] }),
+  user: one(users, { fields: [orders.userId], references: [users.id] }),
+}));
+
+export const submissionsRelations = relations(submissions, ({ one }) => ({
+  article: one(articles, { fields: [submissions.articleId], references: [articles.id] }),
+  order: one(orders, { fields: [submissions.orderId], references: [orders.id] }),
 }));

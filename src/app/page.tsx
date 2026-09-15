@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { ArticleCard, ToolCard, articleUrl } from "@/components/cards";
+import { ArticleCard, ToolCard, articleUrl, toolExample } from "@/components/cards";
 import { Change } from "@/components/data/change";
+import { Img } from "@/components/img";
 import { SearchBox } from "@/components/layout/search-box";
 import { NewsletterForm } from "@/components/newsletter-form";
+import { PhotoTile } from "@/components/photo-tiles";
 import { listArticles } from "@/db/queries/content";
 import { listSeriesWithLatest } from "@/db/queries/data";
 import { categoryCounts } from "@/db/queries/directory";
@@ -22,17 +24,17 @@ function Label({ children }: { children: React.ReactNode }) {
 export default async function HomePage() {
   const [featured, latest, guides, cities, categories, popular, series] = await Promise.all([
     listArticles({ kind: "news", featured: true, limit: 1 }),
-    listArticles({ kind: "news", limit: 9 }),
+    listArticles({ kind: "news", limit: 10 }),
     listArticles({ kind: "guide", limit: 5 }),
-    citiesWithCounts(12),
+    citiesWithCounts(8),
     categoryCounts(),
     popularSearches(6),
     listSeriesWithLatest(),
   ]);
   const lead = featured[0] ?? latest[0];
   const others = latest.filter((a) => a.id !== lead?.id);
-  const secondary = others.slice(0, 2);
-  const headlines = others.slice(2, 8);
+  const secondary = others.slice(0, 3);
+  const headlines = others.slice(3, 9);
   const featuredTools = TOOLS.filter((t) => t.featured).slice(0, 6);
   const topCategories = categories.filter((c) => c.count > 0).slice(0, 10);
   const numbers = series.filter((s) => s.latest);
@@ -70,30 +72,30 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      {/* Front page */}
+      {/* Front page: lead story with photo, numbered headlines, three more stories with photos */}
       {lead ? (
-        <section className="grid gap-x-10 gap-y-8 py-10 lg:grid-cols-[1.7fr_1fr]">
+        <section className="grid gap-x-10 gap-y-8 py-8 sm:py-10 lg:grid-cols-[1.7fr_1fr]">
           <div>
             <ArticleCard article={lead} variant="feature" />
-            {secondary.length ? (
-              <div className="mt-8 grid gap-x-8 border-t border-line sm:grid-cols-2 sm:divide-x sm:divide-[var(--border)]">
-                {secondary.map((a) => (
-                  <ArticleCard key={a.id} article={a} className="sm:[&:nth-child(2)]:pl-8" />
-                ))}
-              </div>
-            ) : null}
           </div>
           <aside className="lg:border-l lg:border-line lg:pl-8">
-            <Label>Latest</Label>
+            <Label>Headlines</Label>
             <div className="divide-y divide-[var(--border)]">
-              {headlines.map((a) => (
-                <ArticleCard key={a.id} article={a} variant="compact" />
+              {headlines.map((a, i) => (
+                <ArticleCard key={a.id} article={a} variant="compact" index={i + 1} thumb />
               ))}
             </div>
             <Link href="/news" className="mt-3 inline-block text-sm font-medium text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
               All news →
             </Link>
           </aside>
+          {secondary.length ? (
+            <div className="grid gap-x-8 border-t border-line sm:grid-cols-3 sm:divide-x sm:divide-[var(--border)] lg:col-span-2">
+              {secondary.map((a) => (
+                <ArticleCard key={a.id} article={a} className="sm:[&:not(:first-child)]:pl-8" />
+              ))}
+            </div>
+          ) : null}
         </section>
       ) : null}
 
@@ -108,7 +110,7 @@ export default async function HomePage() {
         <p className="mt-1 text-[15px] text-2">Real numbers, sourced and dated. Nothing you enter is stored.</p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {featuredTools.map((t) => (
-            <ToolCard key={t.slug} tool={t} />
+            <ToolCard key={t.slug} tool={t} example={toolExample(t)} />
           ))}
         </div>
       </section>
@@ -125,7 +127,13 @@ export default async function HomePage() {
           <div className="mt-2 divide-y divide-[var(--border)]">
             {guides.map((g) => (
               <article key={g.id} className="grid gap-x-6 py-4 sm:grid-cols-[1fr_auto]">
-                <div>
+                <div className="flex gap-4">
+                  {g.featuredImageUrl ? (
+                    <Link href={articleUrl(g)} className="shrink-0" tabIndex={-1} aria-hidden>
+                      <Img src={g.featuredImageUrl} alt="" aspect="1/1" className="size-20" sizes="80px" />
+                    </Link>
+                  ) : null}
+                  <div>
                   <p className="eyebrow">{g.category?.name ?? "Guide"}</p>
                   <h3 className="mt-1 font-serif text-xl font-medium leading-snug">
                     <Link href={articleUrl(g)} className="headline-link">
@@ -133,6 +141,7 @@ export default async function HomePage() {
                     </Link>
                   </h3>
                   {g.dek ? <p className="mt-1.5 text-[15px] text-2 line-clamp-2">{g.dek}</p> : null}
+                  </div>
                 </div>
                 <p className="text-xs text-3 sm:pt-6">{g.readingMinutes ?? 3} min</p>
               </article>
@@ -151,21 +160,25 @@ export default async function HomePage() {
               </li>
             ))}
           </ul>
-          <p className="mt-6 rule pt-2 eyebrow">Cities</p>
-          <p className="mt-2 text-[15px] leading-relaxed">
-            {cities.map((c, i) => (
-              <span key={c.id}>
-                <Link href={`/cities/${c.slug}`} className="underline-offset-4 hover:underline">
-                  {c.name}
-                </Link>
-                {i < cities.length - 1 ? <span className="text-ink-300"> · </span> : null}
-              </span>
-            ))}
-          </p>
           <Link href="/add-business" className="mt-6 inline-block text-sm font-medium underline-offset-4 hover:underline">
             Add your business →
           </Link>
         </aside>
+      </section>
+
+      {/* Cities */}
+      <section className="py-8">
+        <div className="rule flex items-baseline justify-between pt-3">
+          <h2 className="font-serif text-2xl">Cities</h2>
+          <Link href="/cities" className="text-sm font-medium text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
+            All cities →
+          </Link>
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4">
+          {cities.map((c) => (
+            <PhotoTile key={c.id} href={`/cities/${c.slug}`} title={c.name} meta={c.count ? `${c.count} businesses` : undefined} imageUrl={c.imageUrl} />
+          ))}
+        </div>
       </section>
 
       {/* Newsletter */}

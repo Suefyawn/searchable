@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PhotoTile } from "@/components/photo-tiles";
 import { SectionHeader } from "@/components/ui";
 import { categoryCounts } from "@/db/queries/directory";
 import { citiesWithCounts } from "@/db/queries/geo";
@@ -19,16 +20,10 @@ export default async function BusinessesPage() {
       <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
         <section>
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-3">Categories</h2>
-          <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
             {categories.map((c) => (
               <li key={c.id}>
-                <Link href={`/businesses/${c.slug}`} className="surface surface-hover flex items-center justify-between px-5 py-3.5">
-                  <span className="flex items-center gap-2.5">
-                    <span className="text-lg" aria-hidden>{c.icon}</span>
-                    <span className="font-medium">{c.namePlural ?? c.name}</span>
-                  </span>
-                  <span className="text-sm tabular text-3">{c.count || ""}</span>
-                </Link>
+                <PhotoTile href={`/businesses/${c.slug}`} title={c.namePlural ?? c.name} meta={c.count ? `${c.count} listed` : "Be the first to list"} imageUrl={c.imageUrl} aspect="3/2" />
               </li>
             ))}
           </ul>

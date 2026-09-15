@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Newsreader } from "next/font/google";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { AdSenseScript } from "@/components/ads";
 import { JsonLd } from "@/components/ui";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 import { SITE } from "@/lib/utils";
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${serif.variable}`}>
       <body className="min-h-dvh flex flex-col">
         <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
+        <AdSenseScript />
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:bg-ink-900 focus:px-3 focus:py-2 focus:text-white">
           Skip to content
         </a>

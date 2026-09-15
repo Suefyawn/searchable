@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdSlot } from "@/components/ads";
 import { notFound } from "next/navigation";
 import { Change } from "@/components/data/change";
 import { GoldExtras } from "@/components/data/gold-extras";
@@ -76,6 +77,7 @@ export default async function SeriesPage({ params }: Props) {
         ]}
       />
       <Breadcrumbs items={crumbs} className="mb-4" />
+      <AdSlot name="leaderboard" className="my-4" />
       <SectionHeader as="h1" title={series.name} description={series.description ?? `Recorded ${series.frequency} from ${series.sourceName ?? "the official source"}.`} />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">

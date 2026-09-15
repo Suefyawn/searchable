@@ -7,6 +7,7 @@ import { Badge, Breadcrumbs, JsonLd } from "@/components/ui";
 import { getArticle, getArticlesByIds, getTagsForArticle, listArticles } from "@/db/queries/content";
 import { entitiesForTarget } from "@/db/queries/entities";
 import { formatDate } from "@/lib/format";
+import { AdSlot } from "@/components/ads";
 import { extractToc, renderMarkdown } from "@/lib/markdown";
 import { articleJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { TOOLS } from "@/tools/registry";
@@ -17,7 +18,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
   const section = kind === "news" ? "news" : "guides";
   const sectionName = kind === "news" ? "News" : "Guides";
   const path = `/${section}/${article.category?.slug ?? "general"}/${article.slug}`;
-  const html = renderMarkdown(article.body);
+  const html = article.isSponsored ? renderMarkdown(article.body).replace(/<a href="(https?:\/\/[^"]+)"/g, '<a href="$1" rel="sponsored noopener" target="_blank"') : renderMarkdown(article.body);
   const toc = kind === "guide" ? extractToc(article.body) : [];
   const [auto, picked, entities, tags] = await Promise.all([
     listArticles({ kind, categorySlug: article.category?.slug, limit: 4, excludeId: article.id }),
@@ -64,11 +65,14 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
         <h1 className="mt-4 font-serif text-4xl font-medium leading-[1.1] sm:text-5xl lg:text-[3.25rem]">{article.title}</h1>
         {article.dek ? <p className="mt-4 font-serif text-xl leading-relaxed text-2 sm:text-[1.35rem]">{article.dek}</p> : null}
         <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 border-y border-line py-3 text-[13px] text-3">
-          {article.author ? (
+          {article.contributorName ? (
+            <span className="font-medium text-2">{article.contributorName}</span>
+          ) : article.author ? (
             <Link href={`/authors/${article.author.slug}`} className="font-medium text-2 underline-offset-4 hover:underline">
               {article.author.name}
             </Link>
           ) : null}
+          {article.isSponsored ? <Badge tone="warning">Sponsored</Badge> : null}
           {article.publishedAt ? <span>{kind === "news" ? "Published" : "Updated"} {formatDate(article.lastReviewedAt ?? article.publishedAt)}</span> : null}
           <span>{article.readingMinutes ?? 3} min read</span>
         </div>
@@ -77,7 +81,23 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
       {article.featuredImageUrl ? (
         <figure className="mt-8 max-w-4xl">
           <Img src={article.featuredImageUrl} alt={article.featuredImageAlt ?? article.title} aspect="16/9" priority sizes="(min-width: 1024px) 900px, 100vw" />
-          {article.featuredImageAlt ? <figcaption className="mt-2 text-[13px] text-3">{article.featuredImageAlt}</figcaption> : null}
+          {article.featuredImageAlt || article.featuredImageCredit ? (
+            <figcaption className="mt-2 text-[13px] text-3">
+              {article.featuredImageAlt}
+              {article.featuredImageCredit ? (
+                <span className="block text-[12px]">
+                  Photo:{" "}
+                  {article.featuredImageSourceUrl ? (
+                    <a href={article.featuredImageSourceUrl} rel="nofollow noopener" target="_blank" className="underline-offset-2 hover:underline">
+                      {article.featuredImageCredit}
+                    </a>
+                  ) : (
+                    article.featuredImageCredit
+                  )}
+                </span>
+              ) : null}
+            </figcaption>
+          ) : null}
         </figure>
       ) : null}
 
@@ -96,7 +116,23 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
             </nav>
           ) : null}
 
+          {article.isSponsored ? (
+            <p className="mb-6 max-w-[68ch] border-l-2 border-[var(--rule)] pl-4 text-[14px] text-2">
+              <strong>Sponsored content.</strong> This article was paid for by the company named in it and edited by Searchable to our standards. Links to the sponsor are marked as sponsored. <Link href="/advertise" className="underline underline-offset-4">How sponsored posts work</Link>.
+            </p>
+          ) : null}
+
           <div className="prose prose-searchable" dangerouslySetInnerHTML={{ __html: html }} />
+
+          {article.contributorName ? (
+            <aside className="mt-10 max-w-[68ch] border-t border-line pt-4 text-[15px]">
+              <p className="eyebrow">About the author</p>
+              <p className="mt-1 font-medium">{article.contributorName}</p>
+              {article.contributorBio ? <p className="mt-1 text-2">{article.contributorBio}</p> : null}
+            </aside>
+          ) : null}
+
+          <AdSlot name="inArticle" />
 
           {article.faqs.length ? (
             <section className="mt-12 max-w-[68ch]">
@@ -158,6 +194,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-24 self-start">
+          <AdSlot name="sidebar" className="my-0" />
           {toc.length >= 3 ? (
             <nav aria-label="Contents" className="hidden lg:block border-t border-[var(--rule)] pt-3 text-[15px]">
               <p className="font-semibold">In this guide</p>

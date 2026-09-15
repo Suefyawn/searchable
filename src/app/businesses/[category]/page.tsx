@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BusinessCard } from "@/components/cards";
+import { HubBanner } from "@/components/photo-tiles";
 import { Breadcrumbs, EmptyState, JsonLd, SectionHeader } from "@/components/ui";
 import { cityCountsForCategory, countBusinesses, getBusinessCategory, listBusinesses } from "@/db/queries/directory";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
@@ -32,7 +33,9 @@ export default async function CategoryPage({ params }: Props) {
     <div className="container-x py-8 sm:py-12">
       <JsonLd data={breadcrumbJsonLd(crumbs)} />
       <Breadcrumbs items={crumbs} className="mb-4" />
-      <SectionHeader as="h1" title={`${plural} in Pakistan`} description={cat.description ?? `Find ${plural.toLowerCase()} near you. Pick a city to see listings with hours, phone and WhatsApp.`} />
+      <HubBanner imageUrl={cat.imageUrl} credit={cat.imageCredit} alt={plural} className="mb-10">
+        <SectionHeader as="h1" title={`${plural} in Pakistan`} description={cat.description ?? `Find ${plural.toLowerCase()} near you. Pick a city to see listings with hours, phone and WhatsApp.`} className="mb-0" />
+      </HubBanner>
       {cities.length ? (
         <section className="mb-10">
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-3">By city</h2>

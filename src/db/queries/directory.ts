@@ -25,6 +25,7 @@ export async function categoryCounts(cityId?: string) {
       name: schema.businessCategories.name,
       namePlural: schema.businessCategories.namePlural,
       icon: schema.businessCategories.icon,
+      imageUrl: schema.businessCategories.imageUrl,
       count: sql<number>`count(${schema.businesses.id})::int`,
     })
     .from(schema.businessCategories)

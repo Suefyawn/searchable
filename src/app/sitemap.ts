@@ -39,6 +39,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u("/electricity/net-metering", new Date(), 0.9, "monthly"),
     ...DISCOS.map((d) => u(`/electricity/${d.slug}`, undefined, 0.8, "monthly")),
     u("/newsletter", undefined, 0.5, "monthly"),
+    u("/advertise", undefined, 0.6, "monthly"),
+    u("/write-for-us", undefined, 0.6, "monthly"),
     ...series.filter((d) => d.slug !== "solar-panel-per-watt").map((d) => u(`/data/${d.slug}`, d.updatedAt, 0.8, "daily")),
     ...categories.map((c) => u(`/${c.kind === "news" ? "news" : "guides"}/${c.slug}`, undefined, 0.7, "daily")),
     ...Object.keys(TOOL_CATEGORIES).map((c) => u(`/tools/${c}`, undefined, 0.7)),

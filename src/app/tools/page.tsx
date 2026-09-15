@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ToolCard } from "@/components/cards";
+import { ToolCard, toolExample } from "@/components/cards";
 import { SectionHeader } from "@/components/ui";
 import { buildMetadata } from "@/lib/seo";
 import { TOOLS } from "@/tools/registry";
@@ -28,7 +28,7 @@ export default function ToolsPage() {
           <SectionHeader title={TOOL_CATEGORIES[c].name} description={TOOL_CATEGORIES[c].description} href={`/tools/${c}`} as="h2" />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {TOOLS.filter((t) => t.category === c).map((t) => (
-              <ToolCard key={t.slug} tool={t} />
+              <ToolCard key={t.slug} tool={t} example={toolExample(t)} />
             ))}
           </div>
         </section>

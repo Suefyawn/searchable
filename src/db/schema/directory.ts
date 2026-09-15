@@ -31,6 +31,8 @@ export const businessCategories = pgTable(
     namePlural: text("name_plural"),
     description: text("description"),
     icon: text("icon"),
+    imageUrl: text("image_url"),
+    imageCredit: text("image_credit"),
     sortOrder: integer("sort_order").default(0).notNull(),
     createdAt: createdAt(),
   },
@@ -63,6 +65,8 @@ export const businesses = pgTable(
     priceRange: integer("price_range"), // 1–4
     ratingAvg: doublePrecision("rating_avg").default(0).notNull(),
     ratingCount: integer("rating_count").default(0).notNull(),
+    /** When the paid tier lapses; cron downgrades to free after this. */
+    tierExpiresAt: timestamp("tier_expires_at", { withTimezone: true }),
     isVerified: boolean("is_verified").default(false).notNull(),
     verifiedAt: timestamp("verified_at", { withTimezone: true }),
     lastVerifiedAt: timestamp("last_verified_at", { withTimezone: true }),

@@ -42,6 +42,7 @@ const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
       { href: "/about", label: "About" },
       { href: "/editorial-policy", label: "Editorial policy" },
       { href: "/advertise", label: "Advertise" },
+      { href: "/write-for-us", label: "Write for us" },
       { href: "/contact", label: "Contact" },
       { href: "/privacy", label: "Privacy" },
       { href: "/feed.xml", label: "RSS" },
