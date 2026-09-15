@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import { plainText } from "./markdown";
 import { removeSearchDocument, syncSearchDocument } from "./search";
@@ -98,6 +98,7 @@ export async function indexDataSeries(seriesId: string) {
   const db = await getDb();
   const s = await db.query.dataSeries.findFirst({ where: eq(schema.dataSeries.id, seriesId) });
   if (!s) return;
+  const latest = await db.query.dataPoints.findFirst({ where: eq(schema.dataPoints.seriesId, seriesId), orderBy: [desc(schema.dataPoints.date)], columns: { date: true, value: true } });
   await syncSearchDocument({
     entityType: "data_series",
     entityId: s.id,
@@ -107,6 +108,7 @@ export async function indexDataSeries(seriesId: string) {
     keywords: [s.slug.replace(/-/g, " "), "today", "rate", "price", "history", ...(s.slug.startsWith("gold") ? ["gold rate today karachi", "gold rate today lahore", "gold rate today islamabad", "1 tola gold price", "sona"] : []), ...(s.slug === "cpi-yoy" ? ["inflation rate in pakistan", "cpi", "mehngai"] : [])].join(", "),
     category: "Data",
     categorySlug: "data",
+    meta: { slug: s.slug, unit: s.unit, source: s.sourceName, latest: latest ? { date: latest.date, value: Number(latest.value) } : null },
   });
 }
 
@@ -204,6 +206,7 @@ export async function indexTools() {
       category: TOOL_CATEGORIES[t.category].name,
       categorySlug: t.category,
       popularity: row.runCount,
+      meta: { slug: t.slug },
     });
   }
 }

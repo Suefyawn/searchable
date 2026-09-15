@@ -109,11 +109,14 @@ export type SearchHit = {
   publishedAt: Date | null;
   rank: number;
   headline: string | null;
+  /** Per-type extras: data series carry { latest, unit, slug }; tools { slug }; businesses rating and phone. */
+  meta: Record<string, unknown>;
   /** Matched by trigram similarity rather than full text (typo tolerance). */
   fuzzy?: boolean;
 };
 
-export type SearchOptions = { types?: SearchEntityType[]; city?: string; limit?: number; offset?: number };
+export type SearchOptions = { types?: SearchEntityType[]; city?: string; limit?: number; offset?: number; sort?: "relevance" | "newest" };
+export type SearchResult = { hits: SearchHit[]; total: number; facets: Partial<Record<SearchEntityType, number>>; intent: Intent };
 
 export function normalizeQuery(q: string): string {
   return q.trim().toLowerCase().replace(/\s+/g, " ").slice(0, 200);
@@ -156,9 +159,9 @@ export async function expandQuery(q: string): Promise<string> {
  * Federated search. Uses websearch_to_tsquery (supports quotes, OR, -) with a prefix-match fallback
  * so partial words like "electri" still hit "electricity".
  */
-export async function search(query: string, opts: SearchOptions = {}): Promise<{ hits: SearchHit[]; total: number }> {
+export async function search(query: string, opts: SearchOptions = {}): Promise<SearchResult> {
   const q = normalizeQuery(query);
-  if (!q) return { hits: [], total: 0 };
+  if (!q) return { hits: [], total: 0, facets: {}, intent: "general" };
   const db = await getDb();
   const limit = Math.min(opts.limit ?? 20, 50);
   const offset = opts.offset ?? 0;
@@ -177,13 +180,23 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<{
   const typeFilter = opts.types?.length ? sql`and entity_type in (${sql.join(opts.types.map((t) => sql`${t}`), sql`, `)})` : sql``;
   const cityFilter = opts.city ? sql`and city_slug = ${opts.city}` : sql``;
 
-  const list = await rawQuery<Record<string, unknown> & { total: number }>(db, sql`
-    with q as (
-      select websearch_to_tsquery('english', ${expanded}) as ws,
-             ${prefixQuery ? sql`to_tsquery('simple', ${prefixQuery})` : sql`null::tsquery`} as pq
-    ),
+  const tsq = sql`select websearch_to_tsquery('english', ${expanded}) as ws,
+             ${prefixQuery ? sql`to_tsquery('simple', ${prefixQuery})` : sql`null::tsquery`} as pq`;
+  const order = opts.sort === "newest" ? sql`published_at desc nulls last, rank desc` : sql`rank desc, published_at desc nulls last`;
+  // Per-type counts for the filter tabs. Only needed on an unfiltered first page.
+  const facetsPromise =
+    !opts.types?.length && offset === 0
+      ? rawQuery<{ entity_type: SearchEntityType; n: number }>(db, sql`
+          with q as (${tsq})
+          select d.entity_type, count(*)::int as n from search_documents d, q
+          where (d.tsv @@ q.ws or (q.pq is not null and d.tsv_simple @@ q.pq)) ${cityFilter}
+          group by d.entity_type`)
+      : Promise.resolve([]);
+
+  const listPromise = rawQuery<Record<string, unknown> & { total: number }>(db, sql`
+    with q as (${tsq}),
     matched as (
-      select d.entity_type, d.entity_id, d.url, d.title, d.summary, d.category, d.city, d.image_url, d.published_at,
+      select d.entity_type, d.entity_id, d.url, d.title, d.summary, d.category, d.city, d.image_url, d.published_at, d.meta,
              (
                greatest(
                  ts_rank_cd(d.tsv, q.ws, 32),
@@ -205,9 +218,12 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<{
     )
     select *, count(*) over() as total
     from matched
-    order by rank desc, published_at desc nulls last
+    order by ${order}
     limit ${limit} offset ${offset}
   `);
+  const [list, facetRows] = await Promise.all([listPromise, facetsPromise]);
+  const facets: SearchResult["facets"] = {};
+  for (const f of facetRows) facets[f.entity_type] = Number(f.n);
 
   const hits: SearchHit[] = list.map((r) => ({
     entityType: r.entity_type as SearchEntityType,
@@ -221,12 +237,13 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<{
     publishedAt: r.published_at ? new Date(r.published_at as string) : null,
     rank: Number(r.rank),
     headline: (r.headline as string | null) ?? null,
+    meta: (r.meta as Record<string, unknown> | null) ?? {},
   }));
-  if (list.length >= 3 || offset > 0) return { hits, total: list.length ? Number(list[0].total) : 0 };
+  if (list.length >= 3 || offset > 0) return { hits, total: list.length ? Number(list[0].total) : 0, facets, intent };
 
   // Typo tolerance: too few full-text hits → trigram similarity on title/keywords ("electrcity bill" → electricity).
   const fuzzy = await rawQuery<Record<string, unknown>>(db, sql`
-    select d.entity_type, d.entity_id, d.url, d.title, d.summary, d.category, d.city, d.image_url, d.published_at,
+    select d.entity_type, d.entity_id, d.url, d.title, d.summary, d.category, d.city, d.image_url, d.published_at, d.meta,
            greatest(similarity(d.title, ${q}), similarity(coalesce(d.keywords, ''), ${q}) * 0.9) * d.boost * ${intentBoost} as rank
     from search_documents d
     where (similarity(d.title, ${q}) > 0.25 or similarity(coalesce(d.keywords, ''), ${q}) > 0.2)
@@ -250,10 +267,13 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<{
       publishedAt: r.published_at ? new Date(r.published_at as string) : null,
       rank: Number(r.rank),
       headline: null,
+      meta: (r.meta as Record<string, unknown> | null) ?? {},
       fuzzy: true,
     });
+    if (!facets[r.entity_type as SearchEntityType]) facets[r.entity_type as SearchEntityType] = 0;
+    facets[r.entity_type as SearchEntityType]!++;
   }
-  return { hits, total: hits.length };
+  return { hits, total: hits.length, facets, intent };
 }
 
 /** Group hits by type for the "best answer per kind" layout. */
@@ -266,7 +286,9 @@ export function groupHits(hits: SearchHit[]) {
   return groups;
 }
 
-export async function suggest(query: string, limit = 8): Promise<Pick<SearchHit, "entityType" | "url" | "title" | "category" | "city">[]> {
+export type Suggestion = Pick<SearchHit, "entityType" | "url" | "title" | "category" | "city"> & { meta?: Record<string, unknown> | null };
+
+export async function suggest(query: string, limit = 8): Promise<Suggestion[]> {
   const q = normalizeQuery(query);
   if (q.length < 2) return [];
   const db = await getDb();
@@ -277,6 +299,7 @@ export async function suggest(query: string, limit = 8): Promise<Pick<SearchHit,
       title: schema.searchDocuments.title,
       category: schema.searchDocuments.category,
       city: schema.searchDocuments.city,
+      meta: schema.searchDocuments.meta,
     })
     .from(schema.searchDocuments)
     .where(sql`lower(${schema.searchDocuments.title}) like ${"%" + q + "%"} or lower(coalesce(${schema.searchDocuments.keywords}, '')) like ${"%" + q + "%"} or similarity(${schema.searchDocuments.title}, ${q}) > 0.3`)
@@ -314,5 +337,74 @@ export async function popularSearches(limit = 8): Promise<{ query: string; count
         from search_queries
         where created_at > now() - interval '30 days' and result_count > 0
         group by normalized order by count desc limit ${limit}`,
+  );
+}
+
+/** A logged query (or an indexed title) within typo distance of `q` that does return results. */
+export async function didYouMean(query: string): Promise<string | null> {
+  const q = normalizeQuery(query);
+  if (q.length < 3) return null;
+  const db = await getDb();
+  const [logged] = await rawQuery<{ s: string }>(
+    db,
+    sql`select normalized as s from search_queries
+        where result_count > 0 and normalized <> ${q} and similarity(normalized, ${q}) > 0.45
+        group by normalized order by similarity(normalized, ${q}) desc, count(*) desc limit 1`,
+  );
+  if (logged) return logged.s;
+  const [title] = await rawQuery<{ s: string }>(
+    db,
+    sql`select title as s from search_documents where similarity(lower(title), ${q}) > 0.35 order by similarity(lower(title), ${q}) desc, boost desc limit 1`,
+  );
+  return title?.s ?? null;
+}
+
+/** Other things people searched that share a word with `q` and found something. */
+export async function relatedSearches(query: string, limit = 6): Promise<string[]> {
+  const q = normalizeQuery(query);
+  if (!q) return [];
+  const db = await getDb();
+  const rows = await rawQuery<{ s: string }>(
+    db,
+    sql`select normalized as s from search_queries
+        where created_at > now() - interval '90 days' and result_count > 0 and normalized <> ${q}
+          and (string_to_array(normalized, ' ') && string_to_array(${q}, ' ') or normalized % ${q})
+        group by normalized order by count(*) desc, length(normalized) asc limit ${limit}`,
+  );
+  return rows.map((r) => r.s);
+}
+
+/**
+ * Compact index of the evergreen entries (tools, guides, data, places, topics) for instant client-side
+ * suggestions. Served once from /suggest-index.json and cached by the CDN, so typing costs no function calls.
+ */
+export type SuggestIndexEntry = { t: string; u: string; k: string; y: SearchEntityType; c?: string; m?: string };
+export async function suggestIndex(): Promise<{ entries: SuggestIndexEntry[]; popular: string[] }> {
+  const db = await getDb();
+  const rows = await db
+    .select({ entityType: schema.searchDocuments.entityType, url: schema.searchDocuments.url, title: schema.searchDocuments.title, keywords: schema.searchDocuments.keywords, category: schema.searchDocuments.category, city: schema.searchDocuments.city, meta: schema.searchDocuments.meta, boost: schema.searchDocuments.boost, popularity: schema.searchDocuments.popularity })
+    .from(schema.searchDocuments)
+    .where(sql`entity_type in ('tool', 'guide', 'data_series', 'location', 'entity', 'comparison')`)
+    .orderBy(desc(schema.searchDocuments.boost), desc(schema.searchDocuments.popularity))
+    .limit(600);
+  const entries = rows.map((r) => {
+    const latest = (r.meta as { latest?: { value?: number }; unit?: string } | null)?.latest;
+    const unit = (r.meta as { unit?: string } | null)?.unit;
+    const m = latest && typeof latest.value === "number" ? (unit === "%" ? `${latest.value.toFixed(2)}%` : latest.value.toLocaleString("en-PK", { maximumFractionDigits: Number.isInteger(latest.value) ? 0 : 2 })) : undefined;
+    return { t: r.title, u: r.url, k: (r.keywords ?? "").toLowerCase().slice(0, 240), y: r.entityType, c: r.city ?? r.category ?? undefined, m };
+  });
+  const popular = (await popularSearches(8)).map((p) => p.query);
+  return { entries, popular };
+}
+
+/** Marks the most recent log row for this query with the URL the person chose. */
+export async function recordSearchClick(query: string, url: string) {
+  const normalized = normalizeQuery(query);
+  if (!normalized || !url.startsWith("/")) return;
+  const db = await getDb();
+  await rawQuery(
+    db,
+    sql`update search_queries set clicked_url = ${url.slice(0, 300)}
+        where id = (select id from search_queries where normalized = ${normalized} and created_at > now() - interval '1 hour' order by created_at desc limit 1)`,
   );
 }

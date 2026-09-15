@@ -1,6 +1,7 @@
 import { and, desc, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import { addDataPoint } from "@/db/queries/data";
+import { indexDataSeries } from "./indexers";
 
 /**
  * Automated data ingestion for the data hub. Each source fetches once and yields readings for several series.
@@ -230,6 +231,7 @@ export async function runIngestion(opts: { maxJump?: number; only?: string[]; fo
     }
     try {
       await addDataPoint(series.id, r.date, r.value, r.note, r.sourceUrl);
+      await indexDataSeries(series.id);
       const draftArticleId = prev && prev.value !== r.value ? await draftArticle(r.slug, r.value, prev.value, r.note) : null;
       results.push({ slug: r.slug, status: "written", value: r.value, previous: prev?.value, draftArticleId });
     } catch (e) {

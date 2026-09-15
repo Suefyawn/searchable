@@ -6,6 +6,7 @@ import { addDataPoint, listSeriesWithLatest } from "@/db/queries/data";
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import { requireRole } from "@/lib/auth";
+import { indexDataSeries } from "@/lib/indexers";
 import { runIngestion, type IngestResult } from "@/lib/ingest";
 import { formatDate, number } from "@/lib/format";
 
@@ -20,6 +21,7 @@ async function addPoint(formData: FormData) {
   if (!parsed.success) return;
   const d = parsed.data;
   await addDataPoint(d.seriesId, d.date, d.value, d.note || undefined, d.sourceUrl || undefined);
+  await indexDataSeries(d.seriesId);
   revalidatePath("/data");
   revalidatePath("/data/[slug]", "page");
   revalidatePath("/admin/data");

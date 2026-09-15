@@ -48,7 +48,7 @@ export async function Header({ showSearch = true }: { showSearch?: boolean }) {
           <Logo />
           <MegaMenu sections={sections} />
           <div className="ml-auto flex items-center gap-2">
-            {showSearch ? <SearchBox className="hidden w-64 md:block lg:w-72" placeholder="Search…" /> : null}
+            {showSearch ? <SearchBox hotkey className="hidden w-64 md:block lg:w-72" placeholder="Search…" /> : null}
             <MobileNav nav={NAV} sections={sections.map((s) => ({ key: s.key, label: s.label, href: s.href, links: s.columns.flatMap((c) => c.links).slice(0, 12) }))} />
           </div>
         </div>
