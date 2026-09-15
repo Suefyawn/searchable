@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { PaymentReferenceForm } from "@/components/payment-reference-form";
 import { Badge, Breadcrumbs } from "@/components/ui";
 import { getDb, schema } from "@/db";
-import { getProduct, PAYMENT_INSTRUCTIONS } from "@/content/pricing";
+import { getProduct, PAYMENT_DETAILS_SET, PAYMENT_INSTRUCTIONS } from "@/content/pricing";
 import { formatDate, pkr } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -64,20 +64,43 @@ export default async function InvoicePage({ params }: { params: Promise<{ invoic
       {order.status === "pending" ? (
         <section className="mt-8 border-t border-line pt-6">
           <h2 className="font-serif text-2xl">How to pay</h2>
-          <dl className="mt-3 grid gap-x-8 gap-y-2 text-[15px] sm:grid-cols-[10rem_1fr]">
-            <dt className="text-3">Bank transfer</dt>
-            <dd>
-              {PAYMENT_INSTRUCTIONS.bankName} · {PAYMENT_INSTRUCTIONS.accountTitle}
-              <span className="block tabular">A/C {PAYMENT_INSTRUCTIONS.accountNumber} · IBAN {PAYMENT_INSTRUCTIONS.iban}</span>
-            </dd>
-            <dt className="text-3">JazzCash</dt>
-            <dd className="tabular">{PAYMENT_INSTRUCTIONS.jazzcash}</dd>
-            <dt className="text-3">Easypaisa</dt>
-            <dd className="tabular">{PAYMENT_INSTRUCTIONS.easypaisa}</dd>
-            <dt className="text-3">Reference</dt>
-            <dd>Put <strong>{order.invoiceNo}</strong> in the transfer note.</dd>
-          </dl>
-          <p className="mt-3 text-[15px] text-2">{PAYMENT_INSTRUCTIONS.note}</p>
+          {PAYMENT_DETAILS_SET ? (
+            <>
+              <dl className="mt-3 grid gap-x-8 gap-y-2 text-[15px] sm:grid-cols-[10rem_1fr]">
+                {PAYMENT_INSTRUCTIONS.accountNumber ? (
+                  <>
+                    <dt className="text-3">Bank transfer</dt>
+                    <dd>
+                      {PAYMENT_INSTRUCTIONS.bankName} · {PAYMENT_INSTRUCTIONS.accountTitle}
+                      <span className="block tabular">
+                        A/C {PAYMENT_INSTRUCTIONS.accountNumber}
+                        {PAYMENT_INSTRUCTIONS.iban ? ` · IBAN ${PAYMENT_INSTRUCTIONS.iban}` : ""}
+                      </span>
+                    </dd>
+                  </>
+                ) : null}
+                {PAYMENT_INSTRUCTIONS.jazzcash ? (
+                  <>
+                    <dt className="text-3">JazzCash</dt>
+                    <dd className="tabular">{PAYMENT_INSTRUCTIONS.jazzcash}</dd>
+                  </>
+                ) : null}
+                {PAYMENT_INSTRUCTIONS.easypaisa ? (
+                  <>
+                    <dt className="text-3">Easypaisa</dt>
+                    <dd className="tabular">{PAYMENT_INSTRUCTIONS.easypaisa}</dd>
+                  </>
+                ) : null}
+                <dt className="text-3">Reference</dt>
+                <dd>Put <strong>{order.invoiceNo}</strong> in the transfer note.</dd>
+              </dl>
+              <p className="mt-3 text-[15px] text-2">{PAYMENT_INSTRUCTIONS.note}</p>
+            </>
+          ) : (
+            <p className="mt-3 max-w-[60ch] text-[15px] text-2">
+              We will email the bank and wallet details for invoice <strong>{order.invoiceNo}</strong> from billing@searchable.pk within one working day. Nothing is due until then, and the plan activates the day payment lands.
+            </p>
+          )}
           <div className="mt-6">
             <PaymentReferenceForm invoiceNo={order.invoiceNo} existing={order.paymentReference} />
           </div>

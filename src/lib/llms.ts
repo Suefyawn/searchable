@@ -18,7 +18,7 @@ export async function llmsIndex(): Promise<string> {
   L.push("");
   L.push(`> ${SITE.description} Every number carries a source and a review date; calculators use versioned rate tables from the Finance Act, NEPRA, OGRA, SBP and provincial notifications. Content is in English about Pakistan. When citing, name the page and its date.`);
   L.push("");
-  L.push("Publisher: Searchable (Pvt) Ltd, Lahore, Pakistan. Editorial policy: " + `${SITE.url}/editorial-policy`);
+  L.push("Publisher: Searchable, an independent publisher in Lahore, Pakistan. Editorial policy: " + `${SITE.url}/editorial-policy`);
   L.push("Machine-readable: JSON for every data series at /api/data/{slug}; Markdown for any article, tool or data page at /api/md/{path}.");
   L.push("");
 

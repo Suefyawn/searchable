@@ -92,16 +92,21 @@ export function getProduct(code: string) {
   return PRODUCTS.find((p) => p.code === code);
 }
 
-/** Bank / wallet details shown on invoices while payments are manual. Move to env at go-live. */
+/**
+ * Bank and wallet details shown on invoices while payments are manual. They come from the environment so
+ * nothing invented ever reaches a customer: when PAYMENT_ACCOUNT_NUMBER is unset the invoice says the details
+ * will be emailed by billing, and the founder sends them by hand.
+ */
 export const PAYMENT_INSTRUCTIONS = {
-  bankName: "Meezan Bank",
-  accountTitle: "Searchable (Pvt) Ltd",
-  accountNumber: "0000-0000000-00",
-  iban: "PK00MEZN0000000000000000",
-  jazzcash: "0300-0000000",
-  easypaisa: "0300-0000000",
+  bankName: process.env.PAYMENT_BANK_NAME?.trim() || "",
+  accountTitle: process.env.PAYMENT_ACCOUNT_TITLE?.trim() || "",
+  accountNumber: process.env.PAYMENT_ACCOUNT_NUMBER?.trim() || "",
+  iban: process.env.PAYMENT_IBAN?.trim() || "",
+  jazzcash: process.env.PAYMENT_JAZZCASH?.trim() || "",
+  easypaisa: process.env.PAYMENT_EASYPAISA?.trim() || "",
   note: "Send the transaction ID or a screenshot to billing@searchable.pk with your invoice number. Plans activate within one working day of payment.",
 };
+export const PAYMENT_DETAILS_SET = !!PAYMENT_INSTRUCTIONS.accountNumber || !!PAYMENT_INSTRUCTIONS.jazzcash || !!PAYMENT_INSTRUCTIONS.easypaisa;
 
 /** Free-tier honesty: what everyone gets without paying. */
 export const FREE_FEATURES = ["Listing with address, phone, hours, map link and category", "Claim it and edit it yourself", "Collect reviews", "Appear in search and city pages"];
