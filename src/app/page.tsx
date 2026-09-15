@@ -3,6 +3,7 @@ import { ArticleCard, ToolCard, articleUrl, toolExample } from "@/components/car
 import { Change } from "@/components/data/change";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { HeroCarousel, type Slide } from "@/components/home/hero-carousel";
+import { NumbersTicker } from "@/components/home/numbers-ticker";
 import { Img } from "@/components/img";
 import { LiveFeed } from "@/components/home/live-feed";
 import { PhotoTile } from "@/components/photo-tiles";
@@ -56,23 +57,23 @@ export default async function HomePage() {
   ]);
   const featuredTools = TOOLS.filter((t) => t.featured).slice(0, 6);
   const topCategories = categories.filter((c) => c.count > 0).slice(0, 10);
-  const numbers = series.filter((s) => s.latest);
+  const TICKER_ORDER = ["petrol-price", "usd-pkr", "gold-24k-tola", "gold-22k-tola", "kse-100", "diesel-price", "silver-tola", "btc-usd", "sbp-policy-rate", "kibor-1y", "aed-pkr", "sar-pkr", "gbp-pkr", "eur-pkr", "eth-usd", "cpi-yoy", "solar-panel-per-watt"];
+  const numbers = series.filter((s) => s.latest).sort((a, b) => (TICKER_ORDER.indexOf(a.slug) + 1 || 99) - (TICKER_ORDER.indexOf(b.slug) + 1 || 99));
 
   return (
     <div className="container-x">
-      {/* Numbers ticker, thin, scrollable, above the fold */}
+      {/* Numbers ticker: the day's prices and rates, a slow continuous rail above the fold */}
       {numbers.length ? (
-        <section className="no-scrollbar -mx-5 overflow-x-auto border-b border-line px-5 sm:mx-0 sm:px-0" aria-label="Today's numbers">
-          <div className="flex min-w-max divide-x divide-[var(--border)]">
-            {numbers.slice(0, 7).map((s) => (
-              <Link key={s.id} href={`/data/${s.slug}`} className="flex items-baseline gap-2 px-4 py-2.5 first:pl-0 text-[13px] hover:bg-surface-2">
-                <span className="text-3">{s.name.replace(/ in Pakistan.*$/i, "").replace(/ today$/i, "").replace(/ \(.*\)$/, "")}</span>
-                <span className="font-medium tabular">{s.unit === "%" ? `${number(s.latest!.value, 2)}%` : number(s.latest!.value, Number.isInteger(s.latest!.value) ? 0 : 2)}</span>
-                <Change latest={s.latest!.value} previous={s.previous?.value ?? null} unit={s.unit} />
-              </Link>
-            ))}
-          </div>
-        </section>
+        <NumbersTicker
+          items={numbers.map((s) => ({
+            id: s.id,
+            slug: s.slug,
+            name: s.name.replace(/ in Pakistan.*$/i, "").replace(/ today$/i, "").replace(/ \(.*\)$/, "").replace(/ rate$/i, ""),
+            unit: s.unit,
+            value: s.latest!.value,
+            previous: s.previous?.value ?? null,
+          }))}
+        />
       ) : null}
 
       {/* Hero: carousel of the top stories + the live feed */}

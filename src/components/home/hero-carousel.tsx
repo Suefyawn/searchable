@@ -59,22 +59,34 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
       <Link href={s.href} className="block lg:col-span-12" aria-hidden tabIndex={-1}>
         {s.imageUrl ? <Img src={s.imageUrl} alt="" aspect="16/9" priority sizes="(min-width: 1024px) 800px, 100vw" /> : <div className="bg-surface-2" style={{ aspectRatio: "16/9" }} />}
       </Link>
-      <div className="lg:col-span-7" aria-live="polite">
-        <p className="eyebrow">
-          {s.label}
-          <span className="ml-2 font-sans text-[11px] font-normal normal-case tracking-normal text-3">{s.meta}</span>
-        </p>
-        <h1 className="mt-2 font-serif text-[1.9rem] font-medium leading-[1.08] tracking-tight sm:text-[2.3rem] lg:text-[2.2rem] xl:text-[2.5rem]">
-          <Link href={s.href} className="headline-link">
-            {s.title}
-          </Link>
-        </h1>
+      {/* Every slide's text is laid out in the same grid cell, hidden ones invisible, so the block keeps the
+          height of the tallest slide and the page below never jumps when the headline length changes. */}
+      <div className="grid lg:col-span-7" aria-live="polite">
+        {slides.map((x, k) => (
+          <div key={x.id} className={cn("[grid-area:1/1]", k !== i && "invisible")} aria-hidden={k !== i}>
+            <p className="eyebrow">
+              {x.label}
+              <span className="ml-2 font-sans text-[11px] font-normal normal-case tracking-normal text-3">{x.meta}</span>
+            </p>
+            <h1 className="mt-2 font-serif text-[1.9rem] font-medium leading-[1.08] tracking-tight sm:text-[2.3rem] lg:text-[2.2rem] xl:text-[2.5rem]">
+              <Link href={x.href} className="headline-link" tabIndex={k === i ? 0 : -1}>
+                {x.title}
+              </Link>
+            </h1>
+          </div>
+        ))}
       </div>
       <div className="flex flex-col lg:col-span-5">
-        {s.dek ? <p className="font-serif text-[1.05rem] leading-relaxed text-2 lg:pt-6">{s.dek}</p> : null}
-        <Link href={s.href} className="mt-3 inline-block text-sm font-medium underline underline-offset-4">
-          Read the story →
-        </Link>
+        <div className="grid">
+          {slides.map((x, k) => (
+            <div key={x.id} className={cn("[grid-area:1/1]", k !== i && "invisible")} aria-hidden={k !== i}>
+              {x.dek ? <p className="font-serif text-[1.05rem] leading-relaxed text-2 lg:pt-6">{x.dek}</p> : null}
+              <Link href={x.href} className="mt-3 inline-block text-sm font-medium underline underline-offset-4" tabIndex={k === i ? 0 : -1}>
+                Read the story →
+              </Link>
+            </div>
+          ))}
+        </div>
         {n > 1 ? (
           <div className="mt-auto pt-5">
             <div className="flex items-center gap-3">

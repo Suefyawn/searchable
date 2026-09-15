@@ -83,7 +83,11 @@ export function Footer() {
         </div>
         <div className="mt-10 flex flex-col gap-2 border-t border-line pt-5 text-[13px] text-3 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {new Date().getFullYear()} {SITE.name}. Made in Pakistan.
+            © {new Date().getFullYear()} {SITE.name}. Made in Pakistan. Powered by{" "}
+            <a href="https://trellee.com" target="_blank" rel="noopener" className="underline underline-offset-4 hover:text-[var(--text)]">
+              Trellee
+            </a>
+            .
           </p>
           <p>Every number shows its source and review date. Confirm with the primary source before acting.</p>
         </div>

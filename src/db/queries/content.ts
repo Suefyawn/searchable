@@ -77,6 +77,24 @@ export async function listArticles(opts: { kind?: ArticleKind; categorySlug?: st
   return rows.map(shape);
 }
 
+/** Latest published stories linked to any of these entities (data pages show the news behind the number). */
+export async function articlesForEntitySlugs(slugs: string[], limit = 4) {
+  if (!slugs.length) return [];
+  const db = await getDb();
+  const rows = await db
+    .select(listSelect)
+    .from(schema.articles)
+    .innerJoin(schema.entityLinks, and(eq(schema.entityLinks.targetType, "article"), eq(schema.entityLinks.targetId, schema.articles.id)))
+    .innerJoin(schema.entities, eq(schema.entities.id, schema.entityLinks.entityId))
+    .leftJoin(schema.categories, eq(schema.articles.categoryId, schema.categories.id))
+    .leftJoin(schema.authors, eq(schema.articles.authorId, schema.authors.id))
+    .where(and(published(), inArray(schema.entities.slug, slugs)))
+    .orderBy(desc(schema.articles.publishedAt))
+    .limit(limit * 3);
+  const seen = new Set<string>();
+  return rows.filter((r) => (seen.has(r.id) ? false : (seen.add(r.id), true))).slice(0, limit).map(shape);
+}
+
 export async function countArticles(kind?: ArticleKind, categorySlug?: string) {
   const db = await getDb();
   const conds = [published(kind)];

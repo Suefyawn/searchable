@@ -1,0 +1,70 @@
+/**
+ * Editorial layer for the data hub: what each number is, who sets it, how we record it, the questions people
+ * ask, and which other series belong beside it. Keyed by series slug. Anything without an entry still renders;
+ * it just has no explainer or FAQ.
+ */
+export type SeriesContent = {
+  /** Two or three short paragraphs in markdown: what the number is, who sets it, how to read it. */
+  about: string;
+  faqs: { question: string; answer: string }[];
+  /** Series slugs shown as "Also today". */
+  related: string[];
+  /** Which conversion block to render. */
+  conversions?: "fx" | "fuel" | "silver" | "crypto" | "rate";
+  /** For fx: the currency code; for crypto: the coin. */
+  code?: string;
+  guides?: { href: string; label: string }[];
+};
+
+const FX_RELATED = ["usd-pkr", "aed-pkr", "sar-pkr", "gbp-pkr", "eur-pkr"];
+
+export const DATA_SERIES_CONTENT: Record<string, SeriesContent> = {
+  "usd-pkr": {
+    about: `The dollar rate here is the **interbank closing rate**: the price banks pay each other, published by the State Bank of Pakistan each working day. It is the rate behind imports, loan repricing and the figure the government quotes.
+
+The **open market rate** at exchange companies (the one you get for cash) sits a little above interbank, typically Rs 1 to 3, and moves during the day. Bank card transactions abroad use the bank's own rate plus a margin, usually 2 to 4 percent over interbank.
+
+We record the SBP closing rate once a day; on days the SBP page is unreachable the reading comes from a market mid-rate and says so in its note.`,
+    faqs: [
+      { question: "What is the dollar rate in Pakistan today?", answer: "The latest interbank closing rate is shown at the top of this page with its date. The open market (cash) rate is usually Rs 1 to 3 higher." },
+      { question: "Why is the open market rate different from the interbank rate?", answer: "Interbank is what banks trade among themselves in large amounts. Exchange companies buy and sell cash to the public and add a spread for their costs, demand and risk, so the open market rate runs slightly above interbank and moves through the day." },
+      { question: "Which rate applies to my remittance?", answer: "Banks and apps convert remittances close to the interbank rate; the government's incentive scheme adds a small premium for formal channels. Check the rate your provider quotes on the day, not the headline figure." },
+      { question: "Which rate does the PTA phone tax use?", answer: "Customs values imported phones in dollars and converts at the SBP rate on the day of assessment, so a weaker rupee raises the PTA tax in rupees." },
+    ],
+    related: ["aed-pkr", "sar-pkr", "gbp-pkr", "eur-pkr", "gold-24k-tola"],
+    conversions: "fx",
+    code: "USD",
+    guides: [{ href: "/tools/finance/currency-converter", label: "Currency converter" }],
+  },
+  "aed-pkr": { about: `The dirham rate matters to the largest group of overseas Pakistanis. The UAE dirham is pegged to the US dollar at 3.6725, so AED to PKR moves exactly with the dollar: this series is the interbank USD/PKR rate divided by the peg.
+
+For remittances, the rate your exchange house or app offers in Dubai is what counts; compare it with this figure to see the spread you are paying.`, faqs: [{ question: "What is 1 dirham in Pakistani rupees today?", answer: "The latest interbank rate is at the top of the page. Exchange houses in the UAE quote a little below it for remittances; the gap is their margin." }, { question: "Why does the dirham move with the dollar?", answer: "The UAE central bank keeps the dirham fixed at 3.6725 per US dollar, so any change in AED/PKR is really a change in USD/PKR." }], related: FX_RELATED, conversions: "fx", code: "AED" },
+  "sar-pkr": { about: `The Saudi riyal is pegged to the US dollar at 3.75, so SAR to PKR tracks the dollar rate exactly. Saudi Arabia is the second-largest source of remittances to Pakistan, and the riyal is the currency of Hajj and Umrah budgets.`, faqs: [{ question: "What is 1 riyal in rupees today?", answer: "See the top of the page for the latest interbank figure; remittance apps quote close to it." }, { question: "How much is a typical Umrah budget in riyals?", answer: "Hotels and transport in Makkah and Madinah are priced in riyals, so a budget of SAR 3,000 to 6,000 for a week converts at this rate plus your provider's margin." }], related: FX_RELATED, conversions: "fx", code: "SAR" },
+  "gbp-pkr": { about: `The pound rate is interbank GBP/PKR: the dollar rate multiplied by the market GBP/USD cross. It matters for tuition fees, UK remittances and visa costs, which are all set in pounds.`, faqs: [{ question: "What is the pound rate in Pakistan today?", answer: "The latest interbank figure is at the top; banks converting a UK tuition payment add a margin on top of it." }], related: FX_RELATED, conversions: "fx", code: "GBP" },
+  "eur-pkr": { about: `The euro rate is interbank EUR/PKR: the dollar rate multiplied by the market EUR/USD cross. Schengen visa fees, European tuition and exports to the EU are priced in euros.`, faqs: [{ question: "What is the euro rate in Pakistan today?", answer: "See the top of the page; bank card transactions in Europe convert at the bank's own rate, usually 2 to 4 percent above interbank." }], related: FX_RELATED, conversions: "fx", code: "EUR" },
+  "petrol-price": {
+    about: `This is the **ex-depot price of Premier Euro 5 petrol** set by the government on OGRA's recommendation and charged at every PSO pump; other companies match it. It includes the petroleum levy and sales tax where applied. Pump prices in some cities add a few paise of transport cost.
+
+Reviews are fortnightly (the 1st and the 16th) unless the government moves earlier. We record the notified price with the date it took effect and link the notification.`,
+    faqs: [
+      { question: "What is the petrol price in Pakistan today?", answer: "The current notified price per litre is at the top of this page with its effective date." },
+      { question: "When does the petrol price change?", answer: "The government reviews prices every fortnight, effective the 1st and 16th of the month, following OGRA's working on international prices and the exchange rate. It can change earlier when oil moves sharply." },
+      { question: "How is the petrol price calculated?", answer: "Ex-refinery price (international benchmark plus freight) plus the petroleum levy, inland freight equalisation margin, oil company margin, dealer margin and sales tax where charged. The levy is the government's main lever." },
+      { question: "How much does a full tank cost?", answer: "Multiply the price by your tank: a 40-litre tank at the current rate is shown in the table on this page. The fuel cost calculator works it out for your car and mileage." },
+    ],
+    related: ["diesel-price", "usd-pkr"],
+    conversions: "fuel",
+    guides: [{ href: "/tools/cars/fuel-cost-calculator", label: "Fuel cost calculator" }],
+  },
+  "diesel-price": { about: `High-speed diesel, the fuel of transport, agriculture and generators, is notified alongside petrol on the same fortnightly schedule. Diesel moves goods prices: a change here shows up in vegetable and freight rates within days.`, faqs: [{ question: "What is the diesel price in Pakistan today?", answer: "The notified price per litre is at the top of the page with its effective date." }, { question: "Why is diesel priced differently from petrol?", answer: "Different international benchmarks, a different levy and different taxes. Diesel has at times carried a higher levy because it is the bigger revenue earner." }], related: ["petrol-price", "usd-pkr"], conversions: "fuel", guides: [{ href: "/tools/cars/fuel-cost-calculator", label: "Fuel cost calculator" }] },
+  "gold-24k-tola": { about: `24K gold, 99.9 percent pure, per tola (11.664 grams). The Karachi Sarafa quote is the national reference; it follows the international spot price and the rupee, plus a local premium of a few hundred rupees. Bars and coins trade near this rate; jewellery is 22K or 21K with making charges on top.`, faqs: [], related: ["gold-22k-tola", "silver-tola", "usd-pkr"], guides: [{ href: "/tools/finance/zakat-calculator", label: "Zakat calculator" }] },
+  "gold-22k-tola": { about: `22K gold, 91.67 percent pure, is the standard for jewellery in Pakistan. Its rate is 22/24 of the 24K quote; what you pay at a jeweller adds making charges (usually 8 to 15 percent) and, when selling back, a deduction for wastage.`, faqs: [], related: ["gold-24k-tola", "silver-tola", "usd-pkr"], guides: [{ href: "/tools/finance/zakat-calculator", label: "Zakat calculator" }] },
+  "silver-tola": { about: `Silver per tola in Pakistan follows the international spot price and the rupee. Silver matters for zakat: the nisab is 612.36 grams of silver (52.5 tola), and most scholars use the silver nisab as the threshold, so this number decides who owes zakat this year.`, faqs: [{ question: "What is the silver nisab in rupees today?", answer: "52.5 tola of silver at today's rate; the zakat calculator shows the rupee figure and applies it." }, { question: "Why is silver so much cheaper than gold per tola?", answer: "Silver is far more abundant and its industrial demand dominates; the gold to silver ratio has run between 60 and 90 for years." }], related: ["gold-24k-tola", "gold-22k-tola"], conversions: "silver", guides: [{ href: "/tools/finance/zakat-calculator", label: "Zakat calculator" }] },
+  "kse-100": { about: `The KSE-100 is the benchmark index of the Pakistan Stock Exchange: the 100 largest companies by market capitalisation, weighted so a handful of banks, fertiliser, cement and energy companies drive most of the moves. We record the closing level each trading day from the PSX data portal.`, faqs: [{ question: "What moves the KSE-100?", answer: "Interest rates (a cut lifts it), the IMF programme, the rupee, corporate results, and foreign fund flows. Banks and oil and gas companies carry the largest weights." }, { question: "How do I invest in the KSE-100?", answer: "Open an account with a PSX broker or buy an index-tracking mutual fund; the Roshan Digital Account lets overseas Pakistanis invest directly." }], related: ["usd-pkr", "sbp-policy-rate"] },
+  "sbp-policy-rate": { about: `The policy rate is the rate at which the State Bank lends to banks overnight, set by the Monetary Policy Committee every six to eight weeks. Everything else follows it: KIBOR, car and home loan rates, and the return on savings accounts. A cut of one point lowers a Rs 5 million home loan instalment by roughly Rs 3,000 to 4,000 a month.`, faqs: [{ question: "When is the next SBP monetary policy?", answer: "The MPC publishes its calendar for the year on sbp.org.pk; meetings are roughly every six to eight weeks and the decision is announced the same afternoon." }, { question: "How does the policy rate affect my loan?", answer: "Bank loans are priced at KIBOR plus a spread, and KIBOR moves with the policy rate within days, so your next repricing follows the decision." }], related: ["kibor-1y", "cpi-yoy"], guides: [{ href: "/tools/cars/car-loan-calculator", label: "Car loan calculator" }, { href: "/tools/finance/home-loan-calculator", label: "Home loan calculator" }] },
+  "kibor-1y": { about: `KIBOR, the Karachi Interbank Offered Rate, is what banks charge each other; the 12-month offer rate is the base for most car loans, home loans and business financing, which are priced at KIBOR plus a spread. It is published every morning by the Financial Markets Association and tracks the SBP policy rate closely.`, faqs: [{ question: "What is KIBOR used for?", answer: "Almost every floating-rate loan in Pakistan is priced at KIBOR plus the bank's spread and reprices monthly, quarterly or annually." }], related: ["sbp-policy-rate", "cpi-yoy"], guides: [{ href: "/tools/cars/car-loan-calculator", label: "Car loan calculator" }] },
+  "cpi-yoy": { about: `Inflation here is the national Consumer Price Index, year on year, published monthly by the Pakistan Bureau of Statistics at the start of each month for the month before. It drives the policy rate decision, pension and salary adjustments and the real return on savings.`, faqs: [{ question: "When is the next CPI released?", answer: "PBS publishes monthly CPI in the first week of the following month." }], related: ["sbp-policy-rate", "kibor-1y"] },
+  "btc-usd": { about: `Bitcoin in US dollars from the global spot market. Crypto is not legal tender in Pakistan and banks do not process crypto payments, but trading through international exchanges and peer-to-peer is widespread. The rupee value on this page uses the day's interbank dollar rate; peer-to-peer prices carry a premium.`, faqs: [{ question: "Is Bitcoin legal in Pakistan?", answer: "Owning and trading is not criminalised, but it is unregulated and banks may block related transactions. A regulatory framework has been under discussion; treat the rules as unsettled." }], related: ["eth-usd", "usd-pkr"], conversions: "crypto", code: "BTC" },
+  "eth-usd": { about: `Ether, the currency of the Ethereum network, in US dollars from the global spot market. Rupee values on this page use the interbank dollar rate.`, faqs: [], related: ["btc-usd", "usd-pkr"], conversions: "crypto", code: "ETH" },
+  "solar-panel-per-watt": { about: `The price of solar panels in rupees per watt, from dealer quotes in Lahore and Karachi for tier-one mono panels in pallet quantities. A 5 kW system's panels cost roughly 5,000 times this number; inverter, structure and installation come on top.`, faqs: [{ question: "How much does a 5 kW solar system cost?", answer: "Panels at today's per-watt price times 5,000 watts, plus an inverter (Rs 150,000 to 250,000), structure and wiring, and installation. The solar calculator adds it up for your roof and bill." }], related: ["cpi-yoy", "usd-pkr"], guides: [{ href: "/tools/solar/solar-payback-calculator", label: "Solar payback calculator" }] },
+};

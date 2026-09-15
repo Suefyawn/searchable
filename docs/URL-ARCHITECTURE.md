@@ -80,6 +80,7 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
                                          /professionals, /community, /inbox, /system
 
 /api/auth/[...all]                       better-auth
+/api/data/[slug]                         JSON (default) or ?format=csv for every reading
 /api/search  /api/suggest                JSON search; /suggest-index.json (cached client index)
 /api/community/liked  /api/community/saved   Signed-in reader state (private, no-store)
 /api/md/[...path]  /llms.txt  /llms-full.txt  Markdown and LLM renditions
