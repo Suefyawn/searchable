@@ -4,6 +4,8 @@ import { importImageFromUrl } from "@/lib/media-import";
 import { findAndImport, searchOpenImages } from "@/lib/open-images";
 
 export const dynamic = "force-dynamic";
+// Photo imports, ingestion and sends take longer than the 10 s default; Hobby allows up to 60.
+export const maxDuration = 60;
 
 const Body = z.union([
   z.object({ search: z.string().min(2).max(120), orientation: z.enum(["landscape", "portrait", "square"]).optional() }),

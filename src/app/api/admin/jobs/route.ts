@@ -5,6 +5,8 @@ import { reindexAll } from "@/lib/indexers";
 import { pruneOldRows, runDueJobs } from "@/lib/jobs";
 
 export const dynamic = "force-dynamic";
+// Photo imports, ingestion and sends take longer than the 10 s default; Hobby allows up to 60.
+export const maxDuration = 60;
 
 const Body = z.object({ job: z.enum(["due", "reindex", "prune", "revalidate"]), paths: z.array(z.string().startsWith("/")).max(50).optional() });
 

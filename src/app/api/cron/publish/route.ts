@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { runDueJobs } from "@/lib/jobs";
 
+// Ingestion, sends and image processing take longer than the 10 s default; Hobby allows up to 60.
+export const maxDuration = 60;
+
 /**
  * Scheduled publishing, newsletter sends and plan expiry. Point a free external pinger (cron-job.org,
  * every 5 minutes, header "authorization: Bearer $CRON_SECRET") at this; the daily Vercel cron and the

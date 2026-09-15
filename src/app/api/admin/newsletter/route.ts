@@ -6,6 +6,8 @@ import { ApiError, withAdminApi } from "@/lib/admin-api";
 import { assembleIssue, createIssue, sendIssue, sendTestIssue } from "@/lib/newsletter-issue";
 
 export const dynamic = "force-dynamic";
+// Photo imports, ingestion and sends take longer than the 10 s default; Hobby allows up to 60.
+export const maxDuration = 60;
 
 /** GET /api/admin/newsletter: recent issues and a freshly assembled draft body you can edit before saving. */
 export const GET = withAdminApi(async () => {

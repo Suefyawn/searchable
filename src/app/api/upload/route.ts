@@ -4,6 +4,9 @@ import { canEditBusiness } from "@/lib/business-actions";
 import { rateLimit } from "@/lib/rate-limit";
 import { ALLOWED_TYPES, DOCUMENT_TYPES, MAX_DOCUMENT_BYTES, MAX_UPLOAD_BYTES, storeDocument, storeImage } from "@/lib/storage";
 
+// Ingestion, sends and image processing take longer than the 10 s default; Hobby allows up to 60.
+export const maxDuration = 60;
+
 /**
  * POST multipart/form-data { file, variant: article|logo|cover|photo|evidence|avatar|cv, businessId?, alt? }
  * Editors can upload anything; business owners can upload for businesses they manage; any signed-in user

@@ -6,6 +6,8 @@ import { ApiError, qs, withAdminApi } from "@/lib/admin-api";
 import { commitImport, IMPORT_COLUMNS, previewImport } from "@/lib/import";
 
 export const dynamic = "force-dynamic";
+// Photo imports, ingestion and sends take longer than the 10 s default; Hobby allows up to 60.
+export const maxDuration = 60;
 
 /** GET /api/admin/businesses?status=active|pending|all&city=&category=&q=&limit= */
 export const GET = withAdminApi(async (req) => {

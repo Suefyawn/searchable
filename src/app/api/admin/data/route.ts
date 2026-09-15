@@ -6,6 +6,8 @@ import { indexDataSeries } from "@/lib/indexers";
 import { runIngestion } from "@/lib/ingest";
 
 export const dynamic = "force-dynamic";
+// Photo imports, ingestion and sends take longer than the 10 s default; Hobby allows up to 60.
+export const maxDuration = 60;
 
 /** GET /api/admin/data: every series with its latest and previous reading. */
 export const GET = withAdminApi(async () => ({ series: await listSeriesWithLatest() }));

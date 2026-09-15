@@ -7,6 +7,8 @@ import { saveArticle } from "@/app/admin/articles/actions";
 import { importImageFromUrl } from "@/lib/media-import";
 
 export const dynamic = "force-dynamic";
+// Photo imports, ingestion and sends take longer than the 10 s default; Hobby allows up to 60.
+export const maxDuration = 60;
 
 /** GET /api/admin/articles?status=published|draft|scheduled|all&kind=news|guide&q=&limit= */
 export const GET = withAdminApi(async (req) => {
