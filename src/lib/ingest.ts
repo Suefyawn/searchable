@@ -17,7 +17,9 @@ import { indexDataSeries } from "./indexers";
  *  - CoinGecko simple price: BTC and ETH in USD
  */
 
-const UA = "SearchablePK/0.1 (https://searchable.pk; data@searchable.pk)";
+// sbp.org.pk answers 403 to any user agent that does not start with "Mozilla/5.0" (the network is fine: the
+// same request from Tokyo works with this string). Still names us and gives a contact, as a crawler should.
+const UA = "Mozilla/5.0 (compatible; SearchablePK/0.1; +https://searchable.pk; data@searchable.pk)";
 const TOLA_PER_OZ = 11.664 / 31.1035;
 
 export type Reading = { slug: string; value: number; date: string; note: string; sourceUrl: string };
