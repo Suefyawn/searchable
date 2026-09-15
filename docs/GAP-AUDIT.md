@@ -64,7 +64,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | Item | Status |
 |---|---|
 | Federated, ranked, prefix, autocomplete, popular, trending, city filter, synonyms (EN/Roman Urdu), search log + zero-result backlog | ✅ |
-| Typo tolerance (`pg_trgm`), intent detection, result blending per intent | ❌ | Phase 5 |
+| Typo tolerance (`pg_trgm` trigram fallback + did-you-mean), intent detection (tool / place / explainer / number / story) with per-type rank blending | ✅ |
 
 ## Newsletter
 | Item | Status |
@@ -107,5 +107,5 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 1. ✅ Directory volume tooling (import, dedupe, areas, map)
 2. More compare pages (cars, bank accounts, mobile packages) on the inverter-compare pattern.
 3. Tools to 30: ✅ sales tax, 231B, EOBI, FX converter, personal loan, increment, age · next: stamp duty per province, savings/NSC, car import duty, gas bill, freelancer tax, provident fund
-4. Typo tolerance + intent blending in search.
+4. ✅ Typo tolerance + intent blending in search.
 5. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md`) — then AdSense, Resend, Search Console, Position Tracking.

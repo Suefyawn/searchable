@@ -45,6 +45,34 @@ export const TYPE_LABEL: Record<SearchEntityType, string> = {
   comparison: "Compare",
 };
 
+/**
+ * Query intent → per-type rank multipliers (blended on top of TYPE_BOOST). Cheap keyword rules; the log
+ * of zero-result and low-click queries in /admin/search-log is where new rules come from.
+ */
+export type Intent = "tool" | "place" | "explainer" | "number" | "story" | "general";
+
+const INTENT_RULES: { intent: Intent; re: RegExp }[] = [
+  { intent: "tool", re: /\b(calculat|calculator|convert|converter|kitna|kitni|how much|tax on|emi|instal?ment|zakat on|salary of|take.?home)\b/i },
+  { intent: "place", re: /\b(near me|nearby|in (karachi|lahore|islamabad|rawalpindi|faisalabad|multan|peshawar|quetta|hyderabad|gujranwala|sialkot)|restaurants?|hospitals?|doctors?|dentists?|lawyers?|schools?|gyms?|salons?|hotels?|dealers?|workshops?|companies|installers?|shops?|contact|phone number|address)\b/i },
+  { intent: "explainer", re: /\b(how to|how do|kaise|kese|tarika|process|procedure|register|apply|renew|check status|requirements?|documents?|guide|step)\b/i },
+  { intent: "number", re: /\b(rate|rates|price|prices|today|aaj|history|chart|kibor|inflation|per tola|per litre|exchange)\b/i },
+  { intent: "story", re: /\b(news|latest|update|announce|budget|nepra|ecc|cabinet|why|when will)\b/i },
+];
+
+export function detectIntent(q: string): Intent {
+  for (const r of INTENT_RULES) if (r.re.test(q)) return r.intent;
+  return "general";
+}
+
+const INTENT_BOOST: Record<Intent, Partial<Record<SearchEntityType, number>>> = {
+  tool: { tool: 1.6, guide: 1.1, data_series: 1.1 },
+  place: { business: 1.8, location: 1.4, tool: 0.7, news: 0.7 },
+  explainer: { guide: 1.6, tool: 1.1, news: 0.8 },
+  number: { data_series: 1.8, tool: 1.2, news: 0.9 },
+  story: { news: 1.6, entity: 1.1, tool: 0.8 },
+  general: {},
+};
+
 /** Write-through: called by every mutation of a searchable entity. */
 export async function syncSearchDocument(doc: SearchDoc) {
   const db = await getDb();
@@ -81,6 +109,8 @@ export type SearchHit = {
   publishedAt: Date | null;
   rank: number;
   headline: string | null;
+  /** Matched by trigram similarity rather than full text (typo tolerance). */
+  fuzzy?: boolean;
 };
 
 export type SearchOptions = { types?: SearchEntityType[]; city?: string; limit?: number; offset?: number };
@@ -138,6 +168,12 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<{
   const prefixQuery = words.map((w) => `${w.replace(/[^a-z0-9؀-ۿ]/g, "")}:*`).filter((w) => w !== ":*").join(" & ");
 
   const expanded = await expandQuery(q);
+  const intent = detectIntent(q);
+  const intentCase = sql.join(
+    Object.entries(INTENT_BOOST[intent]).map(([t, m]) => sql`when ${t} then ${m}::float`),
+    sql` `,
+  );
+  const intentBoost = Object.keys(INTENT_BOOST[intent]).length ? sql`case d.entity_type::text ${intentCase} else 1.0 end` : sql`1`;
   const typeFilter = opts.types?.length ? sql`and entity_type in (${sql.join(opts.types.map((t) => sql`${t}`), sql`, `)})` : sql``;
   const cityFilter = opts.city ? sql`and city_slug = ${opts.city}` : sql``;
 
@@ -154,6 +190,7 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<{
                  case when q.pq is not null then ts_rank_cd(d.tsv_simple, q.pq, 32) * 0.7 else 0 end
                )
                * d.boost
+               * ${intentBoost}
                * (1 + least(d.popularity, 1000) / 2000.0)
                * case when d.entity_type = 'news' and d.published_at is not null
                       then greatest(0.5, 1 - extract(epoch from (now() - d.published_at)) / (86400.0 * 180))
@@ -185,7 +222,38 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<{
     rank: Number(r.rank),
     headline: (r.headline as string | null) ?? null,
   }));
-  return { hits, total: list.length ? Number(list[0].total) : 0 };
+  if (list.length >= 3 || offset > 0) return { hits, total: list.length ? Number(list[0].total) : 0 };
+
+  // Typo tolerance: too few full-text hits → trigram similarity on title/keywords ("electrcity bill" → electricity).
+  const fuzzy = await rawQuery<Record<string, unknown>>(db, sql`
+    select d.entity_type, d.entity_id, d.url, d.title, d.summary, d.category, d.city, d.image_url, d.published_at,
+           greatest(similarity(d.title, ${q}), similarity(coalesce(d.keywords, ''), ${q}) * 0.9) * d.boost * ${intentBoost} as rank
+    from search_documents d
+    where (similarity(d.title, ${q}) > 0.25 or similarity(coalesce(d.keywords, ''), ${q}) > 0.2)
+    ${typeFilter}
+    ${cityFilter}
+    order by rank desc
+    limit ${limit}
+  `);
+  const seen = new Set(hits.map((h) => h.entityId));
+  for (const r of fuzzy) {
+    if (seen.has(r.entity_id as string)) continue;
+    hits.push({
+      entityType: r.entity_type as SearchEntityType,
+      entityId: r.entity_id as string,
+      url: r.url as string,
+      title: r.title as string,
+      summary: (r.summary as string | null) ?? null,
+      category: (r.category as string | null) ?? null,
+      city: (r.city as string | null) ?? null,
+      imageUrl: (r.image_url as string | null) ?? null,
+      publishedAt: r.published_at ? new Date(r.published_at as string) : null,
+      rank: Number(r.rank),
+      headline: null,
+      fuzzy: true,
+    });
+  }
+  return { hits, total: hits.length };
 }
 
 /** Group hits by type for the "best answer per kind" layout. */
@@ -211,8 +279,8 @@ export async function suggest(query: string, limit = 8): Promise<Pick<SearchHit,
       city: schema.searchDocuments.city,
     })
     .from(schema.searchDocuments)
-    .where(sql`lower(${schema.searchDocuments.title}) like ${"%" + q + "%"} or lower(coalesce(${schema.searchDocuments.keywords}, '')) like ${"%" + q + "%"}`)
-    .orderBy(desc(schema.searchDocuments.boost), desc(schema.searchDocuments.popularity))
+    .where(sql`lower(${schema.searchDocuments.title}) like ${"%" + q + "%"} or lower(coalesce(${schema.searchDocuments.keywords}, '')) like ${"%" + q + "%"} or similarity(${schema.searchDocuments.title}, ${q}) > 0.3`)
+    .orderBy(sql`case when lower(${schema.searchDocuments.title}) like ${"%" + q + "%"} then 0 else 1 end`, desc(schema.searchDocuments.boost), desc(schema.searchDocuments.popularity))
     .limit(limit);
   return rows;
 }

@@ -17,9 +17,11 @@ const g = globalThis as Globals;
 async function create(): Promise<Database> {
   if (isPglite) {
     const { PGlite } = await import("@electric-sql/pglite");
+    const { pg_trgm } = await import("@electric-sql/pglite/contrib/pg_trgm");
     const { drizzle } = await import("drizzle-orm/pglite");
     const dataDir = DATABASE_URL.replace("pglite://", "");
-    const client = await PGlite.create({ dataDir });
+    // pg_trgm powers typo-tolerant search (migration 0005); Supabase has it built in.
+    const client = await PGlite.create({ dataDir, extensions: { pg_trgm } });
     return drizzle(client, { schema }) as unknown as Database;
   }
   const postgres = (await import("postgres")).default;

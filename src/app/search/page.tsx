@@ -98,6 +98,11 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             </div>
           ) : (
             <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_320px]">
+              {hits.some((h) => h.fuzzy) && hits[0]?.fuzzy ? (
+                <p className="lg:col-span-2 -mb-4 text-[15px] text-2">
+                  No exact match for “{q}”. Showing the closest matches — did you mean <Link href={qs({ q: hits[0].title })} className="font-medium underline underline-offset-4">{hits[0].title}</Link>?
+                </p>
+              ) : null}
               <div className="space-y-8">
                 {best && !type ? <BestAnswer hit={best} /> : null}
                 {TYPE_ORDER.filter((t) => groups.has(t)).map((t) => {
