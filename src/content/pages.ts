@@ -17,7 +17,7 @@ Most of what people need is scattered: a tax rate in a Finance Act PDF, a proces
 
 ## How we work
 
-Every factual claim has a source. Money-affecting numbers show an effective date and a last-reviewed date. Corrections are appended, never hidden. AI helps us research and draft; a person publishes. Read our [editorial policy](/editorial-policy).
+Every factual claim has a source. Money-affecting numbers show an effective date and a last-reviewed date. Corrections are appended, never hidden. Much of our routine reporting is researched, written and published by an AI editorial system working under written rules (sources with URLs on every claim, no press text reproduced, nothing published without a source); a person owns the desk, reviews what it does and corrects it. Read our [editorial policy](/editorial-policy).
 
 ## Contact
 
@@ -57,6 +57,10 @@ Editorial content, news, guides, calculator methodology and data, is produced by
 ## Sourcing
 
 Every number carries a source and a review date. Guides cite the law, notification, tariff or official page they rely on. We link primary sources wherever they exist.
+
+## How we use AI
+
+Much of the day-to-day desk work is done by an AI editorial system: it reads the press, official notifications and our own data, writes stories and guides in our house style, records prices, moderates community posts and answers routine mail. It works under written rules: every claim carries a dated source with a link, press text is never reproduced, nothing is published without a source, photographs come only from openly licensed collections, and it must not invent quotes, people, prices or events. A person owns the desk, reviews its output, answers for it and corrects it; anything it gets wrong is treated exactly like any other error, with a correction note and date. If you spot a problem, the "Report a problem" link on the page reaches a human.
 
 ## Corrections
 
