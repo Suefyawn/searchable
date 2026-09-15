@@ -24,6 +24,7 @@ BETTER_AUTH_SECRET=<openssl rand -hex 32>
 DATABASE_URL=postgres://postgres.<ref>:<password>@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres
 
 CRON_SECRET=<openssl rand -hex 24>
+ADMIN_API_KEY=<openssl rand -hex 32>   # the scheduled editorial task, docs/DAILY-TASK.md
 
 EMAIL_PROVIDER=resend
 RESEND_API_KEY=re_...            # full access (receiving needs it)

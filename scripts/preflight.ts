@@ -22,6 +22,7 @@ async function main() {
   checks.push({ name: "DATABASE_URL is Postgres (not PGlite)", ok: !isPglite, note: isPglite ? "pglite://" : "postgres", required: true });
   checks.push({ name: "DATABASE_URL uses the transaction pooler (port 6543)", ok: /:6543\//.test(env.DATABASE_URL ?? ""), note: "Supabase: Connect > Transaction pooler; migrations use the session pooler on 5432" });
   checks.push({ name: "CRON_SECRET set", ok: has("CRON_SECRET"), required: true });
+  checks.push({ name: "ADMIN_API_KEY set (32+ chars; the scheduled editorial task)", ok: (env.ADMIN_API_KEY?.trim().length ?? 0) >= 32, note: "docs/DAILY-TASK.md" });
   checks.push({ name: "EMAIL_PROVIDER=resend with RESEND_API_KEY", ok: env.EMAIL_PROVIDER === "resend" && has("RESEND_API_KEY"), required: true });
   checks.push({ name: "RESEND_WEBHOOK_SECRET set (instant admin inbox; sync every 5 minutes without it)", ok: /^whsec_/.test(env.RESEND_WEBHOOK_SECRET ?? ""), note: "Resend > Webhooks > add https://searchable.pk/api/webhooks/resend for email.received" });
   checks.push({ name: "EMAIL_FROM on the verified domain", ok: /@searchable\.pk>?$/.test(env.EMAIL_FROM ?? ""), note: env.EMAIL_FROM ?? "unset" });

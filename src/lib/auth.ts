@@ -1,3 +1,5 @@
+import { timingSafeEqual } from "node:crypto";
+import { asc, eq } from "drizzle-orm";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { headers } from "next/headers";
@@ -40,9 +42,29 @@ export function getAuth(): Promise<Auth> {
 
 export type SessionUser = { id: string; email: string; name: string; role: Role; image?: string | null };
 
+/**
+ * Admin API: a request carrying `Authorization: Bearer $ADMIN_API_KEY` acts as the first admin account, so every
+ * server action and query guard works unchanged for automation (the scheduled content task, scripts). The key
+ * never creates a browser session; it is only honoured on this header, compared in constant time.
+ */
+async function apiKeyUser(h: Headers): Promise<SessionUser | null> {
+  const key = process.env.ADMIN_API_KEY?.trim();
+  const given = h.get("authorization")?.replace(/^Bearer\s+/i, "").trim();
+  if (!key || !given || key.length < 32) return null;
+  const a = Buffer.from(key);
+  const b = Buffer.from(given);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+  const db = await getDb();
+  const admin = await db.query.users.findFirst({ where: eq(schema.users.role, "admin"), orderBy: [asc(schema.users.createdAt)] });
+  return admin ? { id: admin.id, email: admin.email, name: admin.name, role: "admin", image: admin.image } : null;
+}
+
 export async function getSessionUser(): Promise<SessionUser | null> {
+  const h = await headers();
+  const viaKey = await apiKeyUser(h);
+  if (viaKey) return viaKey;
   const auth = await getAuth();
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await auth.api.getSession({ headers: h });
   if (!session?.user) return null;
   const u = session.user as typeof session.user & { role?: string };
   return { id: u.id, email: u.email, name: u.name, role: (u.role as Role) ?? "user", image: u.image };
