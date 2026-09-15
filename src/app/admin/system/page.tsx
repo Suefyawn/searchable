@@ -63,9 +63,12 @@ export default async function AdminSystem() {
     db.query.settings.findFirst({ where: eq(schema.settings.key, "seed:sample") }),
   ]);
   const sample = sampleRow?.value as SampleSeed | undefined;
-  const [sampleLive] = sample
-    ? await rawQuery<{ articles: number; businesses: number }>(db, sql`select (select count(*) from articles where slug = any(${sample.articles}))::int as articles, (select count(*) from businesses where slug = any(${sample.businesses}))::int as businesses`)
-    : [{ articles: 0, businesses: 0 }];
+  const sampleLive = sample
+    ? {
+        articles: sample.articles.length ? (await db.select({ n: sql<number>`count(*)::int` }).from(schema.articles).where(inArray(schema.articles.slug, sample.articles)))[0]?.n ?? 0 : 0,
+        businesses: sample.businesses.length ? (await db.select({ n: sql<number>`count(*)::int` }).from(schema.businesses).where(inArray(schema.businesses.slug, sample.businesses)))[0]?.n ?? 0 : 0,
+      }
+    : { articles: 0, businesses: 0 };
   const j = jobs?.value as { at?: string } | undefined;
   const ing = ingest?.value as { at?: string; errors?: string[]; results?: { slug: string; status: string; value?: number; message?: string }[] } | undefined;
   const b = budget?.value as { day?: string; dayCount?: number; month?: string; monthCount?: number } | undefined;
