@@ -7,7 +7,7 @@ import { getDb, schema } from "@/db";
 import { requireRole } from "@/lib/auth";
 import { formatDate, timeAgo } from "@/lib/format";
 import { userFootprint } from "@/lib/users";
-import { ActionForm } from "../action-form";
+import { ActionForm } from "@/components/admin/action-form";
 import { deleteUser, revokeSessions, setUserBanned, setUserPassword, updateUser } from "../actions";
 
 export const dynamic = "force-dynamic";

@@ -23,7 +23,8 @@ const UserInput = z.object({
 });
 const Password = z.string().min(8, "At least 8 characters").max(128);
 
-export type Result = { ok?: boolean; error?: string; message?: string };
+import type { Result } from "@/components/admin/action-form";
+export type { Result };
 
 /*
  * Every action takes (id, previousState, formData) so a form can bind the id and hand the rest to

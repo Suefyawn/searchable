@@ -82,6 +82,8 @@ Same pipeline as the CSV importer: category by slug or alias (restaurant, dentis
 `POST /newsletter`: `{ "create": true, "frequency": "daily", "subject"?, "preheader"?, "body"?, "scheduledFor"? }` (omit subject and body to use the automatic assembly of this week's stories); `{ "id", "scheduledFor" }`; `{ "id", "sendNow": true }`; `{ "id", "sendTestTo": "you@..." }`.
 
 ### Media
+`DELETE /data` `{ series, dates[] }` removes readings that were verified wrong (seed placeholders, parser slips); the series is re-indexed and re-rendered.
+
 `GET /front` and `POST /front` `{ leadId?, leadHours?, pins?, breaking?, featured? }`: the homepage hero and news-front controls, the same as `/admin/front-page`. `leadId` pins a story as lead for `leadHours` (null hands back to automatic), `pins` is the ordered list of stories after the lead (max 6), `breaking` `{ text, href?, hours? }` puts a black bar across every page until it expires (null clears), `featured` `{ id, on }` sets the featured flag on one story (the newest featured story leads automatically for 48 hours; only one carries the flag).
 
 `POST /media`: `{ "search": "Karachi skyline", "entities"? }` lists candidates (Wikipedia photo of each entity, then Openverse, then Commons); `{ "query": "...", "alt"? }` imports the first usable one; `{ "url", "alt"?, "credit"?, "sourceUrl"?, "license"? }` imports a known openly licensed image. Returns the stored URL and credit.

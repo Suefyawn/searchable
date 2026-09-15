@@ -1,7 +1,7 @@
 import { AdminPage } from "@/components/admin";
 import { Field, Input, Select } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
-import { ActionForm } from "../action-form";
+import { ActionForm } from "@/components/admin/action-form";
 import { createUser } from "../actions";
 
 export const dynamic = "force-dynamic";

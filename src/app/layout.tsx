@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/header";
 import { AdSenseScript } from "@/components/ads";
 import { JsonLd } from "@/components/ui";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
+import { brandCss, readSiteSettings } from "@/lib/site-settings";
 import { SITE } from "@/lib/utils";
 import "./globals.css";
 
@@ -39,13 +40,17 @@ export const viewport: Viewport = {
 /** Where uploads are served from; the fallback script only retries images from this host. */
 const imageHost = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // DNS, TCP and TLS to the image host are set up while the HTML is still arriving: a page's first photo
   // saves a round trip (a few hundred milliseconds from Pakistan).
   if (imageHost) preconnect(imageHost);
+  const settings = await readSiteSettings();
   return (
     <html lang="en" className={`${inter.variable} ${serif.variable}`}>
       <body className="min-h-dvh flex flex-col">
+        {/* The brand kit from /admin/settings: five tokens every colour in globals.css derives from. Hoisted
+            into <head> after the stylesheet, so a change here needs no deployment. */}
+        <style precedence="brand" href="brand-tokens">{brandCss(settings.brand)}</style>
         {/* If the image host is unreachable for a visitor (an extension, a per-site setting, an ISP), the same
             file is retried through this domain at /media/, which proxies the image CDN. Runs before any image. */}
         {imageHost ? <script dangerouslySetInnerHTML={{ __html: `(function(h){window.addEventListener('error',function(e){var t=e.target;if(!t||t.tagName!=='IMG')return;var s=t.currentSrc||t.src||'';if(s.indexOf(h)!==0||t.dataset.retried===s)return;t.dataset.retried=s;t.removeAttribute('srcset');t.src='/media'+s.slice(h.length);},true);})(${JSON.stringify(imageHost)})` }} /> : null}

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { Button } from "@/components/ui";
-import type { Result } from "./actions";
+export type Result = { ok?: boolean; error?: string; message?: string };
 
 type Action = (prev: Result, formData: FormData) => Promise<Result>;
 

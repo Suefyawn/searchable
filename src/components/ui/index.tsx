@@ -7,7 +7,7 @@ type ButtonVariant = "primary" | "secondary" | "ghost" | "outline" | "danger" | 
 type ButtonSize = "sm" | "md" | "lg";
 
 const buttonVariants: Record<ButtonVariant, string> = {
-  primary: "bg-ink-900 text-white hover:bg-ink-800 dark:bg-white dark:text-ink-900 dark:hover:bg-ink-100",
+  primary: "bg-brand-800 text-white hover:bg-brand-900 dark:bg-white dark:text-ink-900 dark:hover:bg-ink-100",
   dark: "bg-ink-900 text-white hover:bg-ink-800 dark:bg-white dark:text-ink-900 dark:hover:bg-ink-100",
   secondary: "bg-surface-2 text-[var(--text)] hover:bg-surface-3",
   outline: "border border-line bg-surface text-[var(--text)] hover:bg-surface-2",

@@ -87,6 +87,7 @@ GET /front → { front: { leadId, leadUntil, pins[], breaking } }
 POST /front {"leadId"?: id | null, "leadHours"?: 24, "pins"?: [ids], "breaking"?: {"text", "href"?, "hours"?} | null, "featured"?: {"id", "on"}} → { ok, front }
 
 GET /data → { series[] }
+DELETE /data {"series": "kibor-1y", "dates": ["2026-09-12"]} → { ok, removed[] }   (a reading you have verified is wrong)
 POST /data {"readings": [{"series": "petrol-price", "value": 272.61, "date": "2026-09-16", "note": "OGRA notification", "sourceUrl": "https://..."}]}
 POST /data {"ingest": true, "force": false}   (force accepts readings that jump more than 30%)
 

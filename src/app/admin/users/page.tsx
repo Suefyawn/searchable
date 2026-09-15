@@ -5,7 +5,7 @@ import { ButtonLink, Select } from "@/components/ui";
 import { getDb, schema } from "@/db";
 import { requireRole } from "@/lib/auth";
 import { timeAgo } from "@/lib/format";
-import { ActionForm } from "./action-form";
+import { ActionForm } from "@/components/admin/action-form";
 import { setUserRole } from "./actions";
 
 export const dynamic = "force-dynamic";

@@ -14,32 +14,37 @@
 
   /* Brand: a deep, quiet green used sparingly. */
   /* "brand" is a neutral ramp, the palette is black, white and grey only (ADR-23). */
-  --color-brand-50: oklch(0.975 0.004 85);
-  --color-brand-100: oklch(0.95 0.005 85);
-  --color-brand-200: oklch(0.9 0.006 85);
-  --color-brand-300: oklch(0.8 0.008 85);
-  --color-brand-400: oklch(0.65 0.01 85);
-  --color-brand-500: oklch(0.5 0.012 85);
-  --color-brand-600: oklch(0.38 0.012 85);
-  --color-brand-700: oklch(0.24 0.012 85);
-  --color-brand-800: oklch(0.19 0.012 85);
-  --color-brand-900: oklch(0.15 0.012 85);
-  --color-brand-950: oklch(0.11 0.012 85);
+  /*
+   * Brand scale, derived at runtime from the five brand-kit colours set in /admin/settings (defaults in
+   * src/lib/site-settings.ts, the "Charcoal and blue" kit: charcoal 333333, slate 384650, teal 359EB4, blue
+   * 1A74A3, navy 00458E). brand-700 is the link and eyebrow blue, brand-500 the teal accent, brand-800 the
+   * navy of primary buttons; the tints below 500 are mixes toward white for chips and panels.
+   */
+  --color-brand-50: color-mix(in srgb, var(--brand-link) 6%, white);
+  --color-brand-100: color-mix(in srgb, var(--brand-link) 12%, white);
+  --color-brand-200: color-mix(in srgb, var(--brand-link) 24%, white);
+  --color-brand-300: color-mix(in srgb, var(--brand-accent) 45%, white);
+  --color-brand-400: color-mix(in srgb, var(--brand-accent) 75%, white);
+  --color-brand-500: var(--brand-accent);
+  --color-brand-600: color-mix(in srgb, var(--brand-link) 75%, var(--brand-accent));
+  --color-brand-700: var(--brand-link);
+  --color-brand-800: var(--brand-primary);
+  --color-brand-900: color-mix(in srgb, var(--brand-primary) 85%, black);
+  --color-brand-950: color-mix(in srgb, var(--brand-primary) 65%, black);
 
-  /* Warm neutrals. */
-  --color-ink-50: oklch(0.988 0.003 85);
-  --color-ink-100: oklch(0.965 0.005 85);
-  --color-ink-200: oklch(0.93 0.006 85);
-  --color-ink-300: oklch(0.87 0.007 85);
-  --color-ink-400: oklch(0.72 0.01 85);
-  --color-ink-500: oklch(0.57 0.012 85);
-  --color-ink-600: oklch(0.46 0.012 85);
-  --color-ink-700: oklch(0.36 0.012 85);
-  --color-ink-800: oklch(0.26 0.012 85);
-  --color-ink-900: oklch(0.19 0.012 85);
-  --color-ink-950: oklch(0.13 0.012 85);
+  /* Ink: charcoal type and slate secondary text, with cool greys mixed from the slate for the rest. */
+  --color-ink-50: color-mix(in srgb, var(--brand-slate) 3%, white);
+  --color-ink-100: color-mix(in srgb, var(--brand-slate) 6%, white);
+  --color-ink-200: color-mix(in srgb, var(--brand-slate) 12%, white);
+  --color-ink-300: color-mix(in srgb, var(--brand-slate) 22%, white);
+  --color-ink-400: color-mix(in srgb, var(--brand-slate) 40%, white);
+  --color-ink-500: color-mix(in srgb, var(--brand-slate) 62%, white);
+  --color-ink-600: color-mix(in srgb, var(--brand-slate) 82%, white);
+  --color-ink-700: color-mix(in srgb, var(--brand-slate) 92%, white);
+  --color-ink-800: var(--brand-slate);
+  --color-ink-900: var(--brand-ink);
+  --color-ink-950: color-mix(in srgb, var(--brand-ink) 80%, black);
 
-  /* Secondary accents, muted, used for small labels only. */
   --color-accent-100: oklch(0.95 0.06 85);
   --color-accent-300: oklch(0.88 0.12 85);
   --color-accent-500: oklch(0.76 0.14 78);
@@ -71,12 +76,19 @@
 }
 
 :root {
+  /* Brand kit defaults; the root layout overrides these five from the settings row (src/lib/site-settings.ts). */
+  --brand-ink: #333333;
+  --brand-slate: #384650;
+  --brand-accent: #359eb4;
+  --brand-link: #1a74a3;
+  --brand-primary: #00458e;
+
   --bg: #ffffff;
   --surface: #ffffff;
   --surface-2: var(--color-ink-100);
   --surface-3: var(--color-ink-200);
-  --border: oklch(0.905 0.006 85);
-  --rule: oklch(0.2 0.012 85);
+  --border: var(--color-ink-200);
+  --rule: var(--brand-ink);
   --ring: var(--border);
   --text: var(--color-ink-900);
   --text-2: var(--color-ink-600);
@@ -252,7 +264,7 @@
   width: 7px;
   height: 7px;
   border-radius: 999px;
-  background: var(--color-ink-900);
+  background: var(--color-brand-500);
   animation: live-pulse 1.8s ease-in-out infinite;
 }
 @keyframes hero-progress {

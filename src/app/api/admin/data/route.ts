@@ -1,5 +1,7 @@
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { getDb, schema } from "@/db";
 import { addDataPoint, listSeriesWithLatest } from "@/db/queries/data";
 import { resolveSeriesId, withAdminApi } from "@/lib/admin-api";
 import { indexDataSeries } from "@/lib/indexers";
@@ -51,4 +53,27 @@ export const POST = withAdminApi(async (_req, { body }) => {
   revalidatePath("/data/[slug]", "page");
   revalidatePath("/");
   return { ok: true, recorded: out };
+});
+
+const Remove = z.object({ series: z.string().min(1), dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).min(1).max(60) });
+
+/**
+ * DELETE /api/admin/data { series, dates: ["2026-09-12", ...] }: remove readings that were wrong (a seed
+ * placeholder, a parser slip). The series page and hub are re-rendered; the latest value moves back to the
+ * newest remaining reading.
+ */
+export const DELETE = withAdminApi(async (_req, { body }) => {
+  const d = Remove.parse(body);
+  const s = await resolveSeriesId(d.series);
+  const db = await getDb();
+  const removed: string[] = [];
+  for (const date of d.dates) {
+    const r = await db.delete(schema.dataPoints).where(and(eq(schema.dataPoints.seriesId, s.id), eq(schema.dataPoints.date, date))).returning({ date: schema.dataPoints.date });
+    if (r.length) removed.push(date);
+  }
+  await indexDataSeries(s.id);
+  revalidatePath("/data");
+  revalidatePath("/data/[slug]", "page");
+  revalidatePath("/");
+  return { ok: true, series: d.series, removed, missing: d.dates.filter((x) => !removed.includes(x)) };
 });

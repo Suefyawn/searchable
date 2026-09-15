@@ -106,7 +106,7 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
                   <li key={x.id} className="flex-1">
                     <button type="button" onClick={() => go(k)} aria-label={`Story ${k + 1}: ${x.title}`} aria-current={k === i} className="block h-6 w-full">
                       <span className={cn("block h-[2px] w-full bg-[var(--border)]")}>
-                        <span key={k === i ? tick : `idle-${k}`} className={cn("block h-full bg-[var(--text)]", k < i ? "w-full" : k === i ? "hero-progress" : "w-0")} style={k === i ? { animationDuration: `${INTERVAL}ms`, animationPlayState: paused || reduced ? "paused" : "running" } : undefined} />
+                        <span key={k === i ? tick : `idle-${k}`} className={cn("block h-full bg-brand-500", k < i ? "w-full" : k === i ? "hero-progress" : "w-0")} style={k === i ? { animationDuration: `${INTERVAL}ms`, animationPlayState: paused || reduced ? "paused" : "running" } : undefined} />
                       </span>
                     </button>
                   </li>
