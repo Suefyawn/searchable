@@ -50,7 +50,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               <Link
                 key={f.value}
                 href={`/search?q=${encodeURIComponent(q)}${f.value ? `&type=${f.value}` : ""}`}
-                className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors", type === f.value ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "bg-surface-2 text-2 hover:bg-surface-3 hover:text-[var(--text)]")}
+                className={cn("inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-1.5 text-sm transition-colors", type === f.value ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "text-2 hover:bg-surface-2 hover:text-[var(--text)]")}
               >
                 {f.label}
               </Link>
@@ -124,7 +124,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
 function BestAnswer({ hit }: { hit: SearchHit }) {
   return (
-    <Link href={hit.url} className="group block surface surface-hover shadow-glow p-7">
+    <Link href={hit.url} className="group block border-y border-[var(--rule)] py-6">
       <p className="eyebrow">Best match · {TYPE_LABEL[hit.entityType]}</p>
       <h2 className="mt-2 font-display text-3xl font-semibold leading-tight group-hover:text-brand-700 dark:group-hover:text-brand-300">{hit.title}</h2>
       {hit.headline ? <p className="mt-2 text-[15px] text-2 [&_mark]:font-medium" dangerouslySetInnerHTML={{ __html: hit.headline }} /> : hit.summary ? <p className="mt-2 text-[15px] text-2">{hit.summary}</p> : null}

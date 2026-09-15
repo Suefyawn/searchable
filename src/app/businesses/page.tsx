@@ -45,10 +45,10 @@ export default async function BusinessesPage() {
               </li>
             ))}
           </ul>
-          <div className="mt-6 rounded-2xl bg-brand-50 dark:bg-brand-950/30 p-6">
+          <div className="mt-6 border border-line bg-surface-2 p-5">
             <p className="font-semibold">Own a business?</p>
             <p className="mt-1 text-[15px] text-2">Add it free, claim it, and keep your hours and contact details up to date.</p>
-            <Link href="/add-business" className="mt-3 inline-flex h-11 items-center rounded-full bg-brand-600 px-5 text-sm font-semibold text-white hover:bg-brand-700 transition-colors">
+            <Link href="/add-business" className="mt-3 inline-flex h-10 items-center bg-ink-900 px-4 text-sm font-medium text-white hover:bg-ink-800 dark:bg-white dark:text-ink-900">
               Add your business
             </Link>
           </div>

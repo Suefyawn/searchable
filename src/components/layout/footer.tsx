@@ -4,32 +4,33 @@ import { NewsletterForm } from "@/components/newsletter-form";
 
 const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
   {
-    title: "Know",
+    title: "Sections",
     links: [
       { href: "/news", label: "News" },
-      { href: "/news/economy", label: "Economy" },
-      { href: "/news/technology", label: "Technology" },
       { href: "/guides", label: "Guides" },
-      { href: "/data", label: "Data & prices" },
+      { href: "/tools", label: "Calculators" },
+      { href: "/businesses", label: "Businesses" },
+      { href: "/data", label: "Data" },
+      { href: "/cities", label: "Cities" },
     ],
   },
   {
-    title: "Do",
+    title: "Calculators",
     links: [
-      { href: "/tools", label: "All calculators" },
       { href: "/tools/tax/income-tax-calculator", label: "Income tax" },
       { href: "/tools/telecom/pta-mobile-tax-calculator", label: "PTA tax" },
       { href: "/tools/utilities/electricity-bill-calculator", label: "Electricity bill" },
       { href: "/tools/finance/zakat-calculator", label: "Zakat" },
+      { href: "/tools/cars/car-loan-calculator", label: "Car loan" },
     ],
   },
   {
-    title: "Find",
+    title: "Cities",
     links: [
-      { href: "/businesses", label: "Business directory" },
       { href: "/cities/lahore", label: "Lahore" },
       { href: "/cities/karachi", label: "Karachi" },
       { href: "/cities/islamabad", label: "Islamabad" },
+      { href: "/cities/rawalpindi", label: "Rawalpindi" },
       { href: "/add-business", label: "Add your business" },
     ],
   },
@@ -41,34 +42,33 @@ const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
       { href: "/advertise", label: "Advertise" },
       { href: "/contact", label: "Contact" },
       { href: "/privacy", label: "Privacy" },
+      { href: "/feed.xml", label: "RSS" },
     ],
   },
 ];
 
 export function Footer() {
   return (
-    <footer className="mt-24 px-3 pb-3 sm:px-5">
-      <div className="mx-auto max-w-[76rem] rounded-[2rem] bg-ink-950 px-6 py-12 text-ink-200 sm:px-10 sm:py-16 dark:bg-ink-900">
-        <div className="grid gap-12 lg:grid-cols-[1.5fr_repeat(4,1fr)]">
+    <footer className="mt-20 border-t border-[var(--rule)]">
+      <div className="container-x py-12">
+        <div className="grid gap-10 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
           <div className="max-w-sm">
-            <p className="font-display text-2xl font-bold text-white">
+            <p className="font-serif text-2xl">
               {SITE.name}
-              <span className="text-brand-400">.pk</span>
+              <span className="text-brand-700 dark:text-brand-300">.pk</span>
             </p>
-            <p className="mt-3 text-[15px] text-ink-300">{SITE.tagline}</p>
-            <p className="mt-6 text-sm font-semibold text-white">Searchable Daily</p>
-            <p className="mb-3 text-sm text-ink-400">The useful morning email. Two minutes, every day.</p>
-            <div className="[&_input]:bg-ink-800 [&_input]:text-white [&_input]:ring-0 [&_input]:placeholder:text-ink-500 [&_input:focus]:bg-ink-800 [&_p]:text-ink-500">
-              <NewsletterForm compact source="footer" />
-            </div>
+            <p className="mt-2 font-serif text-[15px] italic text-2">{SITE.tagline}</p>
+            <p className="mt-6 text-[13px] font-semibold uppercase tracking-[0.12em] text-3">Searchable Daily</p>
+            <p className="mb-3 mt-1 text-sm text-2">The useful morning email. Two minutes, every day.</p>
+            <NewsletterForm compact source="footer" />
           </div>
           {COLUMNS.map((c) => (
             <div key={c.title}>
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-ink-500">{c.title}</p>
-              <ul className="mt-4 space-y-2.5">
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-3">{c.title}</p>
+              <ul className="mt-3 space-y-2">
                 {c.links.map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className="text-[15px] text-ink-300 transition-colors hover:text-white">
+                    <Link href={l.href} className="text-[15px] text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
                       {l.label}
                     </Link>
                   </li>
@@ -77,7 +77,7 @@ export function Footer() {
             </div>
           ))}
         </div>
-        <div className="mt-12 flex flex-col gap-2 border-t border-ink-800 pt-6 text-sm text-ink-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 flex flex-col gap-2 border-t border-line pt-5 text-[13px] text-3 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} {SITE.name}. Made in Pakistan.
           </p>

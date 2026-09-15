@@ -1,95 +1,101 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* ───────────────────────── Design tokens ───────────────────────── */
+/* ───────────────────────── Design tokens ─────────────────────────
+   Minimal news paper: serif headlines, hairlines, one accent, lots of air. */
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-display: var(--font-display), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-serif), Georgia, "Times New Roman", serif;
+  --font-serif: var(--font-serif), Georgia, "Times New Roman", serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  /* Brand: a vivid, deep green. */
-  --color-brand-50: oklch(0.975 0.025 158);
-  --color-brand-100: oklch(0.94 0.06 158);
-  --color-brand-200: oklch(0.885 0.1 158);
-  --color-brand-300: oklch(0.8 0.14 158);
-  --color-brand-400: oklch(0.72 0.17 158);
-  --color-brand-500: oklch(0.63 0.17 158);
-  --color-brand-600: oklch(0.54 0.155 158);
-  --color-brand-700: oklch(0.46 0.13 158);
-  --color-brand-800: oklch(0.38 0.105 158);
-  --color-brand-900: oklch(0.31 0.08 158);
-  --color-brand-950: oklch(0.21 0.055 158);
+  /* Brand: a deep, quiet green used sparingly. */
+  --color-brand-50: oklch(0.97 0.02 158);
+  --color-brand-100: oklch(0.935 0.05 158);
+  --color-brand-200: oklch(0.88 0.08 158);
+  --color-brand-300: oklch(0.78 0.11 158);
+  --color-brand-400: oklch(0.68 0.13 158);
+  --color-brand-500: oklch(0.58 0.13 158);
+  --color-brand-600: oklch(0.5 0.12 158);
+  --color-brand-700: oklch(0.42 0.1 158);
+  --color-brand-800: oklch(0.35 0.085 158);
+  --color-brand-900: oklch(0.29 0.07 158);
+  --color-brand-950: oklch(0.2 0.05 158);
 
   /* Warm neutrals. */
-  --color-ink-50: oklch(0.985 0.004 85);
-  --color-ink-100: oklch(0.965 0.006 85);
-  --color-ink-200: oklch(0.925 0.008 85);
-  --color-ink-300: oklch(0.87 0.01 85);
-  --color-ink-400: oklch(0.72 0.012 85);
-  --color-ink-500: oklch(0.58 0.014 85);
-  --color-ink-600: oklch(0.47 0.014 85);
-  --color-ink-700: oklch(0.37 0.014 85);
-  --color-ink-800: oklch(0.27 0.014 85);
-  --color-ink-900: oklch(0.2 0.014 85);
-  --color-ink-950: oklch(0.14 0.014 85);
+  --color-ink-50: oklch(0.988 0.003 85);
+  --color-ink-100: oklch(0.965 0.005 85);
+  --color-ink-200: oklch(0.93 0.006 85);
+  --color-ink-300: oklch(0.87 0.007 85);
+  --color-ink-400: oklch(0.72 0.01 85);
+  --color-ink-500: oklch(0.57 0.012 85);
+  --color-ink-600: oklch(0.46 0.012 85);
+  --color-ink-700: oklch(0.36 0.012 85);
+  --color-ink-800: oklch(0.26 0.012 85);
+  --color-ink-900: oklch(0.19 0.012 85);
+  --color-ink-950: oklch(0.13 0.012 85);
 
-  /* Accents for categories and highlights. */
-  --color-accent-100: oklch(0.95 0.08 85);
-  --color-accent-300: oklch(0.88 0.15 85);
-  --color-accent-500: oklch(0.8 0.17 78);
-  --color-accent-700: oklch(0.6 0.15 65);
-  --color-sky-100: oklch(0.95 0.04 235);
-  --color-sky-500: oklch(0.65 0.16 235);
-  --color-sky-700: oklch(0.5 0.15 240);
-  --color-rose-100: oklch(0.95 0.04 15);
-  --color-rose-500: oklch(0.65 0.2 15);
-  --color-rose-700: oklch(0.5 0.19 15);
-  --color-violet-100: oklch(0.95 0.04 300);
-  --color-violet-500: oklch(0.62 0.2 300);
-  --color-violet-700: oklch(0.48 0.19 300);
+  /* Secondary accents, muted, used for small labels only. */
+  --color-accent-100: oklch(0.95 0.06 85);
+  --color-accent-300: oklch(0.88 0.12 85);
+  --color-accent-500: oklch(0.76 0.14 78);
+  --color-accent-700: oklch(0.56 0.13 65);
+  --color-sky-100: oklch(0.95 0.03 235);
+  --color-sky-500: oklch(0.62 0.12 235);
+  --color-sky-700: oklch(0.48 0.12 240);
+  --color-rose-100: oklch(0.95 0.03 15);
+  --color-rose-500: oklch(0.62 0.17 15);
+  --color-rose-700: oklch(0.48 0.16 15);
+  --color-violet-100: oklch(0.95 0.03 300);
+  --color-violet-500: oklch(0.6 0.15 300);
+  --color-violet-700: oklch(0.46 0.15 300);
 
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
-  --radius-2xl: 2rem;
+  /* Square. Every rounded-* class resolves to these. */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
 
-  --shadow-card: 0 1px 2px oklch(0.2 0.02 85 / 0.04), 0 4px 16px -4px oklch(0.2 0.02 85 / 0.08);
-  --shadow-lift: 0 2px 4px oklch(0.2 0.02 85 / 0.05), 0 14px 32px -8px oklch(0.2 0.02 85 / 0.16);
-  --shadow-pop: 0 24px 60px -16px oklch(0.2 0.02 85 / 0.28), 0 4px 12px oklch(0.2 0.02 85 / 0.06);
-  --shadow-glow: 0 0 0 1px oklch(0.63 0.17 158 / 0.25), 0 12px 40px -8px oklch(0.63 0.17 158 / 0.35);
+  --shadow-card: none;
+  --shadow-lift: 0 8px 24px -12px oklch(0.2 0.02 85 / 0.18);
+  --shadow-pop: 0 12px 32px -12px oklch(0.2 0.02 85 / 0.2);
+  --shadow-glow: 0 0 0 1px var(--color-brand-300);
 
   --breakpoint-3xl: 112rem;
 }
 
 :root {
-  --bg: oklch(0.99 0.004 85);
+  --bg: #fdfdfc;
   --surface: #ffffff;
   --surface-2: var(--color-ink-100);
   --surface-3: var(--color-ink-200);
-  --border: oklch(0.9 0.008 85);
-  --ring: oklch(0.2 0.02 85 / 0.06);
+  --border: oklch(0.905 0.006 85);
+  --rule: oklch(0.2 0.012 85);
+  --ring: var(--border);
   --text: var(--color-ink-900);
   --text-2: var(--color-ink-600);
   --text-3: var(--color-ink-500);
   --link: var(--color-brand-700);
-  --glass: oklch(1 0 0 / 0.72);
+  --glass: #ffffff;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: oklch(0.15 0.01 85);
-    --surface: oklch(0.19 0.01 85);
-    --surface-2: oklch(0.235 0.01 85);
-    --surface-3: oklch(0.28 0.01 85);
-    --border: oklch(0.29 0.01 85);
-    --ring: oklch(1 0 0 / 0.06);
-    --text: oklch(0.96 0.005 85);
-    --text-2: oklch(0.78 0.008 85);
-    --text-3: oklch(0.64 0.01 85);
+    --bg: oklch(0.16 0.008 85);
+    --surface: oklch(0.18 0.008 85);
+    --surface-2: oklch(0.22 0.008 85);
+    --surface-3: oklch(0.27 0.008 85);
+    --border: oklch(0.3 0.008 85);
+    --rule: oklch(0.9 0.006 85);
+    --ring: var(--border);
+    --text: oklch(0.95 0.005 85);
+    --text-2: oklch(0.76 0.008 85);
+    --text-3: oklch(0.62 0.01 85);
     --link: var(--color-brand-300);
-    --glass: oklch(0.15 0.01 85 / 0.7);
+    --glass: oklch(0.16 0.008 85);
     color-scheme: dark;
   }
 }
@@ -101,7 +107,7 @@
   }
   html {
     font-family: var(--font-sans);
-    font-feature-settings: "cv11", "ss01", "ss03";
+    font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
@@ -109,18 +115,16 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-size: 1.0625rem;
+    font-size: 1rem;
     line-height: 1.6;
   }
   h1, h2, h3, h4 {
-    font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-family: var(--font-serif);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
     text-wrap: balance;
     color: var(--text);
-  }
-  h1 {
-    letter-spacing: -0.03em;
   }
   p {
     text-wrap: pretty;
@@ -129,14 +133,13 @@
     text-underline-offset: 3px;
   }
   ::selection {
-    background: var(--color-brand-200);
+    background: var(--color-brand-100);
     color: var(--color-brand-950);
   }
   mark {
     background: var(--color-accent-100);
     color: inherit;
-    padding: 0 0.15em;
-    border-radius: 3px;
+    padding: 0 0.1em;
   }
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
@@ -145,49 +148,55 @@
   :focus-visible {
     outline: 2px solid var(--color-brand-500);
     outline-offset: 2px;
-    border-radius: 6px;
+    border-radius: 0;
   }
 }
 
 /* ───────────────────────── Utilities ───────────────────────── */
 @utility container-x {
   width: 100%;
-  max-width: 78rem;
+  max-width: 76rem;
   margin-inline: auto;
   padding-inline: 1.25rem;
   @media (min-width: 640px) {
-    padding-inline: 1.75rem;
+    padding-inline: 1.5rem;
   }
   @media (min-width: 1024px) {
-    padding-inline: 2.5rem;
+    padding-inline: 2rem;
   }
 }
 
-/* Cards: soft, borderless, lifted on hover. */
+/* "Cards" are quiet: white, a hairline, small radius, no shadow. */
 @utility surface {
   background: var(--surface);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-card), 0 0 0 1px var(--ring);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
 @utility surface-hover {
-  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 220ms ease;
+  transition: background-color 160ms ease, border-color 160ms ease;
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lift), 0 0 0 1px var(--ring);
+    border-color: var(--color-ink-300);
   }
 }
 @utility surface-2 {
   background: var(--surface-2);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
 }
 @utility glass {
-  background: var(--glass);
-  backdrop-filter: blur(18px) saturate(1.4);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  box-shadow: 0 1px 0 var(--ring), 0 8px 30px -12px oklch(0.2 0.02 85 / 0.18);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+@utility hairline {
+  border-top: 1px solid var(--border);
+}
+@utility rule {
+  border-top: 1px solid var(--rule);
 }
 @utility font-display {
-  font-family: var(--font-display);
+  font-family: var(--font-serif);
+}
+@utility font-serif {
+  font-family: var(--font-serif);
 }
 @utility text-2 {
   color: var(--text-2);
@@ -208,15 +217,17 @@
   border-color: var(--border);
 }
 @utility ring-line {
-  box-shadow: 0 0 0 1px var(--ring);
+  box-shadow: 0 0 0 1px var(--border);
 }
 @utility tabular {
   font-variant-numeric: tabular-nums;
 }
+/* Section label: small caps sans, with a rule above by convention. */
 @utility eyebrow {
-  font-size: 0.72rem;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-brand-700);
   @media (prefers-color-scheme: dark) {
@@ -224,46 +235,23 @@
   }
 }
 @utility text-gradient {
-  background: linear-gradient(100deg, var(--color-brand-600), var(--color-brand-400) 55%, var(--color-accent-500));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--color-brand-700);
+  @media (prefers-color-scheme: dark) {
+    color: var(--color-brand-300);
+  }
 }
-
-/* Hero backdrop: soft glows + faint grid. */
 @utility hero-bg {
   position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -20% -10% auto;
-    height: 120%;
-    z-index: -1;
-    background:
-      radial-gradient(60% 55% at 20% 20%, oklch(0.9 0.09 158 / 0.55), transparent 65%),
-      radial-gradient(45% 45% at 82% 10%, oklch(0.93 0.1 85 / 0.55), transparent 65%),
-      radial-gradient(40% 40% at 60% 80%, oklch(0.92 0.06 235 / 0.4), transparent 65%);
-    filter: blur(20px);
-  }
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background-image: linear-gradient(var(--ring) 1px, transparent 1px), linear-gradient(90deg, var(--ring) 1px, transparent 1px);
-    background-size: 44px 44px;
-    mask-image: radial-gradient(70% 60% at 50% 40%, #000 30%, transparent 100%);
-    opacity: 0.35;
-  }
-  @media (prefers-color-scheme: dark) {
-    &::before {
-      background:
-        radial-gradient(60% 55% at 20% 20%, oklch(0.45 0.12 158 / 0.35), transparent 65%),
-        radial-gradient(45% 45% at 82% 10%, oklch(0.55 0.12 85 / 0.22), transparent 65%),
-        radial-gradient(40% 40% at 60% 80%, oklch(0.5 0.1 235 / 0.22), transparent 65%);
-    }
+}
+/* Headline link: plain text, underline only on hover. */
+@utility headline-link {
+  color: var(--text);
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--color-ink-400);
   }
 }
 
@@ -274,80 +262,61 @@
   --tw-prose-links: var(--link);
   --tw-prose-bold: var(--text);
   --tw-prose-quotes: var(--text-2);
-  --tw-prose-quote-borders: var(--color-brand-300);
+  --tw-prose-quote-borders: var(--color-ink-300);
   --tw-prose-code: var(--text);
   --tw-prose-hr: var(--border);
-  --tw-prose-th-borders: var(--border);
+  --tw-prose-th-borders: var(--rule);
   --tw-prose-td-borders: var(--border);
-  --tw-prose-bullets: var(--color-brand-400);
-  --tw-prose-counters: var(--color-brand-600);
-  max-width: 68ch;
-  font-size: 1.125rem;
-  line-height: 1.78;
+  --tw-prose-bullets: var(--color-ink-400);
+  --tw-prose-counters: var(--text-2);
+  font-family: var(--font-serif);
+  max-width: 66ch;
+  font-size: 1.1875rem;
+  line-height: 1.7;
 }
 .prose-searchable h2 {
-  font-family: var(--font-display);
-  margin-top: 2.2em;
-  font-size: 1.6em;
-  letter-spacing: -0.02em;
-  scroll-margin-top: 6rem;
+  font-weight: 500;
+  margin-top: 2em;
+  font-size: 1.5em;
+  scroll-margin-top: 5rem;
 }
 .prose-searchable h3 {
-  font-family: var(--font-display);
-  margin-top: 1.7em;
-  scroll-margin-top: 6rem;
+  font-weight: 500;
+  margin-top: 1.6em;
+  scroll-margin-top: 5rem;
 }
 .prose-searchable a {
-  text-decoration-thickness: 1.5px;
-  text-decoration-color: var(--color-brand-300);
-  font-weight: 500;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-ink-400);
 }
 .prose-searchable a:hover {
   text-decoration-color: var(--link);
 }
 .prose-searchable table {
-  font-size: 0.95em;
+  font-family: var(--font-sans);
+  font-size: 0.85em;
 }
 .prose-searchable thead th {
-  font-family: var(--font-display);
+  font-weight: 600;
 }
 .prose-searchable blockquote {
-  font-style: normal;
-  background: var(--surface-2);
-  border-radius: var(--radius-md);
-  padding: 0.75em 1.25em;
+  font-style: italic;
+  border-left-width: 2px;
+  padding-left: 1.25em;
 }
 .prose-searchable img {
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
 }
-.prose-searchable ol > li::marker {
-  font-weight: 700;
+.prose-searchable strong {
+  font-weight: 600;
+}
+.prose-searchable ul,
+.prose-searchable ol {
+  font-size: 0.97em;
 }
 
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-.rise {
-  animation: rise 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-.rise-2 {
-  animation: rise 600ms 90ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-.rise-3 {
-  animation: rise 600ms 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-@media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: no-preference) {
   .rise, .rise-2, .rise-3 {
     animation: none;
-  }
-  .surface-hover:hover {
-    transform: none;
   }
 }

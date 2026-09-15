@@ -32,9 +32,9 @@ export async function SectionHub({ kind, page = 1 }: { kind: "news" | "guide"; p
       <SectionHeader as="h1" title={m.name} description={m.description} />
       <CategoryNav section={m.section} categories={categories} />
       {featured.length ? (
-        <div className="mt-8 grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+        <div className="mt-8 grid gap-x-10 gap-y-6 border-b border-line pb-6 lg:grid-cols-[1.6fr_1fr]">
           <ArticleCard article={featured[0]} variant="feature" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+          <div className="divide-y divide-[var(--border)] lg:border-l lg:border-line lg:pl-8">
             {rest.slice(0, 2).map((a) => (
               <ArticleCard key={a.id} article={a} />
             ))}
@@ -105,16 +105,16 @@ export async function ArticleRoute({ kind, slug }: { kind: "news" | "guide"; cat
 /* ───────────── Shared bits ───────────── */
 function CategoryNav({ section, categories, active }: { section: string; categories: { slug: string; name: string }[]; active?: string }) {
   return (
-    <nav className="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0" aria-label="Categories">
-      <ul className="flex gap-2 pb-1">
+    <nav className="-mx-5 overflow-x-auto border-y border-line px-5 sm:mx-0 sm:px-0" aria-label="Categories">
+      <ul className="flex gap-1 py-1.5">
         <li>
-          <Link href={`/${section}`} className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors", !active ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "bg-surface-2 text-2 hover:bg-surface-3 hover:text-[var(--text)]")}>
+          <Link href={`/${section}`} className={cn("inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-1.5 text-sm transition-colors", !active ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "text-2 hover:bg-surface-2 hover:text-[var(--text)]")}>
             All
           </Link>
         </li>
         {categories.map((c) => (
           <li key={c.slug}>
-            <Link href={`/${section}/${c.slug}`} className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors", active === c.slug ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "bg-surface-2 text-2 hover:bg-surface-3 hover:text-[var(--text)]")}>
+            <Link href={`/${section}/${c.slug}`} className={cn("inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-1.5 text-sm transition-colors", active === c.slug ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "text-2 hover:bg-surface-2 hover:text-[var(--text)]")}>
               {c.name}
             </Link>
           </li>

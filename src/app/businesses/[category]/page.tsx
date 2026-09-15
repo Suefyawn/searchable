@@ -39,7 +39,7 @@ export default async function CategoryPage({ params }: Props) {
           <ul className="flex flex-wrap gap-2">
             {cities.map((c) => (
               <li key={c.id}>
-                <Link href={`/businesses/${cat.slug}/${c.slug}`} className="inline-flex items-center gap-2 rounded-full bg-surface-2 px-4 py-2 text-sm font-medium hover:bg-surface-3 transition-colors">
+                <Link href={`/businesses/${cat.slug}/${c.slug}`} className="inline-flex items-center gap-2 border border-line px-3 py-1.5 text-sm hover:bg-surface-2">
                   {plural} in {c.name} <span className="tabular text-3">{c.count}</span>
                 </Link>
               </li>

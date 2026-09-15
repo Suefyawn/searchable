@@ -159,7 +159,7 @@ export default async function SeriesPage({ params }: Props) {
           {entities.length ? (
             <div className="flex flex-wrap gap-2 text-sm">
               {entities.map((e) => (
-                <Link key={e.id} href={`/e/${e.slug}`} className="rounded-full bg-surface-2 px-3.5 py-1.5 font-medium text-2 hover:bg-surface-3 hover:text-[var(--text)] transition-colors">
+                <Link key={e.id} href={`/e/${e.slug}`} className="border border-line px-2.5 py-1 text-2 hover:bg-surface-2 hover:text-[var(--text)]">
                   {e.name}
                 </Link>
               ))}

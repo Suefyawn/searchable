@@ -79,10 +79,10 @@ export default async function CategoryCityPage({ params, searchParams }: Props) 
               All of {loc.name} →
             </Link>
           </div>
-          <div className="rounded-2xl bg-brand-50 dark:bg-brand-950/30 p-6">
+          <div className="border border-line bg-surface-2 p-5">
             <p className="font-semibold">Is your business missing?</p>
             <p className="mt-1 text-[15px] text-2">Add it free and get found by people searching for {plural.toLowerCase()} in {loc.name}.</p>
-            <Link href="/add-business" className="mt-3 inline-flex h-10 items-center rounded-full bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700 transition-colors">
+            <Link href="/add-business" className="mt-3 inline-flex h-9 items-center bg-ink-900 px-3.5 text-sm font-medium text-white hover:bg-ink-800 dark:bg-white dark:text-ink-900">
               Add your business
             </Link>
           </div>

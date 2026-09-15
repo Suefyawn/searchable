@@ -116,7 +116,7 @@ export default async function CityPage({ params }: Props) {
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-3">Areas</h2>
           <ul className="flex flex-wrap gap-2">
             {loc.children.map((a) => (
-              <li key={a.id} className="rounded-full bg-surface-2 px-4 py-2 text-sm font-medium text-2">
+              <li key={a.id} className="border border-line px-3 py-1.5 text-sm text-2">
                 {a.name}
               </li>
             ))}

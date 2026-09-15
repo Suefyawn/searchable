@@ -56,9 +56,9 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
             </Link>
           ) : null}
         </div>
-        <h1 className="mt-4 font-display text-4xl font-bold leading-[1.06] tracking-tight sm:text-5xl lg:text-[3.4rem]">{article.title}</h1>
-        {article.dek ? <p className="mt-4 text-lg text-2 sm:text-xl leading-relaxed">{article.dek}</p> : null}
-        <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-3">
+        <h1 className="mt-4 font-serif text-4xl font-medium leading-[1.1] sm:text-5xl lg:text-[3.25rem]">{article.title}</h1>
+        {article.dek ? <p className="mt-4 font-serif text-xl leading-relaxed text-2 sm:text-[1.35rem]">{article.dek}</p> : null}
+        <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 border-y border-line py-3 text-[13px] text-3">
           {article.author ? <span className="font-medium text-2">{article.author.name}</span> : null}
           {article.publishedAt ? <span>{kind === "news" ? "Published" : "Updated"} {formatDate(article.lastReviewedAt ?? article.publishedAt)}</span> : null}
           <span>{article.readingMinutes ?? 3} min read</span>
@@ -84,8 +84,8 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
 
           {article.faqs.length ? (
             <section className="mt-12 max-w-[68ch]">
-              <h2 className="font-display text-3xl font-semibold">Frequently asked questions</h2>
-              <dl className="mt-4 divide-y divide-[var(--border)] surface px-5">
+              <h2 className="font-serif text-2xl">Frequently asked questions</h2>
+              <dl className="mt-4 divide-y divide-[var(--border)] border-y border-line">
                 {article.faqs.map((f) => (
                   <div key={f.question} className="py-4">
                     <dt className="font-medium">{f.question}</dt>
@@ -118,7 +118,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
             <section className="mt-8 flex flex-wrap items-center gap-2 text-sm">
               <span className="text-3">Topics:</span>
               {entities.map((e) => (
-                <Link key={e.id} href={`/e/${e.slug}`} className="rounded-full bg-surface-2 px-3.5 py-1.5 font-medium text-2 hover:bg-surface-3 hover:text-[var(--text)] transition-colors">
+                <Link key={e.id} href={`/e/${e.slug}`} className="border border-line px-2.5 py-1 text-2 hover:bg-surface-2 hover:text-[var(--text)]">
                   {e.name}
                 </Link>
               ))}
@@ -128,7 +128,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
 
         <aside className="space-y-6 lg:sticky lg:top-24 self-start">
           {toc.length >= 3 ? (
-            <nav aria-label="Contents" className="hidden lg:block surface p-5 text-[15px]">
+            <nav aria-label="Contents" className="hidden lg:block border-t border-[var(--rule)] pt-3 text-[15px]">
               <p className="font-semibold">In this guide</p>
               <ol className="mt-2 space-y-1.5">
                 {toc.map((t) => (
@@ -149,8 +149,8 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
               </div>
             </div>
           ) : null}
-          <div className="surface p-5">
-            <p className="font-semibold">Searchable Daily</p>
+          <div className="border-t border-[var(--rule)] pt-3">
+            <p className="eyebrow">Searchable Daily</p>
             <p className="mt-1 text-[15px] text-2">The useful morning email. Two minutes, every day.</p>
             <div className="mt-3">
               <NewsletterForm compact source={kind} />
@@ -161,10 +161,10 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
 
       {related.length ? (
         <section className="mt-16">
-          <h2 className="mb-6 font-display text-2xl font-semibold">More in {article.category?.name ?? sectionName}</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <h2 className="rule mb-2 pt-3 font-serif text-2xl">More in {article.category?.name ?? sectionName}</h2>
+          <div className="grid gap-x-8 sm:grid-cols-2 sm:divide-x sm:divide-[var(--border)] lg:grid-cols-4">
             {related.map((a) => (
-              <ArticleCard key={a.id} article={a} />
+              <ArticleCard key={a.id} article={a} className="sm:[&:not(:first-child)]:pl-8" />
             ))}
           </div>
         </section>
@@ -176,9 +176,9 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
 export function ArticleListing({ items, emptyText }: { items: Awaited<ReturnType<typeof listArticles>>; emptyText: string }) {
   if (!items.length) return <p className="text-2">{emptyText}</p>;
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-x-8 border-t border-line sm:grid-cols-2 lg:grid-cols-3">
       {items.map((a) => (
-        <ArticleCard key={a.id} article={a} />
+        <ArticleCard key={a.id} article={a} className="border-b border-line" />
       ))}
     </div>
   );

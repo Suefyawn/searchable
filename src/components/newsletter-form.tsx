@@ -44,7 +44,7 @@ export function NewsletterForm({ compact = false, source = "page", className }: 
 
   if (state === "pending") {
     return (
-      <div className={cn("rounded-2xl bg-brand-50 px-5 py-4 text-[15px] dark:bg-brand-950/40", className)}>
+      <div className={cn("border border-brand-200 bg-brand-50 px-4 py-3 text-[15px] dark:border-brand-800 dark:bg-brand-950/40", className)}>
         <p className="font-medium">Check your inbox</p>
         <p className="text-2">
           We sent a confirmation link to <strong>{email}</strong>. Click it and you are in.
@@ -54,7 +54,7 @@ export function NewsletterForm({ compact = false, source = "page", className }: 
   }
   if (state === "already_active") {
     return (
-      <div className={cn("rounded-2xl bg-surface-2 px-5 py-4 text-[15px]", className)}>
+      <div className={cn("border border-line bg-surface-2 px-4 py-3 text-[15px]", className)}>
         <p className="font-medium">You are already subscribed.</p>
         <p className="text-2">Preferences updated.</p>
       </div>
@@ -81,7 +81,7 @@ export function NewsletterForm({ compact = false, source = "page", className }: 
                   type="button"
                   onClick={() => setTopics((cur) => (on ? cur.filter((x) => x !== t.value) : [...cur, t.value]))}
                   aria-pressed={on}
-                  className={cn("rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors", on ? "bg-brand-600 text-white" : "bg-surface-2 text-2 hover:bg-surface-3")}
+                  className={cn("px-3.5 py-1.5 text-sm font-medium transition-colors", on ? "bg-brand-600 text-white" : "bg-surface-2 text-2 hover:bg-surface-3")}
                 >
                   {t.label}
                 </button>

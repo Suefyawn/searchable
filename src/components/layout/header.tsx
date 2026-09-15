@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatDate } from "@/lib/format";
 import { SITE } from "@/lib/utils";
 import { AuthLinks } from "./auth-links";
 import { MobileNav } from "./mobile-nav";
@@ -15,40 +16,43 @@ export const NAV = [
 
 export function Logo({ className = "" }: { className?: string }) {
   return (
-    <Link href="/" className={`inline-flex items-center gap-2.5 font-display text-[19px] font-bold tracking-tight ${className}`} aria-label={`${SITE.name} home`}>
-      <span className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-[0_6px_16px_-6px_oklch(0.54_0.155_158/0.7)]">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <circle cx="11" cy="11" r="7" />
-          <path d="m20 20-3.5-3.5" />
-        </svg>
-      </span>
-      <span>
-        {SITE.name}
-        <span className="text-brand-600 dark:text-brand-400">.pk</span>
-      </span>
+    <Link href="/" className={`inline-flex items-baseline font-serif text-[26px] font-medium tracking-tight ${className}`} aria-label={`${SITE.name} home`}>
+      {SITE.name}
+      <span className="text-brand-700 dark:text-brand-300">.pk</span>
     </Link>
   );
 }
 
 export function Header({ showSearch = true }: { showSearch?: boolean }) {
+  const today = formatDate(new Date(), { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   return (
-    <header className="sticky top-0 z-30 px-3 pt-3 sm:px-5">
-      <div className="glass mx-auto flex h-14 max-w-[76rem] items-center gap-3 rounded-full pl-4 pr-2 sm:pl-5">
-        <Logo />
-        <nav className="ml-3 hidden items-center gap-0.5 lg:flex" aria-label="Primary">
-          {NAV.map((n) => (
-            <Link key={n.href} href={n.href} className="rounded-full px-3.5 py-1.5 text-[14.5px] font-semibold text-2 transition-colors hover:bg-surface-2 hover:text-[var(--text)]">
-              {n.label}
+    <header className="sticky top-0 z-30 border-b border-line bg-[var(--bg)]">
+      <div className="container-x">
+        {/* Top line: date · tagline · account */}
+        <div className="hidden items-center justify-between py-2 text-[12.5px] text-3 sm:flex">
+          <span>{today}</span>
+          <span className="italic font-serif text-[14px]">{SITE.tagline}</span>
+          <span className="flex items-center gap-4">
+            <AuthLinks />
+            <Link href="/newsletter" className="font-medium text-[var(--text)] underline-offset-4 hover:underline">
+              Newsletter
             </Link>
-          ))}
-        </nav>
-        <div className="ml-auto flex items-center gap-1.5">
-          {showSearch ? <SearchBox className="hidden w-60 md:block lg:w-72" placeholder="Search…" /> : null}
-          <AuthLinks />
-          <Link href="/newsletter" className="hidden h-10 items-center rounded-full bg-ink-900 px-4 text-sm font-semibold text-white transition-colors hover:bg-ink-800 sm:inline-flex dark:bg-white dark:text-ink-900 dark:hover:bg-ink-100">
-            Newsletter
-          </Link>
-          <MobileNav nav={NAV} />
+          </span>
+        </div>
+        {/* Masthead line */}
+        <div className="flex h-14 items-center gap-4 border-t border-line sm:h-16">
+          <Logo />
+          <nav className="ml-4 hidden items-center gap-5 lg:flex" aria-label="Primary">
+            {NAV.map((n) => (
+              <Link key={n.href} href={n.href} className="text-[14.5px] font-medium text-2 underline-offset-[6px] transition-colors hover:text-[var(--text)] hover:underline">
+                {n.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="ml-auto flex items-center gap-2">
+            {showSearch ? <SearchBox className="hidden w-64 md:block lg:w-72" placeholder="Search…" /> : null}
+            <MobileNav nav={NAV} />
+          </div>
         </div>
       </div>
     </header>

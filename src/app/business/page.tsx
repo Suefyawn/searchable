@@ -51,7 +51,7 @@ export default async function BusinessDashboard() {
                   <span>· {b.viewCount} views · {b.clickCount} clicks</span>
                 </p>
               </div>
-              <Link href={`/business/${b.id}`} className="inline-flex h-10 items-center rounded-full bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700 transition-colors">
+              <Link href={`/business/${b.id}`} className="inline-flex h-9 items-center bg-ink-900 px-3.5 text-sm font-medium text-white hover:bg-ink-800 dark:bg-white dark:text-ink-900">
                 Edit listing
               </Link>
             </div>

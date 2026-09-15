@@ -82,12 +82,12 @@ export default async function BusinessPage({ params }: Props) {
         </div>
         <div className="flex flex-wrap gap-2 sm:shrink-0">
           {b.phone ? (
-            <a href={`tel:${b.phone}`} className="inline-flex h-11 items-center gap-2 rounded-full bg-surface-2 px-5 font-semibold hover:bg-surface-3 transition-colors">
+            <a href={`tel:${b.phone}`} className="inline-flex h-10 items-center gap-2 border border-line bg-surface px-4 text-sm font-medium hover:bg-surface-2">
               <Phone className="size-4" /> {b.phone}
             </a>
           ) : null}
           {wa ? (
-            <a href={wa} target="_blank" rel="noopener" className="inline-flex h-11 items-center gap-2 rounded-full bg-emerald-600 px-5 font-semibold text-white hover:bg-emerald-700 transition-colors">
+            <a href={wa} target="_blank" rel="noopener" className="inline-flex h-10 items-center gap-2 bg-brand-700 px-4 text-sm font-medium text-white hover:bg-brand-800">
               WhatsApp
             </a>
           ) : null}
@@ -154,7 +154,7 @@ export default async function BusinessPage({ params }: Props) {
             <section className="flex flex-wrap items-center gap-2 text-sm">
               <span className="text-3">Related topics:</span>
               {entities.map((e) => (
-                <Link key={e.id} href={`/e/${e.slug}`} className="rounded-full bg-surface-2 px-3.5 py-1.5 font-medium text-2 hover:bg-surface-3 hover:text-[var(--text)] transition-colors">
+                <Link key={e.id} href={`/e/${e.slug}`} className="border border-line px-2.5 py-1 text-2 hover:bg-surface-2 hover:text-[var(--text)]">
                   {e.name}
                 </Link>
               ))}

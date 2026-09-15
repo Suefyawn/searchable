@@ -101,13 +101,11 @@ export function SearchBox({
           submit();
         }}
         className={cn(
-          "flex items-center gap-2 rounded-full transition-all",
-          big
-            ? "h-16 sm:h-[4.5rem] pl-6 pr-2 bg-surface shadow-pop ring-line focus-within:shadow-glow"
-            : "h-10 pl-4 pr-1 bg-surface-2 focus-within:bg-surface focus-within:ring-2 focus-within:ring-brand-500/40",
+          "flex items-center gap-2 border bg-surface transition-colors focus-within:border-ink-600 dark:focus-within:border-ink-300",
+          big ? "h-14 border-ink-300 pl-4 pr-1.5 dark:border-ink-600" : "h-9 border-line pl-3 pr-1",
         )}
       >
-        <Search className={cn("shrink-0 text-3", big ? "size-5 sm:size-6" : "size-4")} aria-hidden />
+        <Search className={cn("shrink-0 text-3", big ? "size-5" : "size-4")} aria-hidden />
         <input
           type="search"
           name="q"
@@ -123,38 +121,31 @@ export function SearchBox({
           role="combobox"
           aria-expanded={open}
           aria-controls="search-suggestions"
-          className={cn("min-w-0 flex-1 bg-transparent outline-none placeholder:text-[var(--text-3)] [&::-webkit-search-cancel-button]:hidden", big ? "text-lg sm:text-xl" : "text-[15px]")}
+          className={cn("min-w-0 flex-1 bg-transparent outline-none placeholder:text-[var(--text-3)] [&::-webkit-search-cancel-button]:hidden", big ? "text-lg" : "text-sm")}
         />
         {value ? (
-          <button type="button" onClick={() => setValue("")} aria-label="Clear" className="p-1.5 rounded-md text-3 hover:text-[var(--text)] hover:bg-surface-2">
+          <button type="button" onClick={() => setValue("")} aria-label="Clear" className="p-1 text-3 hover:text-[var(--text)]">
             <X className="size-4" />
           </button>
         ) : null}
-        <button
-          type="submit"
-          className={cn("rounded-full bg-brand-600 font-semibold text-white hover:bg-brand-700 transition-colors", big ? "h-12 sm:h-14 px-5 sm:px-7 text-[15px] sm:text-base" : "h-8 px-3.5 text-sm")}
-        >
+        <button type="submit" className={cn("bg-ink-900 font-medium text-white hover:bg-ink-800 dark:bg-white dark:text-ink-900 dark:hover:bg-ink-100", big ? "h-11 px-5 text-[15px]" : "h-7 px-3 text-[13px]")}>
           Search
         </button>
       </form>
 
       {open && items.length > 0 ? (
-        <ul id="search-suggestions" role="listbox" className="absolute z-40 mt-2 w-full overflow-hidden rounded-2xl bg-surface shadow-pop ring-line">
+        <ul id="search-suggestions" role="listbox" className="absolute z-40 mt-1 w-full border border-line bg-surface shadow-pop">
           {items.map((it, i) => (
             <li key={it.url} role="option" aria-selected={i === active}>
-              <a
-                href={it.url}
-                onMouseEnter={() => setActive(i)}
-                className={cn("flex items-center gap-3 px-5 py-3 text-[15px]", i === active ? "bg-surface-2" : "")}
-              >
-                <span className="w-16 shrink-0 text-[10.5px] font-bold uppercase tracking-[0.1em] text-brand-700 dark:text-brand-300">{TYPE_LABEL[it.entityType] ?? it.entityType}</span>
+              <a href={it.url} onMouseEnter={() => setActive(i)} className={cn("flex items-center gap-3 px-4 py-2.5 text-[15px]", i === active ? "bg-surface-2" : "")}>
+                <span className="w-16 shrink-0 text-[10.5px] font-bold uppercase tracking-[0.1em] text-3">{TYPE_LABEL[it.entityType] ?? it.entityType}</span>
                 <span className="truncate">{it.title}</span>
                 {it.city ? <span className="ml-auto shrink-0 text-xs text-3">{it.city}</span> : it.category ? <span className="ml-auto shrink-0 text-xs text-3">{it.category}</span> : null}
               </a>
             </li>
           ))}
           <li className="border-t border-line">
-            <button type="button" onClick={() => submit()} className="w-full px-5 py-3 text-left text-sm font-medium text-2 hover:bg-surface-2">
+            <button type="button" onClick={() => submit()} className="w-full px-4 py-2.5 text-left text-sm text-2 hover:bg-surface-2">
               Search everything for “{value.trim()}” →
             </button>
           </li>

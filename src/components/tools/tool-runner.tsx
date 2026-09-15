@@ -86,7 +86,7 @@ export function ToolRunner({ slug }: { slug: string }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
       {/* Inputs */}
-      <form className="surface p-6 sm:p-7 space-y-5" onSubmit={(e) => e.preventDefault()}>
+      <form className="space-y-5 border border-line p-5 sm:p-6" onSubmit={(e) => e.preventDefault()}>
         {tool.fields.map((f) => (
           <FieldInput key={f.key} field={f} value={input[f.key]} onChange={(v) => set(f.key, v)} />
         ))}
@@ -104,15 +104,14 @@ export function ToolRunner({ slug }: { slug: string }) {
       <div className="space-y-4">
         {result ? (
           <>
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 via-brand-700 to-ink-950 p-7 text-white shadow-pop">
-              <span aria-hidden className="pointer-events-none absolute -right-16 -top-20 size-56 rounded-full bg-brand-400/30 blur-3xl" />
-              <p className="relative text-[11px] font-bold uppercase tracking-[0.14em] text-brand-200">{result.headline.label}</p>
-              <p className="relative mt-2 font-display text-5xl font-bold tabular tracking-tight sm:text-6xl">{result.headline.value}</p>
-              {result.summary ? <p className="relative mt-4 text-[15px] leading-relaxed text-brand-50/90">{result.summary}</p> : null}
+            <div className="border-y-2 border-[var(--rule)] py-6">
+              <p className="eyebrow">{result.headline.label}</p>
+              <p className="mt-2 font-serif text-5xl tabular tracking-tight sm:text-6xl">{result.headline.value}</p>
+              {result.summary ? <p className="mt-4 max-w-prose text-[15px] leading-relaxed text-2">{result.summary}</p> : null}
             </div>
             {result.sections.map((s, i) => (
-              <div key={i} className="surface p-6">
-                {s.title ? <p className="eyebrow mb-2">{s.title}</p> : null}
+              <div key={i} className="border-t border-line pt-3">
+                {s.title ? <p className="eyebrow mb-1">{s.title}</p> : null}
                 <dl className="divide-y divide-[var(--border)]">
                   {s.lines.map((l, j) => (
                     <div key={j} className={cn("flex items-baseline justify-between gap-4 py-2", l.primary ? "font-semibold" : "", l.muted ? "text-sm text-3" : "")}>
@@ -126,7 +125,7 @@ export function ToolRunner({ slug }: { slug: string }) {
             {result.warnings?.length ? (
               <ul className="space-y-2 text-sm text-2">
                 {result.warnings.map((w, i) => (
-                  <li key={i} className="flex gap-2 rounded-xl bg-amber-50 px-4 py-3 dark:border-amber-900 dark:bg-amber-950/30">
+                  <li key={i} className="flex gap-2 border-l-2 border-amber-400 pl-3 py-1">
                     <span aria-hidden>⚠</span>
                     <span>{w}</span>
                   </li>
