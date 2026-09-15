@@ -34,6 +34,7 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /businesses                              Directory hub, categories + cities
 /businesses/[category]                   Category hub (national)
 /businesses/[category]/[city]            Category × city listing  ← primary SEO page type
+/businesses/[category]/[city]/page/[n]   Page n of that listing (n ≥ 2, 404 past the end)
 /businesses/[category]/[city]/[area]     Category × area (Phase 4, gated)
 /b/[slug]                                Business profile (LocalBusiness JSON-LD)
 /claim/[slug]                            Ownership claim (signed in; ?t= invite token)   noindex
@@ -41,6 +42,7 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 
 /professionals                           Professionals hub (groups, cities)
 /professionals/[profession]              Profession list, national (all = every profession)
+/professionals/[profession]/page/[n]     Page n of that list
 /professionals/[profession]/[city]       Profession × city (noindex under 3 profiles)
 /professionals/join                      Create a profile (signed in)
 /p/[slug]                                Professional profile (Person JSON-LD)
