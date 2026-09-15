@@ -68,7 +68,9 @@ export default async function HomePage() {
           <div className="lg:col-span-8">
             <HeroCarousel slides={slides} />
           </div>
-          <LiveFeed initial={feed} className="lg:col-span-4 lg:max-h-[640px] lg:overflow-hidden" />
+          <div className="relative lg:col-span-4 lg:min-h-0">
+            <LiveFeed initial={feed} className="max-h-[520px] overflow-hidden lg:absolute lg:inset-0 lg:max-h-none" />
+          </div>
         </section>
       ) : null}
 

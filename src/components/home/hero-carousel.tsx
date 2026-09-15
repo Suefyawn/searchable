@@ -46,7 +46,7 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
     <section
       aria-roledescription="carousel"
       aria-label="Top stories"
-      className="grid gap-6 lg:grid-cols-12 lg:gap-8"
+      className="grid gap-4 lg:grid-cols-12 lg:gap-x-8 lg:gap-y-4"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -56,26 +56,27 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
         if (e.key === "ArrowLeft") go(i - 1);
       }}
     >
-      <Link href={s.href} className="block lg:col-span-7" aria-hidden tabIndex={-1}>
-        {s.imageUrl ? <Img src={s.imageUrl} alt="" aspect="3/2" priority sizes="(min-width: 1024px) 720px, 100vw" /> : <div className="bg-surface-2" style={{ aspectRatio: "3/2" }} />}
+      <Link href={s.href} className="block lg:col-span-12" aria-hidden tabIndex={-1}>
+        {s.imageUrl ? <Img src={s.imageUrl} alt="" aspect="16/9" priority sizes="(min-width: 1024px) 800px, 100vw" /> : <div className="bg-surface-2" style={{ aspectRatio: "16/9" }} />}
       </Link>
-      <div className="flex flex-col lg:col-span-5" aria-live="polite">
+      <div className="lg:col-span-7" aria-live="polite">
         <p className="eyebrow">
           {s.label}
           <span className="ml-2 font-sans text-[11px] font-normal normal-case tracking-normal text-3">{s.meta}</span>
         </p>
-        <h1 className="mt-3 font-serif text-[2.1rem] font-medium leading-[1.06] tracking-tight sm:text-[2.5rem] lg:text-[2.35rem] xl:text-[2.7rem]">
+        <h1 className="mt-2 font-serif text-[1.9rem] font-medium leading-[1.08] tracking-tight sm:text-[2.3rem] lg:text-[2.2rem] xl:text-[2.5rem]">
           <Link href={s.href} className="headline-link">
             {s.title}
           </Link>
         </h1>
-        {s.dek ? <p className="mt-4 max-w-xl font-serif text-[1.1rem] leading-relaxed text-2">{s.dek}</p> : null}
-        <Link href={s.href} className="mt-5 inline-block text-sm font-medium underline underline-offset-4">
+      </div>
+      <div className="flex flex-col lg:col-span-5">
+        {s.dek ? <p className="font-serif text-[1.05rem] leading-relaxed text-2 lg:pt-6">{s.dek}</p> : null}
+        <Link href={s.href} className="mt-3 inline-block text-sm font-medium underline underline-offset-4">
           Read the story →
         </Link>
-
         {n > 1 ? (
-          <div className="mt-auto pt-8">
+          <div className="mt-auto pt-5">
             <div className="flex items-center gap-3">
               <button type="button" onClick={() => go(i - 1)} className="border border-line p-1.5 hover:bg-surface-2" aria-label="Previous story">
                 <ChevronLeft className="size-4" />

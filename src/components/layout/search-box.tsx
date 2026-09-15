@@ -13,7 +13,7 @@ export function SearchBox({
   size = "md",
   autoFocus,
   defaultValue = "",
-  placeholder = "Search Pakistan — tax, bills, businesses, guides…",
+  placeholder = "Search…",
   className,
 }: {
   size?: "md" | "lg";

@@ -19,7 +19,7 @@ export function Logo({ className = "" }: { className?: string }) {
   return (
     <Link href="/" className={`inline-flex items-baseline font-serif text-[26px] font-medium tracking-tight ${className}`} aria-label={`${SITE.name} home`}>
       {SITE.name}
-      <span className="text-brand-700 dark:text-brand-300">.pk</span>
+      <span className="text-ink-500">.pk</span>
     </Link>
   );
 }
