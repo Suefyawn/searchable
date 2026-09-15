@@ -7,6 +7,12 @@ import { TOOL_CATEGORIES } from "@/tools/types";
 
 type Props = { params: Promise<{ category: string }> };
 
+// The category list is static, so unknown ones are a real 404 without touching the database.
+export const dynamicParams = false;
+export function generateStaticParams() {
+  return Object.keys(TOOL_CATEGORIES).map((category) => ({ category }));
+}
+
 export async function generateMetadata({ params }: Props) {
   const { category } = await params;
   if (!isToolCategory(category)) return {};
