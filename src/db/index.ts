@@ -32,7 +32,9 @@ async function create(): Promise<Database> {
   // connection (a page's Promise.all of eight queries stalled for good), so pipelining is off: queued
   // queries go one at a time, which costs a few hundred milliseconds on a cold render and nothing on ISR hits.
   const serverless = !!process.env.VERCEL || !!process.env.CF_PAGES || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
-  const client = postgres(DATABASE_URL, { max: serverless ? 1 : 5, prepare: false, max_pipeline: 0, idle_timeout: 20, connect_timeout: 10 });
+  // max_pipeline is a documented postgres-js option that its type definitions leave out.
+  const options = { max: serverless ? 1 : 5, prepare: false, max_pipeline: 0, idle_timeout: 20, connect_timeout: 10 } as Parameters<typeof postgres>[1];
+  const client = postgres(DATABASE_URL, options);
   return drizzle(client, { schema }) as unknown as Database;
 }
 
