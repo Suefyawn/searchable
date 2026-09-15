@@ -22,11 +22,23 @@ import { salesTaxCalculator } from "./calculators/sales-tax-calculator";
 import { solarPaybackCalculator } from "./calculators/solar-payback-calculator";
 import { tokenTaxCalculator } from "./calculators/token-tax-calculator";
 import { zakatCalculator } from "./calculators/zakat-calculator";
+import { freelancerTaxCalculator } from "./calculators/freelancer-tax-calculator";
+import { gratuityCalculator } from "./calculators/gratuity-calculator";
+import { overtimeCalculator } from "./calculators/overtime-calculator";
+import { rentalYieldCalculator } from "./calculators/rental-yield-calculator";
+import { mobileLoadTaxCalculator } from "./calculators/mobile-load-tax-calculator";
+import { cashWithdrawalTaxCalculator } from "./calculators/cash-withdrawal-tax-calculator";
 import { TOOL_CATEGORIES, type ToolCategory, type ToolDefinition } from "./types";
 
 /** Every tool on Searchable. Order here is the default listing order. */
 export const TOOLS: ToolDefinition[] = [
   incomeTaxCalculator,
+  freelancerTaxCalculator,
+  cashWithdrawalTaxCalculator,
+  mobileLoadTaxCalculator,
+  gratuityCalculator,
+  overtimeCalculator,
+  rentalYieldCalculator,
   salaryBreakdownCalculator,
   ptaMobileTaxCalculator,
   electricityBillCalculator,

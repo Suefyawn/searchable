@@ -113,11 +113,11 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 ## Next builds (in order)
 1. ✅ Directory volume tooling (import, dedupe, areas, map)
 2. More compare pages (cars, bank accounts, mobile packages) on the inverter-compare pattern.
-3. Tools to 30: ✅ sales tax, 231B, EOBI, FX converter, personal loan, increment, age · next: stamp duty per province, savings/NSC, car import duty, gas bill, freelancer tax, provident fund
+3. ✅ Tools at 30: sales tax, 231B, EOBI, FX converter, personal loan, increment, age, NSC, gas bill, provident fund, freelancer tax (154A), cash withdrawal tax (231AB), mobile load tax, gratuity, overtime, rental yield · parked until rates can be verified against official notifications: stamp duty per province, car import duty
 4. ✅ Typo tolerance + intent blending in search.
 5. ✅ Professional profiles (ADR-26): hub, profession and city lists, profile page, editor with CV upload, owner dashboard, Verified plan, admin approval.
 6. ✅ Community (ADR-27): member profiles, posts (jobs, listings, auctions, questions, discussions) with editor approval, bids, comments and replies, likes on posts, comments and articles, reports, moderation queue with bans and member verification.
 7. ✅ Notifications (`src/lib/notify.ts`): enquiry emails to business owners (unclaimed listings get the claim link), professionals; outbid emails; one daily digest of comments, replies, likes and bids. ✅ Professional reviews with owner replies and admin moderation. ✅ Home page strips for community and professionals.
 8. ✅ Saved items (bookmark on articles, calculators, data series, businesses, professionals and posts; `/account/saved`) and the daily digest preference.
-9. Next: notification preferences per kind; community search facets; more compare pages; tools to 30.
+9. Next: notification preferences per kind; compare pages for bank accounts and mobile packages (need a monthly data source, not a one-off scrape); stamp duty calculator once provincial notifications are pinned down.
 10. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md` + `docs/FREE-TIER.md`), then AdSense, Resend, Search Console, Position Tracking.
