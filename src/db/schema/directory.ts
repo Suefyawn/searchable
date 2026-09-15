@@ -18,7 +18,9 @@ import { locations } from "./geo";
 
 export const businessStatus = pgEnum("business_status", ["pending", "active", "closed", "rejected", "duplicate"]);
 export const businessTier = pgEnum("business_tier", ["free", "verified", "premium", "sponsored"]);
-export const claimStatus = pgEnum("claim_status", ["pending", "approved", "rejected"]);
+export const claimStatus = pgEnum("claim_status", ["pending", "approved", "rejected", "expired"]);
+/** How ownership was (or will be) proven. invite = clicked the link we emailed to the listed address. */
+export const claimMethod = pgEnum("claim_method", ["invite", "email_domain", "phone", "document"]);
 export const reviewStatus = pgEnum("review_status", ["pending", "published", "hidden"]);
 
 export const businessCategories = pgTable(
@@ -71,6 +73,11 @@ export const businesses = pgTable(
     verifiedAt: timestamp("verified_at", { withTimezone: true }),
     lastVerifiedAt: timestamp("last_verified_at", { withTimezone: true }),
     ownerUserId: text("owner_user_id").references(() => users.id, { onDelete: "set null" }),
+    /** Set when a claim is approved; null means the listing is unclaimed and shows the claim invitation. */
+    claimedAt: timestamp("claimed_at", { withTimezone: true }),
+    /** Outreach: when we last emailed the listed address inviting them to claim, and how many times. */
+    claimInviteSentAt: timestamp("claim_invite_sent_at", { withTimezone: true }),
+    claimInviteCount: integer("claim_invite_count").default(0).notNull(),
     logoUrl: text("logo_url"),
     coverUrl: text("cover_url"),
     viewCount: integer("view_count").default(0).notNull(),
@@ -176,13 +183,26 @@ export const businessClaims = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     status: claimStatus("status").default("pending").notNull(),
+    method: claimMethod("method").default("document").notNull(),
+    /** owner | manager | staff, as declared by the claimant. */
+    role: text("role"),
+    contactName: text("contact_name"),
+    contactPhone: text("contact_phone"),
+    contactEmail: text("contact_email"),
     message: text("message"),
     evidenceUrl: text("evidence_url"),
+    /** One-time code: emailed to the website domain (email_domain) or to be sent to us from the listed number (phone). */
+    verificationCode: text("verification_code"),
+    codeExpiresAt: timestamp("code_expires_at", { withTimezone: true }),
+    codeAttempts: integer("code_attempts").default(0).notNull(),
+    /** Proof received (code matched, invite link used, admin confirmed the call). */
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    decisionNote: text("decision_note"),
     reviewedBy: text("reviewed_by").references(() => users.id, { onDelete: "set null" }),
     reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
     createdAt: createdAt(),
   },
-  (t) => [index("business_claims_business_idx").on(t.businessId)],
+  (t) => [index("business_claims_business_idx").on(t.businessId), uniqueIndex("business_claims_business_user_idx").on(t.businessId, t.userId)],
 );
 
 export const businessLeads = pgTable(

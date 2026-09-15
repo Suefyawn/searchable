@@ -1,6 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AdminPage } from "@/components/admin";
 import { getDb, schema } from "@/db";
 import { hasRole, requireRole } from "@/lib/auth";
 import { renderIssueHtml } from "@/lib/newsletter-issue";
@@ -22,12 +23,17 @@ export default async function IssuePage({ params }: { params: Promise<{ id: stri
   const previewHtml = renderIssueHtml(issue, { unsubscribeUrl: `${SITE.url}/newsletter/unsubscribe?token=preview`, manageUrl: `${SITE.url}/newsletter/manage?token=preview` });
 
   return (
-    <div>
-      <p className="mb-2 text-sm">
-        <Link href="/admin/newsletter" className="text-2 underline-offset-4 hover:underline">← Searchable Daily</Link>
-      </p>
-      <h1 className="mb-6 text-2xl font-semibold">{issue.subject}</h1>
+    <AdminPage
+      title={issue.subject}
+      description={`${issue.frequency} issue · ${issue.status} · ${n} active ${issue.frequency} subscriber${n === 1 ? "" : "s"}`}
+      actions={
+        <Link href="/admin/newsletter" className="text-sm text-2 hover:text-[var(--text)]">
+          ← All issues
+        </Link>
+      }
+      wide
+    >
       <IssueEditor issue={{ ...issue, frequency: issue.frequency as "daily" | "weekly" }} previewHtml={previewHtml} userEmail={user.email} isAdmin={hasRole(user, "admin")} activeCount={n} />
-    </div>
+    </AdminPage>
   );
 }

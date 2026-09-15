@@ -27,6 +27,8 @@ function toLocalInput(iso?: string | null) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+const subscribeNoop = () => () => {};
+
 export function ArticleEditor({ initial, categories, authors, cities, entities, related }: { initial: EditorInitial; categories: Opt[]; authors: Opt[]; cities: Opt[]; entities: { slug: string; name: string }[]; related: Related[] }) {
   const router = useRouter();
   const [kind, setKind] = React.useState<ArticleFormInput["kind"]>(initial.kind ?? "news");
@@ -54,6 +56,12 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
   const isLive = initial.status === "published";
   const isScheduled = initial.status === "scheduled";
 
+  const [savedAt, setSavedAt] = React.useState<Date | null>(null);
+  const backupKey = `sp:draft:${initial.id ?? `new-${initial.kind ?? "news"}`}`;
+  const [recovered, setRecovered] = React.useState<{ body: string; at: number } | null>(null);
+  const mounted = React.useSyncExternalStore(subscribeNoop, () => true, () => false);
+  const submitRef = React.useRef<(intent: ArticleFormInput["intent"], quiet?: boolean) => Promise<void>>(async () => {});
+
   React.useEffect(() => {
     if (!dirty) return;
     const onLeave = (e: BeforeUnloadEvent) => {
@@ -63,7 +71,54 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
     return () => window.removeEventListener("beforeunload", onLeave);
   }, [dirty]);
 
-  async function submit(intent: ArticleFormInput["intent"]) {
+  // Ctrl/Cmd+S saves (never publishes).
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        void submitRef.current("save");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // Autosave an existing draft 30 seconds after the last change. Live articles are never autosaved.
+  React.useEffect(() => {
+    if (!dirty || !initial.id || isLive || busy) return;
+    const t = setTimeout(() => void submitRef.current("save", true), 30_000);
+    return () => clearTimeout(t);
+  }, [dirty, body, initial.id, isLive, busy]);
+
+  // Browser-side backup of the body so a crash or closed tab loses nothing; offered back on the next open.
+  React.useEffect(() => {
+    if (!dirty) return;
+    const t = setTimeout(() => {
+      try {
+        localStorage.setItem(backupKey, JSON.stringify({ body, at: Date.now() }));
+      } catch {
+        /* storage unavailable */
+      }
+    }, 2000);
+    return () => clearTimeout(t);
+  }, [body, dirty, backupKey]);
+  // Checked once after hydration (localStorage is browser-only); the banner offers the text back.
+  const [checkedBackup, setCheckedBackup] = React.useState(false);
+  if (mounted && !checkedBackup) {
+    setCheckedBackup(true);
+    try {
+      const raw = localStorage.getItem(backupKey);
+      if (raw) {
+        const b = JSON.parse(raw) as { body: string; at: number };
+        if (b.body && b.body !== (initial.body ?? "")) setRecovered(b);
+        else localStorage.removeItem(backupKey);
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  async function submit(intent: ArticleFormInput["intent"], quiet = false) {
     const fd = new FormData(formRef.current!);
     const get = (k: string) => String(fd.get(k) ?? "");
     setBusy(intent);
@@ -106,10 +161,19 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
       return;
     }
     setDirty(false);
-    setMsg({ tone: "ok", text: { publish: "Published.", schedule: "Scheduled.", unpublish: "Unpublished, back to draft.", save: "Saved." }[intent] });
+    setSavedAt(new Date());
+    try {
+      localStorage.removeItem(backupKey);
+    } catch {
+      /* ignore */
+    }
+    if (!quiet) setMsg({ tone: "ok", text: { publish: "Published.", schedule: "Scheduled.", unpublish: "Unpublished, back to draft.", save: "Saved." }[intent] });
     if (!initial.id && res.id) router.replace(`/admin/articles/${res.id}`);
-    else router.refresh();
+    else if (!quiet) router.refresh();
   }
+  React.useEffect(() => {
+    submitRef.current = submit;
+  });
 
   function addTag(raw: string) {
     const t = raw.trim().replace(/,+$/, "");
@@ -122,6 +186,40 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
   return (
     <form ref={formRef} onSubmit={(e) => e.preventDefault()} onChange={() => setDirty(true)} className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="space-y-5">
+        {recovered ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-y-2 border-[var(--rule)] py-2.5 text-[14px]">
+            <span>
+              Unsaved text from {new Date(recovered.at).toLocaleString("en-PK", { dateStyle: "medium", timeStyle: "short" })} was found in this browser ({recovered.body.trim().split(/\s+/).length} words).
+            </span>
+            <span className="flex gap-3">
+              <button
+                type="button"
+                className="font-medium underline underline-offset-4"
+                onClick={() => {
+                  setBody(recovered.body);
+                  setDirty(true);
+                  setRecovered(null);
+                }}
+              >
+                Restore
+              </button>
+              <button
+                type="button"
+                className="text-2 underline underline-offset-4"
+                onClick={() => {
+                  try {
+                    localStorage.removeItem(backupKey);
+                  } catch {
+                    /* ignore */
+                  }
+                  setRecovered(null);
+                }}
+              >
+                Discard
+              </button>
+            </span>
+          </div>
+        ) : null}
         <Field label="Title" htmlFor="title">
           <Input id="title" name="title" defaultValue={initial.title} required className="h-12 text-lg font-medium" />
         </Field>
@@ -301,7 +399,9 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
             </div>
           ) : null}
           <Input name="note" placeholder="Revision note (optional)" className="h-9 text-sm" />
-          {msg ? <p className={cn("text-sm", msg.tone === "ok" ? "text-emerald-700" : "text-rose-700")}>{msg.text}</p> : null}
+          <p className={cn("text-[12.5px]", msg?.tone === "err" ? "font-medium text-[var(--text)]" : "text-3")} aria-live="polite">
+            {msg?.tone === "err" ? msg.text : busy ? "Saving…" : dirty ? "Unsaved changes" : savedAt ? `Saved ${savedAt.toLocaleTimeString("en-PK", { hour: "2-digit", minute: "2-digit" })}` : msg?.text ?? "Ctrl+S saves. Drafts autosave 30 s after you stop typing."}
+          </p>
           {initial.previewUrl ? (
             <p className="text-xs">
               <Link href={initial.previewUrl} target="_blank" className="underline underline-offset-4">

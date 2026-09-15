@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { getDb, rawQuery, schema } from "@/db";
 import { publishDueArticles } from "@/app/admin/articles/actions";
+import { expireStaleClaims, sendClaimInvites } from "./claims";
 import { expireLapsedPlans } from "./commerce";
 import { sendDueIssues } from "./newsletter-issue";
 
@@ -16,7 +17,7 @@ import { sendDueIssues } from "./newsletter-issue";
 const JOB_INTERVAL_MS = 5 * 60_000;
 let lastLocalRun = 0;
 
-export type JobsResult = { ran: boolean; published?: number; newsletters?: unknown; lapsedPlans?: number; at?: string };
+export type JobsResult = { ran: boolean; published?: number; newsletters?: unknown; lapsedPlans?: number; invites?: { sent: number; skipped: string }; at?: string };
 
 export async function runDueJobs(opts: { force?: boolean } = {}): Promise<JobsResult> {
   const now = Date.now();
@@ -35,7 +36,8 @@ export async function runDueJobs(opts: { force?: boolean } = {}): Promise<JobsRe
   const published = await publishDueArticles();
   const newsletters = await sendDueIssues();
   const lapsedPlans = await expireLapsedPlans();
-  return { ran: true, published, newsletters, lapsedPlans, at: new Date().toISOString() };
+  const invites = await sendClaimInvites();
+  return { ran: true, published, newsletters, lapsedPlans, invites, at: new Date().toISOString() };
 }
 
 /**
@@ -51,5 +53,6 @@ export async function pruneOldRows(): Promise<Record<string, number>> {
   out.searchQueries = Number(searches[0]?.n ?? 0);
   const rl = await rawQuery<{ n: number }>(db, sql`with d as (delete from ${schema.verifications} where expires_at < now() - interval '7 days' returning 1) select count(*)::int as n from d`);
   out.verifications = Number(rl[0]?.n ?? 0);
+  out.expiredClaims = await expireStaleClaims();
   return out;
 }

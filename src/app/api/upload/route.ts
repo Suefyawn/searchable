@@ -23,13 +23,14 @@ export async function POST(req: Request) {
   if (!(file instanceof File)) return NextResponse.json({ error: "No file received." }, { status: 400 });
   if (!ALLOWED_TYPES.has(file.type)) return NextResponse.json({ error: "Use a JPEG, PNG, WebP, GIF or AVIF image." }, { status: 415 });
   if (file.size > MAX_UPLOAD_BYTES) return NextResponse.json({ error: `Image is too large (max ${MAX_UPLOAD_BYTES / 1024 / 1024} MB).` }, { status: 413 });
-  if (!["article", "logo", "cover", "photo"].includes(variant)) return NextResponse.json({ error: "Unknown variant." }, { status: 400 });
+  if (!["article", "logo", "cover", "photo", "evidence"].includes(variant)) return NextResponse.json({ error: "Unknown variant." }, { status: 400 });
 
-  const allowed = hasRole(user, "editor") || (businessId ? await canEditBusiness(user, businessId) : false);
+  // evidence: a claimant's proof-of-ownership document; any signed-in user, unguessable URL, never linked publicly.
+  const allowed = variant === "evidence" || hasRole(user, "editor") || (businessId ? await canEditBusiness(user, businessId) : false);
   if (!allowed) return NextResponse.json({ error: "You do not have permission to upload here." }, { status: 403 });
 
   try {
-    const stored = await storeImage(Buffer.from(await file.arrayBuffer()), { variant: variant as "article" | "logo" | "cover" | "photo", alt, originalName: file.name });
+    const stored = await storeImage(Buffer.from(await file.arrayBuffer()), { variant: (variant === "evidence" ? "photo" : variant) as "article" | "logo" | "cover" | "photo", alt, originalName: file.name });
     return NextResponse.json(stored);
   } catch (err) {
     console.error(err);

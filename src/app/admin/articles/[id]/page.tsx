@@ -1,6 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AdminPage } from "@/components/admin";
 import { getDb, schema } from "@/db";
 import { formatDate } from "@/lib/format";
 import { ArticleEditor } from "../editor";
@@ -17,13 +18,23 @@ export default async function EditArticlePage({ params }: { params: Promise<{ id
   ]);
   const url = `/${a.kind === "news" ? "news" : "guides"}/${a.category?.slug ?? "general"}/${a.slug}`;
   return (
-    <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">Edit article</h1>
-        <Link href="/admin/articles" className="text-sm text-2">
-          ← All articles
-        </Link>
-      </div>
+    <AdminPage
+      title={a.kind === "guide" ? "Edit guide" : "Edit story"}
+      description={a.status === "published" ? `Live since ${formatDate(a.publishedAt ?? a.updatedAt, { dateStyle: "medium" })}. Saving publishes the change and revalidates the page.` : `${a.status.replace("_", " ")} · last edited ${formatDate(a.updatedAt, { dateStyle: "medium", timeStyle: "short" })}`}
+      actions={
+        <>
+          {a.status === "published" ? (
+            <Link href={url} target="_blank" className="text-sm font-medium underline-offset-4 hover:underline">
+              View live ↗
+            </Link>
+          ) : null}
+          <Link href="/admin/articles" className="text-sm text-2 hover:text-[var(--text)]">
+            ← All articles
+          </Link>
+        </>
+      }
+      wide
+    >
       <ArticleEditor
         initial={{
           id: a.id,
@@ -72,6 +83,6 @@ export default async function EditArticlePage({ params }: { params: Promise<{ id
           </ul>
         </section>
       ) : null}
-    </div>
+    </AdminPage>
   );
 }

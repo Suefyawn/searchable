@@ -1,5 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import Link from "next/link";
+import { AdminPage, Empty, FilterTabs, Status } from "@/components/admin";
 import { Badge, Button, Textarea } from "@/components/ui";
 import { getDb, schema } from "@/db";
 import { requireRole } from "@/lib/auth";
@@ -8,7 +9,6 @@ import { formatDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-const TONE = { new: "warning", reviewing: "brand", accepted: "success", rejected: "danger", published: "success" } as const;
 const STATUSES = ["new", "reviewing", "accepted", "rejected", "published"] as const;
 
 export default async function AdminSubmissions({ searchParams }: { searchParams: Promise<{ status?: string; open?: string }> }) {
@@ -22,24 +22,17 @@ export default async function AdminSubmissions({ searchParams }: { searchParams:
     with: { order: { columns: { invoiceNo: true, status: true } }, article: { columns: { id: true, slug: true, status: true } } },
   });
 
+  const count = (x: string) => (x ? rows.filter((r) => r.status === x).length : rows.length);
   return (
-    <div>
-      <h1 className="mb-1 text-2xl font-semibold">Guest & sponsored submissions</h1>
-      <p className="mb-6 text-sm text-2">Pitches from /write-for-us. Sponsored and press-release submissions carry an invoice; convert to a draft once paid (or once you accept a free guest piece).</p>
-      <nav className="mb-4 flex gap-1 border-y border-line py-1.5 text-sm">
-        {["", ...STATUSES].map((s) => (
-          <Link key={s} href={s ? `/admin/submissions?status=${s}` : "/admin/submissions"} className={`px-2.5 py-1.5 ${(status ?? "") === s ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "text-2 hover:bg-surface-2"}`}>
-            {s || "All"}
-          </Link>
-        ))}
-      </nav>
+    <AdminPage title="Pitches and sponsored posts" description="From /write-for-us. Sponsored and press-release submissions carry an invoice; convert to a draft once paid, or once you accept a free guest piece. The draft opens in the editor with the disclosure already set.">
+      <FilterTabs items={["", ...STATUSES].map((x) => ({ href: x ? `/admin/submissions?status=${x}` : "/admin/submissions", label: x || "all", count: status ? undefined : count(x), active: (status ?? "") === x }))} className="mb-4" />
       <div className="divide-y divide-[var(--border)] border-y border-line">
         {rows.map((s) => (
           <article key={s.id} className="py-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="flex flex-wrap items-center gap-2 text-xs">
-                  <Badge tone={TONE[s.status]}>{s.status}</Badge>
+                  <Status value={s.status} />
                   <Badge>{s.kind.replace("_", " ")}</Badge>
                   <span className="text-3">{formatDate(s.createdAt)}</span>
                   {s.order ? (
@@ -105,8 +98,8 @@ export default async function AdminSubmissions({ searchParams }: { searchParams:
             ) : null}
           </article>
         ))}
-        {rows.length === 0 ? <p className="py-8 text-center text-2">Nothing here yet.</p> : null}
+        {rows.length === 0 ? <Empty>Nothing here yet.</Empty> : null}
       </div>
-    </div>
+    </AdminPage>
   );
 }

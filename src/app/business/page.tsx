@@ -74,6 +74,16 @@ export default async function BusinessDashboard() {
                 </Link>
               </div>
             </div>
+            {!b.isVerified && b.status === "active" ? (
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-y-2 border-[var(--rule)] py-3 text-[14.5px]">
+                <p className="text-2">
+                  <span className="font-medium text-[var(--text)]">Get the Verified badge.</span> Checked by Searchable, ranked above free listings in {b.city?.name ?? "your city"}, followed link to your website. Rs 9,900 a year.
+                </p>
+                <Link href={`/business/${b.id}/upgrade`} className="inline-flex h-9 items-center bg-ink-900 px-3.5 text-sm font-medium text-white hover:bg-ink-800">
+                  See plans
+                </Link>
+              </div>
+            ) : null}
             <div className="mt-5 grid gap-5 md:grid-cols-2">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-3">Recent enquiries</p>

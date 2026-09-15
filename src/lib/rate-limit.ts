@@ -47,4 +47,5 @@ export const LIMITS = {
   submitBusiness: { limit: 3, windowMs: 60 * 60_000 },
   contact: { limit: 5, windowMs: 10 * 60_000 },
   search: { limit: 120, windowMs: 60_000 },
+  claim: { limit: 5, windowMs: 10 * 60_000 },
 } as const;

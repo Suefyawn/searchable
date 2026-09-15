@@ -1,4 +1,5 @@
 import { desc } from "drizzle-orm";
+import { AdminPage } from "@/components/admin";
 import { Img } from "@/components/img";
 import { getDb, schema } from "@/db";
 import { formatDate } from "@/lib/format";
@@ -11,11 +12,7 @@ export default async function AdminMedia() {
   const rows = await db.query.media.findMany({ orderBy: [desc(schema.media.createdAt)], limit: 200 });
   const total = rows.reduce((a, r) => a + (r.bytes ?? 0), 0);
   return (
-    <div>
-      <h1 className="mb-1 text-2xl font-semibold">Media</h1>
-      <p className="mb-6 text-sm text-2">
-        {rows.length} files · {(total / 1024 / 1024).toFixed(1)} MB. Uploads are converted to WebP and resized; originals are not kept.
-      </p>
+    <AdminPage title="Media" description={`${rows.length} files · ${(total / 1024 / 1024).toFixed(1)} MB. Uploads are converted to WebP with 480 and 960 px renditions; originals are not kept. Every photo carries its credit and licence.`}>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {rows.map((m) => (
           <figure key={m.id} className="border border-line">
@@ -35,6 +32,6 @@ export default async function AdminMedia() {
         ))}
         {!rows.length ? <p className="col-span-full py-8 text-center text-2">No uploads yet.</p> : null}
       </div>
-    </div>
+    </AdminPage>
   );
 }

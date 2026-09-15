@@ -232,9 +232,16 @@ export default async function BusinessPage({ params }: Props) {
               <LeadForm businessId={b.id} />
             </div>
           </div>
-          <p className="px-1 text-xs text-3">
-            Is this your business? <Link href={`/claim/${b.slug}`} className="text-brand-700 dark:text-brand-300 underline">Claim it</Link> to update details and respond to reviews.
-          </p>
+          {b.claimedAt || b.ownerUserId ? (
+            <p className="px-1 text-xs text-3">Managed by the owner{b.claimedAt ? ` since ${formatDate(b.claimedAt, { month: "short", year: "numeric" })}` : ""}.{b.isVerified ? " Verified by Searchable." : ""}</p>
+          ) : (
+            <div className="border-t-2 border-[var(--rule)] px-1 pt-3 text-[13.5px]">
+              <p className="font-medium">Unclaimed listing</p>
+              <p className="mt-0.5 text-2">
+                We listed this from public sources. Run it? <Link href={`/claim/${b.slug}`} className="text-[var(--text)] underline underline-offset-4">Claim it free</Link> to correct details, add photos and reply to reviews.
+              </p>
+            </div>
+          )}
           <div className="px-1">
             <ReportForm targetType="business" targetId={b.id} label="Report wrong details or a closed business" />
           </div>

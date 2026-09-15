@@ -1,97 +1,85 @@
-import { and, desc, eq, ilike } from "drizzle-orm";
+import { and, desc, eq, ilike, sql } from "drizzle-orm";
 import Link from "next/link";
-import { Badge, ButtonLink, Input } from "@/components/ui";
+import { AdminPage, EmptyRow, FilterTabs, Pager, Status, SubFilter, Table, TBody, Td, THead, Toolbar } from "@/components/admin";
+import { ButtonLink } from "@/components/ui";
 import { getDb, schema } from "@/db";
-import { timeAgo } from "@/lib/format";
-import { cn } from "@/lib/utils";
+import { formatDate, timeAgo } from "@/lib/format";
 
-type Params = { status?: string; kind?: string; q?: string };
-const STATUSES = ["all", "draft", "published", "archived"];
+type Params = { status?: string; kind?: string; q?: string; page?: string };
+const STATUSES = ["all", "draft", "research", "editing", "fact_check", "scheduled", "published", "archived"] as const;
+const PAGE = 50;
 
 export default async function AdminArticles({ searchParams }: { searchParams: Promise<Params> }) {
-  const { status = "all", kind = "all", q = "" } = await searchParams;
+  const { status = "all", kind = "all", q = "", page = "1" } = await searchParams;
+  const pageNum = Math.max(1, parseInt(page, 10) || 1);
   const db = await getDb();
   const conds = [];
-  if (status !== "all") conds.push(eq(schema.articles.status, status as typeof schema.articleStatus.enumValues[number]));
-  if (kind !== "all") conds.push(eq(schema.articles.kind, kind as typeof schema.articleKind.enumValues[number]));
+  if (status !== "all") conds.push(eq(schema.articles.status, status as (typeof schema.articleStatus.enumValues)[number]));
+  if (kind !== "all") conds.push(eq(schema.articles.kind, kind as (typeof schema.articleKind.enumValues)[number]));
   if (q) conds.push(ilike(schema.articles.title, `%${q}%`));
-  const rows = await db.query.articles.findMany({ where: conds.length ? and(...conds) : undefined, orderBy: [desc(schema.articles.updatedAt)], limit: 100, with: { category: true, author: true } });
-
+  const where = conds.length ? and(...conds) : undefined;
+  const [rows, total, counts] = await Promise.all([
+    db.query.articles.findMany({ where, orderBy: [desc(schema.articles.updatedAt)], limit: PAGE, offset: (pageNum - 1) * PAGE, with: { category: true, author: true } }),
+    db.$count(schema.articles, where),
+    db.select({ status: schema.articles.status, n: sql<number>`count(*)::int` }).from(schema.articles).where(kind !== "all" ? eq(schema.articles.kind, kind as "news") : undefined).groupBy(schema.articles.status),
+  ]);
+  const count = (s: string) => (s === "all" ? counts.reduce((a, c) => a + c.n, 0) : counts.find((c) => c.status === s)?.n ?? 0);
   const link = (p: Partial<Params>) => {
-    const sp = new URLSearchParams({ status, kind, q, ...p });
-    return `/admin/articles?${sp.toString()}`;
+    const sp = new URLSearchParams();
+    const merged = { status, kind, q, ...p };
+    for (const [k, v] of Object.entries(merged)) if (v && v !== "all" && !(k === "page" && v === "1")) sp.set(k, v);
+    const s = sp.toString();
+    return `/admin/articles${s ? `?${s}` : ""}`;
   };
 
   return (
-    <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">Articles</h1>
-        <div className="flex gap-2">
+    <AdminPage
+      title="Articles"
+      description="News leads with the number; guides answer one question completely. Drafts move through research, editing and fact check before they are scheduled."
+      actions={
+        <>
           <ButtonLink href="/admin/articles/new?kind=news" size="sm">
-            + News
+            + Story
           </ButtonLink>
           <ButtonLink href="/admin/articles/new?kind=guide" size="sm" variant="outline">
             + Guide
           </ButtonLink>
-        </div>
-      </div>
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        {STATUSES.map((s) => (
-          <Link key={s} href={link({ status: s })} className={cn("inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-1.5 text-sm transition-colors capitalize", status === s ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "text-2 hover:bg-surface-2 hover:text-[var(--text)]")}>
-            {s}
-          </Link>
-        ))}
-        <span className="mx-1 text-3">·</span>
-        {["all", "news", "guide"].map((k) => (
-          <Link key={k} href={link({ kind: k })} className={cn("inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-1.5 text-sm transition-colors capitalize", kind === k ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "text-2 hover:bg-surface-2 hover:text-[var(--text)]")}>
-            {k}
-          </Link>
-        ))}
-        <form className="ml-auto">
-          <input type="hidden" name="status" value={status} />
-          <input type="hidden" name="kind" value={kind} />
-          <Input name="q" defaultValue={q} placeholder="Search titles…" className="h-9 w-56 text-sm" />
-        </form>
-      </div>
-      <div className="surface overflow-x-auto">
-        <table className="w-full text-[15px]">
-          <thead className="text-left text-xs uppercase tracking-wider text-3">
-            <tr className="border-b border-line">
-              <th className="px-4 py-2.5 font-medium">Title</th>
-              <th className="px-4 py-2.5 font-medium">Kind</th>
-              <th className="px-4 py-2.5 font-medium">Category</th>
-              <th className="px-4 py-2.5 font-medium">Status</th>
-              <th className="px-4 py-2.5 font-medium text-right">Views</th>
-              <th className="px-4 py-2.5 font-medium">Updated</th>
+        </>
+      }
+    >
+      <FilterTabs items={STATUSES.filter((s) => s === "all" || count(s) || s === status).map((s) => ({ href: link({ status: s, page: undefined }), label: s.replace("_", " "), count: count(s), active: status === s }))} />
+      <Toolbar search={{ placeholder: "Search titles…", defaultValue: q, hidden: { status: status !== "all" ? status : undefined, kind: kind !== "all" ? kind : undefined } }}>
+        <SubFilter label="Kind" items={["all", "news", "guide"].map((k) => ({ href: link({ kind: k, page: undefined }), label: k, active: kind === k }))} />
+      </Toolbar>
+      <Table>
+        <THead cols={["Title", "Kind", "Category", "Status", { label: "Views", align: "right" }, "Updated"]} />
+        <TBody>
+          {rows.map((a) => (
+            <tr key={a.id} className="hover:bg-surface-2">
+              <Td className="max-w-lg">
+                <Link href={`/admin/articles/${a.id}`} className="font-medium hover:underline underline-offset-4">
+                  {a.title}
+                </Link>
+                {a.status === "scheduled" && a.scheduledFor ? <span className="block text-[12.5px] text-3">goes live {formatDate(a.scheduledFor, { dateStyle: "medium", timeStyle: "short" })}</span> : null}
+                {a.author ? <span className="block text-[12.5px] text-3">{a.author.name}</span> : null}
+              </Td>
+              <Td muted>{a.kind}</Td>
+              <Td muted>{a.category?.name ?? "-"}</Td>
+              <Td>
+                <Status value={a.status} />
+              </Td>
+              <Td align="right" muted>
+                {a.viewCount.toLocaleString()}
+              </Td>
+              <Td muted className="whitespace-nowrap text-[13px]">
+                {timeAgo(a.updatedAt)}
+              </Td>
             </tr>
-          </thead>
-          <tbody className="divide-y divide-[var(--border)]">
-            {rows.map((a) => (
-              <tr key={a.id} className="hover:bg-surface-2">
-                <td className="max-w-md px-4 py-2.5">
-                  <Link href={`/admin/articles/${a.id}`} className="font-medium hover:text-brand-700">
-                    {a.title}
-                  </Link>
-                </td>
-                <td className="px-4 py-2.5 text-2">{a.kind}</td>
-                <td className="px-4 py-2.5 text-2">{a.category?.name ?? "-"}</td>
-                <td className="px-4 py-2.5">
-                  <Badge tone={a.status === "published" ? "success" : a.status === "draft" ? "neutral" : "warning"}>{a.status}</Badge>
-                </td>
-                <td className="px-4 py-2.5 text-right tabular text-2">{a.viewCount}</td>
-                <td className="px-4 py-2.5 text-sm text-3">{timeAgo(a.updatedAt)}</td>
-              </tr>
-            ))}
-            {!rows.length ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-2">
-                  Nothing here yet.
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </table>
-      </div>
-    </div>
+          ))}
+          {!rows.length ? <EmptyRow colSpan={6}>{q ? `Nothing matches “${q}”.` : "Nothing here yet."}</EmptyRow> : null}
+        </TBody>
+      </Table>
+      <Pager page={pageNum} pageSize={PAGE} total={total} href={(p) => link({ page: String(p) })} />
+    </AdminPage>
   );
 }

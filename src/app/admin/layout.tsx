@@ -1,46 +1,55 @@
+import { sql } from "drizzle-orm";
 import Link from "next/link";
+import { AdminNav, type AdminNavGroup } from "@/components/admin/nav";
+import { getDb, rawQuery } from "@/db";
 import { requireRole } from "@/lib/auth";
 import { runDueJobs } from "@/lib/jobs";
 
 export const metadata = { title: "Admin", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
-const NAV = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/articles", label: "Articles" },
-  { href: "/admin/ideas", label: "Story ideas" },
-  { href: "/admin/businesses", label: "Businesses" },
-  { href: "/admin/reviews", label: "Reviews" },
-  { href: "/admin/data", label: "Data" },
-  { href: "/admin/leads", label: "Leads & claims" },
-  { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/submissions", label: "Submissions" },
-  { href: "/admin/newsletter", label: "Newsletter" },
-  { href: "/admin/subscribers", label: "Subscribers" },
-  { href: "/admin/search-log", label: "Search log" },
-  { href: "/admin/media", label: "Media" },
-  { href: "/admin/reports", label: "Reports" },
-  { href: "/admin/messages", label: "Messages" },
-  { href: "/admin/redirects", label: "Redirects" },
-];
+/** Queue sizes for the sidebar badges: one query, cheap enough for every admin page load. */
+async function queueCounts() {
+  const db = await getDb();
+  const [r] = await rawQuery<Record<string, number>>(
+    db,
+    sql`select
+      (select count(*) from businesses where status = 'pending')::int as businesses,
+      (select count(*) from business_claims where status = 'pending')::int as claims,
+      (select count(*) from business_reviews where status = 'pending')::int as reviews,
+      (select count(*) from orders where status = 'pending')::int as orders,
+      (select count(*) from submissions where status in ('new', 'reviewing'))::int as submissions,
+      (select count(*) from messages where status = 'new')::int as messages,
+      (select count(*) from reports where status = 'open')::int as reports,
+      (select count(*) from articles where status = 'draft')::int as drafts`,
+  );
+  return r ?? {};
+}
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await requireRole("editor", "/admin");
-  // An editor opening admin is a fine moment to publish anything that has come due (cheap: guarded to once per 5 minutes).
+  // An editor opening admin is a fine moment to publish anything that has come due (guarded to once per 5 minutes).
   void runDueJobs().catch(() => {});
+  const c = await queueCounts();
+  const groups: AdminNavGroup[] = [
+    { title: "Desk", items: [{ href: "/admin", label: "Dashboard" }, { href: "/admin/articles", label: "Articles", count: c.drafts }, { href: "/admin/ideas", label: "Story ideas" }, { href: "/admin/data", label: "Data hub" }, { href: "/admin/media", label: "Media" }] },
+    { title: "Directory", items: [{ href: "/admin/businesses", label: "Businesses", count: c.businesses }, { href: "/admin/claims", label: "Claims", count: c.claims }, { href: "/admin/outreach", label: "Outreach" }, { href: "/admin/reviews", label: "Reviews", count: c.reviews }, { href: "/admin/leads", label: "Enquiries" }] },
+    { title: "Money", items: [{ href: "/admin/orders", label: "Orders", count: c.orders }, { href: "/admin/submissions", label: "Pitches", count: c.submissions }] },
+    { title: "Audience", items: [{ href: "/admin/newsletter", label: "Newsletter" }, { href: "/admin/subscribers", label: "Subscribers" }, { href: "/admin/search-log", label: "Search log" }, { href: "/admin/messages", label: "Messages", count: c.messages }, { href: "/admin/reports", label: "Reports", count: c.reports }] },
+    { title: "System", items: [{ href: "/admin/redirects", label: "Redirects" }, { href: "/admin/system", label: "Status" }] },
+  ];
   return (
     <div className="container-x py-8">
-      <div className="grid gap-8 lg:grid-cols-[200px_minmax(0,1fr)]">
-        <aside className="lg:sticky lg:top-24 self-start">
-          <p className="px-3 text-xs font-semibold uppercase tracking-wider text-3">Admin</p>
-          <nav className="mt-2 flex gap-1 overflow-x-auto lg:flex-col" aria-label="Admin">
-            {NAV.map((n) => (
-              <Link key={n.href} href={n.href} className="whitespace-nowrap rounded-md px-3 py-2 text-[15px] font-medium text-2 hover:bg-surface-2 hover:text-[var(--text)]">
-                {n.label}
-              </Link>
-            ))}
-          </nav>
-          <p className="mt-6 px-3 text-xs text-3">
+      <div className="grid gap-8 lg:grid-cols-[190px_minmax(0,1fr)]">
+        <aside className="self-start lg:sticky lg:top-24">
+          <div className="mb-4 flex items-baseline justify-between px-2">
+            <p className="font-serif text-lg">Admin</p>
+            <Link href="/" className="text-[12.5px] text-3 hover:text-[var(--text)]">
+              View site →
+            </Link>
+          </div>
+          <AdminNav groups={groups} />
+          <p className="mt-6 px-2 text-[12px] text-3">
             {user.name} · {user.role}
           </p>
         </aside>

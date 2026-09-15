@@ -43,6 +43,13 @@
       "when": 1789453782863,
       "tag": "0005_search_trigram",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789462556780,
+      "tag": "0006_claims_outreach",
+      "breakpoints": true
     }
   ]
 }

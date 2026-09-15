@@ -56,7 +56,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | Listings, profiles, claim, add, owner editor (hours/services/photos/logo/cover), reviews + owner replies, leads, click tracking, dashboard analytics | ✅ |
 | **Paid tiers: Verified / Premium / Sponsored / category sponsor; upgrade flow; invoices; admin mark-paid; expiry cron; dofollow for paid** | ✅ |
 | Report business / review / article | ✅ |
-| Verification workflow (phone/document) | 🟡 manual + paid Verified |
+| Ownership claims: invite link (auto), website-domain code (auto), phone code (editor), document (editor); claim outreach drip with reminders and opt-out; unclaimed state on profiles; Verified upsell in the owner dashboard (ADR-25) | ✅ |
 | Bulk CSV import with validation + dedupe preview; merge duplicates (redirect + move reviews); area pages (gated); OSM map on profiles | ✅ |
 | "Near me" / multi-pin map search | ❌ | MapLibre when local search ships |
 
@@ -65,6 +65,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 |---|---|
 | Federated, ranked, prefix, autocomplete, popular, trending, city filter, synonyms (EN/Roman Urdu), search log + zero-result backlog | ✅ |
 | Typo tolerance (`pg_trgm` trigram fallback + did-you-mean), intent detection (tool / place / explainer / number / story) with per-type rank blending | ✅ |
+| Polish: instant answers (live figure, worked example), facet tabs with counts, grouped suggestions from a CDN-cached index, recent and popular searches, related searches, news sort, result click tracking, "/" hotkey | ✅ |
 
 ## Newsletter
 | Item | Status |
@@ -104,10 +105,14 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | Homepage hero (lead story + numbered headlines with thumbnails + city photo strip) | ✅ |
 | Photo banners on city / category hubs; photo tiles on hubs | ✅ |
 | Skeletons, error states | 🟡 skeletons ✅; error pages basic |
+| Mega menu (full-width panels per section, mobile expanders) | ✅ |
+| Admin shell: grouped sidebar with queue counts, dashboard KPIs with weekly deltas and 14-day bars, needs-attention queue, consistent tabs/tables/rows, pagination, system status, editor autosave + Ctrl+S + crash recovery | ✅ |
+| Free-tier architecture (docs/FREE-TIER.md, ADR-24): R2 images with renditions, no image optimiser, session hint cookie, email budget, daily-only crons with opportunistic jobs, pruning | ✅ |
 
 ## Next builds (in order)
 1. ✅ Directory volume tooling (import, dedupe, areas, map)
 2. More compare pages (cars, bank accounts, mobile packages) on the inverter-compare pattern.
 3. Tools to 30: ✅ sales tax, 231B, EOBI, FX converter, personal loan, increment, age · next: stamp duty per province, savings/NSC, car import duty, gas bill, freelancer tax, provident fund
 4. ✅ Typo tolerance + intent blending in search.
-5. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md`), then AdSense, Resend, Search Console, Position Tracking.
+5. Professional profiles (doctors, electricians, engineers, architects…): profile with handles, experience, CV, contact; claim and verify like businesses.
+6. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md` + `docs/FREE-TIER.md`), then AdSense, Resend, Search Console, Position Tracking.

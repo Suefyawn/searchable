@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AdminPage, Empty, FilterTabs, Row, Rows, Toolbar } from "@/components/admin";
 import { Badge, Button } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { timeAgo } from "@/lib/format";
@@ -33,49 +33,42 @@ export default async function IdeasPage({ searchParams }: { searchParams: Promis
   const filtered = q ? items.filter((i) => i.title.toLowerCase().includes(q.toLowerCase())) : items;
 
   return (
-    <div>
-      <h1 className="mb-1 text-2xl font-semibold">Story ideas</h1>
-      <p className="mb-4 text-sm text-2">
-        {PRESS_FEEDS.length} feeds, refreshed every 15 minutes. Pick a headline, click <em>Start draft</em>, and write the Searchable version: what it means for readers, with numbers and a tool or guide link. The source goes in the sources list automatically.
-      </p>
-      <div className="mb-4 flex flex-wrap items-center gap-2 border-y border-line py-2 text-sm">
-        {TOPICS.map((t) => (
-          <Link key={t.key} href={`/admin/ideas?topic=${t.key}${q ? `&q=${encodeURIComponent(q)}` : ""}`} className={`px-2.5 py-1.5 ${topic === t.key ? "bg-ink-900 text-white" : "text-2 hover:bg-surface-2"}`}>
-            {t.label}
-          </Link>
-        ))}
-        <form className="ml-auto flex gap-2">
-          <input type="hidden" name="topic" value={topic} />
-          <input name="q" defaultValue={q} placeholder="Filter headlines" className="h-8 border border-line bg-surface px-2 text-sm" />
-          <Button size="sm" variant="secondary" type="submit">Filter</Button>
-        </form>
-      </div>
-      <ul className="divide-y divide-[var(--border)]">
+    <AdminPage title="Story ideas" description={`${PRESS_FEEDS.length} feeds, refreshed every 15 minutes. Pick a headline, start a draft, and write the Searchable version: what it means for readers, with numbers and a calculator or guide link. The source goes into the sources list automatically.`} wide>
+      <FilterTabs items={TOPICS.map((t) => ({ href: `/admin/ideas?topic=${t.key}${q ? `&q=${encodeURIComponent(q)}` : ""}`, label: t.label, active: topic === t.key }))} />
+      <Toolbar search={{ placeholder: "Filter headlines…", defaultValue: q, hidden: { topic } }}>
+        <span className="text-3">{filtered.length} headlines</span>
+      </Toolbar>
+      <Rows>
         {filtered.map((it) => (
-          <li key={it.url} className="flex flex-wrap items-start justify-between gap-3 py-2.5">
-            <div className="min-w-0 flex-1">
-              <a href={it.url} target="_blank" rel="noopener" className="font-medium underline-offset-4 hover:underline">
-                {it.title}
-              </a>
-              <p className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-3">
-                <Badge>{it.topic}</Badge>
-                <span>{it.source}</span>
-                <span>{timeAgo(new Date(it.publishedAt))}</span>
-                {it.category ? <span>{it.category}</span> : null}
-              </p>
-            </div>
-            <form action={startDraftFromHeadline}>
-              <input type="hidden" name="title" value={it.title} />
-              <input type="hidden" name="url" value={it.url} />
-              <input type="hidden" name="source" value={it.source} />
-              <input type="hidden" name="topic" value={it.topic} />
-              <input type="hidden" name="region" value={it.region} />
-              <Button size="sm" variant="outline" type="submit">Start draft</Button>
-            </form>
-          </li>
+          <Row
+            key={it.url}
+            className="py-2.5"
+            actions={
+              <form action={startDraftFromHeadline}>
+                <input type="hidden" name="title" value={it.title} />
+                <input type="hidden" name="url" value={it.url} />
+                <input type="hidden" name="source" value={it.source} />
+                <input type="hidden" name="topic" value={it.topic} />
+                <input type="hidden" name="region" value={it.region} />
+                <Button size="sm" variant="outline" type="submit">
+                  Start draft
+                </Button>
+              </form>
+            }
+          >
+            <a href={it.url} target="_blank" rel="noopener" className="font-medium underline-offset-4 hover:underline">
+              {it.title}
+            </a>
+            <p className="mt-0.5 flex flex-wrap items-center gap-2 text-[12.5px] text-3">
+              <Badge>{it.topic}</Badge>
+              <span>{it.source}</span>
+              <span>{timeAgo(new Date(it.publishedAt))}</span>
+              {it.category ? <span>{it.category}</span> : null}
+            </p>
+          </Row>
         ))}
-        {filtered.length === 0 ? <li className="py-8 text-center text-2">No headlines match.</li> : null}
-      </ul>
-    </div>
+        {filtered.length === 0 ? <Empty>No headlines match.</Empty> : null}
+      </Rows>
+    </AdminPage>
   );
 }
