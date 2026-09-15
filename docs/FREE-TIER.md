@@ -69,3 +69,6 @@ Functions run in Tokyo (`regions: ["hnd1"]` in vercel.json) because the database
 
 ## Error monitoring
 No Sentry. Next's `onRequestError` hook (`src/instrumentation.ts`) writes every uncaught server error (pages, route handlers, server actions) into `analytics_events` as an `error` event with message, digest, route and the top of the stack; the error page sends browser crashes through `/api/track` with the same digest. `/admin/system` shows the last day grouped by message; the rows are pruned with the other events after 90 days. Vercel's own function logs keep the full stack for a few hours if more is needed.
+
+## ISR gotcha (found 2026-09-15, evening)
+A route with a dynamic segment (`/news/[category]/[slug]`, `/data/[slug]`, `/b/[slug]`, every list) is only cached when it exports `generateStaticParams`, even one that returns `[]`. Without it `export const revalidate` is ignored and the page renders on every request (`Cache-Control: private, no-store`), which is what happened for the first day live. Every public dynamic-segment page now exports the empty function and is built on first visit, then served from the CDN for its `revalidate` window; writes call `revalidatePath` as before. Check with `curl -I`: `s-maxage=…` is cached, `private, no-store` is not.

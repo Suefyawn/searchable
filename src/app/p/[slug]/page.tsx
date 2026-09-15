@@ -18,6 +18,11 @@ import { SaveButton } from "@/components/saved/save-button";
 import { ProLeadForm } from "./lead-form";
 
 export const revalidate = 3600;
+// Nothing is prerendered at build time, but exporting this is what makes the route ISR: without it a dynamic
+// segment renders on every request. Pages are built on first visit and cached for `revalidate` seconds.
+export function generateStaticParams() {
+  return [];
+}
 
 const SOCIAL: { key: keyof NonNullable<Awaited<ReturnType<typeof getProfessional>>>["social"]; label: string; base: string }[] = [
   { key: "linkedin", label: "LinkedIn", base: "https://www.linkedin.com/in/" },

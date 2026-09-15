@@ -7,6 +7,11 @@ import { getArea } from "@/db/queries/geo";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 
 export const revalidate = 3600;
+// Nothing is prerendered at build time, but exporting this is what makes the route ISR: without it a dynamic
+// segment renders on every request. Pages are built on first visit and cached for `revalidate` seconds.
+export function generateStaticParams() {
+  return [];
+}
 type Props = { params: Promise<{ city: string; area: string }> };
 
 /** Area hub, e.g. /cities/lahore/gulberg, categories with listings in the area plus the top-rated ones. */

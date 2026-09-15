@@ -9,6 +9,11 @@ import { listProfessionals } from "@/lib/professionals";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 
 export const revalidate = 1800;
+// Nothing is prerendered at build time, but exporting this is what makes the route ISR: without it a dynamic
+// segment renders on every request. Pages are built on first visit and cached for `revalidate` seconds.
+export function generateStaticParams() {
+  return [];
+}
 /** Thin pages (under three profiles) stay out of the index until they have substance. */
 const INDEX_MIN = 3;
 

@@ -1,6 +1,11 @@
 import { ArticleRoute, articleMetadata } from "@/components/section-pages";
 
 export const revalidate = 600;
+// Nothing is prerendered at build time, but exporting this is what makes the route ISR: without it a dynamic
+// segment renders on every request. Pages are built on first visit and cached for `revalidate` seconds.
+export function generateStaticParams() {
+  return [];
+}
 
 type Props = { params: Promise<{ category: string; slug: string }> };
 

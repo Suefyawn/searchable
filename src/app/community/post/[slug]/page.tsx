@@ -18,6 +18,11 @@ import { SITE } from "@/lib/utils";
 import { BidForm } from "./bid-form";
 
 export const revalidate = 300;
+// Nothing is prerendered at build time, but exporting this is what makes the route ISR: without it a dynamic
+// segment renders on every request. Pages are built on first visit and cached for `revalidate` seconds.
+export function generateStaticParams() {
+  return [];
+}
 
 function auctionEnded(endsAt?: string) {
   return !!endsAt && Date.parse(endsAt) < Date.now();

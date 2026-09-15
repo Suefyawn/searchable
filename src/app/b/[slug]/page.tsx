@@ -16,6 +16,11 @@ import { ReportForm } from "@/components/report-form";
 import { ReviewForm } from "@/components/directory/review-form";
 
 export const revalidate = 3600;
+// Nothing is prerendered at build time, but exporting this is what makes the route ISR: without it a dynamic
+// segment renders on every request. Pages are built on first visit and cached for `revalidate` seconds.
+export function generateStaticParams() {
+  return [];
+}
 type Props = { params: Promise<{ slug: string }> };
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
