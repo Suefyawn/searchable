@@ -28,6 +28,13 @@ export default function ElectricityHub() {
           </Link>
         ))}
       </div>
+      <div className="mt-8 border-y-2 border-[var(--rule)] py-4">
+        <p className="eyebrow">Solar</p>
+        <p className="mt-1 font-serif text-xl">
+          <Link href="/electricity/net-metering" className="headline-link">Net metering in 2026: new NEPRA rules, approved inverters and how to apply at your DISCO</Link>
+        </p>
+        <p className="mt-1 text-sm text-2">Net billing replaced net metering in February 2026 — export credit, eligibility, time limits and costs explained.</p>
+      </div>
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <ToolCard tool={getTool("electricity-bill-calculator")!} />
         <ToolCard tool={getTool("ac-running-cost-calculator")!} />

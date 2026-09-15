@@ -50,6 +50,13 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 | electricity bill calculator | 1,300 | 13 | same |
 | per unit electricity price in pakistan | 720 | 20 | same + DISCO tariff tables |
 
+### Net metering (`/electricity/net-metering`)
+| Keyword | Vol | KD | Page |
+|---|---|---|---|
+| net metering in pakistan / net metering | — | — | /electricity/net-metering (hub: 2026 NEPRA Prosumer Regulations, approved inverter list, per-DISCO sections with anchors) |
+| lesco / iesco / k electric net metering | — | — | same, #lesco #iesco #k-electric |
+| net metering approved inverters | — | — | same, #approved-inverters |
+
 ### Tools
 | Keyword | Vol | KD | Page |
 |---|---|---|---|

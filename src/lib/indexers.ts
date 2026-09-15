@@ -125,6 +125,17 @@ export async function indexStaticPages() {
   });
   await syncSearchDocument({
     entityType: "guide",
+    entityId: "hub:net-metering",
+    url: "/electricity/net-metering",
+    title: "Net metering in Pakistan 2026 — new NEPRA rules, approved inverters, how to apply",
+    summary: "Net billing export rate, eligibility, step-by-step application with legal time limits, costs, the approved inverter list and DISCO-by-DISCO details for LESCO, IESCO, MEPCO, K-Electric and the rest.",
+    keywords: "net metering, net metering in pakistan, net metering pakistan 2026, net billing, nepra prosumer regulations, net metering approved inverters, approved inverter list, lesco net metering, iesco net metering, mepco net metering, k electric net metering, net metering cost, net metering procedure, green meter, bi-directional meter, solar export rate",
+    category: "Electricity",
+    categorySlug: "utilities",
+    boost: 1.4,
+  });
+  await syncSearchDocument({
+    entityType: "guide",
     entityId: "hub:solar-inverters",
     url: "/compare/solar-inverters",
     title: "Solar inverter price in Pakistan — compare hybrid, on-grid and off-grid",

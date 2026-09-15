@@ -160,7 +160,7 @@ export default function SolarInverterComparePage() {
               <li><strong>Size to your load, not your roof.</strong> Add up what runs at once on a summer evening (each 1.5-ton inverter AC ≈ 1.2–1.8 kW). A 6 kW single-phase hybrid covers most 5–10 marla houses; go three-phase above 8 kW or if your meter is three-phase.</li>
               <li><strong>Two MPPTs minimum.</strong> Roofs facing two directions, or partial shade, need independent strings. Budget off-grid units have one.</li>
               <li><strong>48 V battery bus</strong> for anything hybrid — the standard for lithium packs from every brand. Huawei uses its own high-voltage LUNA battery.</li>
-              <li><strong>Check net-metering approval.</strong> Your DISCO’s list of approved inverters matters more than the spec sheet. All hybrid and on-grid units here are commonly approved; off-grid never is.</li>
+              <li><strong>Check net-metering approval.</strong> Your DISCO’s list of approved inverters matters more than the spec sheet. All hybrid and on-grid units here are commonly approved; off-grid never is. See the <Link href="/electricity/net-metering#approved-inverters" className="underline underline-offset-4">approved inverter list</Link>.</li>
               <li><strong>Warranty is only as good as the service centre.</strong> Ask where the nearest one is and whether the warranty is replacement or repair. Five years is standard; Huawei gives ten.</li>
               <li><strong>Get three quotes</strong> for the installed system, not the inverter alone — installers bundle margin into structure and wiring. Use the <Link href="/tools/solar/solar-payback-calculator" className="underline underline-offset-4">Solar System Calculator</Link> to size from your bill first.</li>
             </ol>
@@ -186,7 +186,7 @@ export default function SolarInverterComparePage() {
             <p className="eyebrow">Related</p>
             <ul className="mt-2 space-y-1.5">
               <li><Link href="/data/solar-panel-price" className="underline-offset-4 hover:underline">Solar panel price per watt today</Link></li>
-              <li><Link href="/guides/utilities/how-to-apply-for-net-metering-in-pakistan" className="underline-offset-4 hover:underline">How to apply for net metering</Link></li>
+              <li><Link href="/electricity/net-metering" className="underline-offset-4 hover:underline">Net metering rules &amp; approved inverter list</Link></li>
               <li><Link href="/businesses/solar-companies" className="underline-offset-4 hover:underline">Solar installers near you</Link></li>
               <li><Link href="/data/usd-pkr" className="underline-offset-4 hover:underline">Dollar rate today (inverters are priced in USD)</Link></li>
               <li><Link href="/electricity" className="underline-offset-4 hover:underline">Electricity bill check &amp; tariff</Link></li>

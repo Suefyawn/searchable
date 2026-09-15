@@ -46,6 +46,7 @@ export default async function DiscoPage({ params }: Props) {
   const faqs = faqsFor(d);
   const crumbs = [{ name: "Electricity", path: "/electricity" }, { name: d.short, path: `/electricity/${d.slug}` }];
   const others = DISCOS.filter((x) => x.slug !== d.slug);
+  const netMeteringHref = `/electricity/net-metering#${d.slug}`;
 
   return (
     <div className="container-x py-8 sm:py-12">
@@ -141,8 +142,8 @@ export default async function DiscoPage({ params }: Props) {
                 </Link>
               </li>
               <li>
-                <Link href="/guides/utilities/how-to-apply-for-net-metering-in-pakistan" className="underline-offset-4 hover:underline">
-                  How to apply for net metering
+                <Link href={netMeteringHref} className="underline-offset-4 hover:underline">
+                  {d.short} net metering: 2026 rules, approved inverters, how to apply
                 </Link>
               </li>
               <li>

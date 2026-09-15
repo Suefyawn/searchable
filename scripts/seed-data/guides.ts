@@ -190,41 +190,92 @@ Ask the seller to show the IMEI as **PTA approved** before paying. "Non-PTA" pho
   {
     slug: "how-to-apply-for-net-metering-in-pakistan",
     category: "utilities",
-    title: "How to apply for net metering in Pakistan (LESCO, IESCO, K-Electric)",
-    dek: "Net metering lets your rooftop solar export units to the grid and offset your bill. The process runs through your DISCO and NEPRA and takes 1–3 months.",
+    title: "How to apply for net metering in Pakistan in 2026 (LESCO, IESCO, MEPCO, K-Electric)",
+    dek: "Net metering became net billing in February 2026 under NEPRA's Prosumer Regulations. Here is who qualifies, what it costs, which inverters pass, and the step-by-step process with the working-day limits the DISCO must meet.",
     entities: ["nepra", "lesco", "k-electric", "solar-energy"],
-    body: `## Eligibility
+    body: `## What changed in 2026
 
-- Three-phase connection (most systems above 5 kW need it; some DISCOs allow single-phase up to 5 kW).
-- Installed capacity between **1 kW and 1 MW**.
-- Installer must be an **AEDB-certified** vendor.
+NEPRA notified the **Prosumer Regulations** on 10 February 2026, repealing the 2015 net-metering regulations. The new arrangement is **net billing**:
 
-## Steps
+- Units you **import** are billed at your normal slab tariff (Rs 37–55 before taxes).
+- Units you **export** are credited at the **National Average Energy Purchase Price (NAEPP)** — about **Rs 10–11 per unit** — instead of one-for-one.
+- Credits are settled **monthly**; a surplus rolls to the next bill or is paid quarterly.
+- New agreements run **5 years**, renewable.
+- Existing agreements keep their term and are credited at the higher **NAPPP (about Rs 25–26)** until expiry, then renew on the new terms.
 
-1. **Install the system** with a certified vendor. Get the single-line diagram, panel and inverter datasheets, and the vendor's AEDB certificate.
-2. **Apply to your DISCO** (LESCO, IESCO, K-Electric, etc.) — the vendor usually submits it. Attach CNIC, latest bill, property ownership proof, and the technical documents.
-3. **Site inspection** by the DISCO; they check the inverter's grid-tie protection.
-4. **NEPRA generation licence** — the DISCO forwards the application; NEPRA issues a licence (this is where most delays happen).
-5. **Agreement & meter** — sign the net-metering agreement and pay for the bi-directional meter.
-6. **Commissioning** — the DISCO installs the meter and the system starts exporting.
+Self-consumption is now worth four to five times more than export, so size the system to your daytime load. The full rules, timelines and DISCO-by-DISCO details are on the [net metering hub](/electricity/net-metering).
+
+## Eligibility
+
+- **Three-phase 400 V (or 11 kV) connection** — domestic, commercial, industrial, agricultural or bulk. Single-phase houses must upgrade first.
+- System **1 kW to 1 MW**, and **not above your sanctioned load**.
+- Your distribution transformer must have room: the DISCO must refuse once solar on it reaches **80% of its rating**.
+- Installer certified by **AEDB/PPIB**; single-line diagram signed by a PEC-registered engineer.
+- **Grid-tied or hybrid inverter** with a UL 1741 / IEC 62116 anti-islanding certificate. Off-grid inverters never qualify — see the [approved inverter list](/electricity/net-metering#approved-inverters).
+
+## Documents
+
+- CNIC copy of the consumer named on the bill
+- Latest electricity bill (reference number and sanctioned load)
+- Proof of ownership or tenancy with owner's NOC
+- Installer's AEDB/PPIB certificate
+- Inverter datasheet and anti-islanding / grid-code certificate
+- Panel datasheets (IEC 61215)
+- Single-line diagram and site photos
+- Application on Schedule II of the regulations (the DISCO or installer supplies the form)
+
+## Steps and time limits
+
+| # | Step | Who | Limit |
+|---|---|---|---|
+| 1 | Submit the application with documents | You | — |
+| 2 | DISCO acknowledges and confirms completeness | DISCO | 5 working days |
+| 3 | Supply anything missing | You | 3 working days |
+| 4 | Technical review (feasibility, transformer loading) | DISCO | 15 working days |
+| 5 | Sign the interconnection agreement | Both | 7 working days |
+| 6 | DISCO issues the connection-charge estimate (bi-directional meter) | DISCO | 7 working days |
+| 7 | Pay the estimate | You | 7 working days |
+| 8 | Meter installed and system commissioned | DISCO | 15 working days |
+| 9 | NEPRA concurrence (Rs 1,000/kW fee + affidavit) | NEPRA | 7 working days |
+
+About **66 working days** end to end if nothing is returned. Billing under net billing starts from NEPRA's concurrence. You must commission within six months of concurrence, and any later change to the system's technical parameters (more panels, bigger inverter) needs fresh concurrence.
 
 ## Costs
 
-Bi-directional meter and processing fees are typically Rs 25,000–60,000 depending on the DISCO. The vendor's quote should state whether it includes net-metering processing.
+| Item | Amount |
+|---|---|
+| NEPRA concurrence fee | Rs 1,000 per kW (Rs 5,000 for 5 kW) |
+| DISCO meter and interconnection estimate | Rs 25,000–65,000 depending on DISCO |
+| Affidavit | Rs 50 stamp paper |
+| Three-phase upgrade if needed | Rs 25,000–60,000 |
+| Installer processing (optional) | Rs 10,000–30,000 |
 
-## How the bill works
+## Where to apply
 
-Units you export are credited against units you import. Under the current framework, exported units are credited at the DISCO's rate for exports (which is lower than the retail rate you pay), so **consuming your own solar during the day saves more than exporting**. Use the [Solar Payback Calculator](/tools/solar/solar-payback-calculator) to model it.
+- **LESCO** — Net Metering Cell, 22-A Queens Road, Lahore, or through your sub-division.
+- **IESCO** — Net Metering Section, Head Office, G-7/4 Islamabad, or the sub-division for Rawalpindi, Attock, Jhelum, Chakwal.
+- **MEPCO** — Net Metering Cell, Khanewal Road, Multan, or the circle office.
+- **K-Electric** — online through KE's net-metering portal / KE Live, or the Distributed Generation cell at KE House, DHA Karachi.
+- Other DISCOs: the headquarters net-metering cell or circle office — addresses on the [hub page](/electricity/net-metering#discos).
 
-## Policy watch
+## If the DISCO stalls
 
-NEPRA has been revising the net-metering framework, including the export rate and the move to "net billing". Existing agreements are typically honoured for their term. Check the latest before signing.`,
+Every step above has a working-day limit in regulations 3 and 4. Quote the regulation number in a written complaint to the DISCO's net-metering cell; if it is ignored, complain to NEPRA's Consumer Affairs Division (complaints portal on nepra.org.pk) citing regulation 17.
+
+## Is it still worth it?
+
+Run your numbers in the [Solar System Calculator](/tools/solar/solar-payback-calculator) with the export rate at Rs 11. For most homes using 60% or more of their generation directly, payback is still 3–4 years; for a system that mostly exports, it stretches to 6+ years.`,
     faqs: [
-      { question: "How long does net metering approval take?", answer: "Typically 4–12 weeks end-to-end, with the NEPRA licence being the slowest step." },
-      { question: "Can I get net metering on a single-phase connection?", answer: "Some DISCOs allow up to 5 kW on single phase; larger systems require a three-phase upgrade." },
-      { question: "Do I still get a bill?", answer: "Yes — fixed charges, taxes and any net import are billed monthly; excess export credits carry forward." },
+      { question: "How long does net metering approval take in 2026?", answer: "The regulations allow about 66 working days across all steps; in practice LESCO and IESCO take one to three months, longer where bi-directional meters are short." },
+      { question: "Can I get net metering on a single-phase connection?", answer: "No. The 2026 regulations define an applicant as a three-phase 400 V or 11 kV consumer. Apply for a three-phase upgrade first." },
+      { question: "What is the export rate under net billing?", answer: "The National Average Energy Purchase Price, about Rs 10–11 per unit for new agreements. Existing agreements are credited at the National Average Power Purchase Price, about Rs 25–26, until they expire." },
+      { question: "Do I still get a bill?", answer: "Yes. Import is billed at your tariff, export is credited at the NAEPP, and the difference plus fixed charges and taxes is your bill. A surplus rolls to the next month or is paid quarterly." },
+      { question: "Which inverter should I buy for net metering?", answer: "A grid-tied or hybrid unit with a UL 1741 / IEC 62116 certificate: Huawei, Sungrow, Solis, GoodWe, Growatt, SMA and Fronius pass without query; Deye, Inverex Nitrox/Aerox, Ziewnic Xtreme and others pass with the certificate attached. Off-grid inverters are refused." },
     ],
-    sources: [{ title: "NEPRA — Alternative & Renewable Energy Distributed Generation and Net Metering Regulations", url: "https://nepra.org.pk", publisher: "NEPRA" }],
+    sources: [
+      { title: "NEPRA (Prosumer) Regulations, 2026", url: "https://www.nepra.org.pk/Admission%20Notices/2025/12%20Dec/NEPRA%20Prosumer%20Regulations.pdf", publisher: "NEPRA" },
+      { title: "Nepra pulls the plug on net-metering", url: "https://www.dawn.com/news/1972203", publisher: "Dawn" },
+    ],
   },
   {
     slug: "how-to-register-a-vehicle-in-punjab",
