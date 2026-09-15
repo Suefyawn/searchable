@@ -76,7 +76,7 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /account                                 User home; /account/profile, /account/posts, /account/saved
 /business                                Owner dashboard (claimed businesses); /business/[id], /upgrade
 /admin                                   CMS + operations (role ≥ editor); /admin/claims, /outreach,
-                                         /professionals, /community, /system
+                                         /professionals, /community, /inbox, /system
 
 /api/auth/[...all]                       better-auth
 /api/search  /api/suggest                JSON search; /suggest-index.json (cached client index)
@@ -85,6 +85,7 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /api/newsletter/subscribe                POST
 /api/tools/[slug]                        POST run (for Ask Searchable + embeds)
 /api/cron/*                              scheduled jobs (Phase 6)
+/api/webhooks/resend                     POST, signed; email.received feeds the admin inbox
 
 /sitemap.xml                             index → /sitemap/[type].xml
 /robots.txt

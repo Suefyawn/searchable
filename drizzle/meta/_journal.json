@@ -78,6 +78,13 @@
       "when": 1789472310117,
       "tag": "0010_saved_items",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1789476303606,
+      "tag": "0011_inbox",
+      "breakpoints": true
     }
   ]
 }

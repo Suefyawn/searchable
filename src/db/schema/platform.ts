@@ -84,3 +84,36 @@ export const messages = pgTable(
   },
   (t) => [index("messages_status_idx").on(t.status, t.createdAt)],
 );
+
+/**
+ * Mail received at *@searchable.pk through Resend receiving, mirrored here so the admin inbox has read
+ * state and survives the provider's retention window. `id` is Resend's received-email id so syncs and
+ * webhooks are idempotent. HTML and attachments stay at Resend and are fetched when a message is opened.
+ */
+export const inboxMessages = pgTable(
+  "inbox_messages",
+  {
+    id: text("id").primaryKey(),
+    /** Local part of the searchable.pk address it was sent to (editorial, billing, hello). */
+    mailbox: text("mailbox").notNull(),
+    fromAddress: text("from_address").notNull(),
+    fromName: text("from_name"),
+    to: jsonb("to").$type<string[]>().default([]).notNull(),
+    cc: jsonb("cc").$type<string[]>().default([]).notNull(),
+    replyTo: jsonb("reply_to").$type<string[]>().default([]).notNull(),
+    subject: text("subject").notNull(),
+    snippet: text("snippet").notNull(),
+    /** Plain-text body, capped; HTML is fetched live. */
+    text: text("text"),
+    hasHtml: integer("has_html").default(0).notNull(),
+    messageId: text("message_id"),
+    inReplyTo: text("in_reply_to"),
+    attachments: jsonb("attachments").$type<{ id: string; filename: string; contentType: string; size: number }[]>().default([]).notNull(),
+    status: text("status").default("new").notNull(), // new | replied | archived
+    readAt: timestamp("read_at", { withTimezone: true }),
+    repliedAt: timestamp("replied_at", { withTimezone: true }),
+    receivedAt: timestamp("received_at", { withTimezone: true }).notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("inbox_messages_status_idx").on(t.status, t.receivedAt), index("inbox_messages_mailbox_idx").on(t.mailbox, t.receivedAt)],
+);

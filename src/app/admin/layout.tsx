@@ -23,6 +23,7 @@ async function queueCounts() {
       (select count(*) from orders where status = 'pending')::int as orders,
       (select count(*) from submissions where status in ('new', 'reviewing'))::int as submissions,
       (select count(*) from messages where status = 'new')::int as messages,
+      (select count(*) from inbox_messages where status = 'new' and read_at is null)::int as inbox,
       (select count(*) from reports where status = 'open')::int as reports,
       (select count(*) from articles where status = 'draft')::int as drafts`,
   );
@@ -39,13 +40,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { title: "Directory", items: [{ href: "/admin/businesses", label: "Businesses", count: c.businesses }, { href: "/admin/claims", label: "Claims", count: c.claims }, { href: "/admin/professionals", label: "Professionals", count: c.professionals }, { href: "/admin/outreach", label: "Outreach" }, { href: "/admin/reviews", label: "Reviews", count: c.reviews }, { href: "/admin/leads", label: "Enquiries" }] },
     { title: "Money", items: [{ href: "/admin/orders", label: "Orders", count: c.orders }, { href: "/admin/submissions", label: "Pitches", count: c.submissions }] },
     { title: "Community", items: [{ href: "/admin/community", label: "Moderation", count: (c.posts ?? 0) + (c.community_reports ?? 0) }] },
-    { title: "Audience", items: [{ href: "/admin/newsletter", label: "Newsletter" }, { href: "/admin/subscribers", label: "Subscribers" }, { href: "/admin/search-log", label: "Search log" }, { href: "/admin/messages", label: "Messages", count: c.messages }, { href: "/admin/reports", label: "Reports", count: c.reports }] },
+    { title: "Audience", items: [{ href: "/admin/newsletter", label: "Newsletter" }, { href: "/admin/subscribers", label: "Subscribers" }, { href: "/admin/search-log", label: "Search log" }, { href: "/admin/inbox", label: "Inbox", count: c.inbox }, { href: "/admin/messages", label: "Messages", count: c.messages }, { href: "/admin/reports", label: "Reports", count: c.reports }] },
     { title: "System", items: [{ href: "/admin/redirects", label: "Redirects" }, { href: "/admin/system", label: "Status" }] },
   ];
   return (
     <div className="container-x py-8">
       <div className="grid gap-8 lg:grid-cols-[190px_minmax(0,1fr)]">
-        <aside className="self-start lg:sticky lg:top-24">
+        <aside className="min-w-0 self-start lg:sticky lg:top-24">
           <div className="mb-4 flex items-baseline justify-between px-2">
             <p className="font-serif text-lg">Admin</p>
             <Link href="/" className="text-[12.5px] text-3 hover:text-[var(--text)]">

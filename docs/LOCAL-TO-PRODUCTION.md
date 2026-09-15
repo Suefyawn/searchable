@@ -6,9 +6,9 @@ Local runs on PGlite with files on disk. Production is **Vercel (Hobby for now) 
 
 ## 1. Accounts, in this order
 1. **GitHub**: done, `Suefyawn/searchable`, branch `main`.
-2. **Supabase**: one project, region **ap-south-1 (Mumbai)** for Pakistan latency (Singapore second). Free plan.
-3. **Cloudflare**: the domain's DNS, an R2 bucket `searchable-media` with a public custom domain (`img.searchable.pk`), an R2 API token (object read and write on that bucket), Web Analytics, Turnstile (later).
-4. **Resend**: verify `searchable.pk` (DKIM, SPF, DMARC records go in Cloudflare DNS). Sending from `daily@searchable.pk`.
+2. **Supabase**: one project, free plan. Ours is `searchablepk` in ap-northeast-1 (Tokyo); Mumbai or Singapore would be closer for a new one.
+3. **Cloudflare**: the domain's DNS, an R2 bucket (`searchable-images`) with a public custom domain (`img.searchable.pk`), an R2 API token (object read and write on that bucket), Web Analytics, Turnstile (later).
+4. **Resend**: verify `searchable.pk` (DKIM, SPF, DMARC records go in Cloudflare DNS). Sending from `daily@searchable.pk`. Enable receiving (MX record) so every @searchable.pk address lands in `/admin/inbox`; the API key must be **full access** because the receiving endpoints need it. Add a webhook for `email.received` pointing at `https://searchable.pk/api/webhooks/resend` and put its signing secret in `RESEND_WEBHOOK_SECRET` (optional: without it the inbox syncs every 5 minutes instead of instantly).
 5. **Vercel**: import the GitHub repo. Framework Next.js, Node 22. Hobby plan is fine until there is revenue (it forbids commercial use; move to Pro or Cloudflare Workers when ads or paid listings start).
 6. **cron-job.org** (free): pings `/api/cron/publish` every 5 minutes so scheduled publishing and newsletters are exact; Hobby crons run once a day.
 7. Later: Google Search Console, Bing Webmaster Tools, Google News Publisher Center, AdSense.
@@ -21,12 +21,13 @@ BETTER_AUTH_URL=https://searchable.pk
 BETTER_AUTH_SECRET=<openssl rand -hex 32>
 
 # Supabase: Connect > Transaction pooler (port 6543) for the app
-DATABASE_URL=postgres://postgres.<ref>:<password>@aws-0-ap-south-1.pooler.supabase.com:6543/postgres
+DATABASE_URL=postgres://postgres.<ref>:<password>@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres
 
 CRON_SECRET=<openssl rand -hex 24>
 
 EMAIL_PROVIDER=resend
-RESEND_API_KEY=re_...
+RESEND_API_KEY=re_...            # full access (receiving needs it)
+RESEND_WEBHOOK_SECRET=whsec_...  # optional, instant inbox
 EMAIL_FROM="Searchable <daily@searchable.pk>"
 EMAIL_DAILY_CAP=95
 EMAIL_MONTHLY_CAP=2900
@@ -39,7 +40,7 @@ STORAGE_PROVIDER=r2
 R2_ACCOUNT_ID=<cloudflare account id>
 R2_ACCESS_KEY_ID=...
 R2_SECRET_ACCESS_KEY=...
-R2_BUCKET=searchable-media
+R2_BUCKET=searchable-images
 R2_PUBLIC_URL=https://img.searchable.pk
 
 INDEXNOW_KEY=<32 hex chars>
@@ -56,10 +57,10 @@ Preview deployments can reuse the same variables with a second free Supabase pro
 ## 3. Database, from this machine
 ```bash
 # Session pooler (port 5432) for migrations and scripts; the app uses 6543
-export DATABASE_URL="postgres://postgres.<ref>:<password>@aws-0-ap-south-1.pooler.supabase.com:5432/postgres"
+export DATABASE_URL="postgres://postgres.<ref>:<password>@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres"
 export SEED_ADMIN_EMAIL=... SEED_ADMIN_PASSWORD=...
 
-npm run db:migrate                 # applies drizzle/0000 to 0010
+npm run db:migrate                 # applies drizzle/0000 to 0011
 SEED_MODE=reference npm run db:seed   # locations, categories, entities, synonyms, data series, tools, admin user; no sample articles or businesses
 npm run search:reindex
 npm run preflight                  # should print "Ready to deploy"
@@ -73,6 +74,7 @@ In Supabase: Database > Extensions > enable `pg_trgm` before reindexing (search 
 - [ ] Upload a photo in the article editor: it lands on `img.searchable.pk` with 480 and 960 renditions.
 - [ ] Publish an article; it appears on `/news` within a minute and shows up in `/search`.
 - [ ] Subscribe to the newsletter with your own address: the confirmation arrives from Resend.
+- [ ] Send a mail to hello@searchable.pk from your phone: it appears in `/admin/inbox` (instantly with the webhook, within 5 minutes without); reply from there and check it threads.
 - [ ] `curl -H "authorization: Bearer $CRON_SECRET" https://searchable.pk/api/cron/publish` returns `ran: true`; add that URL to cron-job.org every 5 minutes with the header.
 - [ ] Search Console and Bing: verify, submit both sitemaps; check the IndexNow key URL.
 - [ ] Rich Results test on one tool page, one data page, one professional profile.

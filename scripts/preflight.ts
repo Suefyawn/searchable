@@ -23,6 +23,7 @@ async function main() {
   checks.push({ name: "DATABASE_URL uses the transaction pooler (port 6543)", ok: /:6543\//.test(env.DATABASE_URL ?? ""), note: "Supabase: Connect > Transaction pooler; migrations use the session pooler on 5432" });
   checks.push({ name: "CRON_SECRET set", ok: has("CRON_SECRET"), required: true });
   checks.push({ name: "EMAIL_PROVIDER=resend with RESEND_API_KEY", ok: env.EMAIL_PROVIDER === "resend" && has("RESEND_API_KEY"), required: true });
+  checks.push({ name: "RESEND_WEBHOOK_SECRET set (instant admin inbox; sync every 5 minutes without it)", ok: /^whsec_/.test(env.RESEND_WEBHOOK_SECRET ?? ""), note: "Resend > Webhooks > add https://searchable.pk/api/webhooks/resend for email.received" });
   checks.push({ name: "EMAIL_FROM on the verified domain", ok: /@searchable\.pk>?$/.test(env.EMAIL_FROM ?? ""), note: env.EMAIL_FROM ?? "unset" });
   checks.push({ name: "STORAGE_PROVIDER=r2 with R2_* set", ok: env.STORAGE_PROVIDER === "r2" && ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET", "R2_PUBLIC_URL"].every(has), note: env.STORAGE_PROVIDER ?? "local", required: true });
   checks.push({ name: "R2_PUBLIC_URL is https", ok: /^https:\/\//.test(env.R2_PUBLIC_URL ?? "") });
@@ -37,7 +38,7 @@ async function main() {
       await rawQuery(db, sql`select 1`);
       checks.push({ name: "Database reachable", ok: true, required: true });
       const [m] = await rawQuery<{ n: number }>(db, sql`select count(*)::int as n from drizzle.__drizzle_migrations`).catch(() => [{ n: -1 }]);
-      checks.push({ name: "Migrations applied", ok: m?.n >= 11, note: m?.n >= 0 ? `${m.n} applied` : "migrations table missing: run npm run db:migrate", required: true });
+      checks.push({ name: "Migrations applied", ok: m?.n >= 12, note: m?.n >= 0 ? `${m.n} applied` : "migrations table missing: run npm run db:migrate", required: true });
       const [ext] = await rawQuery<{ n: number }>(db, sql`select count(*)::int as n from pg_extension where extname = 'pg_trgm'`).catch(() => [{ n: 0 }]);
       checks.push({ name: "pg_trgm extension enabled", ok: (ext?.n ?? 0) > 0, note: "Supabase: Database > Extensions > pg_trgm", required: true });
       const [docs] = await rawQuery<{ n: number }>(db, sql`select count(*)::int as n from search_documents`).catch(() => [{ n: 0 }]);

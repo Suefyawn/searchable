@@ -3,7 +3,17 @@ import path from "node:path";
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 
-export type Email = { to: string; subject: string; html: string; text?: string };
+export type Email = {
+  to: string;
+  subject: string;
+  html: string;
+  text?: string;
+  /** Override the sender (must be on the verified domain), e.g. a reply from editorial@searchable.pk. */
+  from?: string;
+  replyTo?: string;
+  /** Extra RFC headers such as In-Reply-To and References so replies thread in the recipient's client. */
+  headers?: Record<string, string>;
+};
 /** transactional: confirmations, invoices, password mail. bulk: newsletter issues. */
 export type EmailKind = "transactional" | "bulk";
 
@@ -54,7 +64,7 @@ export async function emailAllowance(kind: EmailKind = "bulk"): Promise<{ today:
  */
 export async function sendEmail(email: Email, kind: EmailKind = "transactional"): Promise<{ id: string }> {
   const provider = process.env.EMAIL_PROVIDER ?? "local";
-  const from = process.env.EMAIL_FROM ?? "Searchable <daily@searchable.pk>";
+  const from = email.from ?? process.env.EMAIL_FROM ?? "Searchable <daily@searchable.pk>";
 
   const budget = await readBudget();
   const reserve = kind === "bulk" ? BULK_RESERVE : 0;
@@ -65,7 +75,7 @@ export async function sendEmail(email: Email, kind: EmailKind = "transactional")
   if (provider === "resend" && process.env.RESEND_API_KEY) {
     const { Resend } = await import("resend");
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const { data, error } = await resend.emails.send({ from, to: email.to, subject: email.subject, html: email.html, text: email.text });
+    const { data, error } = await resend.emails.send({ from, to: email.to, subject: email.subject, html: email.html, text: email.text, replyTo: email.replyTo, headers: email.headers });
     if (error) throw new Error(error.message);
     id = data?.id ?? "";
   } else {
@@ -73,7 +83,10 @@ export async function sendEmail(email: Email, kind: EmailKind = "transactional")
     mkdirSync(dir, { recursive: true });
     id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const file = path.join(dir, `${id}.eml`);
-    writeFileSync(file, `From: ${from}\nTo: ${email.to}\nSubject: ${email.subject}\nDate: ${new Date().toUTCString()}\nContent-Type: text/html; charset=utf-8\n\n${email.html}`);
+    const extra = Object.entries(email.headers ?? {})
+      .map(([k, v]) => `${k}: ${v}\n`)
+      .join("");
+    writeFileSync(file, `From: ${from}\nTo: ${email.to}\nSubject: ${email.subject}\nDate: ${new Date().toUTCString()}\n${extra}Content-Type: text/html; charset=utf-8\n\n${email.html}`);
     console.log(`[email:local] ${email.subject} -> ${email.to}  (${file})`);
   }
   budget.dayCount += 1;
