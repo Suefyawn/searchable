@@ -54,13 +54,51 @@ export async function storeDocument(input: Buffer, opts: { mimeType: string; ori
   return { id, url, bytes: input.length };
 }
 
-/** Writes `<stem>-480.webp` and `<stem>-960.webp` for any rendition narrower than the master. */
+/**
+ * Writes `<stem>-480.webp` and `<stem>-960.webp`. Every rendition name always exists: a master narrower than
+ * the rendition is written as is under that name (never enlarged), because pages build the srcset from the
+ * URL alone and a missing rendition is a broken image, not a fallback.
+ */
 export async function writeRenditions(image: sharp.Sharp, masterWidth: number, stem: string) {
   for (const w of RENDITION_WIDTHS) {
-    if (w >= masterWidth) continue;
-    const r = await image.clone().resize({ width: w, withoutEnlargement: true }).webp({ quality: 78, effort: 4 }).toBuffer();
+    const r = await image.clone().resize({ width: Math.min(w, masterWidth || w), withoutEnlargement: true }).webp({ quality: 78, effort: 4 }).toBuffer();
     await putObject(`${stem}-${w}.webp`, r, "image/webp");
   }
+}
+
+/**
+ * Backfill for files stored before every rendition name existed: for each stored image narrower than the
+ * widest rendition, fetch the master and write the names that are missing. Returns how many were written.
+ */
+export async function backfillRenditions(limit = 40): Promise<{ checked: number; written: number; failed: string[] }> {
+  const db = await getDb();
+  const rows = await db.query.media.findMany({ where: (m, { and, lt, like, gt }) => and(lt(m.width, Math.max(...RENDITION_WIDTHS)), gt(m.width, 0), like(m.storageKey, "uploads/%.webp")), limit });
+  if (!rows.length) return { checked: 0, written: 0, failed: [] };
+  let written = 0;
+  const failed: string[] = [];
+  for (const m of rows) {
+    const stem = (m.storageKey ?? "").replace(/[.]webp$/, "");
+    if (!stem) continue;
+    try {
+      const missing: number[] = [];
+      for (const w of RENDITION_WIDTHS) {
+        if (w < (m.width ?? 0)) continue;
+        const head = await fetch(m.url.replace(/[.]webp$/, `-${w}.webp`), { method: "HEAD", cache: "no-store" });
+        if (!head.ok) missing.push(w);
+      }
+      if (!missing.length) continue;
+      const res = await fetch(m.url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`${res.status}`);
+      const buf = Buffer.from(await res.arrayBuffer());
+      for (const w of missing) {
+        await putObject(`${stem}-${w}.webp`, buf, "image/webp");
+        written += 1;
+      }
+    } catch (e) {
+      failed.push(`${m.storageKey}: ${(e as Error).message}`);
+    }
+  }
+  return { checked: rows.length, written, failed };
 }
 
 export async function putObject(key: string, data: Buffer, contentType: string): Promise<string> {
