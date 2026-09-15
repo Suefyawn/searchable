@@ -28,8 +28,11 @@ async function create(): Promise<Database> {
   const { drizzle } = await import("drizzle-orm/postgres-js");
   // Serverless: one connection per function instance, released quickly, so the Supabase pooler (port 6543)
   // never runs out of slots on the free plan. Long-running servers can hold a few.
+  // Supavisor in transaction mode hangs when postgres-js pipelines more than a couple of queries on one
+  // connection (a page's Promise.all of eight queries stalled for good), so pipelining is off: queued
+  // queries go one at a time, which costs a few hundred milliseconds on a cold render and nothing on ISR hits.
   const serverless = !!process.env.VERCEL || !!process.env.CF_PAGES || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
-  const client = postgres(DATABASE_URL, { max: serverless ? 1 : 5, prepare: false, idle_timeout: 20, connect_timeout: 10 });
+  const client = postgres(DATABASE_URL, { max: serverless ? 1 : 5, prepare: false, max_pipeline: 0, idle_timeout: 20, connect_timeout: 10 });
   return drizzle(client, { schema }) as unknown as Database;
 }
 
