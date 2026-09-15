@@ -37,7 +37,8 @@ On the 1st and 16th of each month (fuel price reviews), and any day OGRA moves t
 11. GET /inbox?status=new. For genuine mail, POST /inbox {"id","reply"} (it goes out from the mailbox the mail arrived at, threaded). Spam: {"id","status":"archived"}. Keep replies short and factual; do not promise refunds, features or timelines. Stay under email.leftToday.
 12. Dawn only: GET /newsletter, take suggestedDraft, sharpen the subject and intro, POST /newsletter {"create": true, "frequency": "daily", "subject", "preheader", "body", "scheduledFor": today 07:30 PKT as ISO (02:30Z)}.
 13. Night only: POST /jobs {"job": "due"}. Also on Night: for the sample content still on the site (stories and businesses from the launch seed, identifiable by their generic sources), replace one sample story per night with a properly sourced update of the same subject, or leave it and note it.
-14. End with a report: published (title and URL), updated, scheduled, backlog item and status, data recorded, businesses added, rate changes for the developer, queue decisions, inbox replies, items left for a human, API errors.
+14. Do not send notifications, summaries, emails or messages anywhere; the report below, in the task output, is the only output.
+15. End with a report: published (title and URL), updated, scheduled, backlog item and status, data recorded, businesses added, rate changes for the developer, queue decisions, inbox replies, items left for a human, API errors.
 
 ## Writing rules
 - Pakistan-first. Rupees, local examples, what it means for a reader in Lahore, Karachi, Islamabad or a smaller city. World, US, markets, crypto, cricket, MMA and snooker from a Pakistani reader's point of view.

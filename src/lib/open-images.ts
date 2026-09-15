@@ -71,6 +71,62 @@ export async function searchOpenImages(query: string, opts: { limit?: number; mi
     .filter((r) => /\.(jpe?g|png|webp)(\?|$)/i.test(r.url) || !/\.(gif|svg|tiff?)(\?|$)/i.test(r.url));
 }
 
+/**
+ * Wikimedia Commons, the fallback when Openverse is down (it has whole days of 502s). Same shape as an
+ * Openverse result. Only files whose licence is CC0, public domain, CC BY or CC BY-SA are returned.
+ */
+export async function searchCommons(query: string, opts: { limit?: number; minWidth?: number } = {}): Promise<OpenImage[]> {
+  const params = new URLSearchParams({
+    action: "query",
+    generator: "search",
+    gsrsearch: `filetype:bitmap ${query}`,
+    gsrnamespace: "6",
+    gsrlimit: String(Math.min(opts.limit ?? 12, 30)),
+    prop: "imageinfo",
+    iiprop: "url|extmetadata|size|mime",
+    iiurlwidth: "1600",
+    format: "json",
+    origin: "*",
+  });
+  const res = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, { headers: { "user-agent": UA, accept: "application/json" }, signal: AbortSignal.timeout(8_000), next: { revalidate: 0 } });
+  if (!res.ok) throw new Error(`Commons search failed: ${res.status}`);
+  const data = (await res.json()) as { query?: { pages?: Record<string, { title: string; imageinfo?: Array<{ url: string; thumburl?: string; descriptionurl?: string; width?: number; height?: number; mime?: string; extmetadata?: Record<string, { value?: string }> }> }> } };
+  const minWidth = opts.minWidth ?? 800;
+  const out: OpenImage[] = [];
+  for (const page of Object.values(data.query?.pages ?? {})) {
+    const ii = page.imageinfo?.[0];
+    if (!ii || !/^image\/(jpeg|png|webp)$/i.test(ii.mime ?? "")) continue;
+    const em = ii.extmetadata ?? {};
+    const short = (em.LicenseShortName?.value ?? em.License?.value ?? "").toLowerCase();
+    let license: string | null = null;
+    let licenseVersion: string | null = null;
+    if (/-nc|-nd|gfdl|fair use|copyright/.test(short)) license = null; // not for us
+    else if (/cc0/.test(short)) license = "cc0";
+    else if (/public domain|^pd/.test(short)) license = "pdm";
+    else if (/cc by-sa/.test(short)) license = "by-sa";
+    else if (/cc by/.test(short)) license = "by";
+    if (!license) continue;
+    licenseVersion = short.match(/(\d\.\d)/)?.[1] ?? null;
+    if (ii.width && ii.width < minWidth) continue;
+    const artist = (em.Artist?.value ?? "").replace(/<[^>]+>/g, "").trim() || null;
+    out.push({
+      id: `commons:${page.title}`,
+      title: page.title.replace(/^File:/, "").replace(/\.[a-z]+$/i, "").replace(/_/g, " "),
+      creator: artist,
+      license,
+      licenseVersion,
+      licenseUrl: null,
+      source: "wikimedia",
+      sourceUrl: ii.descriptionurl ?? `https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title)}`,
+      url: ii.thumburl ?? ii.url,
+      thumbnail: ii.thumburl ?? ii.url,
+      width: ii.thumburl ? Math.min(1600, ii.width ?? 1600) : (ii.width ?? null),
+      height: ii.height ?? null,
+    });
+  }
+  return out;
+}
+
 const SOURCE_NAMES: Record<string, string> = { flickr: "Flickr", wikimedia: "Wikimedia Commons", stocksnap: "StockSnap", rawpixel: "Rawpixel", smithsonian: "Smithsonian", met: "The Met", nasa: "NASA", europeana: "Europeana" };
 
 export function creditLine(img: Pick<OpenImage, "creator" | "license" | "licenseVersion" | "source">): string {
@@ -107,11 +163,18 @@ export async function findAndImport(query: string, variant: "article" | "cover" 
   const deadline = Date.now() + (opts.budgetMs ?? 25_000);
   for (const a of attempts) {
     if (Date.now() > deadline) break;
-    let results: OpenImage[];
+    let results: OpenImage[] = [];
     try {
       results = await searchOpenImages(a.q, { limit: 10, orientation: a.orientation, minWidth: a.minWidth });
     } catch {
-      continue; // one bad search should not sink the next attempt
+      // Openverse down: Commons carries the attempt.
+    }
+    if (!results.length) {
+      try {
+        results = await searchCommons(a.q, { limit: 10, minWidth: a.minWidth });
+      } catch {
+        continue;
+      }
     }
     const ordered = opts.pick ? [...results.slice(opts.pick), ...results.slice(0, opts.pick)] : results;
     for (const candidate of ordered.slice(0, 4)) {
