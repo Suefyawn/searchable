@@ -6,6 +6,7 @@ import { Badge, Breadcrumbs, JsonLd } from "@/components/ui";
 import { entitiesForTarget } from "@/db/queries/entities";
 import { getBusiness, listBusinesses } from "@/db/queries/directory";
 import { formatDate } from "@/lib/format";
+import { followRedirect } from "@/lib/redirects";
 import { breadcrumbJsonLd, buildMetadata, localBusinessJsonLd } from "@/lib/seo";
 import { Img } from "@/components/img";
 import { SaveButton } from "@/components/saved/save-button";
@@ -39,7 +40,10 @@ export async function generateMetadata({ params }: Props) {
 export default async function BusinessPage({ params }: Props) {
   const { slug } = await params;
   const b = await getBusiness(slug);
-  if (!b || b.status !== "active") notFound();
+  if (!b || b.status !== "active") {
+    await followRedirect(`/b/${slug}`);
+    notFound();
+  }
   const [nearby, entities] = await Promise.all([
     b.primaryCategoryId && b.cityId ? listBusinesses({ categoryId: b.primaryCategoryId, cityId: b.cityId, limit: 4 }) : Promise.resolve([]),
     entitiesForTarget("business", b.id),

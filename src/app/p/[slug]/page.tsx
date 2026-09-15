@@ -6,6 +6,7 @@ import { Rating } from "@/components/cards";
 import { CiteThis } from "@/components/cite";
 import { Breadcrumbs, JsonLd } from "@/components/ui";
 import { getProfession } from "@/content/professions";
+import { followRedirect } from "@/lib/redirects";
 import { srcSetFor } from "@/lib/images";
 import { formatDate, pkr } from "@/lib/format";
 import { renderMarkdown } from "@/lib/markdown";
@@ -56,7 +57,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ProfessionalPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const p = await getProfessional(slug);
-  if (!p || p.status !== "active") notFound();
+  if (!p || p.status !== "active") {
+    await followRedirect(`/p/${slug}`);
+    notFound();
+  }
   const prof = getProfession(p.professionSlug);
   const similar = (await listProfessionals({ profession: p.professionSlug, citySlug: p.city?.slug, limit: 4 })).rows.filter((s) => s.id !== p.id).slice(0, 3);
   const crumbs = [

@@ -10,6 +10,7 @@ import { readingMinutes } from "@/lib/format";
 import { indexArticle } from "@/lib/indexers";
 import { pingIndexNow } from "@/lib/indexnow";
 import { plainText } from "@/lib/markdown";
+import { recordRedirect } from "@/lib/redirects";
 import { slugify, uniqueSlug } from "@/lib/slug";
 
 const WORKFLOW = ["draft", "research", "editing", "fact_check"] as const;
@@ -157,6 +158,14 @@ export async function saveArticle(raw: ArticleFormInput): Promise<{ ok: boolean;
 
   await indexArticle(id);
   const section = d.kind === "news" ? "news" : "guides";
+  // A moved address keeps working: the old URL redirects to the new one (rule 5 in CLAUDE.md).
+  if (existing && (existing.slug !== slug || (existing.categoryId ?? null) !== (d.categoryId || null)) && existing.status === "published") {
+    const [oldCat, newCat] = await Promise.all([
+      existing.categoryId ? db.query.categories.findFirst({ where: eq(schema.categories.id, existing.categoryId), columns: { slug: true } }) : null,
+      d.categoryId ? db.query.categories.findFirst({ where: eq(schema.categories.id, d.categoryId), columns: { slug: true } }) : null,
+    ]);
+    await recordRedirect(`/${section}/${oldCat?.slug ?? "general"}/${existing.slug}`, `/${section}/${newCat?.slug ?? "general"}/${slug}`);
+  }
   revalidateTag("articles", "max");
   revalidatePath("/");
   revalidatePath(`/${section}`);

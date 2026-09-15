@@ -6,6 +6,7 @@ import { ArticleCard } from "@/components/cards";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
 import { countArticles, getArticle, getCategory, listArticles, listArticlesByIds, listCategories, type ArticleKind, type ArticleListItem } from "@/db/queries/content";
 import { readFrontPage, resolveFront } from "@/lib/front-page";
+import { followRedirect } from "@/lib/redirects";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { timeAgo } from "@/lib/format";
@@ -106,9 +107,12 @@ export async function articleMetadata(kind: "news" | "guide", category: string, 
   });
 }
 
-export async function ArticleRoute({ kind, slug }: { kind: "news" | "guide"; category: string; slug: string }) {
+export async function ArticleRoute({ kind, category, slug }: { kind: "news" | "guide"; category: string; slug: string }) {
   const a = await getArticle(kind, slug);
-  if (!a) notFound();
+  if (!a) {
+    await followRedirect(`/${META[kind].section}/${category}/${slug}`);
+    notFound();
+  }
   return <ArticlePage article={a} kind={kind} />;
 }
 

@@ -80,7 +80,7 @@ POST /articles
 }
 To update an existing story: include its "id" (from /context or GET /articles) and the full new body; omit "image" to keep the photo. The URL never changes on an update.
 → { id, status, url, image, note? }
-PATCH /articles/{id} {"intent": "publish" | "unpublish" | "schedule", "scheduledFor"?}   or   {"image": {"query", "entities"} | {"url", "credit", "sourceUrl", "license"}} to swap only the photo
+PATCH /articles/{id} {"intent": "publish" | "unpublish" | "schedule", "scheduledFor"?}   or   {"image": {"query", "entities"} | {"url", "credit", "sourceUrl", "license"}} to swap only the photo   or   {"slug": "new-address"} to move a story whose address is now wrong (the old address redirects)
 DELETE /articles/{id}
 
 GET /front → { front: { leadId, leadUntil, pins[], breaking } }

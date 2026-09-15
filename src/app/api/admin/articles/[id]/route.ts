@@ -25,6 +25,8 @@ export const GET = withAdminApi<{ id: string }>(async (_req, { params }) => ({ a
 const Patch = z.object({
   intent: z.enum(["publish", "unpublish", "schedule"]).optional(),
   scheduledFor: z.string().optional(),
+  /** Move the story to a new address; the old one redirects. */
+  slug: z.string().trim().min(3).max(120).optional(),
   /** Replace the photo only: a URL (ours or an openly licensed remote file with its credit) or a search, as on POST. */
   image: z
     .union([
@@ -39,11 +41,12 @@ export const maxDuration = 60;
 
 /**
  * PATCH /api/admin/articles/[id] { intent: publish | unpublish | schedule, scheduledFor } changes status;
- * { image: { url | query } } swaps the photo and keeps everything else, including the current status.
+ * { image: { url | query } } swaps the photo; { slug } moves the story and leaves a redirect. Everything else,
+ * including the current status, is kept.
  */
 export const PATCH = withAdminApi<{ id: string }>(async (_req, { params, body }) => {
   const d = Patch.parse(body);
-  if (!d.intent && !d.image) throw new ApiError(400, "Give an intent or an image");
+  if (!d.intent && !d.image && !d.slug) throw new ApiError(400, "Give an intent, an image or a slug");
   const a = await load(params.id);
   let image = { featuredImageUrl: a.featuredImageUrl ?? undefined, featuredImageAlt: a.featuredImageAlt ?? undefined, featuredImageCredit: a.featuredImageCredit ?? undefined, featuredImageSourceUrl: a.featuredImageSourceUrl ?? undefined };
   let imageNote: string | undefined;
@@ -65,7 +68,7 @@ export const PATCH = withAdminApi<{ id: string }>(async (_req, { params, body })
     id: a.id,
     kind: a.kind,
     title: a.title,
-    slug: a.slug,
+    slug: d.slug ?? a.slug,
     dek: a.dek ?? undefined,
     body: a.body,
     categoryId: a.categoryId ?? undefined,
