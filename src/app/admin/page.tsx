@@ -49,7 +49,7 @@ export default async function AdminDashboard() {
       <SectionHeader as="h1" title="Dashboard" description={`Today is ${formatDate(new Date(), { weekday: "long", day: "numeric", month: "long" })}. Two tracks: publish something useful, then build something.`} />
       <div className="grid gap-3 sm:grid-cols-3">
         {stats.map(([label, value, href]) => (
-          <Link key={label} href={href} className="surface p-4 hover:border-brand-300">
+          <Link key={label} href={href} className="surface surface-hover p-4">
             <p className="text-xs font-medium uppercase tracking-wider text-3">{label}</p>
             <p className="mt-1 text-2xl font-semibold tabular">{value}</p>
           </Link>

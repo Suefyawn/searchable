@@ -12,7 +12,7 @@ export default async function UnsubscribePage({ searchParams }: { searchParams: 
       <div className="mx-auto max-w-md surface p-8">
         <h1 className="text-2xl font-semibold">{ok ? "Unsubscribed" : "Link not valid"}</h1>
         <p className="mt-2 text-2">{ok ? "You will not receive Searchable Daily again. You can resubscribe any time." : "This link is not recognised."}</p>
-        <Link href="/" className="mt-6 inline-flex h-10 items-center rounded-md bg-brand-700 px-4 text-sm font-medium text-white hover:bg-brand-800">
+        <Link href="/" className="mt-6 inline-flex h-11 items-center rounded-full bg-brand-600 px-5 text-sm font-semibold text-white hover:bg-brand-700 transition-colors">
           Back to Searchable
         </Link>
       </div>

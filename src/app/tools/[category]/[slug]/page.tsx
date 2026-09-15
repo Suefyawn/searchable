@@ -50,7 +50,7 @@ export default async function ToolPage({ params }: Props) {
           <Badge>v{tool.version}</Badge>
           <span className="text-sm text-3">Last reviewed {formatDate(tool.lastReviewed)}</span>
         </div>
-        <h1 className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl">{tool.name}</h1>
+        <h1 className="mt-4 font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl">{tool.name}</h1>
         <p className="mt-3 text-lg text-2 leading-relaxed">{tool.description}</p>
       </header>
 
@@ -63,14 +63,14 @@ export default async function ToolPage({ params }: Props) {
       <div className="mt-14 grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-12">
           <section>
-            <h2 className="text-2xl font-semibold">How this is calculated</h2>
+            <h2 className="font-display text-3xl font-semibold">How this is calculated</h2>
             <div className="prose prose-searchable mt-4" dangerouslySetInnerHTML={{ __html: renderMarkdown(tool.methodology) }} />
           </section>
 
           {tool.faqs.length ? (
             <section className="max-w-[68ch]">
-              <h2 className="text-2xl font-semibold">Frequently asked questions</h2>
-              <dl className="mt-4 divide-y divide-[var(--border)] surface px-5">
+              <h2 className="font-display text-3xl font-semibold">Frequently asked questions</h2>
+              <dl className="mt-5 divide-y divide-[var(--border)] surface px-6">
                 {tool.faqs.map((f) => (
                   <div key={f.question} className="py-4">
                     <dt className="font-medium">{f.question}</dt>
@@ -104,7 +104,7 @@ export default async function ToolPage({ params }: Props) {
             <section className="flex flex-wrap items-center gap-2 text-sm">
               <span className="text-3">Topics:</span>
               {entities.map((e) => (
-                <Link key={e.id} href={`/e/${e.slug}`} className="rounded-full border border-line bg-surface px-3 py-1 text-2 hover:border-brand-400 hover:text-[var(--text)]">
+                <Link key={e.id} href={`/e/${e.slug}`} className="rounded-full bg-surface-2 px-3.5 py-1.5 font-medium text-2 hover:bg-surface-3 hover:text-[var(--text)] transition-colors">
                   {e.name}
                 </Link>
               ))}

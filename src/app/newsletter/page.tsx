@@ -21,8 +21,8 @@ export default function NewsletterPage() {
     <div className="container-x py-12 sm:py-16">
       <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-300">Searchable Daily</p>
-          <h1 className="mt-2 text-4xl font-semibold leading-tight sm:text-5xl">The useful morning email about Pakistan</h1>
+          <p className="eyebrow">Searchable Daily</p>
+          <h1 className="mt-2 font-display text-5xl font-bold leading-[1.02] tracking-tight sm:text-6xl">The useful morning email about Pakistan</h1>
           <p className="mt-4 text-lg text-2 leading-relaxed">Not a news dump. A short, practical briefing on what changed and what it means for you — with the tool or guide that helps you act on it.</p>
           <dl className="mt-8 space-y-4">
             {ITEMS.map(([t, d]) => (

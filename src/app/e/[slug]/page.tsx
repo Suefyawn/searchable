@@ -34,7 +34,7 @@ export default async function EntityPage({ params }: Props) {
         <Badge tone="brand" className="capitalize">
           {e.kind}
         </Badge>
-        <h1 className="mt-3 text-3xl font-semibold sm:text-4xl">
+        <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
           {e.name}
           {e.nameUrdu ? <span className="ml-3 text-2xl font-normal text-3">{e.nameUrdu}</span> : null}
         </h1>

@@ -26,11 +26,11 @@ export function ContactForm({ about }: { about?: string }) {
     }
   }
 
-  if (state === "done") return <p className="rounded-md bg-brand-50 px-4 py-3 text-[15px] dark:bg-brand-950/40">Thanks — your message is in. We reply to everything that needs a reply.</p>;
+  if (state === "done") return <p className="rounded-2xl bg-brand-50 px-5 py-4 text-[15px] dark:bg-brand-950/40">Thanks — your message is in. We reply to everything that needs a reply.</p>;
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      {about ? <p className="rounded-md bg-surface-2 px-3 py-2 text-sm text-2">About: {about}</p> : null}
+      {about ? <p className="rounded-xl bg-surface-2 px-3.5 py-2 text-sm text-2">About: {about}</p> : null}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Name" htmlFor="c-name">
           <Input id="c-name" name="name" required maxLength={80} />

@@ -24,7 +24,7 @@ export default async function AccountPage() {
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           {hasRole(user, "editor") ? (
-            <Link href="/admin" className="surface p-5 hover:border-brand-300">
+            <Link href="/admin" className="surface surface-hover p-5">
               <p className="font-semibold">Admin</p>
               <p className="mt-1 text-[15px] text-2">Publish articles, manage businesses, view subscribers and search logs.</p>
             </Link>
@@ -33,7 +33,7 @@ export default async function AccountPage() {
             <p className="font-semibold">Saved items</p>
             <p className="mt-1 text-[15px] text-2">Saving tools, guides and businesses arrives with personalisation (Phase 8).</p>
           </div>
-          <Link href="/business" className="surface p-5 hover:border-brand-300">
+          <Link href="/business" className="surface surface-hover p-5">
             <p className="font-semibold">Your businesses</p>
             <p className="mt-1 text-[15px] text-2">Manage listings you own: details, hours, services, enquiries and review responses.</p>
           </Link>

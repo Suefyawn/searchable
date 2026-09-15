@@ -23,7 +23,7 @@ export default async function StaticPage({ params }: Props) {
   if (!p) notFound();
   return (
     <div className="container-x py-10 sm:py-14">
-      <h1 className="text-3xl font-semibold sm:text-4xl">{p.title}</h1>
+      <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl">{p.title}</h1>
       <p className="mt-3 max-w-[68ch] text-lg text-2">{p.description}</p>
       <div className="prose prose-searchable mt-8" dangerouslySetInnerHTML={{ __html: renderMarkdown(p.body) }} />
     </div>

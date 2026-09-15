@@ -56,7 +56,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
             </Link>
           ) : null}
         </div>
-        <h1 className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl lg:text-[2.75rem] lg:leading-[1.12]">{article.title}</h1>
+        <h1 className="mt-4 font-display text-4xl font-bold leading-[1.06] tracking-tight sm:text-5xl lg:text-[3.4rem]">{article.title}</h1>
         {article.dek ? <p className="mt-4 text-lg text-2 sm:text-xl leading-relaxed">{article.dek}</p> : null}
         <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-3">
           {article.author ? <span className="font-medium text-2">{article.author.name}</span> : null}
@@ -68,7 +68,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div>
           {toc.length >= 3 ? (
-            <nav aria-label="Contents" className="mb-8 rounded-lg border border-line bg-surface-2 p-5 text-[15px] lg:hidden">
+            <nav aria-label="Contents" className="mb-8 surface-2 p-5 text-[15px] lg:hidden">
               <p className="font-semibold">In this guide</p>
               <ol className="mt-2 space-y-1.5">
                 {toc.map((t) => (
@@ -84,7 +84,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
 
           {article.faqs.length ? (
             <section className="mt-12 max-w-[68ch]">
-              <h2 className="text-2xl font-semibold">Frequently asked questions</h2>
+              <h2 className="font-display text-3xl font-semibold">Frequently asked questions</h2>
               <dl className="mt-4 divide-y divide-[var(--border)] surface px-5">
                 {article.faqs.map((f) => (
                   <div key={f.question} className="py-4">
@@ -118,7 +118,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
             <section className="mt-8 flex flex-wrap items-center gap-2 text-sm">
               <span className="text-3">Topics:</span>
               {entities.map((e) => (
-                <Link key={e.id} href={`/e/${e.slug}`} className="rounded-full border border-line bg-surface px-3 py-1 text-2 hover:border-brand-400 hover:text-[var(--text)]">
+                <Link key={e.id} href={`/e/${e.slug}`} className="rounded-full bg-surface-2 px-3.5 py-1.5 font-medium text-2 hover:bg-surface-3 hover:text-[var(--text)] transition-colors">
                   {e.name}
                 </Link>
               ))}
@@ -161,7 +161,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
 
       {related.length ? (
         <section className="mt-16">
-          <h2 className="mb-5 text-xl font-semibold">More in {article.category?.name ?? sectionName}</h2>
+          <h2 className="mb-6 font-display text-2xl font-semibold">More in {article.category?.name ?? sectionName}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((a) => (
               <ArticleCard key={a.id} article={a} />

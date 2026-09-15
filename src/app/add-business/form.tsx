@@ -36,7 +36,7 @@ export function AddBusinessForm({ categories, cities }: { categories: Opt[]; cit
 
   if (state === "done") {
     return (
-      <div className="rounded-md bg-brand-50 px-4 py-4 text-[15px] dark:bg-brand-950/40">
+      <div className="rounded-2xl bg-brand-50 px-5 py-4 text-[15px] dark:bg-brand-950/40">
         <p className="font-medium">Submitted — thank you.</p>
         <p className="mt-1 text-2">We will verify the details and publish the listing within two working days. You will get an email when it is live.</p>
       </div>

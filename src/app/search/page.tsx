@@ -50,7 +50,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               <Link
                 key={f.value}
                 href={`/search?q=${encodeURIComponent(q)}${f.value ? `&type=${f.value}` : ""}`}
-                className={cn("rounded-full border px-3.5 py-1.5 text-sm transition-colors", type === f.value ? "border-brand-600 bg-brand-700 text-white" : "border-line bg-surface text-2 hover:bg-surface-2")}
+                className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors", type === f.value ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "bg-surface-2 text-2 hover:bg-surface-3 hover:text-[var(--text)]")}
               >
                 {f.label}
               </Link>
@@ -84,7 +84,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   return (
                     <section key={t}>
                       <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-3">{t === "data_series" ? "Data" : `${TYPE_LABEL[t]}s`}</h2>
-                      <ol className="divide-y divide-[var(--border)] surface px-5">
+                      <ol className="divide-y divide-[var(--border)] surface px-6">
                         {list.map((h) => (
                           <Hit key={h.entityType + h.entityId} hit={h} />
                         ))}
@@ -124,9 +124,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
 function BestAnswer({ hit }: { hit: SearchHit }) {
   return (
-    <Link href={hit.url} className="group block surface border-brand-300 dark:border-brand-700 p-6 hover:bg-brand-50/50 dark:hover:bg-brand-950/20 transition-colors">
-      <p className="text-xs font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-300">Best match · {TYPE_LABEL[hit.entityType]}</p>
-      <h2 className="mt-1.5 text-2xl font-semibold leading-snug group-hover:text-brand-800 dark:group-hover:text-brand-200">{hit.title}</h2>
+    <Link href={hit.url} className="group block surface surface-hover shadow-glow p-7">
+      <p className="eyebrow">Best match · {TYPE_LABEL[hit.entityType]}</p>
+      <h2 className="mt-2 font-display text-3xl font-semibold leading-tight group-hover:text-brand-700 dark:group-hover:text-brand-300">{hit.title}</h2>
       {hit.headline ? <p className="mt-2 text-[15px] text-2 [&_mark]:font-medium" dangerouslySetInnerHTML={{ __html: hit.headline }} /> : hit.summary ? <p className="mt-2 text-[15px] text-2">{hit.summary}</p> : null}
       <p className="mt-3 text-sm text-3">{[hit.category, hit.city].filter(Boolean).join(" · ")}</p>
     </Link>

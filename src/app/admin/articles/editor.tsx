@@ -190,7 +190,7 @@ export function ArticleEditor({ initial, categories, cities, entities }: { initi
             {entities.map((e) => {
               const on = entitySlugs.includes(e.slug);
               return (
-                <button key={e.slug} type="button" aria-pressed={on} onClick={() => setEntitySlugs(on ? entitySlugs.filter((s) => s !== e.slug) : [...entitySlugs, e.slug])} className={cn("rounded-full border px-2.5 py-0.5 text-xs", on ? "border-brand-600 bg-brand-700 text-white" : "border-line bg-surface text-2 hover:bg-surface-2")}>
+                <button key={e.slug} type="button" aria-pressed={on} onClick={() => setEntitySlugs(on ? entitySlugs.filter((s) => s !== e.slug) : [...entitySlugs, e.slug])} className={cn("rounded-full border px-2.5 py-0.5 text-xs", on ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "bg-surface-2 text-2 hover:bg-surface-3 hover:text-[var(--text)]")}>
                   {e.name}
                 </button>
               );

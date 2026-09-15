@@ -68,7 +68,7 @@ export default async function CityPage({ params }: Props) {
           <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {withCount.map((c) => (
               <li key={c.id}>
-                <Link href={`/businesses/${c.slug}/${loc.slug}`} className="surface flex items-center justify-between px-4 py-3 hover:border-brand-300 transition-colors">
+                <Link href={`/businesses/${c.slug}/${loc.slug}`} className="surface surface-hover flex items-center justify-between px-5 py-3.5">
                   <span className="flex items-center gap-2">
                     <span aria-hidden>{c.icon}</span>
                     {c.namePlural ?? c.name}
@@ -116,7 +116,7 @@ export default async function CityPage({ params }: Props) {
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-3">Areas</h2>
           <ul className="flex flex-wrap gap-2">
             {loc.children.map((a) => (
-              <li key={a.id} className="rounded-full border border-line bg-surface px-3.5 py-1.5 text-sm text-2">
+              <li key={a.id} className="rounded-full bg-surface-2 px-4 py-2 text-sm font-medium text-2">
                 {a.name}
               </li>
             ))}

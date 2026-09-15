@@ -22,7 +22,7 @@ export default async function AdminReviews({ searchParams }: { searchParams: Pro
       <h1 className="mb-4 text-2xl font-semibold">Reviews</h1>
       <div className="mb-4 flex gap-2">
         {["pending", "published", "hidden", "all"].map((s) => (
-          <Link key={s} href={`/admin/reviews?status=${s}`} className={cn("rounded-full border px-3 py-1 text-sm", status === s ? "border-brand-600 bg-brand-700 text-white" : "border-line bg-surface text-2")}>
+          <Link key={s} href={`/admin/reviews?status=${s}`} className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors capitalize", status === s ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "bg-surface-2 text-2 hover:bg-surface-3 hover:text-[var(--text)]")}>
             {s}
           </Link>
         ))}

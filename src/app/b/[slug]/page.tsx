@@ -72,7 +72,7 @@ export default async function BusinessPage({ params }: Props) {
             )}
             {b.tier === "premium" || b.tier === "sponsored" ? <Badge tone="accent">{b.tier === "sponsored" ? "Sponsored" : "Premium"}</Badge> : null}
           </div>
-          <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">{b.name}</h1>
+          <h1 className="mt-3 font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl">{b.name}</h1>
           {b.tagline ? <p className="mt-2 text-lg text-2">{b.tagline}</p> : null}
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[15px]">
             <Rating avg={b.ratingAvg} count={b.ratingCount} />
@@ -82,12 +82,12 @@ export default async function BusinessPage({ params }: Props) {
         </div>
         <div className="flex flex-wrap gap-2 sm:shrink-0">
           {b.phone ? (
-            <a href={`tel:${b.phone}`} className="inline-flex h-11 items-center gap-2 rounded-md border border-line bg-surface px-4 font-medium hover:bg-surface-2">
+            <a href={`tel:${b.phone}`} className="inline-flex h-11 items-center gap-2 rounded-full bg-surface-2 px-5 font-semibold hover:bg-surface-3 transition-colors">
               <Phone className="size-4" /> {b.phone}
             </a>
           ) : null}
           {wa ? (
-            <a href={wa} target="_blank" rel="noopener" className="inline-flex h-11 items-center gap-2 rounded-md bg-emerald-600 px-4 font-medium text-white hover:bg-emerald-700">
+            <a href={wa} target="_blank" rel="noopener" className="inline-flex h-11 items-center gap-2 rounded-full bg-emerald-600 px-5 font-semibold text-white hover:bg-emerald-700 transition-colors">
               WhatsApp
             </a>
           ) : null}
@@ -131,7 +131,7 @@ export default async function BusinessPage({ params }: Props) {
                     {r.title ? <p className="mt-2 font-medium">{r.title}</p> : null}
                     {r.body ? <p className="mt-1 text-[15px] text-2">{r.body}</p> : null}
                     {r.ownerResponse ? (
-                      <div className="mt-3 rounded-md bg-surface-2 px-4 py-3 text-[15px]">
+                      <div className="mt-3 rounded-xl bg-surface-2 px-4 py-3 text-[15px]">
                         <p className="text-xs font-semibold uppercase tracking-wider text-3">Response from the business</p>
                         <p className="mt-1 text-2">{r.ownerResponse}</p>
                       </div>
@@ -154,7 +154,7 @@ export default async function BusinessPage({ params }: Props) {
             <section className="flex flex-wrap items-center gap-2 text-sm">
               <span className="text-3">Related topics:</span>
               {entities.map((e) => (
-                <Link key={e.id} href={`/e/${e.slug}`} className="rounded-full border border-line bg-surface px-3 py-1 text-2 hover:border-brand-400 hover:text-[var(--text)]">
+                <Link key={e.id} href={`/e/${e.slug}`} className="rounded-full bg-surface-2 px-3.5 py-1.5 font-medium text-2 hover:bg-surface-3 hover:text-[var(--text)] transition-colors">
                   {e.name}
                 </Link>
               ))}

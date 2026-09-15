@@ -18,7 +18,7 @@ export default function ToolsPage() {
       <SectionHeader as="h1" title="Calculators & tools" description="Every number shows its source and the date it was last reviewed. Calculations run in your browser — nothing you enter is stored." />
       <nav className="flex flex-wrap gap-2" aria-label="Tool categories">
         {cats.map((c) => (
-          <Link key={c} href={`/tools/${c}`} className="rounded-full border border-line bg-surface px-3.5 py-1.5 text-sm text-2 hover:bg-surface-2">
+          <Link key={c} href={`/tools/${c}`} className="rounded-full bg-surface-2 px-4 py-2 text-sm font-medium text-2 hover:bg-surface-3 hover:text-[var(--text)] transition-colors">
             {TOOL_CATEGORIES[c].name}
           </Link>
         ))}

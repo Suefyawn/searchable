@@ -20,7 +20,7 @@ export function LeadForm({ businessId }: { businessId: string }) {
     }
   }
 
-  if (state === "done") return <p className="rounded-md bg-brand-50 px-4 py-3 text-[15px] dark:bg-brand-950/40">Sent. The business will contact you on the number you gave.</p>;
+  if (state === "done") return <p className="rounded-2xl bg-brand-50 px-5 py-4 text-[15px] dark:bg-brand-950/40">Sent. The business will contact you on the number you gave.</p>;
 
   return (
     <form onSubmit={onSubmit} className="space-y-2.5">

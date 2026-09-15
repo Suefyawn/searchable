@@ -53,3 +53,7 @@ Context: The user asked for a clean, modern, highly readable UI. Decision: Tailw
 ## ADR-13 · `marked` for Markdown, `@tailwindcss/typography` for prose
 **Accepted · 2026-09-15**
 Context: Articles and guides are authored in Markdown by trusted editors; the site needs excellent reading typography. Decision: `marked` (small, fast, GFM) renders on the server; `@tailwindcss/typography` `prose` classes style the output with our tokens. Consequences: no client-side Markdown; editor content is trusted (admin-only) — if user-generated Markdown is ever rendered, add sanitisation (`DOMPurify`/`rehype-sanitize`) first.
+
+## ADR-14 · Visual redesign: display typeface, soft surfaces, glass header
+**Accepted · 2026-09-15**
+Context: The founder judged the first pass "old fashioned". Decision: Bricolage Grotesque (display, variable opsz/wdth) for headings + Inter for body; warm off-white canvas with radial gradient glows on the hero; borderless cards with layered shadows and hover lift; pill buttons and chips; floating glass header; dark editorial footer; per-category colour accents for tools; live data ticker on the home page. Tokens live in `globals.css` (`surface`, `surface-hover`, `glass`, `eyebrow`, `text-gradient`, `hero-bg`). Consequences: every page inherits the language through primitives; dark mode is preserved via the same tokens; motion respects `prefers-reduced-motion`.

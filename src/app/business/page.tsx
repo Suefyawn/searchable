@@ -32,7 +32,7 @@ export default async function BusinessDashboard() {
         </div>
       ) : null}
       {pendingClaims.length ? (
-        <div className="mb-6 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-[15px] dark:border-amber-900 dark:bg-amber-950/30">
+        <div className="mb-6 rounded-2xl bg-amber-50 px-5 py-4 text-[15px] dark:border-amber-900 dark:bg-amber-950/30">
           Claims awaiting verification: {pendingClaims.map((c) => c.business.name).join(", ")}. We will contact you within two working days.
         </div>
       ) : null}
@@ -51,7 +51,7 @@ export default async function BusinessDashboard() {
                   <span>· {b.viewCount} views · {b.clickCount} clicks</span>
                 </p>
               </div>
-              <Link href={`/business/${b.id}`} className="inline-flex h-9 items-center rounded-md bg-brand-700 px-3.5 text-sm font-medium text-white hover:bg-brand-800">
+              <Link href={`/business/${b.id}`} className="inline-flex h-10 items-center rounded-full bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700 transition-colors">
                 Edit listing
               </Link>
             </div>

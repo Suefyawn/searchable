@@ -22,7 +22,7 @@ export default async function BusinessesPage() {
           <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {categories.map((c) => (
               <li key={c.id}>
-                <Link href={`/businesses/${c.slug}`} className="surface flex items-center justify-between px-4 py-3 hover:border-brand-300 transition-colors">
+                <Link href={`/businesses/${c.slug}`} className="surface surface-hover flex items-center justify-between px-5 py-3.5">
                   <span className="flex items-center gap-2.5">
                     <span className="text-lg" aria-hidden>{c.icon}</span>
                     <span className="font-medium">{c.namePlural ?? c.name}</span>
@@ -45,10 +45,10 @@ export default async function BusinessesPage() {
               </li>
             ))}
           </ul>
-          <div className="mt-6 surface bg-brand-50 dark:bg-brand-950/30 border-brand-200 dark:border-brand-800 p-5">
+          <div className="mt-6 rounded-2xl bg-brand-50 dark:bg-brand-950/30 p-6">
             <p className="font-semibold">Own a business?</p>
             <p className="mt-1 text-[15px] text-2">Add it free, claim it, and keep your hours and contact details up to date.</p>
-            <Link href="/add-business" className="mt-3 inline-flex h-10 items-center rounded-md bg-brand-700 px-4 text-sm font-medium text-white hover:bg-brand-800">
+            <Link href="/add-business" className="mt-3 inline-flex h-11 items-center rounded-full bg-brand-600 px-5 text-sm font-semibold text-white hover:bg-brand-700 transition-colors">
               Add your business
             </Link>
           </div>

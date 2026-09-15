@@ -108,13 +108,13 @@ function CategoryNav({ section, categories, active }: { section: string; categor
     <nav className="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0" aria-label="Categories">
       <ul className="flex gap-2 pb-1">
         <li>
-          <Link href={`/${section}`} className={cn("inline-flex whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm", !active ? "border-brand-600 bg-brand-700 text-white" : "border-line bg-surface text-2 hover:bg-surface-2")}>
+          <Link href={`/${section}`} className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors", !active ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "bg-surface-2 text-2 hover:bg-surface-3 hover:text-[var(--text)]")}>
             All
           </Link>
         </li>
         {categories.map((c) => (
           <li key={c.slug}>
-            <Link href={`/${section}/${c.slug}`} className={cn("inline-flex whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm", active === c.slug ? "border-brand-600 bg-brand-700 text-white" : "border-line bg-surface text-2 hover:bg-surface-2")}>
+            <Link href={`/${section}/${c.slug}`} className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors", active === c.slug ? "bg-ink-900 text-white dark:bg-white dark:text-ink-900" : "bg-surface-2 text-2 hover:bg-surface-3 hover:text-[var(--text)]")}>
               {c.name}
             </Link>
           </li>

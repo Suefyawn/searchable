@@ -22,7 +22,7 @@ export function ReviewForm({ businessId, businessSlug }: { businessId: string; b
       </p>
     );
   }
-  if (state === "done") return <p className="rounded-md bg-brand-50 px-4 py-3 text-[15px] dark:bg-brand-950/40">Thank you. Your review is in the moderation queue and will appear once checked.</p>;
+  if (state === "done") return <p className="rounded-2xl bg-brand-50 px-5 py-4 text-[15px] dark:bg-brand-950/40">Thank you. Your review is in the moderation queue and will appear once checked.</p>;
 
   return (
     <form
