@@ -4,7 +4,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 import { Img } from "@/components/img";
-import { srcSetFor } from "@/lib/images";
 import { cn } from "@/lib/utils";
 
 export type Slide = { id: string; href: string; title: string; dek: string | null; imageUrl: string | null; label: string; meta: string };
@@ -41,21 +40,6 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
     return () => clearTimeout(id);
   }, [i, paused, reduced, n, go, tick]);
 
-  // The next slide's photo is fetched a couple of seconds into the current one, in the rendition the browser
-  // would choose anyway, so a rotation never shows an empty frame while the image arrives from the CDN.
-  React.useEffect(() => {
-    if (n < 2) return;
-    const next = slides[(i + 1) % n];
-    if (!next.imageUrl) return;
-    const id = setTimeout(() => {
-      const img = new Image();
-      img.sizes = SIZES;
-      img.srcset = srcSetFor(next.imageUrl!) ?? "";
-      img.src = next.imageUrl!;
-    }, 2000);
-    return () => clearTimeout(id);
-  }, [i, n, slides]);
-
   if (!n) return null;
   const s = slides[i];
 
@@ -73,8 +57,15 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
         if (e.key === "ArrowLeft") go(i - 1);
       }}
     >
-      <Link href={s.href} className="block lg:col-span-12" aria-hidden tabIndex={-1}>
-        {s.imageUrl ? <Img src={s.imageUrl} alt="" aspect="16/9" priority={i === 0} sizes={SIZES} /> : <div className="bg-surface-2" style={{ aspectRatio: "16/9" }} />}
+      {/* Every slide's photo is in the document, stacked in one grid cell, only the current one visible: each
+          file is fetched and decoded once (the first at high priority, the rest right after), so a rotation
+          is a visibility flip and never shows an empty frame while an image arrives. */}
+      <Link href={s.href} className="grid lg:col-span-12" aria-hidden tabIndex={-1}>
+        {slides.map((x, k) => (
+          <div key={x.id} className={cn("[grid-area:1/1]", k !== i && "invisible")}>
+            {x.imageUrl ? <Img src={x.imageUrl} alt="" aspect="16/9" priority={k === 0} eager sizes={SIZES} /> : <div className="bg-surface-2" style={{ aspectRatio: "16/9" }} />}
+          </div>
+        ))}
       </Link>
       {/* Every slide's text is laid out in the same grid cell, hidden ones invisible, so the block keeps the
           height of the tallest slide and the page below never jumps when the headline length changes. */}
