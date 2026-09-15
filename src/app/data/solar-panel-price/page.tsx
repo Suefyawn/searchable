@@ -3,6 +3,7 @@ import { ToolCard } from "@/components/cards";
 import { Change } from "@/components/data/change";
 import { LineChart } from "@/components/data/line-chart";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
+import { INVERTERS } from "@/content/inverters";
 import { SOLAR_PRICES } from "@/content/solar-prices";
 import { getSeries } from "@/db/queries/data";
 import { formatDate, number, pkr } from "@/lib/format";
@@ -113,6 +114,9 @@ export default async function SolarPricePage() {
                 ))}
               </tbody>
             </table>
+            <p className="mt-3 text-[15px]">
+              Compare {INVERTERS.length} inverters by brand, size, warranty and price on the <Link href="/compare/solar-inverters" className="underline underline-offset-4">solar inverter price comparison</Link>.
+            </p>
           </section>
 
           <section>

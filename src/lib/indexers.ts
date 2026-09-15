@@ -123,6 +123,17 @@ export async function indexStaticPages() {
     categorySlug: "telecom",
     boost: 1.4,
   });
+  await syncSearchDocument({
+    entityType: "guide",
+    entityId: "hub:solar-inverters",
+    url: "/compare/solar-inverters",
+    title: "Solar inverter price in Pakistan — compare hybrid, on-grid and off-grid",
+    summary: "Dealer prices and specs for Inverex, Ziewnic, Solis, Deye, Growatt, Sungrow and Huawei inverters from 3 kW to 12 kW, plus lithium battery prices.",
+    keywords: "inverter price in pakistan, solar inverter price in pakistan, solar inverter, hybrid inverter price in pakistan, 5kw solar inverter price, 10kw inverter price, inverex inverter price, ziewnic inverter, best solar inverter in pakistan, off grid inverter, solar battery price, lithium battery price",
+    category: "Solar",
+    categorySlug: "solar",
+    boost: 1.3,
+  });
   for (const d of DISCOS) {
     await syncSearchDocument({
       entityType: "guide",

@@ -31,7 +31,11 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 | kibor rate today / kibor rate | 14,800 / 12,100 | 19 | /data/kibor-1y | ✅ new; feeds loan calculators |
 | inflation rate in pakistan | 2,900 | 34 | /data/cpi-yoy | ✅ monthly PBS series |
 | solar panel price in pakistan | 49,500 | 30 | /data/solar-panel-price | ✅ built (per-watt series + brand table + system costs) |
-| inverter price in pakistan | 8,100 | 14 | /data/solar-panel-price (inverter table) | 🟡 compare page later |
+| inverter price in pakistan | 8,100 | 14 | /compare/solar-inverters | ✅ compare page (30 models, filters, side-by-side) |
+| solar inverter price in pakistan | 6,600 | 10 | same | ✅ |
+| ziewnic inverter / inverex inverter 6kw price | 4,400 / 2,900 | 26 / 15 | same (brand rows) | ✅ |
+| 5kw / 10kw / hybrid inverter price in pakistan | 1,600 / 880 / 1,600 | 10 / 8 / 12 | same (size table) | ✅ |
+| best solar inverter in pakistan | 1,300 | 12 | same (how to choose + FAQ) | ✅ |
 
 ### Electricity (`/electricity/[disco]`)
 | Keyword | Vol | KD | Page |
@@ -94,7 +98,7 @@ pta imei check 74k · pta check 60k · pta dirbs 60k · pta tax 22k · pta appro
 
 ## Content backlog from this research (priority order)
 1. FBR IRIS guide (165k) and ATL/filer status check guide (10k+)
-2. ✅ Solar panel price page (49.5k); inverter compare page later
+2. ✅ Solar panel price page (49.5k) and inverter compare page (8.1k + 6.6k + long tail)
 3. ✅ Inflation (CPI) series and gold city sections
 4. ✅ Token tax, property tax and CGT calculators (FA2026 rates verified 2026-09-15); income tax slabs updated to FY2026-27
 5. ✅ PTA hub
