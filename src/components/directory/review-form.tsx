@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import * as React from "react";
+
+const subscribeNoop = () => () => {};
 import { Button, Input, Textarea } from "@/components/ui";
 import { useSession } from "@/lib/auth-client";
 import { submitReview } from "@/lib/review-actions";
@@ -13,8 +15,10 @@ export function ReviewForm({ businessId, businessSlug }: { businessId: string; b
   const [hover, setHover] = React.useState(0);
   const [state, setState] = React.useState<"idle" | "saving" | "done" | "error">("idle");
   const [error, setError] = React.useState("");
+  // Session state can resolve before hydration on the client; render nothing until mounted so server and client agree.
+  const mounted = React.useSyncExternalStore(subscribeNoop, () => true, () => false);
 
-  if (isPending) return null;
+  if (!mounted || isPending) return null;
   if (!data?.user) {
     return (
       <p className="text-[15px] text-2">

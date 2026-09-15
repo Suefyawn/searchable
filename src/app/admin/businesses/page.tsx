@@ -21,9 +21,10 @@ export default async function AdminBusinesses({ searchParams }: { searchParams: 
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">Businesses</h1>
-        <Link href="/add-business" className="text-sm font-medium text-brand-700 dark:text-brand-300">
-          + Add business
-        </Link>
+        <div className="flex gap-4 text-sm font-medium">
+          <Link href="/admin/businesses/import" className="text-brand-700 dark:text-brand-300">Bulk import (CSV)</Link>
+          <Link href="/add-business" className="text-brand-700 dark:text-brand-300">+ Add business</Link>
+        </div>
       </div>
       <div className="mb-4 flex flex-wrap items-center gap-2">
         {STATUSES.map((s) => (

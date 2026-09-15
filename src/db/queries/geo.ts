@@ -25,6 +25,14 @@ export async function getCity(slug: string) {
   });
 }
 
+export async function getArea(citySlug: string, areaSlug: string) {
+  const db = await getDb();
+  const city = await getCity(citySlug);
+  if (!city) return null;
+  const area = await db.query.locations.findFirst({ where: and(eq(schema.locations.kind, "area"), eq(schema.locations.cityId, city.id), eq(schema.locations.slug, areaSlug)) });
+  return area ? { city, area } : null;
+}
+
 /** Cities with active business counts, for hubs. */
 export async function citiesWithCounts(limit = 12) {
   const db = await getDb();

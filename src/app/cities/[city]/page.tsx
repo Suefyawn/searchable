@@ -113,8 +113,10 @@ export default async function CityPage({ params }: Props) {
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-3">Areas</h2>
           <ul className="flex flex-wrap gap-2">
             {loc.children.map((a) => (
-              <li key={a.id} className="border border-line px-3 py-1.5 text-sm text-2">
-                {a.name}
+              <li key={a.id}>
+                <Link href={`/cities/${loc.slug}/${a.slug}`} className="inline-block border border-line px-3 py-1.5 text-sm text-2 hover:bg-surface-2 hover:text-[var(--text)]">
+                  {a.name}
+                </Link>
               </li>
             ))}
           </ul>

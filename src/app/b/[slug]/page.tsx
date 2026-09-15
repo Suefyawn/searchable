@@ -9,6 +9,7 @@ import { formatDate } from "@/lib/format";
 import { breadcrumbJsonLd, buildMetadata, localBusinessJsonLd } from "@/lib/seo";
 import { Img } from "@/components/img";
 import { LeadForm } from "./lead-form";
+import { MapEmbed } from "@/components/directory/map-embed";
 import { TrackedLink } from "@/components/directory/tracked-link";
 import { ReportForm } from "@/components/report-form";
 import { ReviewForm } from "@/components/directory/review-form";
@@ -180,13 +181,20 @@ export default async function BusinessPage({ params }: Props) {
         </div>
 
         <aside className="space-y-4 self-start lg:sticky lg:top-24">
+          {b.lat != null && b.lng != null ? <MapEmbed lat={b.lat} lng={b.lng} name={b.name} /> : null}
           <div className="surface p-5 space-y-3 text-[15px]">
             {b.address ? (
               <p className="flex gap-2.5">
                 <MapPin className="mt-1 size-4 shrink-0 text-3" />
                 <span>
                   {b.address}
-                  {b.area ? <span className="block text-2">{b.area.name}{b.city ? `, ${b.city.name}` : ""}</span> : b.city ? <span className="block text-2">{b.city.name}</span> : null}
+                  {b.area && b.city ? (
+                    <span className="block text-2">
+                      <Link href={`/cities/${b.city.slug}/${b.area.slug}`} className="underline-offset-4 hover:underline">{b.area.name}</Link>, <Link href={`/cities/${b.city.slug}`} className="underline-offset-4 hover:underline">{b.city.name}</Link>
+                    </span>
+                  ) : b.city ? (
+                    <span className="block text-2"><Link href={`/cities/${b.city.slug}`} className="underline-offset-4 hover:underline">{b.city.name}</Link></span>
+                  ) : null}
                   {maps ? (
                     <TrackedLink businessId={b.id} kind="directions" href={maps} target="_blank" rel="noopener" className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-brand-700 dark:text-brand-300">
                       Directions <ExternalLink className="size-3" />

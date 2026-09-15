@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { BusinessCard } from "@/components/cards";
 import { Pagination } from "@/components/section-pages";
 import { Breadcrumbs, EmptyState, JsonLd, SectionHeader } from "@/components/ui";
-import { categoryCounts, countBusinesses, getBusinessCategory, listBusinesses } from "@/db/queries/directory";
+import { areaCounts, categoryCounts, countBusinesses, getBusinessCategory, listBusinesses } from "@/db/queries/directory";
 import { getCity } from "@/db/queries/geo";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 
@@ -30,10 +30,11 @@ export default async function CategoryCityPage({ params, searchParams }: Props) 
   const page = Math.max(1, parseInt(pageRaw ?? "1", 10) || 1);
   const [cat, loc] = await Promise.all([getBusinessCategory(category), getCity(city)]);
   if (!cat || !loc) notFound();
-  const [items, total, otherCats] = await Promise.all([
+  const [items, total, otherCats, areas] = await Promise.all([
     listBusinesses({ categoryId: cat.id, cityId: loc.id, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }),
     countBusinesses({ categoryId: cat.id, cityId: loc.id }),
     categoryCounts(loc.id),
+    areaCounts(loc.id, cat.id),
   ]);
   const plural = cat.namePlural ?? cat.name;
   const crumbs = [
@@ -46,6 +47,20 @@ export default async function CategoryCityPage({ params, searchParams }: Props) 
       <JsonLd data={breadcrumbJsonLd(crumbs)} />
       <Breadcrumbs items={crumbs} className="mb-4" />
       <SectionHeader as="h1" title={`${plural} in ${loc.name}`} description={total ? `${total} listed. Verified businesses appear first, then by rating.` : undefined} />
+      {areas.length ? (
+        <nav className="-mx-5 mb-6 overflow-x-auto border-y border-line px-5 sm:mx-0 sm:px-0" aria-label="Areas">
+          <ul className="flex gap-1 py-1.5 text-sm">
+            <li><span className="whitespace-nowrap bg-ink-900 px-2.5 py-1.5 text-white dark:bg-white dark:text-ink-900">All {loc.name}</span></li>
+            {areas.map((a) => (
+              <li key={a.id}>
+                <Link href={`/businesses/${cat.slug}/${loc.slug}/${a.slug}`} className="whitespace-nowrap px-2.5 py-1.5 text-2 hover:bg-surface-2">
+                  {a.name} <span className="tabular opacity-70">{a.count}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
         <div>
           {items.length ? (

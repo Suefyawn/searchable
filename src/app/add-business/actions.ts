@@ -1,10 +1,11 @@
 "use server";
 
-import { and, eq, ilike, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
 import { getSessionUser } from "@/lib/auth";
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
+import { findDuplicates } from "@/lib/dedupe";
 import { slugify, uniqueSlug } from "@/lib/slug";
 
 const Input = z.object({
@@ -30,13 +31,9 @@ export async function submitBusiness(input: z.infer<typeof Input>): Promise<{ ok
   const [city, user] = await Promise.all([db.query.locations.findFirst({ where: eq(schema.locations.id, d.cityId) }), getSessionUser()]);
   if (!city) return { ok: false, error: "Unknown city." };
 
-  // Duplicate guard: same phone anywhere, or a very similar name in the same city.
-  const digits = d.phone.replace(/\D/g, "").slice(-9);
-  const dupe = await db.query.businesses.findFirst({
-    where: or(digits.length >= 7 ? ilike(schema.businesses.phone, `%${digits.slice(0, 3)}%${digits.slice(3)}%`) : undefined, and(eq(schema.businesses.cityId, d.cityId), ilike(schema.businesses.name, d.name.trim()))),
-    columns: { name: true, slug: true, status: true },
-  });
-  if (dupe) return { ok: false, error: `A listing for "${dupe.name}" already exists${dupe.status === "active" ? ` (searchable.pk/b/${dupe.slug})` : " and is awaiting review"}. If it is yours, open it and click "Claim it".` };
+  // Duplicate guard: same phone anywhere, same or very similar name in the same city.
+  const [dupe] = await findDuplicates({ name: d.name, phone: d.phone, whatsapp: d.whatsapp, cityId: d.cityId, cityName: city.name });
+  if (dupe) return { ok: false, error: `A listing for "${dupe.name}" already exists${dupe.status === "active" ? ` (searchable.pk/b/${dupe.slug})` : " and is awaiting review"}. If it is yours, open it and click "Claim it". If it is a different business, add a distinguishing word to the name (branch, area).` };
 
   const base = slugify(`${d.name}-${city.slug}`);
   const slug = await uniqueSlug(base, async (s) => !!(await db.query.businesses.findFirst({ where: eq(schema.businesses.slug, s), columns: { id: true } })));

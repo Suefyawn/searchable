@@ -20,7 +20,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | articles, categories, tags, revisions, related | ✅ | Tags rendered at `/tags/[slug]`; manual related + automatic |
 | topics | ✅ | `entities` (knowledge graph) `/e/[slug]` |
 | businesses + hours/services/photos/reviews/claims/leads | ✅ | |
-| locations (province/city/area) | ✅ | Area pages not routed (Phase 4) |
+| locations (province/city/area) | ✅ | Area pages routed and gated |
 | tools, tool_runs | ✅ | Registry mirrored into `tools` table |
 | media | ✅ | With licence + source for open-licence imports; `/admin/media` |
 | newsletter subscribers + issues | ✅ | Builder, preview, test, send, schedule, cron |
@@ -57,7 +57,8 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | **Paid tiers: Verified / Premium / Sponsored / category sponsor; upgrade flow; invoices; admin mark-paid; expiry cron; dofollow for paid** | ✅ |
 | Report business / review / article | ✅ |
 | Verification workflow (phone/document) | 🟡 manual + paid Verified |
-| Area pages, duplicate detection, bulk import, maps, "near me" | ❌ | Phase 4 — next big build |
+| Bulk CSV import with validation + dedupe preview; merge duplicates (redirect + move reviews); area pages (gated); OSM map on profiles | ✅ |
+| "Near me" / multi-pin map search | ❌ | MapLibre when local search ships |
 
 ## Search
 | Item | Status |
@@ -103,7 +104,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | Skeletons, error states | 🟡 skeletons ✅; error pages basic |
 
 ## Next builds (in order)
-1. Directory volume: bulk import pipeline (CSV → validate → categorise → review queue), duplicate detection, area pages, maps.
+1. ✅ Directory volume tooling (import, dedupe, areas, map)
 2. More compare pages (cars, bank accounts, mobile packages) on the inverter-compare pattern.
 3. Tools to 30: sales tax, withholding 231B on cars, EOBI, stamp duty per province, FX converter, remittance, savings/NSC, car import duty.
 4. Typo tolerance + intent blending in search.
