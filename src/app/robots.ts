@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { SITE } from "@/lib/utils";
 
-const PRIVATE = ["/admin", "/account", "/business", "/api/", "/search", "/login", "/orders/", "/newsletter/confirm", "/newsletter/unsubscribe", "/newsletter/manage"];
+const PRIVATE = ["/admin", "/account", "/business", "/api/", "/media/", "/search", "/login", "/orders/", "/newsletter/confirm", "/newsletter/unsubscribe", "/newsletter/manage"];
 
 /**
  * Everyone is welcome, including AI crawlers: being cited by assistants is a goal, not a threat (docs/SEO-AI.md).

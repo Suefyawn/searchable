@@ -35,10 +35,16 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+/** Where uploads are served from; the fallback script only retries images from this host. */
+const imageHost = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${serif.variable}`}>
       <body className="min-h-dvh flex flex-col">
+        {/* If the image host is unreachable for a visitor (an extension, a per-site setting, an ISP), the same
+            file is retried through this domain at /media/, which proxies the image CDN. Runs before any image. */}
+        {imageHost ? <script dangerouslySetInnerHTML={{ __html: `(function(h){window.addEventListener('error',function(e){var t=e.target;if(!t||t.tagName!=='IMG'||t.dataset.retried)return;var s=t.currentSrc||t.src||'';if(s.indexOf(h)!==0)return;t.dataset.retried='1';t.removeAttribute('srcset');t.src='/media'+s.slice(h.length);},true);})(${JSON.stringify(imageHost)})` }} /> : null}
         <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
         <AdSenseScript />
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:bg-ink-900 focus:px-3 focus:py-2 focus:text-white">

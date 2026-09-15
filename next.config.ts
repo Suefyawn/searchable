@@ -17,4 +17,10 @@ const nextConfig: NextConfig = {
   },
 };
 
+/** Same-origin path for the image CDN, used only as a fallback when a visitor cannot reach the CDN host. */
+const imageHost = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
+if (imageHost) {
+  nextConfig.rewrites = async () => [{ source: "/media/:path*", destination: `${imageHost}/:path*` }];
+}
+
 export default nextConfig;

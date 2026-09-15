@@ -59,3 +59,6 @@ Founder's rule (2026-09-15): the site must not run out of free usage on Supabase
 
 ## Database driver note
 postgres-js talks to Supabase's transaction pooler (port 6543) with `prepare: false` and `max_pipeline: 0` (pipelining off only on 6543; it also disables postgres-js transactions, which the app never uses but the migrator does, so scripts must use the session pooler on 5432). Supavisor in transaction mode stalls when more than a few queries are pipelined on one connection, which showed up as 60-second prerender timeouts on the first Vercel build. With pipelining off, queued queries run one after another on the single serverless connection; a cold page render pays a few hundred milliseconds, ISR hits pay nothing. Scripts (migrations, seeds) use the session pooler on 5432, which does not have the problem.
+
+## Image fallback
+Images are served from the R2 custom domain. A tiny inline script in the root layout listens for image load errors from that host and retries the same file through `/media/…`, a Next rewrite that proxies the CDN. It only fires when the CDN host is unreachable for that visitor (an extension, a per-site image setting, an ISP), so the metered origin transfer stays near zero in normal use. `/media/` is disallowed in robots.txt so the copies are never indexed.
