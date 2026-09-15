@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { requireRole } from "@/lib/auth";
-import { importOpenImage, searchOpenImages, type OpenImage } from "@/lib/open-images";
+import { entitiesIn, importOpenImage, searchPhotos, type OpenImage } from "@/lib/open-images";
 import { rateLimit } from "@/lib/rate-limit";
 
 export async function searchOpenImagesAction(query: string) {
@@ -10,12 +10,9 @@ export async function searchOpenImagesAction(query: string) {
   const q = z.string().trim().min(2).max(120).parse(query);
   const rl = await rateLimit(`open-images:${user.id}`, 15, 60_000);
   if (!rl.ok) return { error: "Slow down, 15 searches a minute." as const, results: [] as OpenImage[] };
-  try {
-    const results = await searchOpenImages(q, { limit: 18, minWidth: 900 });
-    return { results };
-  } catch (e) {
-    return { error: (e as Error).message, results: [] as OpenImage[] };
-  }
+  // Names in the query ("Babar Azam", "PSX") get their Wikipedia photo first; then Openverse, then Commons.
+  const results = await searchPhotos(q, { limit: 18, minWidth: 900, entities: entitiesIn(q) });
+  return results.length ? { results } : { error: "Nothing openly licensed for that; try a more concrete scene or a name" as const, results: [] as OpenImage[] };
 }
 
 export async function importOpenImageAction(img: OpenImage, variant: "article" | "cover" | "photo" = "article") {

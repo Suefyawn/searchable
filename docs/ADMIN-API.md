@@ -82,7 +82,7 @@ Same pipeline as the CSV importer: category by slug or alias (restaurant, dentis
 `POST /newsletter`: `{ "create": true, "frequency": "daily", "subject"?, "preheader"?, "body"?, "scheduledFor"? }` (omit subject and body to use the automatic assembly of this week's stories); `{ "id", "scheduledFor" }`; `{ "id", "sendNow": true }`; `{ "id", "sendTestTo": "you@..." }`.
 
 ### Media
-`POST /media`: `{ "search": "Karachi skyline" }` lists Openverse candidates; `{ "query": "...", "alt"? }` imports the first usable one; `{ "url", "alt"?, "credit"?, "sourceUrl"?, "license"? }` imports a known openly licensed image. Returns the stored URL and credit.
+`POST /media`: `{ "search": "Karachi skyline", "entities"? }` lists candidates (Wikipedia photo of each entity, then Openverse, then Commons); `{ "query": "...", "alt"? }` imports the first usable one; `{ "url", "alt"?, "credit"?, "sourceUrl"?, "license"? }` imports a known openly licensed image. Returns the stored URL and credit.
 
 ### Reports
 `POST /report` `{ "slot", "report" (markdown), "published"?, "updated"?, "errors"? }` files a run report; it shows on `/admin/automation`. `GET /report` lists the last twenty.

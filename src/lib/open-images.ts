@@ -247,6 +247,26 @@ export async function importOpenImage(img: OpenImage, variant: "article" | "cove
 }
 
 /**
+ * Candidates for a picker or the API: the Wikipedia lead photo of any named entity first, then Openverse,
+ * then Commons when Openverse is down or empty. Never throws; an outage just means fewer candidates.
+ */
+export async function searchPhotos(query: string, opts: { limit?: number; minWidth?: number; orientation?: "landscape" | "portrait" | "square"; entities?: string[] } = {}): Promise<OpenImage[]> {
+  const out: OpenImage[] = [];
+  for (const name of (opts.entities ?? []).slice(0, 3)) {
+    const img = await wikipediaLeadImage(name).catch(() => null);
+    if (img) out.push(img);
+  }
+  let rest: OpenImage[] = [];
+  try {
+    rest = await searchOpenImages(query, { limit: opts.limit, minWidth: opts.minWidth, orientation: opts.orientation });
+  } catch {
+    // Openverse down
+  }
+  if (!rest.length) rest = await searchCommons(query, { limit: opts.limit, minWidth: opts.minWidth }).catch(() => []);
+  return [...out, ...rest.filter((r) => !out.some((o) => o.url === r.url))];
+}
+
+/**
  * First usable photo for a story: the Wikipedia lead photo of any named entity, then a search for the query
  * (wide, then any orientation), then the fallback query; skips candidates whose file no longer downloads.
  */
