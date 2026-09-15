@@ -15,7 +15,7 @@ const SIZES = "(min-width: 1024px) 800px, 100vw";
  * Lead-story carousel. Auto-advances, pauses on hover/focus, honours prefers-reduced-motion, keyboard arrows.
  * Photo left, headline stack right; a thin progress rule shows the timer, no fades, no overlays (ADR-15/20).
  */
-export function HeroCarousel({ slides }: { slides: Slide[] }) {
+export function HeroCarousel({ slides, intervalMs = INTERVAL }: { slides: Slide[]; intervalMs?: number }) {
   const [i, setI] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
   const [tick, setTick] = React.useState(0);
@@ -36,9 +36,9 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
 
   React.useEffect(() => {
     if (paused || reduced || n < 2) return;
-    const id = setTimeout(() => go(i + 1), INTERVAL);
+    const id = setTimeout(() => go(i + 1), intervalMs);
     return () => clearTimeout(id);
-  }, [i, paused, reduced, n, go, tick]);
+  }, [i, paused, reduced, n, go, tick, intervalMs]);
 
   if (!n) return null;
   const s = slides[i];
@@ -106,7 +106,7 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
                   <li key={x.id} className="flex-1">
                     <button type="button" onClick={() => go(k)} aria-label={`Story ${k + 1}: ${x.title}`} aria-current={k === i} className="block h-6 w-full">
                       <span className={cn("block h-[2px] w-full bg-[var(--border)]")}>
-                        <span key={k === i ? tick : `idle-${k}`} className={cn("block h-full bg-brand-500", k < i ? "w-full" : k === i ? "hero-progress" : "w-0")} style={k === i ? { animationDuration: `${INTERVAL}ms`, animationPlayState: paused || reduced ? "paused" : "running" } : undefined} />
+                        <span key={k === i ? tick : `idle-${k}`} className={cn("block h-full bg-brand-500", k < i ? "w-full" : k === i ? "hero-progress" : "w-0")} style={k === i ? { animationDuration: `${intervalMs}ms`, animationPlayState: paused || reduced ? "paused" : "running" } : undefined} />
                       </span>
                     </button>
                   </li>

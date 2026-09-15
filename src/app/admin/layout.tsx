@@ -41,7 +41,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { title: "Money", items: [{ href: "/admin/orders", label: "Orders", count: c.orders }, { href: "/admin/submissions", label: "Pitches", count: c.submissions }] },
     { title: "Community", items: [{ href: "/admin/community", label: "Moderation", count: (c.posts ?? 0) + (c.community_reports ?? 0) }] },
     { title: "Audience", items: [{ href: "/admin/newsletter", label: "Newsletter" }, { href: "/admin/subscribers", label: "Subscribers" }, { href: "/admin/search-log", label: "Search log" }, { href: "/admin/inbox", label: "Inbox", count: c.inbox }, { href: "/admin/messages", label: "Messages", count: c.messages }, { href: "/admin/reports", label: "Reports", count: c.reports }] },
-    { title: "System", items: [{ href: "/admin/users", label: "Users" }, { href: "/admin/redirects", label: "Redirects" }, { href: "/admin/system", label: "Status" }] },
+    { title: "System", items: [{ href: "/admin/settings", label: "Settings" }, { href: "/admin/users", label: "Users" }, { href: "/admin/redirects", label: "Redirects" }, { href: "/admin/system", label: "Status" }] },
   ];
   return (
     <div className="container-x py-8">

@@ -100,7 +100,8 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 ## Design
 | Item | Status |
 |---|---|
-| Minimal newspaper system (ADR-15): serif headlines, hairlines, no radius | ✅ |
+| Minimal newspaper system (ADR-15): serif headlines, hairlines, no radius | ✅ | Charcoal and blue kit (ADR-32), tunable from `/admin/settings`; brand page at `/brand` |
+| Site settings without a deployment: brand kit with live preview, identity and socials, hero slides and carousel speed, ticker order, homepage switches; front-page desk with lead, pins and breaking bar (`/admin/front-page`, `POST /api/admin/front`) | ✅ |
 | Real photography: 20 articles, 20 cities, 25 categories seeded from Openverse with credits | ✅ |
 | Homepage hero (lead story + numbered headlines with thumbnails + city photo strip) | ✅ |
 | Photo banners on city / category hubs; photo tiles on hubs | ✅ |

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { readSiteSettings } from "@/lib/site-settings";
 import { SITE } from "@/lib/utils";
 import { Wordmark } from "@/components/brand";
 import { NewsletterForm } from "@/components/newsletter-form";
@@ -54,17 +55,39 @@ const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
   },
 ];
 
-export function Footer() {
+const SOCIAL_LABELS: Record<string, string> = { x: "X", facebook: "Facebook", instagram: "Instagram", youtube: "YouTube", linkedin: "LinkedIn", tiktok: "TikTok" };
+
+export async function Footer() {
+  const site = await readSiteSettings();
+  const socials = Object.entries(site.identity.social).filter(([, href]) => href);
   return (
     <footer className="mt-20 border-t border-[var(--rule)]">
       <div className="container-x py-12">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
           <div className="max-w-sm">
             <Wordmark size={24} href={null} />
-            <p className="mt-2 font-serif text-[15px] italic text-2">{SITE.tagline}</p>
-            <p className="mt-6 text-[13px] font-semibold uppercase tracking-[0.12em] text-3">Searchable Daily</p>
-            <p className="mb-3 mt-1 text-sm text-2">The useful morning email. Two minutes, every day.</p>
-            <NewsletterForm compact source="footer" />
+            <p className="mt-2 font-serif text-[15px] italic text-2">{site.identity.tagline}</p>
+            {site.features.newsletterCapture ? (
+              <>
+                <p className="mt-6 text-[13px] font-semibold uppercase tracking-[0.12em] text-3">Searchable Daily</p>
+                <p className="mb-3 mt-1 text-sm text-2">The useful morning email. Two minutes, every day.</p>
+                <NewsletterForm compact source="footer" />
+              </>
+            ) : null}
+            {socials.length || site.identity.contactEmail ? (
+              <p className="mt-6 flex flex-wrap gap-x-4 gap-y-1 text-[13px]">
+                {socials.map(([k, href]) => (
+                  <a key={k} href={href} target="_blank" rel="noopener" className="underline-offset-4 hover:underline">
+                    {SOCIAL_LABELS[k] ?? k}
+                  </a>
+                ))}
+                {site.identity.contactEmail ? (
+                  <a href={`mailto:${site.identity.contactEmail}`} className="underline-offset-4 hover:underline">
+                    {site.identity.contactEmail}
+                  </a>
+                ) : null}
+              </p>
+            ) : null}
           </div>
           {COLUMNS.map((c) => (
             <div key={c.title}>

@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { formatDate } from "@/lib/format";
-import { SITE } from "@/lib/utils";
 import { Wordmark } from "@/components/brand";
 import { activeBreaking, readFrontPage } from "@/lib/front-page";
 import { getMegaNav } from "@/lib/mega-nav";
+import { readSiteSettings } from "@/lib/site-settings";
 import { AuthLinks } from "./auth-links";
 import { MegaMenu } from "./mega-menu";
 import { MobileNav } from "./mobile-nav";
@@ -26,7 +26,7 @@ export function Logo({ className = "" }: { className?: string }) {
 
 export async function Header({ showSearch = true }: { showSearch?: boolean }) {
   const today = formatDate(new Date(), { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  const [sections, front] = await Promise.all([getMegaNav(), readFrontPage()]);
+  const [sections, front, site] = await Promise.all([getMegaNav(), readFrontPage(), readSiteSettings()]);
   const breaking = activeBreaking(front);
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-[var(--bg)]">
@@ -49,7 +49,7 @@ export async function Header({ showSearch = true }: { showSearch?: boolean }) {
         {/* Top line: date · tagline · account */}
         <div className="hidden items-center justify-between py-2 text-[12.5px] text-3 sm:flex">
           <span>{today}</span>
-          <span className="italic font-serif text-[14px]">{SITE.tagline}</span>
+          <span className="italic font-serif text-[14px]">{site.identity.tagline}</span>
           <span className="flex items-center gap-4">
             <AuthLinks />
             <Link href="/newsletter" className="font-medium text-[var(--text)] underline-offset-4 hover:underline">

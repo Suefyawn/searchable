@@ -4,6 +4,7 @@ import { Change } from "@/components/data/change";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { HeroCarousel, type Slide } from "@/components/home/hero-carousel";
 import { readFrontPage, resolveFront } from "@/lib/front-page";
+import { readSiteSettings } from "@/lib/site-settings";
 import { NumbersTicker } from "@/components/home/numbers-ticker";
 import { Img } from "@/components/img";
 import { LiveFeed } from "@/components/home/live-feed";
@@ -28,7 +29,7 @@ function Label({ children }: { children: React.ReactNode }) {
 }
 
 export default async function HomePage() {
-  const front = await readFrontPage();
+  const [front, site] = await Promise.all([readFrontPage(), readSiteSettings()]);
   const [pinned, latest, guides, cities, categories, series, feed, pressItems, worldItems, community, pros] = await Promise.all([
     listArticlesByIds([...(front.leadId ? [front.leadId] : []), ...front.pins]),
     listArticles({ kind: "news", limit: 12 }),
@@ -46,7 +47,7 @@ export default async function HomePage() {
   const { ordered } = resolveFront(front, latest, new Map(pinned.map((a) => [a.id, a])));
   const slides: Slide[] = ordered
     .filter((a) => a.featuredImageUrl)
-    .slice(0, 5)
+    .slice(0, site.front.heroSlides)
     .map((a) => ({ id: a.id, href: articleUrl(a), title: a.title, dek: a.dek, imageUrl: a.featuredImageUrl, label: a.category?.name ?? "News", meta: a.publishedAt ? timeAgo(a.publishedAt) : "" }));
   const slideIds = new Set(slides.map((s) => s.id));
   const headlines = ordered.filter((a) => !slideIds.has(a.id)).slice(0, 8);
@@ -59,7 +60,7 @@ export default async function HomePage() {
   ]);
   const featuredTools = TOOLS.filter((t) => t.featured).slice(0, 6);
   const topCategories = categories.filter((c) => c.count > 0).slice(0, 10);
-  const TICKER_ORDER = ["petrol-price", "usd-pkr", "gold-24k-tola", "gold-22k-tola", "kse-100", "diesel-price", "silver-tola", "btc-usd", "sbp-policy-rate", "kibor-1y", "aed-pkr", "sar-pkr", "gbp-pkr", "eur-pkr", "eth-usd", "cpi-yoy", "solar-panel-per-watt"];
+  const TICKER_ORDER = site.front.tickerOrder;
   const numbers = series.filter((s) => s.latest).sort((a, b) => (TICKER_ORDER.indexOf(a.slug) + 1 || 99) - (TICKER_ORDER.indexOf(b.slug) + 1 || 99));
 
   return (
@@ -82,7 +83,7 @@ export default async function HomePage() {
       {slides.length ? (
         <section className="grid gap-8 py-8 lg:grid-cols-12 lg:gap-10 lg:py-10">
           <div className="lg:col-span-8">
-            <HeroCarousel slides={slides} />
+            <HeroCarousel slides={slides} intervalMs={site.front.carouselSeconds * 1000} />
           </div>
           <div className="relative lg:col-span-4 lg:min-h-0">
             <LiveFeed initial={feed} className="max-h-[520px] overflow-hidden lg:absolute lg:inset-0 lg:max-h-none" />
@@ -91,7 +92,7 @@ export default async function HomePage() {
       ) : null}
 
       {/* From the press */}
-      {press.length ? (
+      {press.length && site.features.homePress ? (
         <section className="border-t border-line py-8">
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
             <h2 className="font-serif text-2xl">From Pakistan’s press</h2>
@@ -117,7 +118,7 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      {world.length ? (
+      {world.length && site.features.homeWorld ? (
         <section className="border-t border-line py-8">
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
             <h2 className="font-serif text-2xl">Around the world</h2>
@@ -250,9 +251,9 @@ export default async function HomePage() {
       </section>
 
       {/* Community and professionals */}
-      {community.rows.length || pros.rows.length ? (
+      {(community.rows.length && site.features.homeCommunity) || (pros.rows.length && site.features.homeProfessionals) ? (
         <section className="grid gap-10 py-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          {community.rows.length ? (
+          {community.rows.length && site.features.homeCommunity ? (
             <div>
               <div className="rule flex items-baseline justify-between pt-3">
                 <h2 className="font-serif text-2xl">From the community</h2>
