@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { ArticleCard, ToolCard, articleUrl, toolExample } from "@/components/cards";
 import { Change } from "@/components/data/change";
-import { Img } from "@/components/img";
 import { NewsletterForm } from "@/components/newsletter-form";
+import { HeroCarousel, type Slide } from "@/components/home/hero-carousel";
+import { Img } from "@/components/img";
+import { LiveFeed } from "@/components/home/live-feed";
 import { PhotoTile } from "@/components/photo-tiles";
+import { activityFeed } from "@/lib/activity";
+import { fetchPress, groupBySource } from "@/lib/press";
 import { listArticles } from "@/db/queries/content";
 import { listSeriesWithLatest } from "@/db/queries/data";
 import { categoryCounts } from "@/db/queries/directory";
@@ -18,18 +22,25 @@ function Label({ children }: { children: React.ReactNode }) {
 }
 
 export default async function HomePage() {
-  const [featured, latest, guides, cities, categories, series] = await Promise.all([
+  const [featured, latest, guides, cities, categories, series, feed, pressItems] = await Promise.all([
     listArticles({ kind: "news", featured: true, limit: 1 }),
-    listArticles({ kind: "news", limit: 10 }),
+    listArticles({ kind: "news", limit: 12 }),
     listArticles({ kind: "guide", limit: 5 }),
     citiesWithCounts(8),
     categoryCounts(),
     listSeriesWithLatest(),
+    activityFeed(24),
+    fetchPress({ limit: 40, perFeed: 8, topics: ["general", "business"] }),
   ]);
   const lead = featured[0] ?? latest[0];
-  const others = latest.filter((a) => a.id !== lead?.id);
-  const secondary = others.slice(0, 3);
-  const headlines = others.slice(3, 11);
+  const ordered = lead ? [lead, ...latest.filter((a) => a.id !== lead.id)] : latest;
+  const slides: Slide[] = ordered
+    .filter((a) => a.featuredImageUrl)
+    .slice(0, 5)
+    .map((a) => ({ id: a.id, href: articleUrl(a), title: a.title, dek: a.dek, imageUrl: a.featuredImageUrl, label: a.category?.name ?? "News", meta: a.publishedAt ? timeAgo(a.publishedAt) : "" }));
+  const slideIds = new Set(slides.map((s) => s.id));
+  const headlines = ordered.filter((a) => !slideIds.has(a.id)).slice(0, 8);
+  const press = groupBySource(pressItems, 5).slice(0, 4);
   const featuredTools = TOOLS.filter((t) => t.featured).slice(0, 6);
   const topCategories = categories.filter((c) => c.count > 0).slice(0, 10);
   const numbers = series.filter((s) => s.latest);
@@ -51,39 +62,39 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      {/* Hero: the lead story */}
-      {lead ? (
-        <section className="grid gap-8 py-8 lg:grid-cols-12 lg:gap-12 lg:py-12">
-          <Link href={articleUrl(lead)} className="block lg:col-span-7" aria-hidden tabIndex={-1}>
-            {lead.featuredImageUrl ? <Img src={lead.featuredImageUrl} alt="" aspect="3/2" priority sizes="(min-width: 1024px) 720px, 100vw" /> : <div className="bg-surface-2" style={{ aspectRatio: "3/2" }} />}
-          </Link>
-          <div className="flex flex-col justify-center lg:col-span-5">
-            <p className="eyebrow">
-              {lead.category?.name ?? "News"}
-              {lead.publishedAt ? <span className="ml-2 font-sans text-[11px] font-normal normal-case tracking-normal text-3">{timeAgo(lead.publishedAt)}</span> : null}
-            </p>
-            <h1 className="mt-3 font-serif text-[2.4rem] font-medium leading-[1.05] tracking-tight sm:text-[3rem] lg:text-[3.4rem]">
-              <Link href={articleUrl(lead)} className="headline-link">
-                {lead.title}
-              </Link>
-            </h1>
-            {lead.dek ? <p className="mt-5 max-w-xl font-serif text-[1.15rem] leading-relaxed text-2">{lead.dek}</p> : null}
-            <p className="mt-5 text-[13px] text-3">
-              {lead.author?.name ? `${lead.author.name} · ` : ""}
-              {lead.readingMinutes ?? 3} min read
-            </p>
-            {secondary.length ? (
-              <ol className="mt-8 divide-y divide-[var(--border)] border-t border-line">
-                {secondary.map((a) => (
-                  <li key={a.id} className="py-3">
-                    <p className="eyebrow">{a.category?.name ?? "News"}</p>
-                    <Link href={articleUrl(a)} className="headline-link mt-0.5 block font-serif text-[1.1rem] font-medium leading-snug">
-                      {a.title}
-                    </Link>
-                  </li>
-                ))}
-              </ol>
-            ) : null}
+      {/* Hero: carousel of the top stories + the live feed */}
+      {slides.length ? (
+        <section className="grid gap-8 py-8 lg:grid-cols-12 lg:gap-10 lg:py-10">
+          <div className="lg:col-span-8">
+            <HeroCarousel slides={slides} />
+          </div>
+          <LiveFeed initial={feed} className="lg:col-span-4 lg:max-h-[640px] lg:overflow-hidden" />
+        </section>
+      ) : null}
+
+      {/* From the press */}
+      {press.length ? (
+        <section className="border-t border-line py-8">
+          <div className="flex items-baseline justify-between">
+            <h2 className="font-serif text-2xl">From Pakistan’s press</h2>
+            <p className="text-xs text-3">Headlines refresh every 15 minutes · links open at the publisher</p>
+          </div>
+          <div className="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+            {press.map((g) => (
+              <div key={g.sourceSlug}>
+                <p className="rule pt-2 eyebrow">{g.source}</p>
+                <ul className="mt-1 divide-y divide-[var(--border)]">
+                  {g.items.map((it) => (
+                    <li key={it.url} className="py-2">
+                      <a href={it.url} target="_blank" rel="noopener" className="headline-link text-[15px] leading-snug">
+                        {it.title}
+                      </a>
+                      <span className="block text-[11px] text-3">{timeAgo(new Date(it.publishedAt))}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </section>
       ) : null}

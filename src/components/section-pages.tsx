@@ -7,6 +7,8 @@ import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
 import { countArticles, getArticle, getCategory, listArticles, listCategories, type ArticleKind } from "@/db/queries/content";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
+import { fetchPress, groupBySource } from "@/lib/press";
+import { timeAgo } from "@/lib/format";
 
 const META: Record<"news" | "guide", { section: string; name: string; title: string; description: string }> = {
   news: { section: "news", name: "News", title: "Pakistan news — with the useful context", description: "What changed, what it means for you, and what to do next. Business, economy, technology, cars, property and more." },
@@ -23,8 +25,9 @@ export function sectionMetadata(kind: "news" | "guide", page = 1): Metadata {
 
 export async function SectionHub({ kind, page = 1 }: { kind: "news" | "guide"; page?: number }) {
   const m = META[kind];
-  const [categories, items, total] = await Promise.all([listCategories(kind), listArticles({ kind, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }), countArticles(kind)]);
+  const [categories, items, total, pressItems] = await Promise.all([listCategories(kind), listArticles({ kind, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }), countArticles(kind), kind === "news" && page === 1 ? fetchPress({ limit: 40, perFeed: 8 }) : Promise.resolve([])]);
   if (page > 1 && !items.length) notFound();
+  const press = groupBySource(pressItems, 6);
   const featured = page === 1 ? items.slice(0, 1) : [];
   const rest = page === 1 ? items.slice(1) : items;
   return (
@@ -45,6 +48,29 @@ export async function SectionHub({ kind, page = 1 }: { kind: "news" | "guide"; p
         <ArticleListing items={page === 1 ? rest.slice(2) : rest} emptyText={`No ${m.name.toLowerCase()} published yet.`} />
       </div>
       <Pagination base={`/${m.section}`} page={page} total={total} />
+      {press.length ? (
+        <section className="mt-12 border-t border-line pt-8">
+          <div className="flex items-baseline justify-between">
+            <h2 className="font-serif text-2xl">From Pakistan’s press</h2>
+            <p className="text-xs text-3">Headlines refresh every 15 minutes · links open at the publisher</p>
+          </div>
+          <div className="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+            {press.map((g) => (
+              <div key={g.sourceSlug}>
+                <p className="rule pt-2 eyebrow">{g.source}</p>
+                <ul className="mt-1 divide-y divide-[var(--border)]">
+                  {g.items.map((it) => (
+                    <li key={it.url} className="py-2">
+                      <a href={it.url} target="_blank" rel="noopener" className="headline-link text-[15px] leading-snug">{it.title}</a>
+                      <span className="block text-[11px] text-3">{timeAgo(new Date(it.publishedAt))}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

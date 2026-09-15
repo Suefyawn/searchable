@@ -236,6 +236,41 @@
     color: var(--color-brand-300);
   }
 }
+/* Carousel timer rule and the live dot — the only two things that move on the front page. */
+@utility hero-progress {
+  width: 0;
+  animation: hero-progress linear forwards;
+}
+@utility live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--color-brand-700);
+  animation: live-pulse 1.8s ease-in-out infinite;
+}
+@keyframes hero-progress {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-dot {
+    animation: none;
+  }
+}
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar {
