@@ -3,6 +3,7 @@ import { getDb, rawQuery, schema } from "@/db";
 import { publishDueArticles } from "@/app/admin/articles/actions";
 import { expireStaleClaims, sendClaimInvites } from "./claims";
 import { expireLapsedPlans } from "./commerce";
+import { closeExpiredPosts } from "./community";
 import { sendDueIssues } from "./newsletter-issue";
 
 /**
@@ -54,5 +55,6 @@ export async function pruneOldRows(): Promise<Record<string, number>> {
   const rl = await rawQuery<{ n: number }>(db, sql`with d as (delete from ${schema.verifications} where expires_at < now() - interval '7 days' returning 1) select count(*)::int as n from d`);
   out.verifications = Number(rl[0]?.n ?? 0);
   out.expiredClaims = await expireStaleClaims();
+  out.closedPosts = await closeExpiredPosts();
   return out;
 }

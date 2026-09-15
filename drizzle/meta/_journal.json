@@ -57,6 +57,13 @@
       "when": 1789464303923,
       "tag": "0007_professionals",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789465120940,
+      "tag": "0008_community",
+      "breakpoints": true
     }
   ]
 }

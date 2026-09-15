@@ -29,7 +29,7 @@ export function AuthForm({ next, initialMode }: { next: string; initialMode: "lo
       setError(res.error.message ?? "Something went wrong");
       return;
     }
-    setAuthHint();
+    setAuthHint((res.data as { user?: { id?: string } } | null)?.user?.id);
     router.push(next);
     router.refresh();
   }

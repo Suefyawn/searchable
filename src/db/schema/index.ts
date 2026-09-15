@@ -10,4 +10,5 @@ export * from "./search";
 export * from "./platform";
 export * from "./commerce";
 export * from "./professionals";
+export * from "./community";
 export * from "./relations";

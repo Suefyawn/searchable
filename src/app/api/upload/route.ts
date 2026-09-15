@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   const alt = form?.get("alt") ? String(form.get("alt")).slice(0, 200) : undefined;
 
   if (!(file instanceof File)) return NextResponse.json({ error: "No file received." }, { status: 400 });
-  if (!["article", "logo", "cover", "photo", "evidence", "avatar", "cv"].includes(variant)) return NextResponse.json({ error: "Unknown variant." }, { status: 400 });
+  if (!["article", "logo", "cover", "photo", "evidence", "avatar", "post", "cv"].includes(variant)) return NextResponse.json({ error: "Unknown variant." }, { status: 400 });
 
   // Documents (CVs) take a different path: stored as is, PDF only, smaller cap.
   if (variant === "cv") {
@@ -41,11 +41,11 @@ export async function POST(req: Request) {
   if (file.size > MAX_UPLOAD_BYTES) return NextResponse.json({ error: `Image is too large (max ${MAX_UPLOAD_BYTES / 1024 / 1024} MB).` }, { status: 413 });
 
   // evidence / avatar: any signed-in user, unguessable URL, never listed publicly.
-  const selfService = variant === "evidence" || variant === "avatar";
+  const selfService = variant === "evidence" || variant === "avatar" || variant === "post";
   const allowed = selfService || hasRole(user, "editor") || (businessId ? await canEditBusiness(user, businessId) : false);
   if (!allowed) return NextResponse.json({ error: "You do not have permission to upload here." }, { status: 403 });
 
-  const storeVariant = variant === "evidence" ? "photo" : variant === "avatar" ? "logo" : (variant as "article" | "logo" | "cover" | "photo");
+  const storeVariant = variant === "evidence" || variant === "post" ? "photo" : variant === "avatar" ? "logo" : (variant as "article" | "logo" | "cover" | "photo");
   try {
     const stored = await storeImage(Buffer.from(await file.arrayBuffer()), { variant: storeVariant, alt, originalName: file.name });
     return NextResponse.json(stored);

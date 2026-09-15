@@ -48,7 +48,7 @@ export const settings = pgTable("settings", {
   updatedAt: updatedAt(),
 });
 
-export const reportTarget = pgEnum("report_target", ["business", "review", "article"]);
+export const reportTarget = pgEnum("report_target", ["business", "review", "article", "post", "comment", "professional", "member"]);
 export const reportStatus = pgEnum("report_status", ["open", "resolved", "dismissed"]);
 
 /** User reports: wrong details, closed business, abusive review, factual error. */

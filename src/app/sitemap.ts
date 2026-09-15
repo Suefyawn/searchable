@@ -6,12 +6,13 @@ import { TOOLS, toolUrl } from "@/tools/registry";
 import { TOOL_CATEGORIES } from "@/tools/types";
 import { DISCOS } from "@/content/discos";
 import { PROFESSIONS } from "@/content/professions";
+import { POST_KINDS } from "@/lib/community-schema";
 
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const db = await getDb();
-  const [articles, businesses, cities, entities, categories, bcats, series, pros] = await Promise.all([
+  const [articles, businesses, cities, entities, categories, bcats, series, pros, communityPosts] = await Promise.all([
     db
       .select({ kind: schema.articles.kind, slug: schema.articles.slug, updatedAt: schema.articles.updatedAt, cat: schema.categories.slug })
       .from(schema.articles)
@@ -24,6 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     db.select({ slug: schema.businessCategories.slug }).from(schema.businessCategories),
     db.select({ slug: schema.dataSeries.slug, updatedAt: schema.dataSeries.updatedAt }).from(schema.dataSeries),
     db.select({ slug: schema.professionals.slug, updatedAt: schema.professionals.updatedAt }).from(schema.professionals).where(eq(schema.professionals.status, "active")),
+    db.select({ slug: schema.posts.slug, updatedAt: schema.posts.updatedAt }).from(schema.posts).where(eq(schema.posts.status, "published")),
   ]);
   const u = (path: string, lastModified?: Date, priority = 0.6, changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] = "weekly") => ({ url: `${SITE.url}${path}`, lastModified, priority, changeFrequency });
   return [
@@ -33,6 +35,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u("/tools", new Date(), 0.9, "weekly"),
     u("/businesses", new Date(), 0.8, "weekly"),
     u("/professionals", new Date(), 0.8, "weekly"),
+    u("/community/all", new Date(), 0.7, "daily"),
+    ...POST_KINDS.map((k) => u(`/community/${k.key}`, new Date(), 0.6, "daily")),
     ...PROFESSIONS.map((p) => u(`/professionals/${p.slug}`, undefined, 0.6)),
     u("/cities", new Date(), 0.7, "monthly"),
     u("/data", new Date(), 0.8, "daily"),
@@ -55,6 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...bcats.map((c) => u(`/businesses/${c.slug}`, undefined, 0.6)),
     ...businesses.map((b) => u(`/b/${b.slug}`, b.updatedAt, 0.5)),
     ...pros.map((p) => u(`/p/${p.slug}`, p.updatedAt, 0.5)),
+    ...communityPosts.map((p) => u(`/community/post/${p.slug}`, p.updatedAt, 0.4)),
     ...cities.map((c) => u(`/cities/${c.slug}`, c.updatedAt, 0.6)),
     ...entities.map((e) => u(`/e/${e.slug}`, e.updatedAt, 0.5)),
   ];

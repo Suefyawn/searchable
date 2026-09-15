@@ -120,7 +120,18 @@ async function build(): Promise<MegaSection[]> {
     footer: { href: "/cities", label: "All cities" },
   };
 
-  return [news, guidesSection, tools, businesses, dataSection, compare, citiesSection];
+  const community: MegaSection = {
+    key: "community",
+    label: "Community",
+    href: "/community",
+    columns: [
+      { title: "Browse", links: [{ href: "/community/job", label: "Jobs" }, { href: "/community/listing", label: "For sale" }, { href: "/community/auction", label: "Auctions" }, { href: "/community/question", label: "Questions" }, { href: "/community/discussion", label: "Discussions" }] },
+      { title: "Take part", links: [{ href: "/community/new", label: "Post something" }, { href: "/account/profile", label: "Your profile" }, { href: "/account/posts", label: "Your posts" }] },
+      { title: "People", links: [{ href: "/professionals", label: "Find a professional" }, { href: "/professionals/join", label: "Create a professional profile" }, { href: "/add-business", label: "List a business" }] },
+    ],
+    footer: { href: "/community", label: "Community home" },
+  };
+  return [news, guidesSection, tools, businesses, dataSection, compare, citiesSection, community];
 }
 
 /** Cached for 10 minutes so the header never adds noticeable work to a request. */

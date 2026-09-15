@@ -9,6 +9,10 @@ import { entitiesForTarget } from "@/db/queries/entities";
 import { formatDate } from "@/lib/format";
 import { AdSlot } from "@/components/ads";
 import { CiteThis } from "@/components/cite";
+import { CommentsSection } from "@/components/community/comments";
+import { reactionCount } from "@/lib/community";
+import { LikeButton } from "@/components/community/like-button";
+import { LikedProvider } from "@/components/community/liked-context";
 import { extractToc, renderMarkdown } from "@/lib/markdown";
 import { articleJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { TOOLS } from "@/tools/registry";
@@ -21,11 +25,12 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
   const path = `/${section}/${article.category?.slug ?? "general"}/${article.slug}`;
   const html = article.isSponsored ? renderMarkdown(article.body).replace(/<a href="(https?:\/\/[^"]+)"/g, '<a href="$1" rel="sponsored noopener" target="_blank"') : renderMarkdown(article.body);
   const toc = kind === "guide" ? extractToc(article.body) : [];
-  const [auto, picked, entities, tags] = await Promise.all([
+  const [auto, picked, entities, tags, likeCount] = await Promise.all([
     listArticles({ kind, categorySlug: article.category?.slug, limit: 4, excludeId: article.id }),
     getArticlesByIds(article.relatedIds),
     entitiesForTarget("article", article.id),
     getTagsForArticle(article.id),
+    reactionCount("article", article.id),
   ]);
   const related = [...picked, ...auto.filter((a) => !picked.some((p) => p.id === a.id))].slice(0, 4);
   // Tools mentioned in the body (by URL) come first; otherwise tools sharing an entity.
@@ -150,6 +155,14 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
           ) : null}
 
           <div className="mt-8 max-w-[68ch]">
+            <LikedProvider targets={[{ type: "article", id: article.id }]}>
+              <div className="flex items-center gap-5 border-y border-line py-3">
+                <LikeButton type="article" id={article.id} count={likeCount} path={path} />
+                <a href="#comments" className="text-[13.5px] text-2 hover:text-[var(--text)]">
+                  Comments
+                </a>
+              </div>
+            </LikedProvider>
             <ReportForm targetType="article" targetId={article.id} label="Spotted an error? Report it" />
             <CiteThis title={article.title} path={path} date={article.updatedAt ?? article.publishedAt} markdownPath={`/api/md${path}`} className="mt-3" />
           </div>
@@ -227,6 +240,10 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
             </div>
           </div>
         </aside>
+      </div>
+
+      <div className="max-w-3xl">
+        <CommentsSection targetType="article" targetId={article.id} path={path} title="Reader comments" />
       </div>
 
       {related.length ? (

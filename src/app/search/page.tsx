@@ -19,8 +19,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   return { title: q ? `“${q}”` : "Search", robots: { index: false, follow: true } };
 }
 
-const TYPE_ORDER: SearchEntityType[] = ["tool", "data_series", "guide", "comparison", "professional", "business", "news", "location", "entity"];
-const PLURAL: Record<SearchEntityType, string> = { tool: "Calculators", guide: "Guides", news: "News", business: "Businesses", entity: "Topics", location: "Places", data_series: "Data", comparison: "Comparisons", professional: "Professionals" };
+const TYPE_ORDER: SearchEntityType[] = ["tool", "data_series", "guide", "comparison", "professional", "business", "news", "post", "location", "entity"];
+const PLURAL: Record<SearchEntityType, string> = { tool: "Calculators", guide: "Guides", news: "News", business: "Businesses", entity: "Topics", location: "Places", data_series: "Data", comparison: "Comparisons", professional: "Professionals", post: "Community" };
 const FILTERS: { value: SearchEntityType | ""; label: string }[] = [
   { value: "", label: "All" },
   { value: "tool", label: "Calculators" },
@@ -29,6 +29,7 @@ const FILTERS: { value: SearchEntityType | ""; label: string }[] = [
   { value: "business", label: "Businesses" },
   { value: "professional", label: "Professionals" },
   { value: "news", label: "News" },
+  { value: "post", label: "Community" },
   { value: "location", label: "Places" },
 ];
 // The side rails change slowly; cache them so a search costs one query, not four.

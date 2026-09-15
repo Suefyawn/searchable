@@ -15,6 +15,7 @@ export const NAV = [
   { href: "/data", label: "Data" },
   { href: "/compare", label: "Compare" },
   { href: "/cities", label: "Cities" },
+  { href: "/community", label: "Community" },
 ];
 
 export function Logo({ className = "" }: { className?: string }) {

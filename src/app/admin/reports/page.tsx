@@ -18,6 +18,18 @@ async function targetLink(type: string, id: string) {
     const a = await db.query.articles.findFirst({ where: eq(schema.articles.id, id), columns: { title: true } });
     return a ? { label: a.title, href: `/admin/articles/${id}` } : null;
   }
+  if (type === "post") {
+    const p = await db.query.posts.findFirst({ where: eq(schema.posts.id, id), columns: { title: true, slug: true } });
+    return p ? { label: `Post: ${p.title}`, href: `/community/post/${p.slug}` } : null;
+  }
+  if (type === "comment") {
+    const c = await db.query.comments.findFirst({ where: eq(schema.comments.id, id), columns: { body: true } });
+    return c ? { label: `Comment: ${c.body.slice(0, 80)}`, href: `/admin/community?view=comments` } : null;
+  }
+  if (type === "member") {
+    const m = await db.query.memberProfiles.findFirst({ where: eq(schema.memberProfiles.userId, id), columns: { handle: true, displayName: true } });
+    return m ? { label: `Member: ${m.displayName} (@${m.handle})`, href: `/admin/community?view=members` } : null;
+  }
   const r = await db.query.businessReviews.findFirst({ where: eq(schema.businessReviews.id, id), columns: { title: true, body: true } });
   return r ? { label: `Review: ${r.title ?? r.body?.slice(0, 60)}`, href: `/admin/reviews?status=all` } : null;
 }

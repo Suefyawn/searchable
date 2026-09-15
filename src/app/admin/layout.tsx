@@ -17,6 +17,8 @@ async function queueCounts() {
       (select count(*) from businesses where status = 'pending')::int as businesses,
       (select count(*) from business_claims where status = 'pending')::int as claims,
       (select count(*) from professionals where status = 'pending')::int as professionals,
+      (select count(*) from posts where status = 'pending')::int as posts,
+      (select count(*) from reports where status = 'open' and target_type in ('post', 'comment', 'member'))::int as community_reports,
       (select count(*) from business_reviews where status = 'pending')::int as reviews,
       (select count(*) from orders where status = 'pending')::int as orders,
       (select count(*) from submissions where status in ('new', 'reviewing'))::int as submissions,
@@ -36,6 +38,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { title: "Desk", items: [{ href: "/admin", label: "Dashboard" }, { href: "/admin/articles", label: "Articles", count: c.drafts }, { href: "/admin/ideas", label: "Story ideas" }, { href: "/admin/data", label: "Data hub" }, { href: "/admin/media", label: "Media" }] },
     { title: "Directory", items: [{ href: "/admin/businesses", label: "Businesses", count: c.businesses }, { href: "/admin/claims", label: "Claims", count: c.claims }, { href: "/admin/professionals", label: "Professionals", count: c.professionals }, { href: "/admin/outreach", label: "Outreach" }, { href: "/admin/reviews", label: "Reviews", count: c.reviews }, { href: "/admin/leads", label: "Enquiries" }] },
     { title: "Money", items: [{ href: "/admin/orders", label: "Orders", count: c.orders }, { href: "/admin/submissions", label: "Pitches", count: c.submissions }] },
+    { title: "Community", items: [{ href: "/admin/community", label: "Moderation", count: (c.posts ?? 0) + (c.community_reports ?? 0) }] },
     { title: "Audience", items: [{ href: "/admin/newsletter", label: "Newsletter" }, { href: "/admin/subscribers", label: "Subscribers" }, { href: "/admin/search-log", label: "Search log" }, { href: "/admin/messages", label: "Messages", count: c.messages }, { href: "/admin/reports", label: "Reports", count: c.reports }] },
     { title: "System", items: [{ href: "/admin/redirects", label: "Redirects" }, { href: "/admin/system", label: "Status" }] },
   ];

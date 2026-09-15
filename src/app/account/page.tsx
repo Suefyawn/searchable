@@ -29,10 +29,18 @@ export default async function AccountPage() {
               <p className="mt-1 text-[15px] text-2">Publish articles, manage businesses, view subscribers and search logs.</p>
             </Link>
           ) : null}
-          <div className="surface p-5">
-            <p className="font-semibold">Saved items</p>
-            <p className="mt-1 text-[15px] text-2">Saving tools, guides and businesses arrives with personalisation (Phase 8).</p>
-          </div>
+          <Link href="/account/profile" className="surface surface-hover p-5">
+            <p className="font-semibold">Your public profile</p>
+            <p className="mt-1 text-[15px] text-2">Handle, photo, bio and handles shown on your posts and comments.</p>
+          </Link>
+          <Link href="/account/posts" className="surface surface-hover p-5">
+            <p className="font-semibold">Your posts</p>
+            <p className="mt-1 text-[15px] text-2">Jobs, listings, auctions and questions you have posted, and their status.</p>
+          </Link>
+          <Link href="/professional" className="surface surface-hover p-5">
+            <p className="font-semibold">Professional profile</p>
+            <p className="mt-1 text-[15px] text-2">Doctor, engineer, electrician, tutor: a profile people can hire you from.</p>
+          </Link>
           <Link href="/business" className="surface surface-hover p-5">
             <p className="font-semibold">Your businesses</p>
             <p className="mt-1 text-[15px] text-2">Manage listings you own: details, hours, services, enquiries and review responses.</p>

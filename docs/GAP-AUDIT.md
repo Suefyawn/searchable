@@ -115,5 +115,6 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 3. Tools to 30: ✅ sales tax, 231B, EOBI, FX converter, personal loan, increment, age · next: stamp duty per province, savings/NSC, car import duty, gas bill, freelancer tax, provident fund
 4. ✅ Typo tolerance + intent blending in search.
 5. ✅ Professional profiles (ADR-26): hub, profession and city lists, profile page, editor with CV upload, owner dashboard, Verified plan, admin approval.
-6. Community: member profiles, posts (jobs, listings, auctions, anything) with admin approval, comments, replies, likes on posts and articles, moderation queue.
-7. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md` + `docs/FREE-TIER.md`), then AdSense, Resend, Search Console, Position Tracking.
+6. ✅ Community (ADR-27): member profiles, posts (jobs, listings, auctions, questions, discussions) with editor approval, bids, comments and replies, likes on posts, comments and articles, reports, moderation queue with bans and member verification.
+7. Next: reviews for professionals; saved items; notifications (email digest of replies); community search facets by city.
+8. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md` + `docs/FREE-TIER.md`), then AdSense, Resend, Search Console, Position Tracking.

@@ -7,6 +7,7 @@ import { locations } from "./geo";
 import { users } from "./auth";
 import { orders, submissions } from "./commerce";
 import { professionalLeads, professionals } from "./professionals";
+import { bids, comments, memberProfiles, posts, reactions } from "./community";
 
 export const locationsRelations = relations(locations, ({ one, many }) => ({
   parent: one(locations, { fields: [locations.parentId], references: [locations.id], relationName: "parent" }),
@@ -119,4 +120,24 @@ export const professionalsRelations = relations(professionals, ({ one, many }) =
 }));
 export const professionalLeadsRelations = relations(professionalLeads, ({ one }) => ({
   professional: one(professionals, { fields: [professionalLeads.professionalId], references: [professionals.id] }),
+}));
+
+export const memberProfilesRelations = relations(memberProfiles, ({ one }) => ({
+  user: one(users, { fields: [memberProfiles.userId], references: [users.id] }),
+  city: one(locations, { fields: [memberProfiles.cityId], references: [locations.id], relationName: "memberCity" }),
+}));
+export const postsRelations = relations(posts, ({ one, many }) => ({
+  author: one(users, { fields: [posts.authorId], references: [users.id] }),
+  city: one(locations, { fields: [posts.cityId], references: [locations.id], relationName: "postCity" }),
+  bids: many(bids),
+}));
+export const bidsRelations = relations(bids, ({ one }) => ({
+  post: one(posts, { fields: [bids.postId], references: [posts.id] }),
+  user: one(users, { fields: [bids.userId], references: [users.id] }),
+}));
+export const commentsRelations = relations(comments, ({ one }) => ({
+  author: one(users, { fields: [comments.authorId], references: [users.id] }),
+}));
+export const reactionsRelations = relations(reactions, ({ one }) => ({
+  user: one(users, { fields: [reactions.userId], references: [users.id] }),
 }));
