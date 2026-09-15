@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ToolCard } from "@/components/cards";
+import { DiscoFinder } from "@/components/disco-finder";
 import { SectionHeader } from "@/components/ui";
 import { DISCOS } from "@/content/discos";
 import { buildMetadata } from "@/lib/seo";
@@ -17,6 +18,9 @@ export default function ElectricityHub() {
   return (
     <div className="container-x py-8 sm:py-12">
       <SectionHeader as="h1" eyebrow="Electricity" title="Electricity bill check online" description="Pick your distribution company to check a bill by reference number, see the per-unit tariff and use the bill calculator." />
+      <div className="mb-8">
+        <DiscoFinder discos={DISCOS.map(({ slug, short, name, region, cities, billUrl, billUrlLabel }) => ({ slug, short, name, region, cities, billUrl, billUrlLabel }))} />
+      </div>
       <div className="grid gap-x-8 gap-y-2 border-t border-line sm:grid-cols-2">
         {DISCOS.map((d) => (
           <Link key={d.slug} href={`/electricity/${d.slug}`} className="border-b border-line py-4 hover:bg-surface-2">
