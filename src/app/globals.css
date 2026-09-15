@@ -341,6 +341,19 @@
 .prose-searchable table {
   font-size: 0.9em;
 }
+.prose-searchable .table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-block: 1.5em;
+}
+.prose-searchable .table-scroll table {
+  margin-block: 0;
+  min-width: 100%;
+}
+.prose-searchable .table-scroll th,
+.prose-searchable .table-scroll td {
+  white-space: nowrap;
+}
 .prose-searchable thead th {
   font-weight: 600;
 }

@@ -17,6 +17,13 @@ marked.use({
       const id = headingId(text);
       return `<h${depth} id="${id}">${text}</h${depth}>\n`;
     },
+    // Tables scroll sideways on phones instead of wrapping "Rs 75,000" across two lines.
+    table(token: Tokens.Table) {
+      const cell = (c: Tokens.TableCell, tag: "th" | "td") => `<${tag}${c.align ? ` style="text-align:${c.align}"` : ""}>${this.parser.parseInline(c.tokens)}</${tag}>`;
+      const head = `<thead><tr>${token.header.map((c) => cell(c, "th")).join("")}</tr></thead>`;
+      const body = token.rows.length ? `<tbody>${token.rows.map((r) => `<tr>${r.map((c) => cell(c, "td")).join("")}</tr>`).join("")}</tbody>` : "";
+      return `<div class="table-scroll"><table>${head}${body}</table></div>\n`;
+    },
     link({ href, title, tokens }: Tokens.Link) {
       const text = this.parser.parseInline(tokens);
       const external = /^https?:\/\//.test(href);
