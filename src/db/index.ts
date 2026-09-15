@@ -1,5 +1,5 @@
 import "dotenv/config";
-import type { SQL } from "drizzle-orm";
+import { Param, SQL } from "drizzle-orm";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import * as schema from "./schema";
 
@@ -54,10 +54,25 @@ export async function getDb(): Promise<Database> {
 }
 
 /**
+ * postgres-js cannot serialise a Date handed to it through a raw `sql` template (drizzle passes the value
+ * untyped and the driver tries to measure it as a string). ISO text compares fine against timestamptz, so
+ * every Date parameter in a raw query is converted before it reaches the driver. PGlite accepts both.
+ */
+function stringifyDates(query: SQL) {
+  const chunks = query.queryChunks as unknown[];
+  chunks.forEach((chunk, i) => {
+    if (chunk instanceof Date) chunks[i] = chunk.toISOString();
+    else if (chunk instanceof Param && chunk.value instanceof Date) (chunk as { value: unknown }).value = chunk.value.toISOString();
+    else if (chunk instanceof SQL) stringifyDates(chunk);
+  });
+}
+
+/**
  * Run a raw SQL query and always get rows back as an array, regardless of driver
  * (PGlite returns { rows }, postgres-js returns an array-like RowList).
  */
 export async function rawQuery<T = Record<string, unknown>>(db: Database, query: SQL): Promise<T[]> {
+  stringifyDates(query);
   const result = (await db.execute(query)) as unknown;
   if (Array.isArray(result)) return result as T[];
   return ((result as { rows?: T[] }).rows ?? []) as T[];
