@@ -241,7 +241,7 @@ export default async function HomePage() {
         </div>
         <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4">
           {cities.map((c) => (
-            <PhotoTile key={c.id} href={`/cities/${c.slug}`} title={c.name} meta={c.count ? `${c.count} businesses` : undefined} imageUrl={c.imageUrl} />
+            <PhotoTile key={c.id} href={`/cities/${c.slug}`} title={c.name} meta={c.count ? `${c.count} business${c.count === 1 ? "" : "es"}` : undefined} imageUrl={c.imageUrl} />
           ))}
         </div>
       </section>

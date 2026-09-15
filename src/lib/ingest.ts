@@ -25,6 +25,9 @@ export type IngestResult = { slug: string; status: "written" | "unchanged" | "re
 
 const today = () => new Date().toISOString().slice(0, 10);
 
+/** Every series a source can fill; the rest are entered by hand (CPI, solar, and SBP's when its site blocks us). */
+export const AUTO_SERIES = ["usd-pkr", "aed-pkr", "sar-pkr", "gbp-pkr", "eur-pkr", "kibor-1y", "sbp-policy-rate", "petrol-price", "diesel-price", "gold-24k-tola", "gold-22k-tola", "silver-tola", "kse-100", "btc-usd", "eth-usd"] as const;
+
 /** Series whose change is news: a draft article is created for the desk to check and publish. */
 const NEWSWORTHY: Record<string, { title: (v: number, prev: number) => string; body: (v: number, prev: number, note: string) => string; category: string; tool?: string }> = {
   "petrol-price": {

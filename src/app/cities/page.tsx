@@ -23,7 +23,7 @@ export default async function CitiesPage() {
               <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-5">
                 {list.map((c) => (
                   <li key={c.id}>
-                    <PhotoTile href={`/cities/${c.slug}`} title={c.name} meta={countBy.get(c.id) ? `${countBy.get(c.id)} businesses` : undefined} imageUrl={c.imageUrl ?? null} aspect="4/3" sizes="(min-width: 1024px) 220px, 50vw" />
+                    <PhotoTile href={`/cities/${c.slug}`} title={c.name} meta={countBy.get(c.id) ? `${countBy.get(c.id)} business${countBy.get(c.id) === 1 ? "" : "es"}` : undefined} imageUrl={c.imageUrl ?? null} aspect="4/3" sizes="(min-width: 1024px) 220px, 50vw" />
                   </li>
                 ))}
               </ul>
