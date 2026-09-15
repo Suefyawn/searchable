@@ -258,6 +258,9 @@ async function main() {
     await seedArticles("guide", GUIDES, catIds, cityIds, entityIds, author.id);
     await seedArticles("news", NEWS, catIds, cityIds, entityIds, author.id);
     await seedBusinesses(bcIds, cityIds, areaIds, entityIds);
+    // Remember which rows are demonstration content so /admin/system can remove them in one go.
+    const sample = { articles: [...GUIDES, ...NEWS].map((a) => a.slug), businesses: BUSINESSES.map((b) => b.slug), seededAt: new Date().toISOString() };
+    await db.insert(schema.settings).values({ key: "seed:sample", value: sample }).onConflictDoUpdate({ target: schema.settings.key, set: { value: sample, updatedAt: new Date() } });
     // A few sample searches so "popular searches" has something to show.
     for (const q of ["income tax", "pta tax iphone", "solar companies lahore", "electricity bill", "dollar rate", "zakat", "restaurants lahore", "become a filer"]) {
       await db.insert(schema.searchQueries).values({ query: q, normalized: q, resultCount: 3 });

@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { AdminPage, Details, Section } from "@/components/admin";
 import { Button } from "@/components/ui";
@@ -7,6 +7,7 @@ import { requireRole } from "@/lib/auth";
 import { emailAllowance } from "@/lib/email";
 import { formatDate, timeAgo } from "@/lib/format";
 import { runDueJobs } from "@/lib/jobs";
+import { removeSearchDocument } from "@/lib/search";
 
 export const dynamic = "force-dynamic";
 
@@ -17,10 +18,32 @@ async function runJobsNow() {
   revalidatePath("/admin/system");
 }
 
+type SampleSeed = { articles: string[]; businesses: string[]; seededAt?: string };
+
+/** Delete the demonstration articles and businesses the sample seed created (comments, reviews and photos cascade). */
+async function removeSampleContent() {
+  "use server";
+  await requireRole("admin");
+  const db = await getDb();
+  const row = await db.query.settings.findFirst({ where: eq(schema.settings.key, "seed:sample") });
+  const sample = row?.value as SampleSeed | undefined;
+  if (!sample) return;
+  if (sample.articles.length) {
+    const gone = await db.delete(schema.articles).where(inArray(schema.articles.slug, sample.articles)).returning({ id: schema.articles.id, kind: schema.articles.kind });
+    for (const g of gone) await removeSearchDocument(g.kind === "news" ? "news" : "guide", g.id);
+  }
+  if (sample.businesses.length) {
+    const gone = await db.delete(schema.businesses).where(inArray(schema.businesses.slug, sample.businesses)).returning({ id: schema.businesses.id });
+    for (const g of gone) await removeSearchDocument("business", g.id);
+  }
+  await db.delete(schema.settings).where(eq(schema.settings.key, "seed:sample"));
+  revalidatePath("/", "layout");
+}
+
 /** What is running, what it costs, and whether the free allowances are safe (docs/FREE-TIER.md). */
 export default async function AdminSystem() {
   const db = await getDb();
-  const [jobs, ingest, budget, allowance, [sizes], [rows]] = await Promise.all([
+  const [jobs, ingest, budget, allowance, [sizes], [rows], sampleRow] = await Promise.all([
     db.query.settings.findFirst({ where: eq(schema.settings.key, "jobs:last") }),
     db.query.settings.findFirst({ where: eq(schema.settings.key, "ingest:last") }),
     db.query.settings.findFirst({ where: eq(schema.settings.key, "email:budget") }),
@@ -37,7 +60,12 @@ export default async function AdminSystem() {
         (select count(*) from data_points)::int as data_points,
         (select count(*) from sessions)::int as sessions`,
     ),
+    db.query.settings.findFirst({ where: eq(schema.settings.key, "seed:sample") }),
   ]);
+  const sample = sampleRow?.value as SampleSeed | undefined;
+  const [sampleLive] = sample
+    ? await rawQuery<{ articles: number; businesses: number }>(db, sql`select (select count(*) from articles where slug = any(${sample.articles}))::int as articles, (select count(*) from businesses where slug = any(${sample.businesses}))::int as businesses`)
+    : [{ articles: 0, businesses: 0 }];
   const j = jobs?.value as { at?: string } | undefined;
   const ing = ingest?.value as { at?: string; errors?: string[]; results?: { slug: string; status: string; value?: number; message?: string }[] } | undefined;
   const b = budget?.value as { day?: string; dayCount?: number; month?: string; monthCount?: number } | undefined;
@@ -109,6 +137,23 @@ export default async function AdminSystem() {
             ]}
           />
         </Section>
+        {sample ? (
+          <Section title="Sample content" description="Demonstration articles and businesses from the seed. Fine for testing; remove them before you promote the site so nothing invented gets indexed or cited." action={
+            <form action={removeSampleContent}>
+              <Button size="sm" variant="outline" type="submit">
+                Remove sample content
+              </Button>
+            </form>
+          }>
+            <Details
+              items={[
+                { label: "Articles", value: `${sampleLive.articles} of ${sample.articles.length} still live` },
+                { label: "Businesses", value: `${sampleLive.businesses} of ${sample.businesses.length} still live` },
+                { label: "Seeded", value: sample.seededAt ? formatDate(sample.seededAt, { dateStyle: "medium", timeStyle: "short" }) : null },
+              ]}
+            />
+          </Section>
+        ) : null}
       </div>
     </AdminPage>
   );
