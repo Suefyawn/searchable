@@ -2,97 +2,110 @@ import Link from "next/link";
 import { ArticleCard, ToolCard, articleUrl, toolExample } from "@/components/cards";
 import { Change } from "@/components/data/change";
 import { Img } from "@/components/img";
-import { SearchBox } from "@/components/layout/search-box";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { PhotoTile } from "@/components/photo-tiles";
 import { listArticles } from "@/db/queries/content";
 import { listSeriesWithLatest } from "@/db/queries/data";
 import { categoryCounts } from "@/db/queries/directory";
 import { citiesWithCounts } from "@/db/queries/geo";
-import { formatDate, number } from "@/lib/format";
-import { popularSearches } from "@/lib/search";
+import { number, timeAgo } from "@/lib/format";
 import { TOOLS } from "@/tools/registry";
 
 export const revalidate = 300;
-
-const EXAMPLES = ["PTA tax on iPhone 17", "income tax on 250,000 salary", "solar companies in Lahore", "how to become a filer", "electricity bill for 350 units"];
 
 function Label({ children }: { children: React.ReactNode }) {
   return <p className="rule pt-2 eyebrow">{children}</p>;
 }
 
 export default async function HomePage() {
-  const [featured, latest, guides, cities, categories, popular, series] = await Promise.all([
+  const [featured, latest, guides, cities, categories, series] = await Promise.all([
     listArticles({ kind: "news", featured: true, limit: 1 }),
     listArticles({ kind: "news", limit: 10 }),
     listArticles({ kind: "guide", limit: 5 }),
     citiesWithCounts(8),
     categoryCounts(),
-    popularSearches(6),
     listSeriesWithLatest(),
   ]);
   const lead = featured[0] ?? latest[0];
   const others = latest.filter((a) => a.id !== lead?.id);
   const secondary = others.slice(0, 3);
-  const headlines = others.slice(3, 9);
+  const headlines = others.slice(3, 11);
   const featuredTools = TOOLS.filter((t) => t.featured).slice(0, 6);
   const topCategories = categories.filter((c) => c.count > 0).slice(0, 10);
   const numbers = series.filter((s) => s.latest);
 
   return (
     <div className="container-x">
-      {/* Search bar — the product, but quiet */}
-      <section className="py-7 sm:py-9">
-        <div className="mx-auto max-w-3xl">
-          <SearchBox size="lg" placeholder="What do you want to know?" />
-          <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-3">
-            <span>Popular:</span>
-            {(popular.length >= 4 ? popular.map((p) => p.query) : EXAMPLES).map((q) => (
-              <Link key={q} href={`/search?q=${encodeURIComponent(q)}`} className="underline-offset-4 hover:text-[var(--text)] hover:underline">
-                {q}
+      {/* Numbers ticker — thin, scrollable, above the fold */}
+      {numbers.length ? (
+        <section className="no-scrollbar -mx-5 overflow-x-auto border-b border-line px-5 sm:mx-0 sm:px-0" aria-label="Today's numbers">
+          <div className="flex min-w-max divide-x divide-[var(--border)]">
+            {numbers.slice(0, 7).map((s) => (
+              <Link key={s.id} href={`/data/${s.slug}`} className="flex items-baseline gap-2 px-4 py-2.5 first:pl-0 text-[13px] hover:bg-surface-2">
+                <span className="text-3">{s.name.replace(/ in Pakistan.*$/i, "").replace(/ today$/i, "").replace(/ \(.*\)$/, "")}</span>
+                <span className="font-medium tabular">{s.unit === "%" ? `${number(s.latest!.value, 2)}%` : number(s.latest!.value, Number.isInteger(s.latest!.value) ? 0 : 2)}</span>
+                <Change latest={s.latest!.value} previous={s.previous?.value ?? null} unit={s.unit} />
               </Link>
             ))}
-          </p>
-        </div>
-      </section>
-
-      {/* Numbers today */}
-      {numbers.length ? (
-        <section className="rule grid grid-cols-2 divide-x divide-[var(--border)] border-b border-line sm:grid-cols-3 lg:grid-cols-5">
-          {numbers.slice(0, 5).map((s) => (
-            <Link key={s.id} href={`/data/${s.slug}`} className="group px-3 py-3.5 first:pl-0 hover:bg-surface-2">
-              <p className="truncate text-[11px] font-semibold uppercase tracking-[0.1em] text-3">{s.name}</p>
-              <p className="mt-0.5 flex flex-wrap items-baseline gap-x-2">
-                <span className="font-serif text-2xl tabular">{s.unit === "%" ? `${number(s.latest!.value, 2)}%` : number(s.latest!.value, Number.isInteger(s.latest!.value) ? 0 : 2)}</span>
-                <Change latest={s.latest!.value} previous={s.previous?.value ?? null} unit={s.unit} />
-              </p>
-              <p className="text-[11px] text-3">{formatDate(s.latest!.date, { day: "numeric", month: "short" })}</p>
-            </Link>
-          ))}
+          </div>
         </section>
       ) : null}
 
-      {/* Front page: lead story with photo, numbered headlines, three more stories with photos */}
+      {/* Hero: the lead story */}
       {lead ? (
-        <section className="grid gap-x-10 gap-y-8 py-8 sm:py-10 lg:grid-cols-[1.7fr_1fr]">
-          <div>
-            <ArticleCard article={lead} variant="feature" />
+        <section className="grid gap-8 py-8 lg:grid-cols-12 lg:gap-12 lg:py-12">
+          <Link href={articleUrl(lead)} className="block lg:col-span-7" aria-hidden tabIndex={-1}>
+            {lead.featuredImageUrl ? <Img src={lead.featuredImageUrl} alt="" aspect="3/2" priority sizes="(min-width: 1024px) 720px, 100vw" /> : <div className="bg-surface-2" style={{ aspectRatio: "3/2" }} />}
+          </Link>
+          <div className="flex flex-col justify-center lg:col-span-5">
+            <p className="eyebrow">
+              {lead.category?.name ?? "News"}
+              {lead.publishedAt ? <span className="ml-2 font-sans text-[11px] font-normal normal-case tracking-normal text-3">{timeAgo(lead.publishedAt)}</span> : null}
+            </p>
+            <h1 className="mt-3 font-serif text-[2.4rem] font-medium leading-[1.05] tracking-tight sm:text-[3rem] lg:text-[3.4rem]">
+              <Link href={articleUrl(lead)} className="headline-link">
+                {lead.title}
+              </Link>
+            </h1>
+            {lead.dek ? <p className="mt-5 max-w-xl font-serif text-[1.15rem] leading-relaxed text-2">{lead.dek}</p> : null}
+            <p className="mt-5 text-[13px] text-3">
+              {lead.author?.name ? `${lead.author.name} · ` : ""}
+              {lead.readingMinutes ?? 3} min read
+            </p>
+            {secondary.length ? (
+              <ol className="mt-8 divide-y divide-[var(--border)] border-t border-line">
+                {secondary.map((a) => (
+                  <li key={a.id} className="py-3">
+                    <p className="eyebrow">{a.category?.name ?? "News"}</p>
+                    <Link href={articleUrl(a)} className="headline-link mt-0.5 block font-serif text-[1.1rem] font-medium leading-snug">
+                      {a.title}
+                    </Link>
+                  </li>
+                ))}
+              </ol>
+            ) : null}
           </div>
-          <aside className="lg:border-l lg:border-line lg:pl-8">
-            <Label>Headlines</Label>
-            <div className="divide-y divide-[var(--border)]">
-              {headlines.map((a, i) => (
-                <ArticleCard key={a.id} article={a} variant="compact" index={i + 1} thumb />
-              ))}
-            </div>
-            <Link href="/news" className="mt-3 inline-block text-sm font-medium text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
+        </section>
+      ) : null}
+
+      {/* Latest: photo grid */}
+      {headlines.length ? (
+        <section className="border-t border-line py-8">
+          <div className="flex items-baseline justify-between">
+            <h2 className="font-serif text-2xl">Latest</h2>
+            <Link href="/news" className="text-sm font-medium text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
               All news →
             </Link>
-          </aside>
-          {secondary.length ? (
-            <div className="grid gap-x-8 border-t border-line sm:grid-cols-3 sm:divide-x sm:divide-[var(--border)] lg:col-span-2">
-              {secondary.map((a) => (
-                <ArticleCard key={a.id} article={a} className="sm:[&:not(:first-child)]:pl-8" />
+          </div>
+          <div className="mt-4 grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+            {headlines.slice(0, 4).map((a) => (
+              <ArticleCard key={a.id} article={a} />
+            ))}
+          </div>
+          {headlines.length > 4 ? (
+            <div className="mt-6 grid gap-x-8 border-t border-line sm:grid-cols-2">
+              {headlines.slice(4, 8).map((a) => (
+                <ArticleCard key={a.id} article={a} variant="compact" />
               ))}
             </div>
           ) : null}

@@ -1,4 +1,7 @@
 @import "tailwindcss";
+
+/* `dark:` utilities only apply under an explicit data-theme="dark"; the OS preference is ignored. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @plugin "@tailwindcss/typography";
 
 /* ───────────────────────── Design tokens ─────────────────────────
@@ -67,7 +70,7 @@
 }
 
 :root {
-  --bg: #fdfdfc;
+  --bg: #ffffff;
   --surface: #ffffff;
   --surface-2: var(--color-ink-100);
   --surface-3: var(--color-ink-200);
@@ -82,8 +85,8 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+/* Dark palette is opt-in only (data-theme="dark" on <html>); the site ships light — white base, near-black type (ADR-20). */
+:root[data-theme="dark"] {
     --bg: oklch(0.16 0.008 85);
     --surface: oklch(0.18 0.008 85);
     --surface-2: oklch(0.22 0.008 85);
@@ -97,7 +100,6 @@
     --link: var(--color-brand-300);
     --glass: oklch(0.16 0.008 85);
     color-scheme: dark;
-  }
 }
 
 /* ───────────────────────── Base ───────────────────────── */
@@ -230,13 +232,19 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-brand-700);
-  @media (prefers-color-scheme: dark) {
+  :root[data-theme="dark"] & {
     color: var(--color-brand-300);
+  }
+}
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
 @utility text-gradient {
   color: var(--color-brand-700);
-  @media (prefers-color-scheme: dark) {
+  :root[data-theme="dark"] & {
     color: var(--color-brand-300);
   }
 }
