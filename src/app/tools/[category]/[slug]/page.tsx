@@ -11,8 +11,11 @@ import { renderMarkdown } from "@/lib/markdown";
 import { breadcrumbJsonLd, buildMetadata, faqJsonLd, toolJsonLd } from "@/lib/seo";
 import { TOOLS, getTool, toolUrl } from "@/tools/registry";
 import { TOOL_CATEGORIES } from "@/tools/types";
+import { liveDefaults } from "@/tools/live-defaults";
 
 type Props = { params: Promise<{ category: string; slug: string }> };
+
+export const revalidate = 600;
 
 export function generateStaticParams() {
   return TOOLS.map((t) => ({ category: t.category, slug: t.slug }));
@@ -22,7 +25,7 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const tool = getTool(slug);
   if (!tool) return {};
-  return buildMetadata({ title: tool.name, description: tool.description, path: toolUrl(tool) });
+  return buildMetadata({ title: tool.name, description: tool.description, path: toolUrl(tool), kicker: `${TOOL_CATEGORIES[tool.category].name} calculator` });
 }
 
 export default async function ToolPage({ params }: Props) {
@@ -33,7 +36,7 @@ export default async function ToolPage({ params }: Props) {
 
   const path = toolUrl(tool);
   const cat = TOOL_CATEGORIES[tool.category];
-  const [guides, entities] = await Promise.all([getArticlesBySlugs("guide", tool.related?.guides ?? []), getEntitiesBySlugs(tool.related?.entities ?? [])]);
+  const [guides, entities, live] = await Promise.all([getArticlesBySlugs("guide", tool.related?.guides ?? []), getEntitiesBySlugs(tool.related?.entities ?? []), liveDefaults(tool.slug)]);
   const relatedTools = (tool.related?.tools ?? []).map(getTool).filter((t): t is NonNullable<typeof t> => !!t);
   const crumbs = [{ name: "Tools", path: "/tools" }, { name: cat.name, path: `/tools/${tool.category}` }, { name: tool.shortName ?? tool.name, path }];
 
@@ -56,8 +59,19 @@ export default async function ToolPage({ params }: Props) {
 
       <div className="mt-8">
         <Suspense fallback={<div className="surface p-6 text-2">Loading calculator…</div>}>
-          <ToolRunner slug={tool.slug} />
+          <ToolRunner slug={tool.slug} live={live.input} />
         </Suspense>
+        {live.sources.length ? (
+          <p className="mt-3 text-[13px] text-3">
+            Pre-filled from Searchable Data:{" "}
+            {live.sources.map((s, i) => (
+              <span key={s.key}>
+                {i ? " · " : ""}
+                <Link href={`/data/${s.seriesSlug}`} className="underline underline-offset-4">{s.label}</Link> {s.value.toLocaleString()} ({formatDate(s.date, { day: "numeric", month: "short" })})
+              </span>
+            ))}
+          </p>
+        ) : null}
       </div>
 
       <div className="mt-14 grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">

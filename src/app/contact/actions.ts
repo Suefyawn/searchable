@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { getDb, schema } from "@/db";
 import { sendEmail } from "@/lib/email";
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
 
@@ -12,6 +13,8 @@ export async function sendContact(input: z.infer<typeof Msg>): Promise<{ ok: boo
   const parsed = Msg.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Please complete every field." };
   const d = parsed.data;
+  const db = await getDb();
+  await db.insert(schema.messages).values({ name: d.name, email: d.email, subject: d.subject, body: d.message, about: d.about ?? null });
   await sendEmail({
     to: "hello@searchable.pk",
     subject: `[Contact] ${d.subject}${d.about ? ` (about: ${d.about})` : ""}`,

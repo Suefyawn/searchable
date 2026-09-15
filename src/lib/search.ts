@@ -89,6 +89,39 @@ export function normalizeQuery(q: string): string {
   return q.trim().toLowerCase().replace(/\s+/g, " ").slice(0, 200);
 }
 
+let synonymCache: { at: number; map: Map<string, string[]> } | null = null;
+
+/** term → synonyms, cached for 5 minutes. Seeded with Roman-Urdu ↔ English pairs (bijli → electricity). */
+async function synonymMap(): Promise<Map<string, string[]>> {
+  if (synonymCache && Date.now() - synonymCache.at < 300_000) return synonymCache.map;
+  const db = await getDb();
+  const rows = await db.select().from(schema.searchSynonyms);
+  const map = new Map<string, string[]>();
+  for (const r of rows) {
+    map.set(r.term.toLowerCase(), r.synonyms);
+    // reverse direction: each synonym also expands back to the term
+    for (const syn of r.synonyms) {
+      const key = syn.toLowerCase();
+      map.set(key, Array.from(new Set([...(map.get(key) ?? []), r.term, ...r.synonyms.filter((x) => x !== syn)])));
+    }
+  }
+  synonymCache = { at: Date.now(), map };
+  return map;
+}
+
+/** "bijli bill" → "(bijli OR electricity OR power OR wapda) bill" for websearch_to_tsquery. */
+export async function expandQuery(q: string): Promise<string> {
+  const map = await synonymMap();
+  if (!map.size) return q;
+  return q
+    .split(" ")
+    .map((w) => {
+      const syns = map.get(w.replace(/[^a-z0-9؀-ۿ]/g, ""));
+      return syns?.length ? `(${[w, ...syns].join(" OR ")})` : w;
+    })
+    .join(" ");
+}
+
 /**
  * Federated search. Uses websearch_to_tsquery (supports quotes, OR, -) with a prefix-match fallback
  * so partial words like "electri" still hit "electricity".
@@ -104,12 +137,13 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<{
   const words = q.split(" ").filter((w) => w.length > 1).slice(0, 8);
   const prefixQuery = words.map((w) => `${w.replace(/[^a-z0-9؀-ۿ]/g, "")}:*`).filter((w) => w !== ":*").join(" & ");
 
+  const expanded = await expandQuery(q);
   const typeFilter = opts.types?.length ? sql`and entity_type in (${sql.join(opts.types.map((t) => sql`${t}`), sql`, `)})` : sql``;
   const cityFilter = opts.city ? sql`and city_slug = ${opts.city}` : sql``;
 
   const list = await rawQuery<Record<string, unknown> & { total: number }>(db, sql`
     with q as (
-      select websearch_to_tsquery('english', ${q}) as ws,
+      select websearch_to_tsquery('english', ${expanded}) as ws,
              ${prefixQuery ? sql`to_tsquery('simple', ${prefixQuery})` : sql`null::tsquery`} as pq
     ),
     matched as (
@@ -188,6 +222,20 @@ export async function logSearch(query: string, resultCount: number, sessionId?: 
   const normalized = normalizeQuery(query);
   if (!normalized) return;
   await db.insert(schema.searchQueries).values({ query: query.slice(0, 200), normalized, resultCount, sessionId });
+}
+
+/** Queries rising in the last 24h vs the prior week. */
+export async function trendingSearches(limit = 6): Promise<{ query: string; count: number }[]> {
+  const db = await getDb();
+  return rawQuery<{ query: string; count: number }>(
+    db,
+    sql`with recent as (select normalized, count(*)::int as n from search_queries where created_at > now() - interval '1 day' and result_count > 0 group by normalized),
+             prior as (select normalized, count(*)::float / 7 as n from search_queries where created_at between now() - interval '8 days' and now() - interval '1 day' group by normalized)
+        select recent.normalized as query, recent.n as count
+        from recent left join prior on prior.normalized = recent.normalized
+        where recent.n >= 2 and recent.n > coalesce(prior.n, 0) * 1.5
+        order by recent.n desc limit ${limit}`,
+  );
 }
 
 export async function popularSearches(limit = 8): Promise<{ query: string; count: number }[]> {

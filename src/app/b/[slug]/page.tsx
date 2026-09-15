@@ -9,6 +9,8 @@ import { formatDate } from "@/lib/format";
 import { breadcrumbJsonLd, buildMetadata, localBusinessJsonLd } from "@/lib/seo";
 import { Img } from "@/components/img";
 import { LeadForm } from "./lead-form";
+import { TrackedLink } from "@/components/directory/tracked-link";
+import { ReportForm } from "@/components/report-form";
 import { ReviewForm } from "@/components/directory/review-form";
 
 export const revalidate = 3600;
@@ -86,14 +88,14 @@ export default async function BusinessPage({ params }: Props) {
         </div>
         <div className="flex flex-wrap gap-2 sm:shrink-0">
           {b.phone ? (
-            <a href={`tel:${b.phone}`} className="inline-flex h-10 items-center gap-2 border border-line bg-surface px-4 text-sm font-medium hover:bg-surface-2">
+            <TrackedLink businessId={b.id} kind="call" href={`tel:${b.phone}`} className="inline-flex h-10 items-center gap-2 border border-line bg-surface px-4 text-sm font-medium hover:bg-surface-2">
               <Phone className="size-4" /> {b.phone}
-            </a>
+            </TrackedLink>
           ) : null}
           {wa ? (
-            <a href={wa} target="_blank" rel="noopener" className="inline-flex h-10 items-center gap-2 bg-brand-700 px-4 text-sm font-medium text-white hover:bg-brand-800">
+            <TrackedLink businessId={b.id} kind="whatsapp" href={wa} target="_blank" rel="noopener" className="inline-flex h-10 items-center gap-2 bg-brand-700 px-4 text-sm font-medium text-white hover:bg-brand-800">
               WhatsApp
-            </a>
+            </TrackedLink>
           ) : null}
         </div>
       </header>
@@ -186,9 +188,9 @@ export default async function BusinessPage({ params }: Props) {
                   {b.address}
                   {b.area ? <span className="block text-2">{b.area.name}{b.city ? `, ${b.city.name}` : ""}</span> : b.city ? <span className="block text-2">{b.city.name}</span> : null}
                   {maps ? (
-                    <a href={maps} target="_blank" rel="noopener" className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-brand-700 dark:text-brand-300">
+                    <TrackedLink businessId={b.id} kind="directions" href={maps} target="_blank" rel="noopener" className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-brand-700 dark:text-brand-300">
                       Directions <ExternalLink className="size-3" />
-                    </a>
+                    </TrackedLink>
                   ) : null}
                 </span>
               </p>
@@ -196,9 +198,9 @@ export default async function BusinessPage({ params }: Props) {
             {b.website ? (
               <p className="flex gap-2.5">
                 <Globe className="mt-1 size-4 shrink-0 text-3" />
-                <a href={b.website} target="_blank" rel="noopener nofollow" className="truncate text-brand-700 dark:text-brand-300 hover:underline">
+                <TrackedLink businessId={b.id} kind="website" href={b.website} target="_blank" rel="noopener nofollow" className="truncate text-brand-700 dark:text-brand-300 hover:underline">
                   {b.website.replace(/^https?:\/\//, "")}
-                </a>
+                </TrackedLink>
               </p>
             ) : null}
             {b.hours.length ? (
@@ -223,8 +225,11 @@ export default async function BusinessPage({ params }: Props) {
             </div>
           </div>
           <p className="px-1 text-xs text-3">
-            Is this your business? <Link href={`/claim/${b.slug}`} className="text-brand-700 dark:text-brand-300 underline">Claim it</Link> to update details and respond to reviews. Something wrong? <Link href={`/contact?about=${b.slug}`} className="underline">Report</Link>.
+            Is this your business? <Link href={`/claim/${b.slug}`} className="text-brand-700 dark:text-brand-300 underline">Claim it</Link> to update details and respond to reviews.
           </p>
+          <div className="px-1">
+            <ReportForm targetType="business" targetId={b.id} label="Report wrong details or a closed business" />
+          </div>
         </aside>
       </div>
 

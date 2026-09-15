@@ -1,7 +1,8 @@
 import { and, desc, eq, inArray, or } from "drizzle-orm";
 import Link from "next/link";
 import { Badge, SectionHeader } from "@/components/ui";
-import { getDb, schema } from "@/db";
+import { getDb, rawQuery, schema } from "@/db";
+import { sql } from "drizzle-orm";
 import { requireUser } from "@/lib/auth";
 import { formatDate } from "@/lib/format";
 
@@ -18,6 +19,16 @@ export default async function BusinessDashboard() {
     with: { primaryCategory: true, city: true, leads: { orderBy: [desc(schema.businessLeads.createdAt)], limit: 5 }, reviews: { orderBy: [desc(schema.businessReviews.createdAt)], limit: 5 } },
     orderBy: [desc(schema.businesses.createdAt)],
   });
+  const ids30 = businesses.map((b) => b.id);
+  const clicks = ids30.length
+    ? await rawQuery<{ business_id: string; kind: string; n: number }>(
+        db,
+        sql`select props->>'businessId' as business_id, props->>'kind' as kind, count(*)::int as n
+            from analytics_events where name = 'business_click' and created_at > now() - interval '30 days'
+            and props->>'businessId' in (${sql.join(ids30.map((i) => sql`${i}`), sql`, `)}) group by 1, 2`,
+      )
+    : [];
+  const clicksFor = (id: string) => clicks.filter((c) => c.business_id === id);
   const pendingClaims = await db.query.businessClaims.findMany({ where: and(eq(schema.businessClaims.userId, user.id), eq(schema.businessClaims.status, "pending")), with: { business: true } });
 
   return (
@@ -48,7 +59,10 @@ export default async function BusinessDashboard() {
                   <Badge tone={b.status === "active" ? "success" : "warning"}>{b.status}</Badge>
                   {b.isVerified ? <Badge tone="brand">Verified</Badge> : <Badge>Unverified</Badge>}
                   <span>{b.primaryCategory?.name}{b.city ? ` · ${b.city.name}` : ""}</span>
-                  <span>· {b.viewCount} views · {b.clickCount} clicks</span>
+                  <span>
+                    · {b.viewCount} views · {b.clickCount} contact clicks
+                    {clicksFor(b.id).length ? ` (30 days: ${clicksFor(b.id).map((c) => `${c.n} ${c.kind}`).join(", ")})` : ""}
+                  </span>
                 </p>
               </div>
               <Link href={`/business/${b.id}`} className="inline-flex h-9 items-center bg-ink-900 px-3.5 text-sm font-medium text-white hover:bg-ink-800 dark:bg-white dark:text-ink-900">

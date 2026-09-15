@@ -73,6 +73,8 @@ export const articles = pgTable(
     featuredImageUrl: text("featured_image_url"),
     featuredImageAlt: text("featured_image_alt"),
     sources: jsonb("sources").$type<ArticleSource[]>().default([]).notNull(),
+    /** Hand-picked related article ids (shown before automatic same-category picks). */
+    relatedIds: jsonb("related_ids").$type<string[]>().default([]).notNull(),
     faqs: jsonb("faqs").$type<ArticleFaq[]>().default([]).notNull(),
     seoTitle: text("seo_title"),
     seoDescription: text("seo_description"),

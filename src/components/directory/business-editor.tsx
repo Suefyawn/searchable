@@ -12,7 +12,7 @@ type Opt = { id: string; name: string; cityId?: string | null };
 type HourRow = { dayOfWeek: number; opens: string | null; closes: string | null; isClosed: boolean };
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-export function BusinessEditor({ initial, categories, cities, areas }: { initial: BusinessFormInput; categories: Opt[]; cities: Opt[]; areas: Opt[] }) {
+export function BusinessEditor({ initial, categories, cities, areas, entities = [] }: { initial: BusinessFormInput; categories: Opt[]; cities: Opt[]; areas: Opt[]; entities?: { slug: string; name: string }[] }) {
   const router = useRouter();
   const [cityId, setCityId] = React.useState(initial.cityId ?? "");
   const [hours, setHours] = React.useState<HourRow[]>(() =>
@@ -22,6 +22,7 @@ export function BusinessEditor({ initial, categories, cities, areas }: { initial
   const [logoUrl, setLogoUrl] = React.useState(initial.logoUrl ?? "");
   const [coverUrl, setCoverUrl] = React.useState(initial.coverUrl ?? "");
   const [photos, setPhotos] = React.useState(initial.photos ?? []);
+  const [entitySlugs, setEntitySlugs] = React.useState<string[]>(initial.entitySlugs ?? []);
   const [busy, setBusy] = React.useState(false);
   const [msg, setMsg] = React.useState<{ ok: boolean; text: string } | null>(null);
   const formRef = React.useRef<HTMLFormElement>(null);
@@ -51,6 +52,7 @@ export function BusinessEditor({ initial, categories, cities, areas }: { initial
       logoUrl: logoUrl || undefined,
       coverUrl: coverUrl || undefined,
       photos,
+      entitySlugs,
       hours: hours.map((h) => (h.isClosed ? { ...h, opens: null, closes: null } : h)),
       services: services.filter((s) => s.name.trim()),
     });
@@ -211,6 +213,21 @@ export function BusinessEditor({ initial, categories, cities, areas }: { initial
       </div>
 
       <aside className="self-start space-y-3 lg:sticky lg:top-24">
+        {entities.length ? (
+          <div className="border border-line p-4">
+            <p className="mb-2 text-[13px] font-semibold">Topics (brands, regulators)</p>
+            <div className="flex flex-wrap gap-1.5">
+              {entities.map((e) => {
+                const on = entitySlugs.includes(e.slug);
+                return (
+                  <button key={e.slug} type="button" aria-pressed={on} onClick={() => setEntitySlugs(on ? entitySlugs.filter((s) => s !== e.slug) : [...entitySlugs, e.slug])} className={cn("border px-2 py-0.5 text-xs", on ? "border-ink-900 bg-ink-900 text-white dark:border-white dark:bg-white dark:text-ink-900" : "border-line text-2 hover:bg-surface-2")}>
+                    {e.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
         <div className="surface p-4 space-y-3">
           <Button type="button" onClick={submit} disabled={busy} className="w-full">
             {busy ? "Saving…" : "Save changes"}

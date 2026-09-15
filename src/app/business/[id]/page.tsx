@@ -37,7 +37,7 @@ export default async function OwnerEditBusiness({ params }: { params: Promise<{ 
           <Link href="/business" className="text-2">← Your businesses</Link>
         </div>
       </div>
-      <BusinessEditor initial={data.initial} categories={data.categories} cities={data.cities} areas={data.areas} />
+      <BusinessEditor initial={data.initial} categories={data.categories} cities={data.cities} areas={data.areas} entities={data.entities} />
 
       <section className="mt-12 max-w-3xl">
         <h2 className="text-xl font-semibold">Reviews</h2>

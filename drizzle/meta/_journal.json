@@ -15,6 +15,13 @@
       "when": 1789432885252,
       "tag": "0001_search_simple_vector",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789447716463,
+      "tag": "0002_reports_messages_related",
+      "breakpoints": true
     }
   ]
 }

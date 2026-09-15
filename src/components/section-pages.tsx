@@ -93,6 +93,7 @@ export async function articleMetadata(kind: "news" | "guide", category: string, 
     publishedTime: a.publishedAt,
     modifiedTime: a.updatedAt,
     noindex: a.noindex,
+    kicker: a.category?.name ?? m.name,
   });
 }
 

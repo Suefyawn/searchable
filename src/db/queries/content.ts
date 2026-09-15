@@ -115,3 +115,56 @@ export async function incrementArticleViews(id: string) {
   const db = await getDb();
   await db.update(schema.articles).set({ viewCount: sql`${schema.articles.viewCount} + 1` }).where(eq(schema.articles.id, id));
 }
+
+export async function getArticlesByIds(ids: string[]) {
+  if (!ids.length) return [];
+  const db = await getDb();
+  const rows = await db
+    .select(listSelect)
+    .from(schema.articles)
+    .leftJoin(schema.categories, eq(schema.articles.categoryId, schema.categories.id))
+    .leftJoin(schema.authors, eq(schema.articles.authorId, schema.authors.id))
+    .where(and(published(), inArray(schema.articles.id, ids)));
+  const map = new Map(rows.map((r) => [r.id, shape(r)]));
+  return ids.map((id) => map.get(id)).filter((x): x is ArticleListItem => !!x);
+}
+
+export async function getTagsForArticle(articleId: string) {
+  const db = await getDb();
+  return db
+    .select({ id: schema.tags.id, slug: schema.tags.slug, name: schema.tags.name })
+    .from(schema.articleTags)
+    .innerJoin(schema.tags, eq(schema.articleTags.tagId, schema.tags.id))
+    .where(eq(schema.articleTags.articleId, articleId));
+}
+
+export async function listArticlesByTag(tagSlug: string, limit = 30) {
+  const db = await getDb();
+  const tag = await db.query.tags.findFirst({ where: eq(schema.tags.slug, tagSlug) });
+  if (!tag) return null;
+  const rows = await db
+    .select(listSelect)
+    .from(schema.articleTags)
+    .innerJoin(schema.articles, eq(schema.articleTags.articleId, schema.articles.id))
+    .leftJoin(schema.categories, eq(schema.articles.categoryId, schema.categories.id))
+    .leftJoin(schema.authors, eq(schema.articles.authorId, schema.authors.id))
+    .where(and(eq(schema.articleTags.tagId, tag.id), published()))
+    .orderBy(desc(schema.articles.publishedAt))
+    .limit(limit);
+  return { tag, items: rows.map(shape) };
+}
+
+export async function listArticlesByAuthor(authorSlug: string, limit = 30) {
+  const db = await getDb();
+  const author = await db.query.authors.findFirst({ where: eq(schema.authors.slug, authorSlug) });
+  if (!author) return null;
+  const rows = await db
+    .select(listSelect)
+    .from(schema.articles)
+    .leftJoin(schema.categories, eq(schema.articles.categoryId, schema.categories.id))
+    .leftJoin(schema.authors, eq(schema.articles.authorId, schema.authors.id))
+    .where(and(eq(schema.articles.authorId, author.id), published()))
+    .orderBy(desc(schema.articles.publishedAt))
+    .limit(limit);
+  return { author, items: rows.map(shape) };
+}

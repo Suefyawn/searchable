@@ -22,6 +22,7 @@ export const BusinessInput = z.object({
   logoUrl: z.string().trim().max(500).optional(),
   coverUrl: z.string().trim().max(500).optional(),
   photos: z.array(z.object({ url: z.string().min(1).max(500), alt: z.string().max(200).optional() })).max(12).default([]),
+  entitySlugs: z.array(z.string()).max(12).default([]),
   hours: z.array(Hours).max(7).default([]),
   services: z.array(Service).max(40).default([]),
 });

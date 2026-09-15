@@ -25,7 +25,7 @@ export default async function AdminEditBusiness({ params }: { params: Promise<{ 
           <Link href="/admin/businesses" className="text-2">← All businesses</Link>
         </div>
       </div>
-      <BusinessEditor initial={data.initial} categories={data.categories} cities={data.cities} areas={data.areas} />
+      <BusinessEditor initial={data.initial} categories={data.categories} cities={data.cities} areas={data.areas} entities={data.entities} />
     </div>
   );
 }

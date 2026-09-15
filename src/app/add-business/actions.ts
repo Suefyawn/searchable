@@ -1,6 +1,6 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq, ilike, or } from "drizzle-orm";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
 import { getSessionUser } from "@/lib/auth";
@@ -29,6 +29,14 @@ export async function submitBusiness(input: z.infer<typeof Input>): Promise<{ ok
   const db = await getDb();
   const [city, user] = await Promise.all([db.query.locations.findFirst({ where: eq(schema.locations.id, d.cityId) }), getSessionUser()]);
   if (!city) return { ok: false, error: "Unknown city." };
+
+  // Duplicate guard: same phone anywhere, or a very similar name in the same city.
+  const digits = d.phone.replace(/\D/g, "").slice(-9);
+  const dupe = await db.query.businesses.findFirst({
+    where: or(digits.length >= 7 ? ilike(schema.businesses.phone, `%${digits.slice(0, 3)}%${digits.slice(3)}%`) : undefined, and(eq(schema.businesses.cityId, d.cityId), ilike(schema.businesses.name, d.name.trim()))),
+    columns: { name: true, slug: true, status: true },
+  });
+  if (dupe) return { ok: false, error: `A listing for "${dupe.name}" already exists${dupe.status === "active" ? ` (searchable.pk/b/${dupe.slug})` : " and is awaiting review"}. If it is yours, open it and click "Claim it".` };
 
   const base = slugify(`${d.name}-${city.slug}`);
   const slug = await uniqueSlug(base, async (s) => !!(await db.query.businesses.findFirst({ where: eq(schema.businesses.slug, s), columns: { id: true } })));

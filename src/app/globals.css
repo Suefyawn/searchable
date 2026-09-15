@@ -318,3 +318,28 @@
     animation: none;
   }
 }
+
+/* Print: guides and tools come out clean. */
+@media print {
+  header, footer, nav, aside, form, .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 11pt;
+  }
+  .container-x {
+    max-width: none;
+    padding: 0;
+  }
+  .prose-searchable {
+    max-width: none;
+    font-size: 11pt;
+  }
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #555;
+  }
+}

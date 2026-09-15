@@ -1,4 +1,4 @@
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import type { BusinessFormInput } from "@/lib/business-schema";
 
@@ -7,10 +7,12 @@ export async function loadBusinessEditor(id: string) {
   const db = await getDb();
   const b = await db.query.businesses.findFirst({ where: eq(schema.businesses.id, id), with: { hours: true, photos: { orderBy: [asc(schema.businessPhotos.sortOrder)] }, services: { orderBy: [asc(schema.businessServices.sortOrder)] }, city: true, primaryCategory: true } });
   if (!b) return null;
-  const [categories, cities, areas] = await Promise.all([
+  const [categories, cities, areas, entities, links] = await Promise.all([
     db.query.businessCategories.findMany({ orderBy: [asc(schema.businessCategories.name)] }),
     db.query.locations.findMany({ where: eq(schema.locations.kind, "city"), orderBy: [asc(schema.locations.name)] }),
     db.query.locations.findMany({ where: eq(schema.locations.kind, "area"), orderBy: [asc(schema.locations.name)] }),
+    db.query.entities.findMany({ orderBy: [asc(schema.entities.name)], limit: 200 }),
+    db.select({ slug: schema.entities.slug }).from(schema.entityLinks).innerJoin(schema.entities, eq(schema.entityLinks.entityId, schema.entities.id)).where(and(eq(schema.entityLinks.targetType, "business"), eq(schema.entityLinks.targetId, id))),
   ]);
   const initial: BusinessFormInput = {
     id: b.id,
@@ -30,6 +32,7 @@ export async function loadBusinessEditor(id: string) {
     priceRange: b.priceRange ?? undefined,
     logoUrl: b.logoUrl ?? undefined,
     coverUrl: b.coverUrl ?? undefined,
+    entitySlugs: links.map((l) => l.slug),
     photos: b.photos.map((p) => ({ url: p.url, alt: p.alt ?? undefined })),
     hours: b.hours.map((h) => ({ dayOfWeek: h.dayOfWeek, opens: h.opens, closes: h.closes, isClosed: h.isClosed })),
     services: b.services.map((s) => ({ name: s.name, description: s.description ?? undefined, priceFrom: s.priceFrom ?? undefined })),
@@ -40,5 +43,6 @@ export async function loadBusinessEditor(id: string) {
     categories: categories.map((c) => ({ id: c.id, name: c.namePlural ?? c.name })),
     cities: cities.map((c) => ({ id: c.id, name: c.name })),
     areas: areas.map((a) => ({ id: a.id, name: a.name, cityId: a.cityId })),
+    entities: entities.map((e) => ({ slug: e.slug, name: e.name })),
   };
 }

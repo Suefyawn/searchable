@@ -1,4 +1,4 @@
-import { index, integer, jsonb, pgTable, text } from "drizzle-orm/pg-core";
+import { index, integer, jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { createdAt, id, updatedAt } from "./_shared";
 
 export const redirects = pgTable("redirects", {
@@ -42,3 +42,40 @@ export const settings = pgTable("settings", {
   value: jsonb("value").$type<unknown>().notNull(),
   updatedAt: updatedAt(),
 });
+
+export const reportTarget = pgEnum("report_target", ["business", "review", "article"]);
+export const reportStatus = pgEnum("report_status", ["open", "resolved", "dismissed"]);
+
+/** User reports: wrong details, closed business, abusive review, factual error. */
+export const reports = pgTable(
+  "reports",
+  {
+    id: id(),
+    targetType: reportTarget("target_type").notNull(),
+    targetId: text("target_id").notNull(),
+    reason: text("reason").notNull(), // wrong_details | closed | duplicate | inappropriate | factual_error | other
+    details: text("details"),
+    reporterEmail: text("reporter_email"),
+    reporterUserId: text("reporter_user_id"),
+    status: reportStatus("status").default("open").notNull(),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("reports_status_idx").on(t.status, t.createdAt), index("reports_target_idx").on(t.targetType, t.targetId)],
+);
+
+/** Contact-form messages (also emailed). */
+export const messages = pgTable(
+  "messages",
+  {
+    id: id(),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
+    subject: text("subject").notNull(),
+    body: text("body").notNull(),
+    about: text("about"),
+    status: text("status").default("new").notNull(), // new | replied | archived
+    createdAt: createdAt(),
+  },
+  (t) => [index("messages_status_idx").on(t.status, t.createdAt)],
+);

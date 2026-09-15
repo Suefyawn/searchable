@@ -12,14 +12,22 @@ type MetaInput = {
   noindex?: boolean;
   /** Skip the " · Searchable" suffix (home page). */
   absoluteTitle?: boolean;
+  /** Small label on the generated social card (category, section). */
+  kicker?: string;
 };
+
+export function ogImageUrl(title: string, kicker?: string) {
+  const p = new URLSearchParams({ title });
+  if (kicker) p.set("kicker", kicker);
+  return `${SITE.url}/og?${p.toString()}`;
+}
 
 export function buildMetadata(input: MetaInput): Metadata {
   const url = `${SITE.url}${input.path}`;
   // The root layout applies the "%s · Searchable" template; social cards get the full string.
   const title = input.absoluteTitle ? input.title : `${input.title} · ${SITE.name}`;
   const description = input.description ?? SITE.description;
-  const image = input.image ?? `${SITE.url}/og-default.png`;
+  const image = input.image ?? ogImageUrl(input.title, input.kicker);
   return {
     title: input.absoluteTitle ? { absolute: input.title } : input.title,
     description,

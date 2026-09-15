@@ -2,8 +2,9 @@ import Link from "next/link";
 import { ArticleCard, ToolCard, articleUrl } from "@/components/cards";
 import { Img } from "@/components/img";
 import { NewsletterForm } from "@/components/newsletter-form";
+import { ReportForm } from "@/components/report-form";
 import { Badge, Breadcrumbs, JsonLd } from "@/components/ui";
-import { getArticle, listArticles } from "@/db/queries/content";
+import { getArticle, getArticlesByIds, getTagsForArticle, listArticles } from "@/db/queries/content";
 import { entitiesForTarget } from "@/db/queries/entities";
 import { formatDate } from "@/lib/format";
 import { extractToc, renderMarkdown } from "@/lib/markdown";
@@ -18,10 +19,13 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
   const path = `/${section}/${article.category?.slug ?? "general"}/${article.slug}`;
   const html = renderMarkdown(article.body);
   const toc = kind === "guide" ? extractToc(article.body) : [];
-  const [related, entities] = await Promise.all([
+  const [auto, picked, entities, tags] = await Promise.all([
     listArticles({ kind, categorySlug: article.category?.slug, limit: 4, excludeId: article.id }),
+    getArticlesByIds(article.relatedIds),
     entitiesForTarget("article", article.id),
+    getTagsForArticle(article.id),
   ]);
+  const related = [...picked, ...auto.filter((a) => !picked.some((p) => p.id === a.id))].slice(0, 4);
   // Tools mentioned in the body (by URL) come first; otherwise tools sharing an entity.
   const linkedToolSlugs = [...article.body.matchAll(/\/tools\/[a-z]+\/([a-z0-9-]+)/g)].map((m) => m[1]);
   const entitySlugs = new Set(entities.map((e) => e.slug));
@@ -60,7 +64,11 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
         <h1 className="mt-4 font-serif text-4xl font-medium leading-[1.1] sm:text-5xl lg:text-[3.25rem]">{article.title}</h1>
         {article.dek ? <p className="mt-4 font-serif text-xl leading-relaxed text-2 sm:text-[1.35rem]">{article.dek}</p> : null}
         <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 border-y border-line py-3 text-[13px] text-3">
-          {article.author ? <span className="font-medium text-2">{article.author.name}</span> : null}
+          {article.author ? (
+            <Link href={`/authors/${article.author.slug}`} className="font-medium text-2 underline-offset-4 hover:underline">
+              {article.author.name}
+            </Link>
+          ) : null}
           {article.publishedAt ? <span>{kind === "news" ? "Published" : "Updated"} {formatDate(article.lastReviewedAt ?? article.publishedAt)}</span> : null}
           <span>{article.readingMinutes ?? 3} min read</span>
         </div>
@@ -104,6 +112,10 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
             </section>
           ) : null}
 
+          <div className="mt-8 max-w-[68ch]">
+            <ReportForm targetType="article" targetId={article.id} label="Spotted an error? Report it" />
+          </div>
+
           {article.sources.length ? (
             <section className="mt-10 max-w-[68ch] text-sm">
               <h2 className="font-semibold uppercase tracking-wider text-3 text-xs">Sources</h2>
@@ -122,8 +134,19 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
             </section>
           ) : null}
 
-          {entities.length ? (
+          {tags.length ? (
             <section className="mt-8 flex flex-wrap items-center gap-2 text-sm">
+              <span className="text-3">Tags:</span>
+              {tags.map((t) => (
+                <Link key={t.id} href={`/tags/${t.slug}`} className="border border-line px-2.5 py-1 text-2 hover:bg-surface-2 hover:text-[var(--text)]">
+                  {t.name}
+                </Link>
+              ))}
+            </section>
+          ) : null}
+
+          {entities.length ? (
+            <section className="mt-4 flex flex-wrap items-center gap-2 text-sm">
               <span className="text-3">Topics:</span>
               {entities.map((e) => (
                 <Link key={e.id} href={`/e/${e.slug}`} className="border border-line px-2.5 py-1 text-2 hover:bg-surface-2 hover:text-[var(--text)]">

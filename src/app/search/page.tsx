@@ -3,7 +3,8 @@ import Link from "next/link";
 import { SearchBox } from "@/components/layout/search-box";
 import { EmptyState } from "@/components/ui";
 import { formatDate } from "@/lib/format";
-import { TYPE_LABEL, groupHits, logSearch, search, type SearchEntityType, type SearchHit } from "@/lib/search";
+import { TYPE_LABEL, groupHits, logSearch, search, trendingSearches, type SearchEntityType, type SearchHit } from "@/lib/search";
+import { citiesWithCounts } from "@/db/queries/geo";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +32,17 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const pageNum = Math.max(1, parseInt(page, 10) || 1);
   const limit = 30;
   const types = TYPE_ORDER.includes(type as SearchEntityType) ? [type as SearchEntityType] : undefined;
-  const { hits, total } = q ? await search(q, { types, city, limit, offset: (pageNum - 1) * limit }) : { hits: [], total: 0 };
+  const [{ hits, total }, trending, cities] = await Promise.all([
+    q ? search(q, { types, city, limit, offset: (pageNum - 1) * limit }) : Promise.resolve({ hits: [], total: 0 }),
+    trendingSearches(6),
+    citiesWithCounts(8),
+  ]);
+  const qs = (extra: Record<string, string | undefined>) => {
+    const p = new URLSearchParams({ q });
+    const merged = { type, city, ...extra };
+    for (const [k, v] of Object.entries(merged)) if (v) p.set(k, v);
+    return `/search?${p.toString()}`;
+  };
   if (q && pageNum === 1) void logSearch(q, total).catch(() => {});
 
   const groups = groupHits(hits);
@@ -57,6 +68,17 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             ))}
             <span className="ml-auto text-sm text-3">{total ? `${total.toLocaleString()} result${total === 1 ? "" : "s"}` : ""}</span>
           </div>
+          {(!type || type === "business" || type === "news") && cities.length ? (
+            <div className="mt-2 flex flex-wrap items-center gap-1 text-sm">
+              <span className="mr-1 text-3">City:</span>
+              <Link href={qs({ city: undefined })} className={cn("px-2 py-1", !city ? "font-semibold" : "text-2 hover:text-[var(--text)]")}>Anywhere</Link>
+              {cities.map((c) => (
+                <Link key={c.id} href={qs({ city: c.slug })} className={cn("px-2 py-1", city === c.slug ? "font-semibold underline underline-offset-4" : "text-2 hover:text-[var(--text)]")}>
+                  {c.name}
+                </Link>
+              ))}
+            </div>
+          ) : null}
 
           {hits.length === 0 ? (
             <div className="mt-8 max-w-2xl">
@@ -105,6 +127,18 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   <p className="font-semibold">How results are ranked</p>
                   <p className="mt-1.5 text-2">Tools and guides that answer the question directly come first, then businesses and news. Recent news ranks higher than old news.</p>
                 </div>
+                {trending.length ? (
+                  <div className="surface p-5 text-[15px]">
+                    <p className="font-semibold">Trending today</p>
+                    <ul className="mt-2 space-y-1">
+                      {trending.map((t) => (
+                        <li key={t.query}>
+                          <Link href={`/search?q=${encodeURIComponent(t.query)}`} className="text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">{t.query}</Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
                 <div className="surface p-5 text-[15px]">
                   <p className="font-semibold">Can&rsquo;t find it?</p>
                   <p className="mt-1.5 text-2">

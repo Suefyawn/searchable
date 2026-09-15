@@ -37,11 +37,11 @@ function fromParams(fields: Field[], params: URLSearchParams): ToolInput {
  * Renders any ToolDefinition: form from `fields`, live `compute`, results, warnings.
  * Runs entirely in the browser — nothing personal is sent to the server.
  */
-export function ToolRunner({ slug }: { slug: string }) {
+export function ToolRunner({ slug, live = {} }: { slug: string; live?: ToolInput }) {
   const tool = getTool(slug);
   const pathname = usePathname();
   const params = useSearchParams();
-  const [input, setInput] = React.useState<ToolInput>(() => ({ ...defaults(tool?.fields ?? []), ...fromParams(tool?.fields ?? [], params) }));
+  const [input, setInput] = React.useState<ToolInput>(() => ({ ...defaults(tool?.fields ?? []), ...live, ...fromParams(tool?.fields ?? [], params) }));
   const [copied, setCopied] = React.useState(false);
   const logged = React.useRef(false);
 
@@ -91,7 +91,7 @@ export function ToolRunner({ slug }: { slug: string }) {
           <FieldInput key={f.key} field={f} value={input[f.key]} onChange={(v) => set(f.key, v)} />
         ))}
         <div className="flex items-center justify-between pt-1">
-          <button type="button" onClick={() => setInput(defaults(tool.fields))} className="inline-flex items-center gap-1.5 text-sm text-2 hover:text-[var(--text)]">
+          <button type="button" onClick={() => setInput({ ...defaults(tool.fields), ...live })} className="inline-flex items-center gap-1.5 text-sm text-2 hover:text-[var(--text)]">
             <RotateCcw className="size-3.5" /> Reset
           </button>
           <button type="button" onClick={share} className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 dark:text-brand-300">

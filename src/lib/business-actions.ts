@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb, schema } from "@/db";
 import { getSessionUser, hasRole, type SessionUser } from "@/lib/auth";
@@ -58,6 +58,12 @@ export async function saveBusiness(raw: BusinessFormInput): Promise<{ ok: boolea
 
   await db.delete(schema.businessServices).where(eq(schema.businessServices.businessId, d.id));
   if (d.services.length) await db.insert(schema.businessServices).values(d.services.map((s, i) => ({ businessId: d.id, name: s.name, description: s.description || null, priceFrom: s.priceFrom ?? null, sortOrder: i })));
+
+  await db.delete(schema.entityLinks).where(and(eq(schema.entityLinks.targetType, "business"), eq(schema.entityLinks.targetId, d.id)));
+  if (d.entitySlugs.length) {
+    const ents = await db.query.entities.findMany({ where: inArray(schema.entities.slug, d.entitySlugs) });
+    if (ents.length) await db.insert(schema.entityLinks).values(ents.map((e) => ({ entityId: e.id, targetType: "business" as const, targetId: d.id, relation: "about" })));
+  }
 
   await indexBusiness(d.id);
   const b = await db.query.businesses.findFirst({ where: eq(schema.businesses.id, d.id), columns: { slug: true } });
