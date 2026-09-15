@@ -6,7 +6,7 @@ import { rateLimit } from "@/lib/rate-limit";
 import { recordSearchClick } from "@/lib/search";
 
 const Event = z.object({
-  name: z.enum(["business_click", "page_view", "share", "tool_share", "search_click"]),
+  name: z.enum(["business_click", "page_view", "share", "tool_share", "search_click", "error"]),
   path: z.string().max(300).optional(),
   props: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
 });

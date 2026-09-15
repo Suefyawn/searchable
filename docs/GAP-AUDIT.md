@@ -10,7 +10,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | Supabase / Vercel / staging / production | ✅ | Live at https://searchable.pk since 2026-09-15: Vercel Hobby + Supabase + R2 + Resend (`docs/LOCAL-TO-PRODUCTION.md`) |
 | CI | ✅ | GitHub Actions: typecheck, lint, build |
 | Env management | ✅ | `.env.example`; ads/Openverse/billing keys documented |
-| Error monitoring | ❌ | Sentry at go-live |
+| Error monitoring | ✅ | No vendor: `src/instrumentation.ts` records every uncaught server error as an `error` event, the error page reports browser crashes through the beacon, `/admin/system` groups the last 24 hours (docs/FREE-TIER.md) |
 
 ## Database
 | Entity | Status | Note |

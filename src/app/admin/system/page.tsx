@@ -43,7 +43,7 @@ async function removeSampleContent() {
 /** What is running, what it costs, and whether the free allowances are safe (docs/FREE-TIER.md). */
 export default async function AdminSystem() {
   const db = await getDb();
-  const [jobs, ingest, budget, allowance, [sizes], [rows], sampleRow, api, apiCalls] = await Promise.all([
+  const [jobs, ingest, budget, allowance, [sizes], [rows], sampleRow, api, apiCalls, errs, errCounts] = await Promise.all([
     db.query.settings.findFirst({ where: eq(schema.settings.key, "jobs:last") }),
     db.query.settings.findFirst({ where: eq(schema.settings.key, "ingest:last") }),
     db.query.settings.findFirst({ where: eq(schema.settings.key, "email:budget") }),
@@ -71,6 +71,13 @@ export default async function AdminSystem() {
         from analytics_events where name = 'admin_api'`,
     ).then((r) => r[0]),
     rawQuery<{ path: string; method: string; status: number; ms: number; at: string }>(db, sql`select path, props->>'method' as method, (props->>'status')::int as status, (props->>'ms')::int as ms, created_at::text as at from analytics_events where name = 'admin_api' order by created_at desc limit 12`),
+    rawQuery<{ path: string; message: string; digest: string | null; route: string | null; source: string; n: number; last_at: string }>(
+      db,
+      sql`select path, props->>'message' as message, props->>'digest' as digest, props->>'routePath' as route, coalesce(props->>'source', 'server') as source, count(*)::int as n, max(created_at)::text as last_at
+        from analytics_events where name = 'error' and created_at > now() - interval '1 day'
+        group by path, props->>'message', props->>'digest', props->>'routePath', coalesce(props->>'source', 'server') order by max(created_at) desc limit 20`,
+    ),
+    rawQuery<{ today: number; week: number }>(db, sql`select count(*) filter (where created_at > now() - interval '1 day')::int as today, count(*) filter (where created_at > now() - interval '7 days')::int as week from analytics_events where name = 'error'`).then((r) => r[0]),
   ]);
   const sample = sampleRow?.value as SampleSeed | undefined;
   const sampleLive = sample
@@ -172,6 +179,35 @@ export default async function AdminSystem() {
               ))}
             </ul>
           ) : null}
+        </Section>
+        <Section title="Errors" description="Uncaught errors from pages, route handlers and server actions (src/instrumentation.ts) and crashes reported by the error page. Grouped by message, last 24 hours; pruned with the other events after 90 days.">
+          <Details
+            items={[
+              { label: "Last 24 hours", value: (errCounts?.today ?? 0).toLocaleString() },
+              { label: "Last 7 days", value: (errCounts?.week ?? 0).toLocaleString() },
+            ]}
+          />
+          {errs.length ? (
+            <ul className="mt-4 divide-y divide-[var(--border)] border-y border-line text-[13.5px]">
+              {errs.map((e, i) => (
+                <li key={i} className="py-2">
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span className="min-w-0 flex-1 truncate font-mono text-[12.5px]">{e.path}</span>
+                    <span className="text-3">{e.source}</span>
+                    <span className="tabular font-semibold">{e.n}×</span>
+                    <span className="text-3">{timeAgo(e.last_at)}</span>
+                  </div>
+                  <p className="mt-0.5 text-2">
+                    {e.message}
+                    {e.digest ? <span className="ml-2 font-mono text-[11.5px] text-3">{e.digest}</span> : null}
+                    {e.route && e.route !== e.path ? <span className="ml-2 font-mono text-[11.5px] text-3">{e.route}</span> : null}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-3 text-[14px] text-2">None in the last day.</p>
+          )}
         </Section>
         {sample ? (
           <Section title="Sample content" description="Demonstration articles and businesses from the seed. Fine for testing; remove them before you promote the site so nothing invented gets indexed or cited." action={

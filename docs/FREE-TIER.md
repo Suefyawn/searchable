@@ -66,3 +66,6 @@ Images are served from the R2 custom domain. A tiny inline script in the root la
 
 ## Region
 Functions run in Tokyo (`regions: ["hnd1"]` in vercel.json) because the database is in Supabase ap-northeast-1; on the default US East region every query paid a trans-Pacific round trip and a cold data page took six seconds. Pakistan to Tokyo is about the same latency as Pakistan to Virginia, so readers lose nothing.
+
+## Error monitoring
+No Sentry. Next's `onRequestError` hook (`src/instrumentation.ts`) writes every uncaught server error (pages, route handlers, server actions) into `analytics_events` as an `error` event with message, digest, route and the top of the stack; the error page sends browser crashes through `/api/track` with the same digest. `/admin/system` shows the last day grouped by message; the rows are pruned with the other events after 90 days. Vercel's own function logs keep the full stack for a few hours if more is needed.
