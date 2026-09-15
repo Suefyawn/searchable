@@ -4,6 +4,7 @@ import { plainText } from "./markdown";
 import { removeSearchDocument, syncSearchDocument } from "./search";
 import { TOOLS, toolUrl } from "@/tools/registry";
 import { TOOL_CATEGORIES } from "@/tools/types";
+import { DISCOS } from "@/content/discos";
 
 /** Article → search document (or removal when unpublished). */
 export async function indexArticle(articleId: string) {
@@ -101,12 +102,29 @@ export async function indexDataSeries(seriesId: string) {
     entityType: "data_series",
     entityId: s.id,
     url: `/data/${s.slug}`,
-    title: `${s.name} today`,
+    title: /today/i.test(s.name) ? s.name : `${s.name} today`,
     summary: s.description ?? `${s.name} in Pakistan — latest value, history and source (${s.sourceName ?? "official"}).`,
     keywords: [s.slug.replace(/-/g, " "), "today", "rate", "price", "history"].join(" "),
     category: "Data",
     categorySlug: "data",
   });
+}
+
+/** Static high-intent pages (DISCO bill-check) live in code but must be searchable. */
+export async function indexStaticPages() {
+  for (const d of DISCOS) {
+    await syncSearchDocument({
+      entityType: "guide",
+      entityId: `disco:${d.slug}`,
+      url: `/electricity/${d.slug}`,
+      title: `${d.short} bill check online`,
+      summary: `Check your ${d.short} electricity bill by reference number, see the per-unit price and calculate a bill. ${d.cities.slice(0, 4).join(", ")}.`,
+      keywords: [`${d.short.toLowerCase()} bill`, `${d.short.toLowerCase()} bill check`, `${d.short.toLowerCase()} online bill`, `${d.short.toLowerCase()} duplicate bill`, "electricity bill check online", "bijli bill", d.name, ...d.cities].join(", "),
+      category: "Electricity",
+      categorySlug: "utilities",
+      boost: 1.3,
+    });
+  }
 }
 
 /** Mirror the code registry into the `tools` table and the search index. */
@@ -162,5 +180,6 @@ export async function reindexAll() {
   for (const e of entities) await indexEntity(e.id);
   for (const d of series) await indexDataSeries(d.id);
   await indexTools();
+  await indexStaticPages();
   return { articles: articles.length, businesses: businesses.length, locations: locations.length, entities: entities.length, series: series.length, tools: TOOLS.length };
 }

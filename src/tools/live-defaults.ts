@@ -10,9 +10,12 @@ export type LiveDefault = { key: string; value: number; label: string; seriesSlu
 const MAP: Record<string, { key: string; series: string; label: string; transform?: (v: number) => number }[]> = {
   "fuel-cost-calculator": [{ key: "price", series: "petrol-price", label: "Petrol price" }],
   "pta-mobile-tax-calculator": [{ key: "usdPkr", series: "usd-pkr", label: "USD/PKR interbank" }],
-  "zakat-calculator": [{ key: "goldPrice", series: "gold-24k-tola", label: "Gold 24k per gram", transform: (v) => Math.round(v / 11.664) }],
-  "car-loan-calculator": [{ key: "rate", series: "sbp-policy-rate", label: "SBP policy rate + 3% spread", transform: (v) => v + 3 }],
-  "home-loan-calculator": [{ key: "rate", series: "sbp-policy-rate", label: "SBP policy rate + 3% spread", transform: (v) => v + 3 }],
+  "zakat-calculator": [
+    { key: "goldPrice", series: "gold-24k-tola", label: "Gold 24k per gram", transform: (v) => Math.round(v / 11.664) },
+    { key: "silverPrice", series: "silver-tola", label: "Silver per gram", transform: (v) => Math.round(v / 11.664) },
+  ],
+  "car-loan-calculator": [{ key: "rate", series: "kibor-1y", label: "1-year KIBOR + 3% spread", transform: (v) => v + 3 }],
+  "home-loan-calculator": [{ key: "rate", series: "kibor-1y", label: "1-year KIBOR + 3% spread", transform: (v) => v + 3 }],
 };
 
 export async function liveDefaults(toolSlug: string): Promise<{ input: ToolInput; sources: LiveDefault[] }> {

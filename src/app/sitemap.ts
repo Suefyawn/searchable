@@ -4,6 +4,7 @@ import { getDb, schema } from "@/db";
 import { SITE } from "@/lib/utils";
 import { TOOLS, toolUrl } from "@/tools/registry";
 import { TOOL_CATEGORIES } from "@/tools/types";
+import { DISCOS } from "@/content/discos";
 
 export const revalidate = 3600;
 
@@ -31,6 +32,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u("/businesses", new Date(), 0.8, "weekly"),
     u("/cities", new Date(), 0.7, "monthly"),
     u("/data", new Date(), 0.8, "daily"),
+    u("/electricity", undefined, 0.8, "monthly"),
+    ...DISCOS.map((d) => u(`/electricity/${d.slug}`, undefined, 0.8, "monthly")),
     u("/newsletter", undefined, 0.5, "monthly"),
     ...series.map((d) => u(`/data/${d.slug}`, d.updatedAt, 0.8, "daily")),
     ...categories.map((c) => u(`/${c.kind === "news" ? "news" : "guides"}/${c.slug}`, undefined, 0.7, "daily")),

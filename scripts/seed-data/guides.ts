@@ -381,4 +381,128 @@ First-time CNIC, changes to name, date of birth, gender or father's name, and bi
     ],
     sources: [{ title: "SECP — eZfile", url: "https://ezfile.secp.gov.pk", publisher: "SECP" }],
   },
+  {
+    slug: "fbr-iris-login-registration-and-filing-guide",
+    category: "taxes",
+    title: "FBR IRIS: login, registration and filing your return — the complete guide",
+    dek: "IRIS is FBR's online portal for NTN registration, income tax returns, wealth statements and notices. Here is how to log in, what each menu does, and how to fix the errors everyone hits.",
+    featured: true,
+    entities: ["fbr", "income-tax"],
+    body: `## What IRIS is
+
+**IRIS** (iris.fbr.gov.pk) is the Federal Board of Revenue's self-service portal. Everything an individual taxpayer does with FBR happens here: registering for an NTN, filing the annual income tax return and wealth statement, replying to notices, applying for refunds, and checking withholding certificates.
+
+## Summary
+
+| | |
+|---|---|
+| **Portal** | iris.fbr.gov.pk |
+| **Login** | Registration number (your CNIC for individuals) + password |
+| **Cost** | Free |
+| **Mobile app** | Tax Asaan (Android/iOS) covers registration, ATL check and simplified returns |
+
+## FBR IRIS login
+
+1. Go to **iris.fbr.gov.pk** and click **Login**.
+2. Enter your **Registration No.** — for individuals this is your 13-digit CNIC without dashes — and your password.
+3. Complete the captcha. On first login after registration you will be asked to change the password.
+
+**Forgot password?** Use *Forgot Password* on the login screen. Codes are sent to the mobile number and email on your registration — both must still be in your name and active.
+
+## Registration on IRIS (first time)
+
+1. Choose **Registration for Unregistered Person**.
+2. Enter CNIC, full name as per CNIC, a mobile number registered in your own name, and an email.
+3. Enter the verification codes sent by SMS and email.
+4. Set a password. Your NTN is now your CNIC.
+5. Log in and complete **Form 181** (Registration) — address, employer or business, bank account. Without Form 181 the registration stays incomplete.
+
+## The IRIS menus that matter
+
+- **Registration → Form 181** — your profile. Update it when you change job, address or bank.
+- **Declaration → 114(1) Return of Income** — the annual return. Choose the tax year (e.g. 2026 for income earned July 2025 – June 2026).
+- **Declaration → 116(2) Wealth Statement** — assets and liabilities; required with the return for individuals.
+- **Inbox** — notices from FBR (e.g. 114(4) for non-filing, 122 for audit). Replies are filed from here with a deadline shown.
+- **Refund → 170** — apply for a refund of excess withholding.
+- **MIS → Withholding Statements / Tax Deducted** — see what employers, banks and others have reported deducting from you. Use it to reconcile before filing.
+
+## Filing a salaried return in IRIS
+
+1. Open **114(1)** for the year; IRIS pre-fills some withholding from MIS.
+2. **Salary**: enter total gross salary; tax deducted appears under *Adjustable tax → Salary u/s 149*.
+3. Add other income (profit on debt, rental, capital gains) and the tax withheld on each.
+4. Add adjustable withholdings you paid during the year (mobile, vehicle token, property, cash withdrawal).
+5. IRIS computes the tax — compare with the [Income Tax Calculator](/tools/tax/income-tax-calculator).
+6. Complete the **Wealth Statement** and its reconciliation.
+7. **Verify** with the PIN sent to your mobile, then **Submit**. Download the acknowledgement.
+
+## Common IRIS errors and fixes
+
+- **"Mobile number already registered"** — the number is tied to another CNIC; get it re-registered in your name with your operator first.
+- **"Form 181 pending"** — open Registration and submit the form; the return option stays greyed out until then.
+- **Wealth reconciliation does not balance** — every rupee of increase in net assets must be explained by income, gifts, loans or inheritance. Check bank balances at 30 June, not today.
+- **Session timeout** — IRIS logs out after inactivity; save each tab as you go.
+- **Cannot see 2026 return** — returns open after the FBR notification for the year; late July onward.
+
+## Deadlines and the ATL
+
+Individuals file by **30 September** (extensions are announced most years). Filing puts you on the **Active Taxpayer List**; check it via SMS *ATL space CNIC* to **9966** or on the FBR website. Late filers pay Rs 1,000 to be added to the ATL.`,
+    faqs: [
+      { question: "What is my FBR IRIS registration number?", answer: "For individuals it is your 13-digit CNIC without dashes. For companies and AOPs it is the 7-digit NTN issued at registration." },
+      { question: "Is IRIS the same as Tax Asaan?", answer: "Tax Asaan is FBR's mobile app that covers registration, ATL check and simplified returns. Full returns, wealth statements and notices are handled on the IRIS web portal." },
+      { question: "Can I change my email or mobile number on IRIS?", answer: "Yes — under Registration → Form 181 → Modify. The new number must be registered in your own name." },
+      { question: "How do I reply to an FBR notice?", answer: "Open Inbox, select the notice, and use Reply. Attach documents as PDF. The deadline is shown on the notice; you can request an extension from the same screen." },
+      { question: "Why does IRIS show tax deducted that I did not know about?", answer: "Banks, mobile operators and employers report withholding to FBR under your CNIC. MIS shows these; claim them in your return so they reduce your liability or create a refund." },
+    ],
+    sources: [
+      { title: "FBR IRIS portal", url: "https://iris.fbr.gov.pk", publisher: "Federal Board of Revenue" },
+      { title: "Income Tax Ordinance 2001 — sections 114, 116, 149", publisher: "FBR" },
+    ],
+  },
+  {
+    slug: "how-to-check-filer-status-atl-pakistan",
+    category: "taxes",
+    title: "How to check filer status in Pakistan: ATL check by SMS, online and by NTN",
+    dek: "Your filer status decides whether you pay the normal or the doubled withholding rate. Checking it takes ten seconds by SMS or on the FBR website.",
+    entities: ["fbr", "income-tax"],
+    body: `## Three ways to check the Active Taxpayer List
+
+### 1. By SMS (fastest)
+Send **ATL (space) 13-digit CNIC** to **9966**. The reply says *Active* or *Inactive* with the date. For a company or AOP, send **ATL (space) 7-digit NTN**.
+
+### 2. Online
+Open the FBR website → **Online Verifications → Active Taxpayer List (Income Tax)**. Enter the CNIC or NTN, the captcha, and check. The result shows the name, registration number and status.
+
+### 3. Download the full list
+FBR publishes the complete ATL as a downloadable file every Monday. Useful for businesses that need to verify many vendors at once.
+
+## What "filer" and "non-filer" mean
+
+A **filer** is a person whose name appears on the ATL because they filed the return for the latest tax year (or paid the surcharge to be added). A **non-filer** pays higher withholding rates under the Tenth Schedule — roughly double on vehicle registration, property transactions, bank profit and more. See [what non-filers pay extra](/news/economy/filer-vs-non-filer-what-you-pay-extra-on-cars-property-and-bank-transactions).
+
+## Why you might show as inactive
+
+- You registered on IRIS but never submitted a return.
+- You filed after the deadline and did not pay the Rs 1,000 ATL surcharge.
+- The ATL updates weekly; a return filed on Tuesday appears the following Monday.
+- The new tax year's ATL replaced the old one (published 1 March each year) and you have not filed for the new year yet.
+
+## How to become active
+
+File the return for the latest tax year on IRIS — the [step-by-step guide](/guides/taxes/how-to-file-income-tax-return-pakistan) — or, if the deadline has passed, file and pay the surcharge through a PSID generated in IRIS. Status updates on the next Monday.
+
+## Checking someone else's status
+
+Businesses routinely check vendors and buyers before applying withholding. The SMS and web checks work for any CNIC or NTN; no login is required.`,
+    faqs: [
+      { question: "How do I check filer status by CNIC?", answer: "SMS 'ATL <CNIC>' to 9966, or use Online Verifications → Active Taxpayer List on the FBR website. Both are free." },
+      { question: "What is the difference between ATL and NTN?", answer: "An NTN is your registration number with FBR (your CNIC for individuals). The ATL is the list of registered people who actually filed the latest return — only those on it are filers." },
+      { question: "How long after filing does the ATL update?", answer: "The list is refreshed every Monday. File by Sunday to appear on Monday's list." },
+      { question: "I filed last year — why am I a non-filer now?", answer: "A new ATL based on the latest tax year is published every 1 March. You must file each year to stay active." },
+    ],
+    sources: [
+      { title: "FBR — Active Taxpayer List", url: "https://fbr.gov.pk", publisher: "Federal Board of Revenue" },
+      { title: "Income Tax Ordinance 2001 — section 182A and Tenth Schedule", publisher: "FBR" },
+    ],
+  },
 ];

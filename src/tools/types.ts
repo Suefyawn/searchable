@@ -53,6 +53,8 @@ export interface ToolDefinition {
   category: ToolCategory;
   name: string;
   shortName?: string;
+  /** Title tag / social card title, keyword-led. Falls back to name. */
+  seoTitle?: string;
   description: string;
   keywords: string[];
   version: string;

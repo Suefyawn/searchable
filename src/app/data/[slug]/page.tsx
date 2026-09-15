@@ -21,6 +21,13 @@ const LINKS: Record<string, { tools?: string[]; entities?: string[] }> = {
   "usd-pkr": { tools: ["pta-mobile-tax-calculator"], entities: ["usd-pkr", "sbp"] },
   "gold-24k-tola": { tools: ["zakat-calculator"], entities: ["gold"] },
   "sbp-policy-rate": { tools: ["car-loan-calculator", "home-loan-calculator"], entities: ["sbp"] },
+  "kibor-1y": { tools: ["car-loan-calculator", "home-loan-calculator"], entities: ["sbp", "meezan-bank", "hbl"] },
+  "gold-22k-tola": { tools: ["zakat-calculator"], entities: ["gold"] },
+  "silver-tola": { tools: ["zakat-calculator"], entities: ["gold"] },
+  "eur-pkr": { tools: [], entities: ["usd-pkr", "sbp"] },
+  "gbp-pkr": { tools: [], entities: ["usd-pkr", "sbp"] },
+  "aed-pkr": { tools: [], entities: ["usd-pkr", "sbp"] },
+  "sar-pkr": { tools: [], entities: ["usd-pkr", "sbp"] },
 };
 
 export async function generateMetadata({ params }: Props) {
@@ -30,7 +37,7 @@ export async function generateMetadata({ params }: Props) {
   const latest = data.points[data.points.length - 1];
   const value = latest ? (data.series.unit === "%" ? `${number(latest.value, 2)}%` : `${number(latest.value, Number.isInteger(latest.value) ? 0 : 2)} ${data.series.unit}`) : "";
   return buildMetadata({
-    title: `${data.series.name} today${value ? ` — ${value}` : ""}`,
+    title: `${/today/i.test(data.series.name) ? data.series.name : `${data.series.name} today`}${value ? ` — ${value}` : ""}`,
     description: `${data.series.name} in Pakistan with history, source (${data.series.sourceName ?? "official"}) and the date of every change. Updated ${data.series.frequency}.`,
     path: `/data/${slug}`,
   });

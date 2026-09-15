@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const tool = getTool(slug);
   if (!tool) return {};
-  return buildMetadata({ title: tool.name, description: tool.description, path: toolUrl(tool), kicker: `${TOOL_CATEGORIES[tool.category].name} calculator` });
+  return buildMetadata({ title: tool.seoTitle ?? tool.name, description: tool.description, path: toolUrl(tool), kicker: `${TOOL_CATEGORIES[tool.category].name} calculator` });
 }
 
 export default async function ToolPage({ params }: Props) {

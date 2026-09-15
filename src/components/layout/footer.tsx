@@ -21,7 +21,7 @@ const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
       { href: "/tools/telecom/pta-mobile-tax-calculator", label: "PTA tax" },
       { href: "/tools/utilities/electricity-bill-calculator", label: "Electricity bill" },
       { href: "/tools/finance/zakat-calculator", label: "Zakat" },
-      { href: "/tools/cars/car-loan-calculator", label: "Car loan" },
+      { href: "/electricity", label: "Electricity bill check" },
     ],
   },
   {

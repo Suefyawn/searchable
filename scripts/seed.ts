@@ -127,8 +127,8 @@ async function seedDataSeries() {
   for (const s of DATA_SERIES) {
     const [row] = await db
       .insert(schema.dataSeries)
-      .values({ slug: s.slug, name: s.name, unit: s.unit, frequency: s.frequency, sourceName: s.sourceName, sourceUrl: s.sourceUrl })
-      .onConflictDoUpdate({ target: schema.dataSeries.slug, set: { name: s.name, unit: s.unit, frequency: s.frequency, sourceName: s.sourceName, sourceUrl: s.sourceUrl } })
+      .values({ slug: s.slug, name: s.name, unit: s.unit, frequency: s.frequency, sourceName: s.sourceName, sourceUrl: s.sourceUrl, description: s.description })
+      .onConflictDoUpdate({ target: schema.dataSeries.slug, set: { name: s.name, unit: s.unit, frequency: s.frequency, sourceName: s.sourceName, sourceUrl: s.sourceUrl, description: s.description } })
       .returning();
     for (const [date, value] of s.points) {
       await db.insert(schema.dataPoints).values({ seriesId: row.id, date: date as string, value: value as number }).onConflictDoUpdate({ target: [schema.dataPoints.seriesId, schema.dataPoints.date], set: { value: value as number } });
