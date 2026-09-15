@@ -1,0 +1,30 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next.js
+.next/
+out/
+build/
+dist/
+
+# local database (PGlite data dir) and uploads
+.data/
+public/uploads/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# misc
+.DS_Store
+*.pem
+*.log
+npm-debug.log*
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+.turbo/
+coverage/

@@ -1,0 +1,140 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArticleListing, ArticlePage } from "@/components/article-page";
+import { ArticleCard } from "@/components/cards";
+import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
+import { countArticles, getArticle, getCategory, listArticles, listCategories, type ArticleKind } from "@/db/queries/content";
+import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
+import { cn } from "@/lib/utils";
+
+const META: Record<"news" | "guide", { section: string; name: string; title: string; description: string }> = {
+  news: { section: "news", name: "News", title: "Pakistan news — with the useful context", description: "What changed, what it means for you, and what to do next. Business, economy, technology, cars, property and more." },
+  guide: { section: "guides", name: "Guides", title: "Guides — how things actually work in Pakistan", description: "Step-by-step guides for taxes, banking, cars, property, government processes and utilities. With fees, timelines and the mistakes to avoid." },
+};
+
+const PAGE_SIZE = 18;
+
+/* ───────────── Section hub (/news, /guides) ───────────── */
+export function sectionMetadata(kind: "news" | "guide"): Metadata {
+  const m = META[kind];
+  return buildMetadata({ title: m.title, description: m.description, path: `/${m.section}` });
+}
+
+export async function SectionHub({ kind, page = 1 }: { kind: "news" | "guide"; page?: number }) {
+  const m = META[kind];
+  const [categories, items, total] = await Promise.all([listCategories(kind), listArticles({ kind, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }), countArticles(kind)]);
+  const featured = page === 1 ? items.slice(0, 1) : [];
+  const rest = page === 1 ? items.slice(1) : items;
+  return (
+    <div className="container-x py-8 sm:py-12">
+      <SectionHeader as="h1" title={m.name} description={m.description} />
+      <CategoryNav section={m.section} categories={categories} />
+      {featured.length ? (
+        <div className="mt-8 grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+          <ArticleCard article={featured[0]} variant="feature" />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            {rest.slice(0, 2).map((a) => (
+              <ArticleCard key={a.id} article={a} />
+            ))}
+          </div>
+        </div>
+      ) : null}
+      <div className="mt-8">
+        <ArticleListing items={page === 1 ? rest.slice(2) : rest} emptyText={`No ${m.name.toLowerCase()} published yet.`} />
+      </div>
+      <Pagination base={`/${m.section}`} page={page} total={total} />
+    </div>
+  );
+}
+
+/* ───────────── Category (/news/[category]) ───────────── */
+export async function categoryMetadata(kind: "news" | "guide", slug: string): Promise<Metadata> {
+  const cat = await getCategory(kind, slug);
+  if (!cat) return {};
+  const m = META[kind];
+  return buildMetadata({ title: `${cat.name} ${m.name.toLowerCase()}`, description: cat.description ?? `${cat.name} — ${m.description}`, path: `/${m.section}/${cat.slug}` });
+}
+
+export async function CategoryPage({ kind, slug, page = 1 }: { kind: "news" | "guide"; slug: string; page?: number }) {
+  const m = META[kind];
+  const cat = await getCategory(kind, slug);
+  if (!cat) notFound();
+  const [categories, items, total] = await Promise.all([listCategories(kind), listArticles({ kind, categorySlug: slug, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }), countArticles(kind, slug)]);
+  const crumbs = [{ name: m.name, path: `/${m.section}` }, { name: cat.name, path: `/${m.section}/${cat.slug}` }];
+  return (
+    <div className="container-x py-8 sm:py-12">
+      <JsonLd data={breadcrumbJsonLd(crumbs)} />
+      <Breadcrumbs items={crumbs} className="mb-4" />
+      <SectionHeader as="h1" title={cat.name} description={cat.description ?? undefined} />
+      <CategoryNav section={m.section} categories={categories} active={slug} />
+      <div className="mt-8">
+        <ArticleListing items={items} emptyText={`Nothing in ${cat.name} yet — check back soon.`} />
+      </div>
+      <Pagination base={`/${m.section}/${cat.slug}`} page={page} total={total} />
+    </div>
+  );
+}
+
+/* ───────────── Article (/news/[category]/[slug]) ───────────── */
+export async function articleMetadata(kind: "news" | "guide", category: string, slug: string): Promise<Metadata> {
+  const a = await getArticle(kind, slug);
+  if (!a) return {};
+  const m = META[kind];
+  return buildMetadata({
+    title: a.seoTitle ?? a.title,
+    description: a.seoDescription ?? a.dek ?? a.excerpt,
+    path: `/${m.section}/${a.category?.slug ?? category}/${a.slug}`,
+    image: a.featuredImageUrl,
+    type: "article",
+    publishedTime: a.publishedAt,
+    modifiedTime: a.updatedAt,
+    noindex: a.noindex,
+  });
+}
+
+export async function ArticleRoute({ kind, slug }: { kind: "news" | "guide"; category: string; slug: string }) {
+  const a = await getArticle(kind, slug);
+  if (!a) notFound();
+  return <ArticlePage article={a} kind={kind} />;
+}
+
+/* ───────────── Shared bits ───────────── */
+function CategoryNav({ section, categories, active }: { section: string; categories: { slug: string; name: string }[]; active?: string }) {
+  return (
+    <nav className="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0" aria-label="Categories">
+      <ul className="flex gap-2 pb-1">
+        <li>
+          <Link href={`/${section}`} className={cn("inline-flex whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm", !active ? "border-brand-600 bg-brand-700 text-white" : "border-line bg-surface text-2 hover:bg-surface-2")}>
+            All
+          </Link>
+        </li>
+        {categories.map((c) => (
+          <li key={c.slug}>
+            <Link href={`/${section}/${c.slug}`} className={cn("inline-flex whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm", active === c.slug ? "border-brand-600 bg-brand-700 text-white" : "border-line bg-surface text-2 hover:bg-surface-2")}>
+              {c.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+export function Pagination({ base, page, total, pageSize = PAGE_SIZE }: { base: string; page: number; total: number; pageSize?: number }) {
+  const pages = Math.ceil(total / pageSize);
+  if (pages <= 1) return null;
+  return (
+    <nav className="mt-10 flex items-center justify-between text-sm" aria-label="Pagination">
+      {page > 1 ? <Link href={`${base}?page=${page - 1}`} className="font-medium text-brand-700 dark:text-brand-300">← Newer</Link> : <span />}
+      <span className="text-3">Page {page} of {pages}</span>
+      {page < pages ? <Link href={`${base}?page=${page + 1}`} className="font-medium text-brand-700 dark:text-brand-300">Older →</Link> : <span />}
+    </nav>
+  );
+}
+
+export function pageParam(v: string | undefined) {
+  return Math.max(1, parseInt(v ?? "1", 10) || 1);
+}
+
+export type { ArticleKind };

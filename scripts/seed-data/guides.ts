@@ -1,0 +1,384 @@
+/** SAMPLE guides for the local prototype. Written as launch-quality drafts; verify before publishing live. */
+export type ArticleDef = {
+  slug: string;
+  category: string;
+  title: string;
+  dek: string;
+  body: string;
+  faqs?: { question: string; answer: string }[];
+  sources?: { title: string; url?: string; publisher?: string }[];
+  entities?: string[];
+  featured?: boolean;
+  publishedDaysAgo?: number;
+  city?: string;
+};
+
+export const GUIDES: ArticleDef[] = [
+  {
+    slug: "how-to-become-a-tax-filer-in-pakistan",
+    category: "taxes",
+    title: "How to become a tax filer in Pakistan (2026)",
+    dek: "Registering with FBR takes about 20 minutes online. Being on the Active Taxpayer List halves the withholding tax you pay on cars, property, bank transactions and phones.",
+    featured: true,
+    entities: ["fbr", "income-tax", "nadra"],
+    body: `## Why it matters
+
+Pakistan taxes **non-filers** at roughly double the withholding rates of filers on vehicle registration, property purchase, cash withdrawals above the threshold, dividends and profit on debt. If you earn any taxable income — or plan to buy a car or plot — being on the **Active Taxpayer List (ATL)** saves real money.
+
+## Summary
+
+| | |
+|---|---|
+| **Time** | 20–30 minutes online |
+| **Cost** | Free |
+| **Where** | FBR IRIS portal (iris.fbr.gov.pk) |
+| **You need** | CNIC, a mobile number registered in your name, an email address, and details of your income |
+
+## Step 1 — Register for an NTN on IRIS
+
+1. Go to the IRIS portal and choose **Registration for Unregistered Person**.
+2. Enter your CNIC, name as per CNIC, mobile number (must be registered in your own name), and email.
+3. You will receive separate codes by SMS and email. Enter both.
+4. Set a password. Your **NTN is your CNIC number** for individuals.
+
+## Step 2 — Complete your registration profile
+
+Log in, open **Registration → Form 181**, and fill in your address, employer (if salaried), business details (if any), and bank account. Submit. This step is often skipped and is why registrations show as incomplete.
+
+## Step 3 — File your income tax return
+
+Filing is what puts you on the ATL. From **Declaration → Income Tax Return**, pick the tax year and:
+
+- **Salaried individuals:** enter salary from your employer's annual certificate, tax already deducted, and any other income. Use our [Income Tax Calculator](/tools/tax/income-tax-calculator) to sanity-check the tax due.
+- **Business individuals:** enter revenue, expenses and net profit.
+
+Then complete the **Wealth Statement** — assets and liabilities at the end of the year, with a reconciliation against last year. Submit both.
+
+## Step 4 — Check the Active Taxpayer List
+
+The ATL updates every Monday. Confirm your status by SMS: send **ATL (space) CNIC** to **9966**, or search the ATL on the FBR website.
+
+## Deadlines
+
+The return for a tax year (July–June) is due by **30 September** for individuals. File late and you pay a surcharge to be added to the ATL — Rs 1,000 for individuals.
+
+## Common problems
+
+- **Mobile number not in your name:** IRIS cannot send the code. Fix ownership with your operator first.
+- **Registration "in process":** usually Form 181 was never submitted.
+- **Can't see the ATL entry:** you registered but did not file a return, or you filed after the deadline without paying the surcharge.`,
+    faqs: [
+      { question: "Do I need an NTN if I am salaried?", answer: "Yes. Your CNIC becomes your NTN once you register on IRIS. Your employer deducts tax, but only filing a return puts you on the ATL." },
+      { question: "Is there a fee to become a filer?", answer: "Registration and filing are free. A late-filing surcharge of Rs 1,000 applies if you file after the deadline and want to be on the ATL." },
+      { question: "Can overseas Pakistanis become filers?", answer: "Yes. Non-resident Pakistanis register the same way and file a return declaring Pakistan-source income, if any." },
+      { question: "What is the difference between filer and non-filer?", answer: "A filer appears on the Active Taxpayer List and pays lower withholding tax rates on many transactions. A non-filer pays the higher rates listed for persons not on the ATL." },
+    ],
+    sources: [
+      { title: "FBR — IRIS registration", url: "https://iris.fbr.gov.pk", publisher: "Federal Board of Revenue" },
+      { title: "Income Tax Ordinance 2001, section 114 and Tenth Schedule", publisher: "FBR" },
+    ],
+  },
+  {
+    slug: "how-to-file-income-tax-return-pakistan",
+    category: "taxes",
+    title: "How to file your income tax return on FBR IRIS, step by step",
+    dek: "A salaried return takes under an hour once you have your salary certificate and bank statements. Here is every screen, what to enter, and the mistakes that trigger notices.",
+    entities: ["fbr", "income-tax"],
+    body: `## Before you start
+
+Collect:
+
+- **Annual salary certificate** from your employer (shows gross salary and tax deducted under section 149).
+- **Bank statements** for 1 July – 30 June for every account.
+- **Withholding certificates**: mobile operators, banks (profit on debt), vehicle token tax, property transactions.
+- Last year's wealth statement, if you filed before.
+
+## 1. Open the return
+
+Log in to IRIS → **Declaration** → **114(1) Return of Income** → select the tax year.
+
+## 2. Salary
+
+Under **Employment → Salary**, enter total gross salary. Enter tax deducted by the employer under **Tax Chargeable / Adjustable Tax → Salary of Employees u/s 149**.
+
+## 3. Other income
+
+- **Profit on bank deposits** — under Other Sources; enter the profit and the tax withheld (from the bank certificate).
+- **Rental income**, **capital gains**, **dividends** — each has its own section.
+
+## 4. Adjustable tax
+
+Withholding you already paid on mobile bills, vehicle token, property purchase, cash withdrawals, etc. Enter each with the amount so it is credited against your liability. Missing these is the most common reason people overpay.
+
+## 5. Tax computation
+
+IRIS calculates tax on the slabs automatically. Compare it with our [calculator](/tools/tax/income-tax-calculator). If tax deducted exceeds tax due, the difference becomes a **refund** claim.
+
+## 6. Wealth statement (section 116)
+
+List assets at cost (property, vehicles, bank balances, investments, gold, cash) and liabilities. The **reconciliation** must balance: last year's net wealth + this year's income − expenses = this year's net wealth. Unexplained increases in wealth are what draw notices.
+
+## 7. Submit
+
+Verify with the PIN sent to your mobile. Download the acknowledgement. Check the ATL the following Monday.
+
+## Mistakes that trigger notices
+
+1. Bank deposits larger than declared income.
+2. A car or property in your name that is missing from the wealth statement.
+3. Foreign remittances without a bank certificate.
+4. Declaring salary lower than what the employer reported.`,
+    faqs: [
+      { question: "Can I file a return without a wealth statement?", answer: "Individuals must file both; the return is incomplete without the wealth statement and will not put you on the ATL." },
+      { question: "What if my employer did not deduct tax?", answer: "You still owe tax on your income. Pay the balance via a PSID generated in IRIS before submitting." },
+      { question: "How do I revise a submitted return?", answer: "Within 60 days you can file a revised return without approval; after that, you need the Commissioner's permission." },
+    ],
+    sources: [{ title: "FBR — Filing income tax return user guide", url: "https://fbr.gov.pk", publisher: "FBR" }],
+  },
+  {
+    slug: "how-to-register-phone-with-pta",
+    category: "telecom",
+    title: "How to register an imported phone with PTA (DIRBS) and pay the tax",
+    dek: "Bring a phone from abroad and you have 120 days of free use per passport. After that it must be registered on DIRBS — here is the process, the documents and how to pay.",
+    featured: true,
+    entities: ["pta", "fbr", "apple", "samsung"],
+    body: `## What DIRBS is
+
+The **Device Identification, Registration and Blocking System** checks every phone's IMEI against a whitelist. Unregistered phones work for 120 days after first use on a Pakistani SIM, then lose network access until taxes are paid.
+
+## Summary
+
+| | |
+|---|---|
+| **Time** | 10 minutes to apply; PSID usually within 24 hours |
+| **Cost** | Depends on phone value — use the [PTA Tax Calculator](/tools/telecom/pta-mobile-tax-calculator) |
+| **Where** | dirbs.pta.gov.pk or SMS to 8484 |
+| **You need** | IMEI(s), CNIC or passport, arrival date (for passport) |
+
+## Step 1 — Find your IMEI
+
+Dial **\\*#06#**. Dual-SIM phones show two IMEIs; you will register both under one application.
+
+## Step 2 — Check the phone's status
+
+SMS the 15-digit IMEI to **8484**. The reply says *compliant* (already registered), *non-compliant* (needs registration) or *blocked*.
+
+## Step 3 — Apply on DIRBS
+
+1. Create an account at the DIRBS portal (local or overseas Pakistani / foreigner).
+2. Choose **Individual COC** (Certificate of Compliance).
+3. Enter IMEI(s), pick **passport** (if within 60 days of arrival — cheaper) or **CNIC**, and submit.
+
+## Step 4 — Pay the PSID
+
+FBR generates a **PSID** with the exact amount. Pay through any bank app, ATM, or branch under *FBR – Mobile Device Tax*. Registration completes within a day of payment.
+
+## Passport vs CNIC
+
+Rates are lower on a passport but only within **60 days of arrival**; the arrival stamp date is checked. After 60 days, you must use CNIC rates.
+
+## Buying a phone locally?
+
+Ask the seller to show the IMEI as **PTA approved** before paying. "Non-PTA" phones are cheaper because the tax has not been paid — you will pay it, or the phone will be blocked.`,
+    faqs: [
+      { question: "Can I use a non-PTA phone with WiFi only?", answer: "Yes. Blocking only affects SIM/network use; WiFi keeps working." },
+      { question: "Is there any exemption?", answer: "Overseas Pakistanis get the 120-day temporary registration per passport visit, renewable on each entry. No permanent exemption exists." },
+      { question: "What if I paid but it still shows blocked?", answer: "Allow 24 hours after payment. If still blocked, raise a complaint on the PTA CMS portal with the PSID and payment receipt." },
+    ],
+    sources: [{ title: "PTA — DIRBS user guide", url: "https://dirbs.pta.gov.pk", publisher: "Pakistan Telecommunication Authority" }],
+  },
+  {
+    slug: "how-to-apply-for-net-metering-in-pakistan",
+    category: "utilities",
+    title: "How to apply for net metering in Pakistan (LESCO, IESCO, K-Electric)",
+    dek: "Net metering lets your rooftop solar export units to the grid and offset your bill. The process runs through your DISCO and NEPRA and takes 1–3 months.",
+    entities: ["nepra", "lesco", "k-electric", "solar-energy"],
+    body: `## Eligibility
+
+- Three-phase connection (most systems above 5 kW need it; some DISCOs allow single-phase up to 5 kW).
+- Installed capacity between **1 kW and 1 MW**.
+- Installer must be an **AEDB-certified** vendor.
+
+## Steps
+
+1. **Install the system** with a certified vendor. Get the single-line diagram, panel and inverter datasheets, and the vendor's AEDB certificate.
+2. **Apply to your DISCO** (LESCO, IESCO, K-Electric, etc.) — the vendor usually submits it. Attach CNIC, latest bill, property ownership proof, and the technical documents.
+3. **Site inspection** by the DISCO; they check the inverter's grid-tie protection.
+4. **NEPRA generation licence** — the DISCO forwards the application; NEPRA issues a licence (this is where most delays happen).
+5. **Agreement & meter** — sign the net-metering agreement and pay for the bi-directional meter.
+6. **Commissioning** — the DISCO installs the meter and the system starts exporting.
+
+## Costs
+
+Bi-directional meter and processing fees are typically Rs 25,000–60,000 depending on the DISCO. The vendor's quote should state whether it includes net-metering processing.
+
+## How the bill works
+
+Units you export are credited against units you import. Under the current framework, exported units are credited at the DISCO's rate for exports (which is lower than the retail rate you pay), so **consuming your own solar during the day saves more than exporting**. Use the [Solar Payback Calculator](/tools/solar/solar-payback-calculator) to model it.
+
+## Policy watch
+
+NEPRA has been revising the net-metering framework, including the export rate and the move to "net billing". Existing agreements are typically honoured for their term. Check the latest before signing.`,
+    faqs: [
+      { question: "How long does net metering approval take?", answer: "Typically 4–12 weeks end-to-end, with the NEPRA licence being the slowest step." },
+      { question: "Can I get net metering on a single-phase connection?", answer: "Some DISCOs allow up to 5 kW on single phase; larger systems require a three-phase upgrade." },
+      { question: "Do I still get a bill?", answer: "Yes — fixed charges, taxes and any net import are billed monthly; excess export credits carry forward." },
+    ],
+    sources: [{ title: "NEPRA — Alternative & Renewable Energy Distributed Generation and Net Metering Regulations", url: "https://nepra.org.pk", publisher: "NEPRA" }],
+  },
+  {
+    slug: "how-to-register-a-vehicle-in-punjab",
+    category: "cars",
+    title: "How to register a new car in Punjab and get a number plate",
+    dek: "New vehicles are registered with the Excise & Taxation Department of the province where you live. Punjab's process is online-first through e-Pay and the Excise portal.",
+    entities: ["toyota", "honda", "suzuki"],
+    body: `## Documents
+
+- Sales invoice / delivery order from the dealer
+- Sales certificate and Form 'F'
+- CNIC copy
+- Proof of address (utility bill)
+- Filer status (affects withholding tax)
+
+## Costs (indicative)
+
+| Item | Basis |
+|---|---|
+| Registration fee | 1–4% of vehicle value by engine size |
+| Withholding tax (section 231B) | Slab by engine capacity; roughly double for non-filers |
+| Token tax | Annual, by engine size |
+| Number plate | Fixed fee |
+
+Filer vs non-filer differences alone can exceed Rs 100,000 on a 1,500 cc car — see [how to become a filer](/guides/taxes/how-to-become-a-tax-filer-in-pakistan).
+
+## Steps
+
+1. Dealer provides invoice and Form F.
+2. Generate a PSID on the Punjab **e-Pay** app for registration fee, withholding tax and token tax; pay via bank app.
+3. Submit the file at the Excise office (or via the dealer) with payment receipts.
+4. Physical inspection of chassis and engine numbers.
+5. Registration book (or smart card) and number plate are issued; plates are delivered by post in Lahore.
+
+## Timelines
+
+7–15 working days in Lahore; longer in smaller districts.
+
+## After registration
+
+Token tax is due annually — pay it through e-Pay to avoid a penalty. Selling the car requires a transfer of ownership at Excise; keep the original book safe.`,
+    faqs: [
+      { question: "Can the dealer register the car for me?", answer: "Yes, most dealers offer registration as a service for a fee; the taxes are the same." },
+      { question: "What is the difference between registration in Punjab and Islamabad?", answer: "Islamabad registration is handled by ICT Excise and often faster; token tax rates differ slightly." },
+    ],
+    sources: [{ title: "Excise, Taxation & Narcotics Control Department Punjab", url: "https://excise.punjab.gov.pk", publisher: "Government of Punjab" }],
+  },
+  {
+    slug: "how-to-open-a-roshan-digital-account",
+    category: "banking",
+    title: "Roshan Digital Account: how overseas Pakistanis open one and what it offers",
+    dek: "RDA lets non-resident Pakistanis open a bank account from abroad in a few days, invest in Naya Pakistan Certificates, stocks and property, and repatriate freely.",
+    entities: ["sbp", "meezan-bank", "hbl"],
+    body: `## Who can open one
+
+Non-resident Pakistanis (NRPs) and Pakistan-origin card holders, plus resident Pakistanis with assets declared abroad.
+
+## Documents
+
+- CNIC / NICOP / POC
+- Passport
+- Proof of NRP status (visa, residence permit, foreign ID)
+- Proof of profession/income (job letter, payslip, bank statement)
+- Live photo/selfie
+
+## Steps
+
+1. Choose a participating bank (all major banks: HBL, UBL, MCB, Meezan, Bank Alfalah, etc.).
+2. Fill the online RDA form and upload documents.
+3. The bank verifies within 48 hours and opens the account; you fund it via international transfer.
+
+## What you can do
+
+- **Naya Pakistan Certificates** — USD and PKR, Islamic and conventional.
+- **Stocks** through a broker linked to your RDA.
+- **Property** purchase with funds from the RDA, with repatriation of sale proceeds.
+- **Car financing** and personal finance from some banks.
+- Send money home instantly at interbank rates.
+
+## Taxes
+
+Profit on Naya Pakistan Certificates is subject to a final withholding tax (10%); no return filing is required for that income alone.`,
+    faqs: [
+      { question: "Is RDA money repatriable?", answer: "Yes. Funds and profits can be transferred back abroad without prior SBP approval." },
+      { question: "Can I open RDA while in Pakistan?", answer: "The applicant must be an NRP; some banks allow application while visiting with proof of foreign residence." },
+    ],
+    sources: [{ title: "State Bank of Pakistan — Roshan Digital Account", url: "https://www.sbp.org.pk/RDA/", publisher: "SBP" }],
+  },
+  {
+    slug: "how-to-renew-cnic-online-nadra",
+    category: "government",
+    title: "How to renew or update your CNIC online with NADRA Pak-Identity",
+    dek: "Renewal, address change and marital-status updates can be done from home through Pak-Identity. New CNICs and name changes still need a NADRA centre visit.",
+    entities: ["nadra"],
+    body: `## What Pak-Identity can do
+
+- Renew an expired CNIC
+- Change address or marital status
+- Apply for NICOP/POC (overseas)
+- Request a reprint
+
+## Steps
+
+1. Create an account on the Pak-Identity portal or app.
+2. Choose **Apply → Renewal** (or Modification).
+3. Upload a photo, signature and fingerprint scans (the app captures fingerprints on supported phones).
+4. Add a family member's CNIC as a verifier if asked.
+5. Pay online (fees vary by delivery speed: Normal, Urgent, Executive).
+6. Track status; the card is delivered by courier.
+
+## Fees (indicative)
+
+Normal delivery is the cheapest; Executive is roughly triple. Fees are shown at checkout.
+
+## When you must visit a centre
+
+First-time CNIC, changes to name, date of birth, gender or father's name, and biometric re-capture. Book a slot to avoid queues.`,
+    faqs: [
+      { question: "How long does online renewal take?", answer: "Normal: about 30 days; Urgent: 7–15 days; Executive: 3–7 days, plus courier time." },
+      { question: "Can I keep using an expired CNIC?", answer: "Banks and NADRA verification will fail on an expired card. Renew before travel or transactions." },
+    ],
+    sources: [{ title: "NADRA — Pak-Identity", url: "https://id.nadra.gov.pk", publisher: "NADRA" }],
+  },
+  {
+    slug: "how-to-register-a-company-with-secp",
+    category: "business",
+    title: "How to register a private limited company with SECP (eZfile)",
+    dek: "Incorporation is fully online, costs a few thousand rupees, and typically completes in 1–3 working days.",
+    entities: ["secp", "fbr"],
+    body: `## Choose the structure
+
+- **Sole proprietorship** — no SECP registration; just NTN and a bank account.
+- **Private Limited (Pvt) Ltd** — most common for startups and SMEs; limited liability; 1+ directors.
+- **SMC** — single-member company.
+- **LLP** — partnership with limited liability.
+
+## Steps for a Pvt Ltd
+
+1. **Name reservation** on eZfile — check availability, pay the fee; approval within a day.
+2. **Incorporation form** — directors' details, share capital, registered address, principal business.
+3. Upload CNICs, a Memorandum & Articles (templates provided), and pay incorporation fees (based on authorised capital).
+4. Certificate of Incorporation is issued digitally.
+5. **NTN** is generated automatically and shared with FBR; register on IRIS to file returns.
+6. Open a company bank account with the certificate, NTN and board resolution.
+
+## Ongoing compliance
+
+- Annual return (Form A) and financial statements to SECP.
+- Income tax return and, if applicable, sales tax returns to FBR.
+- Provincial sales tax on services (PRA/SRB/KPRA) if you provide services.`,
+    faqs: [
+      { question: "How much does company registration cost?", answer: "Name reservation and incorporation fees together are typically Rs 3,000–10,000 for small authorised capital through eZfile." },
+      { question: "Do I need a lawyer?", answer: "Not for a standard Pvt Ltd; eZfile templates are sufficient. Complex shareholding or foreign directors benefit from professional help." },
+    ],
+    sources: [{ title: "SECP — eZfile", url: "https://ezfile.secp.gov.pk", publisher: "SECP" }],
+  },
+];
