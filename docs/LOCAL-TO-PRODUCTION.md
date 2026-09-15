@@ -61,7 +61,7 @@ Preview deployments can reuse the same variables with a second free Supabase pro
 export DATABASE_URL="postgres://postgres.<ref>:<password>@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres"
 export SEED_ADMIN_EMAIL=... SEED_ADMIN_PASSWORD=...
 
-npm run db:migrate                 # applies drizzle/0000 to 0011
+npm run db:migrate                 # applies drizzle/0000 to 0012
 SEED_MODE=reference npm run db:seed   # locations, categories, entities, synonyms, data series, tools, admin user; no sample articles or businesses
 npm run search:reindex
 npm run preflight                  # should print "Ready to deploy"

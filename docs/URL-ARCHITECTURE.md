@@ -73,7 +73,8 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 
 /about  /contact  /editorial-policy  /privacy  /terms  /advertise  /add-business
 
-/account                                 User home; /account/profile, /account/posts, /account/saved
+/account                                 User home; /account/profile, /account/posts, /account/saved,
+                                         /account/notifications
 /business                                Owner dashboard (claimed businesses); /business/[id], /upgrade
 /admin                                   CMS + operations (role ≥ editor); /admin/claims, /outreach,
                                          /professionals, /community, /inbox, /system

@@ -39,7 +39,7 @@ async function main() {
       await rawQuery(db, sql`select 1`);
       checks.push({ name: "Database reachable", ok: true, required: true });
       const [m] = await rawQuery<{ n: number }>(db, sql`select count(*)::int as n from drizzle.__drizzle_migrations`).catch(() => [{ n: -1 }]);
-      checks.push({ name: "Migrations applied", ok: m?.n >= 12, note: m?.n >= 0 ? `${m.n} applied` : "migrations table missing: run npm run db:migrate", required: true });
+      checks.push({ name: "Migrations applied", ok: m?.n >= 13, note: m?.n >= 0 ? `${m.n} applied` : "migrations table missing: run npm run db:migrate", required: true });
       const [ext] = await rawQuery<{ n: number }>(db, sql`select count(*)::int as n from pg_extension where extname = 'pg_trgm'`).catch(() => [{ n: 0 }]);
       checks.push({ name: "pg_trgm extension enabled", ok: (ext?.n ?? 0) > 0, note: "Supabase: Database > Extensions > pg_trgm", required: true });
       const [docs] = await rawQuery<{ n: number }>(db, sql`select count(*)::int as n from search_documents`).catch(() => [{ n: 0 }]);

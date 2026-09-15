@@ -37,6 +37,10 @@ export default async function AccountPage() {
             <p className="font-semibold">Saved</p>
             <p className="mt-1 text-[15px] text-2">Articles, calculators, listings, profiles and posts you bookmarked.</p>
           </Link>
+          <Link href="/account/notifications" className="surface surface-hover p-5">
+            <p className="font-semibold">Email notifications</p>
+            <p className="mt-1 text-[15px] text-2">Enquiries, outbid alerts and the daily activity digest: on or off, each one.</p>
+          </Link>
           <Link href="/account/posts" className="surface surface-hover p-5">
             <p className="font-semibold">Your posts</p>
             <p className="mt-1 text-[15px] text-2">Jobs, listings, auctions and questions you have posted, and their status.</p>

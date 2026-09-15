@@ -1,4 +1,4 @@
-import { boolean, index, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { createdAt, updatedAt } from "./_shared";
 
 // Tables follow better-auth's core schema (field names are what the Drizzle adapter maps on).
@@ -15,6 +15,8 @@ export const users = pgTable(
     emailVerified: boolean("email_verified").default(false).notNull(),
     image: text("image"),
     role: userRole("role").default("user").notNull(),
+    /** Per-kind email switches (leads, outbid, digest); a missing key means on. See src/lib/notify.ts. */
+    notificationPrefs: jsonb("notification_prefs").$type<Record<string, boolean>>().default({}).notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },

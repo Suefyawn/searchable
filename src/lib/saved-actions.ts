@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
 import { getSessionUser, requireUser } from "@/lib/auth";
+import { NOTIFY_KINDS, type NotifyKind } from "@/lib/notify";
 
 const Target = z.object({ targetType: z.enum(["article", "tool", "business", "professional", "post", "data_series"]), targetId: z.string().min(1).max(200), title: z.string().trim().min(1).max(200), url: z.string().regex(/^\/[^\s]*$/).max(300) });
 export type SaveTarget = z.input<typeof Target>;
@@ -36,10 +37,12 @@ export async function listSaved() {
   return db.query.savedItems.findMany({ where: eq(schema.savedItems.userId, user.id), orderBy: [desc(schema.savedItems.createdAt)], limit: 500 });
 }
 
-export async function setDigestPreference(on: boolean): Promise<{ ok: boolean }> {
-  const user = await requireUser("/account/profile");
+export async function setNotificationPreference(kind: NotifyKind, on: boolean): Promise<{ ok: boolean }> {
+  if (!NOTIFY_KINDS.some((k) => k.kind === kind)) return { ok: false };
+  const user = await requireUser("/account/notifications");
   const db = await getDb();
-  await db.update(schema.memberProfiles).set({ notifyDigest: on }).where(eq(schema.memberProfiles.userId, user.id));
-  revalidatePath("/account/profile");
+  const row = await db.query.users.findFirst({ where: eq(schema.users.id, user.id), columns: { notificationPrefs: true } });
+  await db.update(schema.users).set({ notificationPrefs: { ...(row?.notificationPrefs ?? {}), [kind]: on } }).where(eq(schema.users.id, user.id));
+  revalidatePath("/account/notifications");
   return { ok: true };
 }
