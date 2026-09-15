@@ -62,3 +62,6 @@ postgres-js talks to Supabase's transaction pooler (port 6543) with `prepare: fa
 
 ## Image fallback
 Images are served from the R2 custom domain. A tiny inline script in the root layout listens for image load errors from that host and retries the same file through `/media/…`, a Next rewrite that proxies the CDN. It only fires when the CDN host is unreachable for that visitor (an extension, a per-site image setting, an ISP), so the metered origin transfer stays near zero in normal use. `/media/` is disallowed in robots.txt so the copies are never indexed.
+
+## Region
+Functions run in Tokyo (`regions: ["hnd1"]` in vercel.json) because the database is in Supabase ap-northeast-1; on the default US East region every query paid a trans-Pacific round trip and a cold data page took six seconds. Pakistan to Tokyo is about the same latency as Pakistan to Virginia, so readers lose nothing.

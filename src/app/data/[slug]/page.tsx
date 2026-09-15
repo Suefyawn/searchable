@@ -5,7 +5,7 @@ import { ArticleCard, ToolCard } from "@/components/cards";
 import { CiteThis, KeyFacts } from "@/components/cite";
 import { Change } from "@/components/data/change";
 import { GoldExtras } from "@/components/data/gold-extras";
-import { LineChart } from "@/components/data/line-chart";
+import { RangeChart } from "@/components/data/range-chart";
 import { ChartPlaceholder, Conversions, Explainer, RelatedSeries } from "@/components/data/series-extras";
 import { SaveButton } from "@/components/saved/save-button";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
@@ -19,7 +19,7 @@ import { SITE } from "@/lib/utils";
 import { getTool } from "@/tools/registry";
 
 export const revalidate = 600;
-type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ range?: string }> };
+type Props = { params: Promise<{ slug: string }> };
 
 /** Which calculators and topics each series feeds. Extend as tools are added. */
 const LINKS: Record<string, { tools?: string[]; entities?: string[] }> = {
@@ -42,13 +42,6 @@ const LINKS: Record<string, { tools?: string[]; entities?: string[] }> = {
   "solar-panel-per-watt": { tools: ["solar-payback-calculator"], entities: ["nepra"] },
 };
 
-const RANGES = [
-  { key: "1m", label: "1 month", days: 31 },
-  { key: "3m", label: "3 months", days: 93 },
-  { key: "1y", label: "1 year", days: 366 },
-  { key: "all", label: "All", days: Infinity },
-] as const;
-
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const data = await getSeries(slug, 1);
@@ -63,8 +56,8 @@ export async function generateMetadata({ params }: Props) {
   });
 }
 
-export default async function SeriesPage({ params, searchParams }: Props) {
-  const [{ slug }, { range: rangeKey = "3m" }] = await Promise.all([params, searchParams]);
+export default async function SeriesPage({ params }: Props) {
+  const { slug } = await params;
   const data = await getSeries(slug, 2000);
   if (!data) notFound();
   const { series, points } = data;
@@ -78,12 +71,6 @@ export default async function SeriesPage({ params, searchParams }: Props) {
   const recent = [...points].reverse().slice(0, 30);
   const usdPkr = all.find((s) => s.slug === "usd-pkr")?.latest?.value ?? null;
   const related = (content?.related ?? []).map((r) => all.find((s) => s.slug === r)).filter((s): s is NonNullable<typeof s> => !!s);
-
-  // Chart range: the last N days, but never fewer than the last 8 readings so a fortnightly series still draws.
-  const range = RANGES.find((r) => r.key === rangeKey) ?? RANGES[1];
-  const cutoff = latest && Number.isFinite(range.days) ? new Date(new Date(latest.date).getTime() - range.days * 86_400_000).toISOString().slice(0, 10) : "0000-00-00";
-  const inRange = points.filter((p) => p.date >= cutoff);
-  const chartPoints = inRange.length >= 8 ? inRange : points.slice(-8);
 
   // Change over a period: against the reading closest before the cutoff.
   const changeOver = (days: number) => {
@@ -160,27 +147,12 @@ export default async function SeriesPage({ params, searchParams }: Props) {
           </section>
 
           {/* The chart */}
-          <section>
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-[13px] font-semibold uppercase tracking-[0.1em] text-3">History</h2>
-              {points.length >= 8 ? (
-                <nav className="flex gap-1 text-[13px]" aria-label="Chart range">
-                  {RANGES.map((r) => (
-                    <Link key={r.key} href={`/data/${slug}?range=${r.key}`} scroll={false} className={`border px-2.5 py-1 ${r.key === range.key ? "border-[var(--text)] font-medium" : "border-line text-2 hover:bg-surface-2"}`} aria-current={r.key === range.key ? "true" : undefined}>
-                      {r.label}
-                    </Link>
-                  ))}
-                </nav>
-              ) : null}
-            </div>
-            {chartPoints.length >= 2 ? (
-              <div className="text-brand-700">
-                <LineChart points={chartPoints.map((p) => ({ date: p.date, value: p.value }))} unit={series.unit} />
-              </div>
-            ) : (
+          {points.length >= 2 ? <RangeChart points={points.map((p) => ({ date: p.date, value: p.value }))} unit={series.unit} /> : (
+            <section>
+              <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-[0.1em] text-3">History</h2>
               <ChartPlaceholder since={latest?.date ?? stats?.first ?? ""} frequency={series.frequency} />
-            )}
-          </section>
+            </section>
+          )}
 
           {content?.conversions && latest ? <Conversions kind={content.conversions} code={content.code} value={latest.value} usdPkr={usdPkr} date={latest.date} /> : null}
           {(slug === "gold-24k-tola" || slug === "gold-22k-tola") && latest ? <GoldExtras slug={slug} latestPerTola={latest.value} date={latest.date} /> : null}

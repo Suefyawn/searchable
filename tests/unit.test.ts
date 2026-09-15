@@ -58,21 +58,21 @@ test("backlog score favours demand over difficulty", () => {
 
 test("every calculator computes its defaults without throwing and returns a headline", () => {
   for (const t of TOOLS) {
-    const input = Object.fromEntries(t.fields.map((f) => [f.key, f.default]));
+    const input = Object.fromEntries(t.fields.filter((f) => f.default !== undefined).map((f) => [f.key, f.default as string | number | boolean]));
     const r = t.compute(input);
     assert.ok(r.headline?.value, `${t.slug} has no headline`);
     assert.ok(r.sections.length > 0, `${t.slug} has no sections`);
     assert.ok(t.sources.length > 0, `${t.slug} lists no source`);
-    assert.match(t.lastReviewed, /^\d{4}-\d{2}-\d{2}$/, `${t.slug} has no review date`);
+    assert.match(t.lastReviewed ?? "", /^\d{4}-\d{2}-\d{2}$/, `${t.slug} has no review date`);
   }
 });
 
 test("income tax: exempt below the threshold, positive above it", () => {
   const tool = TOOLS.find((t) => t.slug === "income-tax-calculator")!;
   const low = tool.compute({ income: 40_000, period: "monthly", kind: "salaried" });
-  assert.match(low.summary, /exempt/i);
+  assert.match(low.summary ?? "", /exempt/i);
   const high = tool.compute({ income: 250_000, period: "monthly", kind: "salaried" });
-  assert.doesNotMatch(high.summary, /exempt/i);
+  assert.doesNotMatch(high.summary ?? "", /exempt/i);
   // pkr() joins "Rs" and the number with a non-breaking space.
   assert.match(high.headline.value, /^Rs\s[\d,]+$/);
 });
