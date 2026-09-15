@@ -37,7 +37,7 @@ async function authHeader(): Promise<Record<string, string>> {
   const secret = process.env.OPENVERSE_CLIENT_SECRET;
   if (!id || !secret) return {};
   if (cachedToken && cachedToken.expires > Date.now()) return { authorization: `Bearer ${cachedToken.token}` };
-  const res = await fetch(`${API}/auth_tokens/token/`, { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ client_id: id, client_secret: secret, grant_type: "client_credentials" }) });
+  const res = await fetch(`${API}/auth_tokens/token/`, { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ client_id: id, client_secret: secret, grant_type: "client_credentials" }), signal: AbortSignal.timeout(6_000) });
   if (!res.ok) return {};
   const data = (await res.json()) as { access_token: string; expires_in: number };
   cachedToken = { token: data.access_token, expires: Date.now() + (data.expires_in - 60) * 1000 };
@@ -47,7 +47,8 @@ async function authHeader(): Promise<Record<string, string>> {
 export async function searchOpenImages(query: string, opts: { limit?: number; minWidth?: number; orientation?: "landscape" | "portrait" | "square" } = {}): Promise<OpenImage[]> {
   const params = new URLSearchParams({ q: query, license: LICENSES, page_size: String(Math.min(opts.limit ?? 12, 50)), mature: "false" });
   if (opts.orientation) params.set("aspect_ratio", opts.orientation === "landscape" ? "wide" : opts.orientation === "portrait" ? "tall" : "square");
-  const res = await fetch(`${API}/images/?${params}`, { headers: { "user-agent": UA, accept: "application/json", ...(await authHeader()) }, next: { revalidate: 0 } });
+  // Openverse has bad days (502s, stalls). A slow answer must not hold a request past the function limit.
+  const res = await fetch(`${API}/images/?${params}`, { headers: { "user-agent": UA, accept: "application/json", ...(await authHeader()) }, next: { revalidate: 0 }, signal: AbortSignal.timeout(8_000) });
   if (!res.ok) throw new Error(`Openverse search failed: ${res.status}`);
   const data = (await res.json()) as { results: Array<Record<string, unknown>> };
   const minWidth = opts.minWidth ?? 800;
@@ -82,7 +83,7 @@ export function creditLine(img: Pick<OpenImage, "creator" | "license" | "license
 
 /** Download an Openverse result, normalise it through the storage adapter, and record licence + source. */
 export async function importOpenImage(img: OpenImage, variant: "article" | "cover" | "photo" = "article", alt?: string) {
-  const res = await fetch(img.url, { headers: { "user-agent": UA, referer: img.sourceUrl } });
+  const res = await fetch(img.url, { headers: { "user-agent": UA, referer: img.sourceUrl }, signal: AbortSignal.timeout(12_000) });
   if (!res.ok) throw new Error(`Image download failed: ${res.status}`);
   const buf = Buffer.from(await res.arrayBuffer());
   if (buf.byteLength > 25 * 1024 * 1024) throw new Error("Image too large");
@@ -97,16 +98,24 @@ export async function importOpenImage(img: OpenImage, variant: "article" | "cove
  * First usable result for a query, used by the seed to give pages a real photo. Tries wide, then any
  * orientation, then a relaxed width; skips candidates whose file no longer downloads.
  */
-export async function findAndImport(query: string, variant: "article" | "cover" | "photo" = "article", alt?: string, opts: { orientation?: "landscape" | "portrait" | "square"; pick?: number; fallbackQuery?: string } = {}) {
+export async function findAndImport(query: string, variant: "article" | "cover" | "photo" = "article", alt?: string, opts: { orientation?: "landscape" | "portrait" | "square"; pick?: number; fallbackQuery?: string; budgetMs?: number } = {}) {
   const attempts: Array<{ q: string; orientation?: "landscape" | "portrait" | "square"; minWidth: number }> = [
     { q: query, orientation: opts.orientation ?? "landscape", minWidth: 1000 },
     { q: query, minWidth: 800 },
     ...(opts.fallbackQuery ? [{ q: opts.fallbackQuery, orientation: "landscape" as const, minWidth: 900 }, { q: opts.fallbackQuery, minWidth: 700 }] : []),
   ];
+  const deadline = Date.now() + (opts.budgetMs ?? 25_000);
   for (const a of attempts) {
-    const results = await searchOpenImages(a.q, { limit: 10, orientation: a.orientation, minWidth: a.minWidth });
+    if (Date.now() > deadline) break;
+    let results: OpenImage[];
+    try {
+      results = await searchOpenImages(a.q, { limit: 10, orientation: a.orientation, minWidth: a.minWidth });
+    } catch {
+      continue; // one bad search should not sink the next attempt
+    }
     const ordered = opts.pick ? [...results.slice(opts.pick), ...results.slice(0, opts.pick)] : results;
     for (const candidate of ordered.slice(0, 4)) {
+      if (Date.now() > deadline) break;
       try {
         return await importOpenImage(candidate, variant, alt);
       } catch {

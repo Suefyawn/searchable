@@ -5,6 +5,7 @@ import { expireStaleClaims, sendClaimInvites } from "./claims";
 import { expireLapsedPlans } from "./commerce";
 import { closeExpiredPosts } from "./community";
 import { syncInbox } from "./inbox";
+import { backfillArticlePhotos } from "./media-import";
 import { sendActivityDigests } from "./notify";
 import { sendDueIssues } from "./newsletter-issue";
 
@@ -20,7 +21,7 @@ import { sendDueIssues } from "./newsletter-issue";
 const JOB_INTERVAL_MS = 5 * 60_000;
 let lastLocalRun = 0;
 
-export type JobsResult = { ran: boolean; published?: number; newsletters?: unknown; lapsedPlans?: number; invites?: { sent: number; skipped: string }; digests?: { sent: number }; inbox?: { added: number; skipped?: string }; at?: string };
+export type JobsResult = { ran: boolean; published?: number; newsletters?: unknown; lapsedPlans?: number; invites?: { sent: number; skipped: string }; digests?: { sent: number }; inbox?: { added: number; skipped?: string }; photos?: { tried: number; filled: number }; at?: string };
 
 export async function runDueJobs(opts: { force?: boolean } = {}): Promise<JobsResult> {
   const now = Date.now();
@@ -43,7 +44,8 @@ export async function runDueJobs(opts: { force?: boolean } = {}): Promise<JobsRe
   const digests = await sendActivityDigests();
   // Mirror new mail into the admin inbox; the webhook is faster, this is the safety net.
   const inbox = await syncInbox().catch((e: Error) => ({ added: 0, skipped: e.message }));
-  return { ran: true, published, newsletters, lapsedPlans, invites, digests, inbox, at: new Date().toISOString() };
+  const photos = await backfillArticlePhotos().catch(() => ({ tried: 0, filled: 0 }));
+  return { ran: true, published, newsletters, lapsedPlans, invites, digests, inbox, photos, at: new Date().toISOString() };
 }
 
 /**

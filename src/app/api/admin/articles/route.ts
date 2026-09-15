@@ -82,9 +82,9 @@ export const POST = withAdminApi(async (_req, { body }) => {
     : {};
   let imageNote: string | undefined;
   if (d.image && "query" in d.image) {
-    const img = await findAndImport(d.image.query, "article", d.image.alt ?? d.title, { fallbackQuery: d.image.fallbackQuery });
+    const img = await findAndImport(d.image.query, "article", d.image.alt ?? d.title, { fallbackQuery: d.image.fallbackQuery, budgetMs: 25_000 });
     if (img) imageFields = { featuredImageUrl: img.url, featuredImageAlt: d.image.alt ?? d.title, featuredImageCredit: img.credit, featuredImageSourceUrl: img.sourceUrl };
-    else imageNote = `No openly licensed photo found for "${d.image.query}"; published without one`;
+    else imageNote = `No openly licensed photo found for "${d.image.query}" right now; the photo backfill job will try again over the next days`;
   } else if (d.image && "url" in d.image) {
     if (d.image.url.startsWith(process.env.R2_PUBLIC_URL ?? "https://img.searchable.pk")) {
       imageFields = { featuredImageUrl: d.image.url, featuredImageAlt: d.image.alt, featuredImageCredit: d.image.credit, featuredImageSourceUrl: d.image.sourceUrl };
@@ -98,7 +98,8 @@ export const POST = withAdminApi(async (_req, { body }) => {
     id: existing?.id,
     kind: d.kind,
     title: d.title,
-    slug: d.slug,
+    // A title edit must never move the page: updates keep the slug unless one is given explicitly.
+    slug: d.slug ?? existing?.slug,
     dek: d.dek,
     body: d.body,
     categoryId,
