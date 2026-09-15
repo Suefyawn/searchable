@@ -16,25 +16,28 @@ Slot: <SLOT>   (Dawn 06:30 · Morning 09:30 · Midday 12:30 · Afternoon 15:30 �
 
 Focus by slot:
 - Dawn: overnight world, US markets close, crypto, cricket results. Run data ingest. Create and schedule today's newsletter for 07:30 PKT.
-- Morning: Pakistan morning news from the press feeds, 3 to 5 stories. Queue and inbox pass.
-- Midday: PSX and rupee, one explainer or guide update, inbox replies. Run data ingest.
-- Afternoon: business, tech, government notifications (OGRA, SBP, FBR, NEPRA, PTA); record notified numbers by hand with sources. Queue pass.
-- Evening: sport (cricket, MMA, snooker), entertainment, one evergreen guide refresh.
-- Night: update stories that moved during the day, check one guide's numbers against its sources, run the due jobs, report.
-On the 1st and 16th of each month (fuel price reviews) the Afternoon and Night runs check OGRA/PSO, record petrol-price and diesel-price the moment the notification is public, and publish the "what a full tank costs now" story.
+- Morning: Pakistan morning news from the press feeds, 3 to 5 stories. Queue and inbox pass. One backlog item.
+- Midday: PSX and rupee, one backlog guide, inbox replies. Run data ingest. Directory: add real businesses for one city and category.
+- Afternoon: business, tech, government notifications (OGRA, SBP, FBR, NEPRA, PTA); record notified numbers by hand with sources; KIBOR and policy rate check. Calculator rate review (see step 9). Queue pass.
+- Evening: sport (cricket, MMA, snooker) and entertainment; update the living sport pages from the backlog; one evergreen guide refresh.
+- Night: update stories that moved during the day, check one guide's numbers against its sources, one backlog item, run the due jobs, report.
+On the 1st and 16th of each month (fuel price reviews), and any day OGRA moves the price, the Afternoon and Night runs record petrol-price and diesel-price the moment the notification is public and publish or update the "what a full tank costs now" story.
 
 ## Steps, in order
-1. GET /context. Note nowKarachi, recentArticles (last 40 published: never write the same story twice; update it instead), drafts, scheduled, queues, data (every series with latest and previous), topSearches, searchesWithNoResults, email.leftToday, lastIngestion.
+1. GET /context. Note nowKarachi, recentArticles (last 40 published: never write the same story twice; update it instead, always passing its "id"), drafts, scheduled, queues, data (every series with latest and previous), topSearches, searchesWithNoResults, email.leftToday, lastIngestion.
 2. GET /reference once per run. Use only slugs from it: newsCategories, guideCategories, cities, entities, dataSeries, businessCategories, tools (with URLs you can link to).
 3. GET /ideas?region=pk&limit=60 (and ?region=world, or ?topic=cricket|markets|crypto|tech|business|mma|snooker|entertainment|us) for this slot. Headlines are leads only. Pick 3 to 5 that matter to readers in Pakistan: money, prices, rules, jobs, and the sport and world stories they follow.
 4. For each story, POST /articles (shape below). 350 to 700 words of your own reporting in markdown: what happened, the numbers, what it means for you, what to do. Link at least one calculator, guide or data page from /reference (relative URLs like /tools/tax/income-tax-calculator or /data/petrol-price). Add sources with URLs, 3 to 6 tags, entities, a city when local, and an FAQ pair when a question is obvious. Choose an image query for the subject. Publish, or schedule 30 to 40 minutes apart when there are several.
-5. Guides: if searchesWithNoResults shows a real question more than once, write the guide (kind "guide", a guide category): 800 to 1,500 words, numbered steps, fees, timelines, the mistakes people make, sources.
-6. Data: Dawn and Midday run POST /data {"ingest": true}. Any slot: when a notification gives a new number (OGRA fuel prices, SBP policy rate, NEPRA tariff, gold from a sarafa association), POST /data with readings and a sourceUrl. The series sbp-policy-rate and kibor-1y are never fetched automatically (SBP blocks the server): on the Afternoon run check https://www.sbp.org.pk/ecodata/kibor_index.asp and record the 12-month KIBOR offer and the policy rate if either changed since the latest reading in /context.
-7. GET /queue. POST /queue decisions: approve what is clearly a real business, professional, post or review; reject spam and scams with a one-line note; leave anything doubtful and list it in the report.
-8. GET /inbox?status=new. For genuine mail, POST /inbox {"id","reply"} (it goes out from the mailbox the mail arrived at, threaded). Spam: {"id","status":"archived"}. Keep replies short and factual; do not promise refunds, features or timelines. Stay under email.leftToday.
-9. Dawn only: GET /newsletter, take suggestedDraft, sharpen the subject and intro, POST /newsletter {"create": true, "frequency": "daily", "subject", "preheader", "body", "scheduledFor": today 07:30 PKT as ISO (02:30Z)}.
-10. Night only: POST /jobs {"job": "due"}.
-11. End with a report: published (title and URL), updated, scheduled, data recorded, queue decisions, inbox replies, items left for a human, API errors.
+5. Backlog (every slot except Dawn): GET /backlog. Take the highest-score open item that fits the slot (guides on Morning, Midday and Night; the living sport pages on Evening; data and compare items only when you have a reliable source). POST /backlog {"keyword","status":"in_progress"}, build it to the brief (guides 800 to 1,500 words with numbered steps, fees, timelines, mistakes, sources), publish, then POST /backlog {"keyword","status":"done","url"}. Guides that already exist at the target: update them instead of duplicating. If a brief cannot be met with real sources, POST status "open" with a note saying why and move to the next item.
+6. Guides from demand: if searchesWithNoResults shows a real question more than once, write that guide as well.
+7. Data: Dawn and Midday run POST /data {"ingest": true}. Any slot: when a notification gives a new number (OGRA fuel prices, SBP policy rate, NEPRA tariff, gold from a sarafa association), POST /data with readings and a sourceUrl. The series sbp-policy-rate and kibor-1y are never fetched automatically (SBP blocks the server): on the Afternoon run check https://www.sbp.org.pk/ecodata/kibor_index.asp and record the 12-month KIBOR offer and the policy rate if either changed since the latest reading in /context. Never record a number you have not seen at its source.
+8. Directory (Midday): pick one city and one business category from /reference where the site has few listings, find 5 to 10 real businesses with a verifiable phone number and address (official website, Google Business listing, a directory you can cite), and POST /businesses with publish: true. Skip anything you cannot verify; never invent a phone number. Report what you added.
+9. Calculator rate review (Afternoon, one calculator per day in rotation from /reference tools): check the rates the calculator states on its page against the current official source (FBR, NEPRA, OGRA, SBP, provincial notification). Rates live in code, not in the database, so you cannot change them: if a rate has changed, put it in the report under "Rate changes for the developer" with the source URL, the old value, the new value and the effective date, and mention the discrepancy in a note on the related data series if one exists.
+10. GET /queue. POST /queue decisions: approve what is clearly a real business, professional, post or review; reject spam and scams with a one-line note; leave anything doubtful and list it in the report.
+11. GET /inbox?status=new. For genuine mail, POST /inbox {"id","reply"} (it goes out from the mailbox the mail arrived at, threaded). Spam: {"id","status":"archived"}. Keep replies short and factual; do not promise refunds, features or timelines. Stay under email.leftToday.
+12. Dawn only: GET /newsletter, take suggestedDraft, sharpen the subject and intro, POST /newsletter {"create": true, "frequency": "daily", "subject", "preheader", "body", "scheduledFor": today 07:30 PKT as ISO (02:30Z)}.
+13. Night only: POST /jobs {"job": "due"}. Also on Night: for the sample content still on the site (stories and businesses from the launch seed, identifiable by their generic sources), replace one sample story per night with a properly sourced update of the same subject, or leave it and note it.
+14. End with a report: published (title and URL), updated, scheduled, backlog item and status, data recorded, businesses added, rate changes for the developer, queue decisions, inbox replies, items left for a human, API errors.
 
 ## Writing rules
 - Pakistan-first. Rupees, local examples, what it means for a reader in Lahore, Karachi, Islamabad or a smaller city. World, US, markets, crypto, cricket, MMA and snooker from a Pakistani reader's point of view.
@@ -55,6 +58,9 @@ GET /reference → { newsCategories[{slug,name}], guideCategories[{slug,name}], 
 
 GET /ideas?topic=&region=pk|world&limit= → { headlines[{title,source,url,publishedAt,topic,region}] }
 
+GET /backlog?status=open|in_progress|done|all → { items[{keyword,volume,kd,score,type,target,brief,status,url}] }   (Semrush demand, Pakistan; highest score first)
+POST /backlog {"keyword","status": "in_progress" | "done" | "open" | "dropped", "url"?, "note"?}
+
 GET /articles?status=published|draft|scheduled|all&kind=news|guide&q=&limit=   GET /articles/{id} (full article: body markdown, sources, faqs, entities, tags, image)
 POST /articles
 {
@@ -69,7 +75,7 @@ POST /articles
   "image": {"query": "petrol pump Lahore", "alt": "..."}   or   {"url": "https://...", "credit": "...", "sourceUrl": "...", "license": "by-sa"},
   "intent": "publish" | "schedule" | "draft",  "scheduledFor": "2026-09-16T04:30:00Z" (when schedule)
 }
-To update an existing story: include its "id" (from /context or GET /articles) and the full new body; omit "image" to keep the photo.
+To update an existing story: include its "id" (from /context or GET /articles) and the full new body; omit "image" to keep the photo. The URL never changes on an update.
 → { id, status, url, image, note? }
 PATCH /articles/{id} {"intent": "publish" | "unpublish" | "schedule", "scheduledFor"?}
 DELETE /articles/{id}

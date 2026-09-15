@@ -88,7 +88,7 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /api/cron/*                              scheduled jobs (Phase 6)
 /api/webhooks/resend                     POST, signed; email.received feeds the admin inbox
 /api/admin/*                             Bearer ADMIN_API_KEY; context, reference, ideas, articles, data,
-                                         businesses, queue, inbox, newsletter, media, jobs (docs/ADMIN-API.md)
+                                         businesses, backlog, queue, inbox, newsletter, media, jobs (docs/ADMIN-API.md)
 
 /sitemap.xml                             index → /sitemap/[type].xml
 /robots.txt

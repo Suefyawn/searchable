@@ -36,7 +36,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   void runDueJobs().catch(() => {});
   const c = await queueCounts();
   const groups: AdminNavGroup[] = [
-    { title: "Desk", items: [{ href: "/admin", label: "Dashboard" }, { href: "/admin/articles", label: "Articles", count: c.drafts }, { href: "/admin/ideas", label: "Story ideas" }, { href: "/admin/data", label: "Data hub" }, { href: "/admin/media", label: "Media" }] },
+    { title: "Desk", items: [{ href: "/admin", label: "Dashboard" }, { href: "/admin/articles", label: "Articles", count: c.drafts }, { href: "/admin/ideas", label: "Story ideas" }, { href: "/admin/backlog", label: "Backlog" }, { href: "/admin/data", label: "Data hub" }, { href: "/admin/media", label: "Media" }] },
     { title: "Directory", items: [{ href: "/admin/businesses", label: "Businesses", count: c.businesses }, { href: "/admin/claims", label: "Claims", count: c.claims }, { href: "/admin/professionals", label: "Professionals", count: c.professionals }, { href: "/admin/outreach", label: "Outreach" }, { href: "/admin/reviews", label: "Reviews", count: c.reviews }, { href: "/admin/leads", label: "Enquiries" }] },
     { title: "Money", items: [{ href: "/admin/orders", label: "Orders", count: c.orders }, { href: "/admin/submissions", label: "Pitches", count: c.submissions }] },
     { title: "Community", items: [{ href: "/admin/community", label: "Moderation", count: (c.posts ?? 0) + (c.community_reports ?? 0) }] },

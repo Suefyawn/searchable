@@ -1,0 +1,44 @@
+/**
+ * Search-demand backlog, Semrush Pakistan database, pulled 15 Sept 2026. Volume is monthly searches, KD is
+ * keyword difficulty. Loaded into the `seo:backlog` settings row by `scripts/seed-backlog.ts` (or POST
+ * /api/admin/backlog { items }). Add rows when you research; keep briefs concrete.
+ */
+export const BACKLOG = [
+  // Utilities: bill checking is the largest search category in the country and we have the DISCO data.
+  { keyword: "fesco bill check", volume: 550000, kd: 23, type: "guide", target: "/guides/utilities/fesco-bill-check-online", brief: "How to check and download a FESCO bill by reference number, read the bill (units, slabs, taxes, due date), pay it (banks, JazzCash, Easypaisa), and what to do if it is wrong. Link the electricity bill calculator and the FESCO tariff." },
+  { keyword: "mepco bill check", volume: 450000, kd: 31, type: "guide", target: "/guides/utilities/mepco-bill-check-online", brief: "Same structure as FESCO: check by reference, duplicate bill, due date, pay, complaint. Multan region examples." },
+  { keyword: "lesco bill check", volume: 246000, kd: 26, type: "guide", target: "/guides/utilities/lesco-bill-check-online", brief: "LESCO (Lahore) bill check, duplicate bill, protective load, net metering line on the bill, complaint numbers. Link the bill calculator." },
+  { keyword: "gepco online bill", volume: 450000, kd: 28, type: "guide", target: "/guides/utilities/gepco-bill-check-online", brief: "GEPCO (Gujranwala) bill check and payment guide." },
+  { keyword: "iesco online bill", volume: 301000, kd: 31, type: "guide", target: "/guides/utilities/iesco-bill-check-online", brief: "IESCO (Islamabad, Rawalpindi) bill check and payment guide." },
+  { keyword: "pesco online bill", volume: 301000, kd: 23, type: "guide", target: "/guides/utilities/pesco-bill-check-online", brief: "PESCO (Peshawar, KP) bill check and payment guide." },
+  { keyword: "hesco bill", volume: 49500, kd: 24, type: "guide", target: "/guides/utilities/hesco-bill-check-online", brief: "HESCO (Hyderabad) bill check guide." },
+  { keyword: "k electric bill", volume: 33100, kd: 34, type: "guide", target: "/guides/utilities/k-electric-bill-check-online", brief: "K-Electric (Karachi) bill check, duplicate bill, KE Live app, complaint 118." },
+  { keyword: "sui gas bill", volume: 165000, kd: 23, type: "guide", target: "/guides/utilities/sui-gas-bill-check-online", brief: "SNGPL and SSGC bill check by consumer number, how gas slabs work, pay, complaint. Link the gas bill calculator." },
+  { keyword: "electricity bill online check", volume: 135000, kd: 42, type: "hub", target: "/electricity", brief: "Turn the electricity hub into the one page that links every DISCO guide, the calculator and the current tariff; add a DISCO picker by city." },
+  // Identity and government
+  { keyword: "sim owner details", volume: 673000, kd: 21, type: "guide", target: "/guides/telecom/check-sims-registered-on-your-cnic", brief: "How to see which SIMs are registered on your CNIC (PTA 668 SMS, cnic.sims.pk), what to do about unknown numbers, how to block them, why owner-lookup sites are scams. Sources: PTA." },
+  { keyword: "ehsaas program", volume: 246000, kd: 48, type: "guide", target: "/guides/government/bisp-8171-eligibility-and-payment-check", brief: "BISP (formerly Ehsaas) 8171: who qualifies, how to check by CNIC, payment schedule, how to register, complaints, the scams to avoid. Sources: bisp.gov.pk." },
+  { keyword: "prize bond", volume: 201000, kd: 41, type: "guide", target: "/guides/banking/prize-bond-draw-schedule-and-how-to-check", brief: "Prize bond denominations, draw schedule for the year, how to check a number, how to claim, tax on prizes, premium bonds. Sources: National Savings." },
+  { keyword: "vehicle verification", volume: 135000, kd: 47, type: "guide", target: "/guides/cars/online-vehicle-verification-punjab-sindh-islamabad", brief: "MTMIS Punjab, Sindh excise, Islamabad: verify a car by registration number before buying, what the record shows, token tax status. Link the car registration guide." },
+  { keyword: "passport fee", volume: 27100, kd: 29, type: "guide", target: "/guides/government/passport-fee-and-how-to-apply", brief: "Passport fees for normal, urgent and fast track, 5 and 10 year, e-passport, renewal online, documents, timelines. Sources: DGIP fee schedule." },
+  { keyword: "driving license", volume: 14800, kd: 33, type: "guide", target: "/guides/cars/driving-licence-punjab-sindh-fees-and-test", brief: "Learner permit, test, fees by province, renewal, international permit. Sources: provincial traffic police sites." },
+  { keyword: "nadra birth certificate", volume: 2400, kd: 34, type: "guide", target: "/guides/government/nadra-birth-certificate", brief: "Union council vs NADRA, documents, fee, urgent, how to correct errors." },
+  { keyword: "car registration", volume: 2400, kd: 35, type: "guide", target: "/guides/cars/car-registration-and-token-tax", brief: "New registration, transfer, token tax per province, smart card, fees. Link the vehicle verification guide." },
+  // Money
+  { keyword: "national savings", volume: 33100, kd: 37, type: "data", target: "/data/national-savings-rates", brief: "Profit rates for Behbood, Regular Income, Defence, Special Savings certificates and accounts as a data series with history; a guide on how to buy. Sources: savings.gov.pk." },
+  { keyword: "credit card", volume: 9900, kd: 30, type: "compare", target: "/compare/credit-cards", brief: "Compare cards from HBL, UBL, Meezan, Faysal, Standard Chartered: annual fee, markup, cashback, Islamic options. Needs a monthly refresh source." },
+  { keyword: "remittance", volume: 9900, kd: 32, type: "guide", target: "/guides/banking/send-money-to-pakistan-cheapest-way", brief: "Compare Western Union, Remitly, Wise, bank transfers, Sohni Dharti: rate, fee, speed, the 1 percent incentive scheme. Link the FX converter." },
+  { keyword: "umrah package", volume: 27100, kd: 26, type: "guide", target: "/guides/travel/umrah-cost-from-pakistan", brief: "What an Umrah costs in 2026: visa, flights, hotel tiers, agent packages, what to check before paying. Sources: Ministry of Religious Affairs, PIA." },
+  { keyword: "zakat calculator", volume: 18100, kd: 33, type: "guide", target: "/guides/banking/how-to-calculate-zakat", brief: "The nisab this year (gold and silver), what counts, bank deduction on Ramadan 1 and the exemption form, how to pay. Link the zakat calculator. Many site searches for zakat found no guide." },
+  { keyword: "tax calculator 2026-27", volume: 1900, kd: 0, type: "guide", target: "/guides/taxes/income-tax-slabs-2026-27", brief: "The FY2026-27 salary slabs with worked examples, rising keyword with zero difficulty. Keep the existing take-home story consistent with it." },
+  { keyword: "sales tax", volume: 4400, kd: 37, type: "guide", target: "/guides/taxes/sales-tax-in-pakistan-explained", brief: "Federal vs provincial sales tax, rates by sector, registration, filing, who must register. Link the sales tax calculator." },
+  { keyword: "withholding tax", volume: 2900, kd: 33, type: "guide", target: "/guides/taxes/withholding-tax-rates-filer-vs-non-filer", brief: "Every common withholding: bank transactions, property, cars, mobile, contracts; filer vs non-filer; how to claim it back." },
+  // Prices and products
+  { keyword: "iphone 17 price in pakistan", volume: 27100, kd: 29, type: "news", target: "/news/technology/iphone-17-price-in-pakistan-with-pta-tax", brief: "Official and market price for each model, PTA tax on passport and CNIC, total landed cost. Link the PTA tax calculator. Refresh when prices move." },
+  { keyword: "solar panel price in pakistan", volume: 49500, kd: 30, type: "update", target: "/data/solar-panel-price", brief: "Keep the per-watt series current weekly with dealer quotes from Lahore and Karachi; write the monthly price story." },
+  { keyword: "ac price in pakistan", volume: 8100, kd: 33, type: "compare", target: "/compare/inverter-acs", brief: "Inverter AC prices and running cost per hour at current tariffs; link the electricity calculator." },
+  // Sport: living pages that get updated after every match
+  { keyword: "psl 2026", volume: 1220000, kd: 55, type: "hub", target: "/news/cricket/psl-2026-schedule-results-points-table", brief: "One living page: schedule, results, points table, where to watch. Update after each match through the season." },
+  { keyword: "asia cup", volume: 1830000, kd: 71, type: "hub", target: "/news/cricket/asia-cup-schedule-results-pakistan", brief: "Living page for the tournament: Pakistan fixtures, results, squad, points, where to watch." },
+  { keyword: "t20 world cup", volume: 1500000, kd: 46, type: "hub", target: "/news/cricket/t20-world-cup-pakistan-schedule-results", brief: "Living page: Pakistan schedule, results, squad, standings, where to watch." },
+] as const;
