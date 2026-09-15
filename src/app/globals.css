@@ -108,6 +108,12 @@
   * {
     border-color: var(--border);
   }
+  /* Grid and flex children default to min-width:auto, which lets one long word or table push a phone layout
+     wider than the screen. Zero is the value nearly every layout here wants. */
+  .grid > *,
+  .flex > * {
+    min-width: 0;
+  }
   html {
     font-family: var(--font-sans);
     font-feature-settings: "cv11", "ss01";
@@ -301,6 +307,7 @@
 
 /* Reading typography for articles and guides. */
 .prose-searchable {
+  overflow-wrap: anywhere;
   --tw-prose-body: var(--text);
   --tw-prose-headings: var(--text);
   --tw-prose-links: var(--link);

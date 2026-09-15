@@ -109,7 +109,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
       ) : null}
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <div>
+        <div className="min-w-0">
           {toc.length >= 3 ? (
             <nav aria-label="Contents" className="mb-8 surface-2 p-5 text-[15px] lg:hidden">
               <p className="font-semibold">In this guide</p>

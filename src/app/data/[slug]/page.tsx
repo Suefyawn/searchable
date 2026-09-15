@@ -84,7 +84,7 @@ export default async function SeriesPage({ params }: Props) {
       <SectionHeader as="h1" title={series.name} description={series.description ?? `Recorded ${series.frequency} from ${series.sourceName ?? "the official source"}.`} />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <div className="surface p-6">
             <p className="text-sm text-2">Latest{latest ? ` · ${formatDate(latest.date)}` : ""}</p>
             <p className="mt-1 flex flex-wrap items-baseline gap-3">
