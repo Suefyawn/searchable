@@ -6,26 +6,34 @@ import * as React from "react";
 const subscribeNoop = () => () => {};
 import { Button, Input, Textarea } from "@/components/ui";
 import { useSession } from "@/lib/auth-client";
+import { hasAuthHint } from "@/lib/auth-hint";
 import { submitReview } from "@/lib/review-actions";
 import { cn } from "@/lib/utils";
 
-export function ReviewForm({ businessId, businessSlug }: { businessId: string; businessSlug: string }) {
+/** Business profile pages are the busiest public pages; anonymous readers must not trigger a session request. */
+export function ReviewForm(props: { businessId: string; businessSlug: string }) {
+  const mounted = React.useSyncExternalStore(subscribeNoop, () => true, () => false);
+  if (!mounted) return null;
+  if (!hasAuthHint()) return <SignInPrompt businessSlug={props.businessSlug} />;
+  return <ReviewFormInner {...props} />;
+}
+
+function SignInPrompt({ businessSlug }: { businessSlug: string }) {
+  return (
+    <p className="text-[15px] text-2">
+      <Link href={`/login?next=${encodeURIComponent(`/b/${businessSlug}#write-review`)}`} className="font-medium underline underline-offset-4">Sign in</Link> to write a review. Reviews are checked before they appear.
+    </p>
+  );
+}
+
+function ReviewFormInner({ businessId, businessSlug }: { businessId: string; businessSlug: string }) {
   const { data, isPending } = useSession();
   const [rating, setRating] = React.useState(0);
   const [hover, setHover] = React.useState(0);
   const [state, setState] = React.useState<"idle" | "saving" | "done" | "error">("idle");
   const [error, setError] = React.useState("");
-  // Session state can resolve before hydration on the client; render nothing until mounted so server and client agree.
-  const mounted = React.useSyncExternalStore(subscribeNoop, () => true, () => false);
-
-  if (!mounted || isPending) return null;
-  if (!data?.user) {
-    return (
-      <p className="text-[15px] text-2">
-        <Link href={`/login?next=${encodeURIComponent(`/b/${businessSlug}#write-review`)}`} className="font-medium text-brand-700 underline dark:text-brand-300">Sign in</Link> to write a review. Reviews are checked before they appear.
-      </p>
-    );
-  }
+  if (isPending) return null;
+  if (!data?.user) return <SignInPrompt businessSlug={businessSlug} />;
   if (state === "done") return <p className="border border-brand-200 bg-brand-50 px-4 py-3 text-[15px] dark:border-brand-800 dark:bg-brand-950/40">Thank you. Your review is in the moderation queue and will appear once checked.</p>;
 
   return (

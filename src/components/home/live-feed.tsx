@@ -5,7 +5,8 @@ import * as React from "react";
 import type { FeedItem } from "@/lib/activity";
 import { cn } from "@/lib/utils";
 
-const REFRESH_MS = 120_000;
+// Matches the CDN cache on /api/feed (s-maxage 300): polling faster would only hit the cache anyway.
+const REFRESH_MS = 300_000;
 
 function clock(iso: string) {
   const d = new Date(iso);
@@ -40,10 +41,22 @@ export function LiveFeed({ initial, limit = 12, className }: { initial: FeedItem
         /* keep what we have */
       }
     };
-    const id = setInterval(load, REFRESH_MS);
+    // Only poll while the tab is visible; a hidden tab stops asking.
+    let id: ReturnType<typeof setInterval> | null = setInterval(load, REFRESH_MS);
+    const onVisibility = () => {
+      if (document.hidden) {
+        if (id) clearInterval(id);
+        id = null;
+      } else if (!id) {
+        void load();
+        id = setInterval(load, REFRESH_MS);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
     return () => {
       alive = false;
-      clearInterval(id);
+      if (id) clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, []);
 

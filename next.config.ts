@@ -6,9 +6,9 @@ const usingPglite = (process.env.DATABASE_URL ?? "pglite://./.data/pglite").star
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["@electric-sql/pglite"],
-  images: {
-    remotePatterns: [{ protocol: "https", hostname: "**" }],
-  },
+  // Renditions are written at upload time (src/lib/storage.ts) and served as plain <img srcset>, so the
+  // metered image optimiser is never used.
+  images: { unoptimized: true },
   experimental: {
     serverActions: { bodySizeLimit: "4mb" },
     ...(usingPglite ? { cpus: 1, workerThreads: false } : {}),

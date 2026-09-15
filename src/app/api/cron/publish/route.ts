@@ -1,17 +1,15 @@
 import { NextResponse } from "next/server";
-import { publishDueArticles } from "@/app/admin/articles/actions";
-import { expireLapsedPlans } from "@/lib/commerce";
-import { sendDueIssues } from "@/lib/newsletter-issue";
+import { runDueJobs } from "@/lib/jobs";
 
 /**
- * Vercel Cron target (see vercel.json). Locally: curl -H "authorization: Bearer $CRON_SECRET" /api/cron/publish
+ * Scheduled publishing, newsletter sends and plan expiry. Point a free external pinger (cron-job.org,
+ * every 5 minutes, header "authorization: Bearer $CRON_SECRET") at this; the daily Vercel cron and the
+ * live feed poll also run it, so nothing waits more than a few minutes even without the pinger.
  * If CRON_SECRET is unset (local dev), the endpoint is open.
  */
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
   if (secret && req.headers.get("authorization") !== `Bearer ${secret}`) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const published = await publishDueArticles();
-  const newsletters = await sendDueIssues();
-  const lapsedPlans = await expireLapsedPlans();
-  return NextResponse.json({ ok: true, published, newsletters, lapsedPlans, at: new Date().toISOString() });
+  const result = await runDueJobs({ force: true });
+  return NextResponse.json({ ok: true, ...result });
 }

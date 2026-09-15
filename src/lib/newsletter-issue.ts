@@ -1,8 +1,8 @@
-import { and, desc, eq, lte } from "drizzle-orm";
+import { and, asc, desc, eq, lte } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import { listArticles } from "@/db/queries/content";
 import { listSeriesWithLatest } from "@/db/queries/data";
-import { sendEmail } from "./email";
+import { EmailBudgetExceeded, emailAllowance, sendEmail } from "./email";
 import { formatDate, number } from "./format";
 import { renderMarkdown } from "./markdown";
 import { trendingSearches } from "./search";
@@ -115,35 +115,54 @@ export async function sendTestIssue(issueId: string, to: string) {
   await sendEmail({ to, subject: `[TEST] ${issue.subject}`, html, text: plainTextOf(issue.body) });
 }
 
-/** Send an issue to every active subscriber on its frequency. Idempotent: refuses if already sent. */
+/**
+ * Send an issue to every active subscriber on its frequency. Idempotent and resumable: progress is kept in
+ * settings (`newsletter:progress:<id>`), so when the daily email allowance runs out the issue stays
+ * "scheduled" and the next run carries on from where it stopped. Marked "sent" only when everyone has it.
+ */
 export async function sendIssue(issueId: string) {
   const db = await getDb();
   const issue = await db.query.newsletterIssues.findFirst({ where: eq(schema.newsletterIssues.id, issueId) });
   if (!issue) throw new Error("Issue not found");
-  if (issue.status === "sent") return { sent: 0, skipped: "already sent" as const };
+  if (issue.status === "sent") return { sent: 0, remaining: 0, skipped: "already sent" as const };
   const recipients = await db.query.newsletterSubscribers.findMany({
     where: and(eq(schema.newsletterSubscribers.status, "active"), eq(schema.newsletterSubscribers.frequency, issue.frequency)),
     columns: { email: true, unsubscribeToken: true },
+    orderBy: [asc(schema.newsletterSubscribers.email)],
   });
+  const progressKey = `newsletter:progress:${issueId}`;
+  const progress = await db.query.settings.findFirst({ where: eq(schema.settings.key, progressKey) });
+  let offset = Number((progress?.value as { offset?: number } | undefined)?.offset ?? 0);
   const text = plainTextOf(issue.body);
   let sent = 0;
   const failures: string[] = [];
-  // Small batches keep the local outbox readable and stay under provider rate limits.
-  for (let i = 0; i < recipients.length; i += 10) {
+  const allowance = await emailAllowance("bulk");
+  const budget = Math.min(allowance.today, allowance.month);
+  const end = Math.min(recipients.length, offset + budget);
+  for (let i = offset; i < end; i += 10) {
     await Promise.all(
-      recipients.slice(i, i + 10).map(async (r) => {
+      recipients.slice(i, Math.min(i + 10, end)).map(async (r) => {
         try {
           const html = renderIssueHtml(issue, { unsubscribeUrl: `${SITE.url}/newsletter/unsubscribe?token=${r.unsubscribeToken}`, manageUrl: `${SITE.url}/newsletter/manage?token=${r.unsubscribeToken}` });
-          await sendEmail({ to: r.email, subject: issue.subject, html, text });
+          await sendEmail({ to: r.email, subject: issue.subject, html, text }, "bulk");
           sent += 1;
         } catch (e) {
+          if (e instanceof EmailBudgetExceeded) return;
           failures.push(`${r.email}: ${(e as Error).message}`);
         }
       }),
     );
+    offset = Math.min(i + 10, end);
   }
-  await db.update(schema.newsletterIssues).set({ status: "sent", sentAt: new Date(), recipientCount: sent }).where(eq(schema.newsletterIssues.id, issueId));
-  return { sent, failures };
+  const remaining = recipients.length - end;
+  const previously = Number((progress?.value as { sent?: number } | undefined)?.sent ?? 0);
+  if (remaining > 0) {
+    await db.insert(schema.settings).values({ key: progressKey, value: { offset, sent: previously + sent } }).onConflictDoUpdate({ target: schema.settings.key, set: { value: { offset, sent: previously + sent }, updatedAt: new Date() } });
+    return { sent, remaining, failures, paused: "daily email allowance reached; the rest goes out on the next run" as const };
+  }
+  await db.update(schema.newsletterIssues).set({ status: "sent", sentAt: new Date(), recipientCount: previously + sent }).where(eq(schema.newsletterIssues.id, issueId));
+  if (progress) await db.delete(schema.settings).where(eq(schema.settings.key, progressKey));
+  return { sent, remaining: 0, failures };
 }
 
 /** Called by the cron endpoint: send every scheduled issue whose time has come. */

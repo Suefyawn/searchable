@@ -26,7 +26,10 @@ async function create(): Promise<Database> {
   }
   const postgres = (await import("postgres")).default;
   const { drizzle } = await import("drizzle-orm/postgres-js");
-  const client = postgres(DATABASE_URL, { max: 10, prepare: false });
+  // Serverless: one connection per function instance, released quickly, so the Supabase pooler (port 6543)
+  // never runs out of slots on the free plan. Long-running servers can hold a few.
+  const serverless = !!process.env.VERCEL || !!process.env.CF_PAGES || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+  const client = postgres(DATABASE_URL, { max: serverless ? 1 : 5, prepare: false, idle_timeout: 20, connect_timeout: 10 });
   return drizzle(client, { schema }) as unknown as Database;
 }
 

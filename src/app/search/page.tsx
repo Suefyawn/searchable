@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import { Rating, toolExample } from "@/components/cards";
 import { SearchBox } from "@/components/layout/search-box";
@@ -29,6 +30,9 @@ const FILTERS: { value: SearchEntityType | ""; label: string }[] = [
   { value: "news", label: "News" },
   { value: "location", label: "Places" },
 ];
+// The side rails change slowly; cache them so a search costs one query, not four.
+const sideRails = unstable_cache(async () => Promise.all([trendingSearches(6), popularSearches(8), citiesWithCounts(8)]), ["search-side-rails"], { revalidate: 600 });
+
 const SAMPLE_QUERIES = ["income tax on 150000 salary", "petrol price today", "usd to pkr", "lesco bill check", "pta tax iphone 16", "net metering", "solar companies in lahore", "zakat on gold", "car prices", "kibor rate"];
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<Params> }) {
@@ -38,11 +42,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const typeKey = TYPE_ORDER.includes(type as SearchEntityType) ? (type as SearchEntityType) : "";
   const types = typeKey ? [typeKey] : undefined;
   const newest = sort === "newest";
-  const [result, trending, popular, cities] = await Promise.all([
+  const [result, [trending, popular, cities]] = await Promise.all([
     q ? search(q, { types, city, limit, offset: (pageNum - 1) * limit, sort: newest ? "newest" : "relevance" }) : Promise.resolve<SearchResult>({ hits: [], total: 0, facets: {}, intent: "general" }),
-    trendingSearches(6),
-    popularSearches(8),
-    citiesWithCounts(8),
+    sideRails(),
   ]);
   const { hits, total, facets } = result;
   const [suggestion, related] = q ? await Promise.all([hits.length === 0 || hits[0]?.fuzzy ? didYouMean(q) : Promise.resolve(null), relatedSearches(q, 6)]) : [null, []];

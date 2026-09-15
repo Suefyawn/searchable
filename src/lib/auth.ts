@@ -21,7 +21,9 @@ function buildAuth(db: Database) {
         role: { type: "string", defaultValue: "user", input: false },
       },
     },
-    session: { expiresIn: 60 * 60 * 24 * 30, updateAge: 60 * 60 * 24 },
+    // cookieCache: a signed cookie answers getSession for 5 minutes, so signed-in browsing does not hit the
+    // database on every request (free-tier query budget).
+    session: { expiresIn: 60 * 60 * 24 * 30, updateAge: 60 * 60 * 24, cookieCache: { enabled: true, maxAge: 300 } },
   });
 }
 

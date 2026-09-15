@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth";
+import { runDueJobs } from "@/lib/jobs";
 
 export const metadata = { title: "Admin", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -25,6 +26,8 @@ const NAV = [
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await requireRole("editor", "/admin");
+  // An editor opening admin is a fine moment to publish anything that has come due (cheap: guarded to once per 5 minutes).
+  void runDueJobs().catch(() => {});
   return (
     <div className="container-x py-8">
       <div className="grid gap-8 lg:grid-cols-[200px_minmax(0,1fr)]">

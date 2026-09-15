@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 import { Button, Field, Input } from "@/components/ui";
 import { signIn, signUp } from "@/lib/auth-client";
+import { setAuthHint } from "@/lib/auth-hint";
 
 export function AuthForm({ next, initialMode }: { next: string; initialMode: "login" | "register" }) {
   const router = useRouter();
@@ -28,6 +29,7 @@ export function AuthForm({ next, initialMode }: { next: string; initialMode: "lo
       setError(res.error.message ?? "Something went wrong");
       return;
     }
+    setAuthHint();
     router.push(next);
     router.refresh();
   }

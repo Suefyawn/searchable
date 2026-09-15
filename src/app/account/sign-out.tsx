@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui";
 import { signOut } from "@/lib/auth-client";
+import { clearAuthHint } from "@/lib/auth-hint";
 
 export function SignOutButton() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export function SignOutButton() {
       size="sm"
       onClick={async () => {
         await signOut();
+        clearAuthHint();
         router.push("/");
         router.refresh();
       }}
