@@ -43,7 +43,7 @@ async function removeSampleContent() {
 /** What is running, what it costs, and whether the free allowances are safe (docs/FREE-TIER.md). */
 export default async function AdminSystem() {
   const db = await getDb();
-  const [jobs, ingest, budget, allowance, [sizes], [rows], sampleRow] = await Promise.all([
+  const [jobs, ingest, budget, allowance, [sizes], [rows], sampleRow, api, apiCalls] = await Promise.all([
     db.query.settings.findFirst({ where: eq(schema.settings.key, "jobs:last") }),
     db.query.settings.findFirst({ where: eq(schema.settings.key, "ingest:last") }),
     db.query.settings.findFirst({ where: eq(schema.settings.key, "email:budget") }),
@@ -61,6 +61,16 @@ export default async function AdminSystem() {
         (select count(*) from sessions)::int as sessions`,
     ),
     db.query.settings.findFirst({ where: eq(schema.settings.key, "seed:sample") }),
+    rawQuery<{ today: number; week: number; errors_today: number; last_at: string | null }>(
+      db,
+      sql`select
+        count(*) filter (where created_at > now() - interval '1 day')::int as today,
+        count(*) filter (where created_at > now() - interval '7 days')::int as week,
+        count(*) filter (where created_at > now() - interval '1 day' and (props->>'status')::int >= 400)::int as errors_today,
+        max(created_at)::text as last_at
+        from analytics_events where name = 'admin_api'`,
+    ).then((r) => r[0]),
+    rawQuery<{ path: string; method: string; status: number; ms: number; at: string }>(db, sql`select path, props->>'method' as method, (props->>'status')::int as status, (props->>'ms')::int as ms, created_at::text as at from analytics_events where name = 'admin_api' order by created_at desc limit 12`),
   ]);
   const sample = sampleRow?.value as SampleSeed | undefined;
   const sampleLive = sample
@@ -139,6 +149,29 @@ export default async function AdminSystem() {
               { label: "Sessions", value: (rows?.sessions ?? 0).toLocaleString() },
             ]}
           />
+        </Section>
+        <Section title="Automation" description="Writes made through the admin API by the scheduled editorial task (docs/DAILY-TASK.md). Reads are not logged.">
+          <Details
+            items={[
+              { label: "Key", value: process.env.ADMIN_API_KEY ? "set" : "not set (API refuses everything)" },
+              { label: "Writes today", value: `${api?.today ?? 0}${api?.errors_today ? ` (${api.errors_today} failed)` : ""}` },
+              { label: "Writes, 7 days", value: (api?.week ?? 0).toLocaleString() },
+              { label: "Last write", value: api?.last_at ? timeAgo(api.last_at) : "never" },
+            ]}
+          />
+          {apiCalls.length ? (
+            <ul className="mt-4 divide-y divide-[var(--border)] border-y border-line text-[13.5px]">
+              {apiCalls.map((c, i) => (
+                <li key={i} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-1.5">
+                  <span className="w-14 font-mono text-[12px] text-3">{c.method}</span>
+                  <span className="min-w-0 flex-1 truncate font-mono text-[12.5px]">{c.path.replace("/api/admin", "")}</span>
+                  <span className={c.status >= 400 ? "font-semibold" : "text-2"}>{c.status}</span>
+                  <span className="tabular text-3">{c.ms} ms</span>
+                  <span className="text-3">{timeAgo(c.at)}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </Section>
         {sample ? (
           <Section title="Sample content" description="Demonstration articles and businesses from the seed. Fine for testing; remove them before you promote the site so nothing invented gets indexed or cited." action={
