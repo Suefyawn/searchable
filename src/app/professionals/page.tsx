@@ -22,7 +22,7 @@ export default async function ProfessionalsHub() {
   return (
     <div className="container-x py-8 sm:py-10">
       <JsonLd data={breadcrumbJsonLd([{ name: "Professionals", path: "/professionals" }])} />
-      <SectionHeader as="h1" title="Professionals" description={`${total.toLocaleString()} people you can hire directly: doctors, tradespeople, engineers, architects, lawyers, accountants, tutors. Every profile lists experience, qualifications and how to reach them.`} />
+      <SectionHeader as="h1" title="Professionals" description={`${total >= 10 ? `${total.toLocaleString()} people` : "People"} you can hire directly: doctors, tradespeople, engineers, architects, lawyers, accountants, tutors. Every profile lists experience, qualifications and how to reach them.${total < 10 ? " New profiles go live after a quick check; add yours below." : ""}`} />
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="space-y-10">

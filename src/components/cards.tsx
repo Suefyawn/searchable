@@ -141,7 +141,7 @@ export function PriceRange({ level, className }: { level: number; className?: st
 
 export function BusinessCard({ business: b, className }: { business: BusinessCardData; className?: string }) {
   return (
-    <article className={cn("surface surface-hover flex flex-col gap-3 p-5", className)}>
+    <article className={cn("surface surface-hover flex min-w-0 flex-col gap-3 p-5", className)}>
       <div className="flex items-start justify-between gap-3">
         {b.logoUrl ? <Img src={b.logoUrl} alt="" aspect="1/1" fit="contain" className="size-12 shrink-0 border border-line" sizes="48px" /> : null}
         <div className="min-w-0 flex-1">
@@ -167,7 +167,7 @@ export function BusinessCard({ business: b, className }: { business: BusinessCar
         <Rating avg={b.ratingAvg} count={b.ratingCount} />
         {b.priceRange ? <PriceRange level={b.priceRange} /> : null}
         {b.address ? (
-          <span className="inline-flex min-w-0 items-center gap-1">
+          <span className="inline-flex min-w-0 max-w-full items-center gap-1">
             <MapPin className="size-3.5 shrink-0" /> <span className="truncate">{b.address}</span>
           </span>
         ) : null}
