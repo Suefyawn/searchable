@@ -39,7 +39,7 @@ export default async function ProfessionListPage({ params, searchParams }: { par
     <div className="container-x py-8 sm:py-10">
       <JsonLd data={breadcrumbJsonLd(crumbs)} />
       <Breadcrumbs items={crumbs} className="mb-6" />
-      <SectionHeader as="h1" title={`${name} in Pakistan`} description={`${total.toLocaleString()} profile${total === 1 ? "" : "s"}. Verified first, then by reviews.${prof?.licence ? ` Ask for the ${prof.licence.body} number; verified profiles show it.` : ""}`} />
+      <SectionHeader as="h1" title={`${name} in Pakistan`} description={`${total ? `${total.toLocaleString()} profile${total === 1 ? "" : "s"}, verified first, then by reviews.` : "Profiles go live here as professionals sign up; the first ones are reviewed by an editor before they appear."}${prof?.licence ? ` Ask for the ${prof.licence.body} number; verified profiles show it.` : ""}`} />
       {cities.length ? (
         <p className="mb-6 flex flex-wrap items-center gap-x-1 gap-y-1 text-[14px]">
           <span className="mr-1 text-3">City</span>
