@@ -7,7 +7,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 |---|---|---|
 | Repo, Next.js 16, TS strict, Tailwind v4, Drizzle, PGlite locally | ✅ | |
 | UI primitives | ✅ | Hand-rolled, ADR-12/15 (minimal newspaper) |
-| Supabase / Vercel / staging / production | ❌ | Deliberately deferred: founder will say when (`docs/LOCAL-TO-PRODUCTION.md`) |
+| Supabase / Vercel / staging / production | ✅ | Live at https://searchable.pk since 2026-09-15: Vercel Hobby + Supabase + R2 + Resend (`docs/LOCAL-TO-PRODUCTION.md`) |
 | CI | ✅ | GitHub Actions: typecheck, lint, build |
 | Env management | ✅ | `.env.example`; ads/Openverse/billing keys documented |
 | Error monitoring | ❌ | Sentry at go-live |
@@ -95,7 +95,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | SEO: Semrush keyword map, keyword-led titles, metadata, JSON-LD (9 types), sitemap, robots, canonicals, redirects, noindex rules, OG images, real credited photos | ✅ |
 | AI and search readiness: llms.txt + llms-full.txt, Markdown renditions (/api/md), key facts + cite blocks, AI-crawler allow list, news sitemap, IndexNow, Discover robots meta, Person JSON-LD (docs/SEO-AI.md) | ✅ |
 | World coverage: 30 press feeds (PK, world, US, markets, crypto, cricket, MMA, snooker, tech, entertainment), matching news categories, /admin/ideas one-click drafts, KSE-100/BTC/ETH series | ✅ |
-| Search Console / Position Tracking | ❌ | after go-live |
+| Search Console / Position Tracking | 🟡 | verification meta tags via `GOOGLE_SITE_VERIFICATION` / `BING_SITE_VERIFICATION`; founder to verify and submit sitemaps |
 
 ## Design
 | Item | Status |
@@ -104,7 +104,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | Real photography: 20 articles, 20 cities, 25 categories seeded from Openverse with credits | ✅ |
 | Homepage hero (lead story + numbered headlines with thumbnails + city photo strip) | ✅ |
 | Photo banners on city / category hubs; photo tiles on hubs | ✅ |
-| Skeletons, error states | 🟡 skeletons ✅; error pages basic |
+| Skeletons, error states | 🟡 public routes deliberately have no loading skeletons (streaming turned every notFound into a soft 404); error pages basic |
 | Mega menu (full-width panels per section, mobile expanders) | ✅ |
 | Upload fields (`src/components/upload`): drop, paste or browse; instant preview with real progress and cancel; browser-side downscale; replace, remove, retry; multi-image gallery with parallel uploads, cover, reorder by drag or arrows, captions; PDF field; CSV picker; touch-visible controls; container-aware hints | ✅ |
 | Admin shell: grouped sidebar with queue counts, dashboard KPIs with weekly deltas and 14-day bars, needs-attention queue, consistent tabs/tables/rows, pagination, system status, editor autosave + Ctrl+S + crash recovery | ✅ |
@@ -119,5 +119,5 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 6. ✅ Community (ADR-27): member profiles, posts (jobs, listings, auctions, questions, discussions) with editor approval, bids, comments and replies, likes on posts, comments and articles, reports, moderation queue with bans and member verification.
 7. ✅ Notifications (`src/lib/notify.ts`): enquiry emails to business owners (unclaimed listings get the claim link), professionals; outbid emails; one daily digest of comments, replies, likes and bids. ✅ Professional reviews with owner replies and admin moderation. ✅ Home page strips for community and professionals.
 8. ✅ Saved items (bookmark on articles, calculators, data series, businesses, professionals and posts; `/account/saved`) and the daily digest preference.
-9. Next: notification preferences per kind; compare pages for bank accounts and mobile packages (need a monthly data source, not a one-off scrape); stamp duty calculator once provincial notifications are pinned down.
-10. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md` + `docs/FREE-TIER.md`), then AdSense, Resend, Search Console, Position Tracking.
+9. ✅ Go-live (2026-09-15). ✅ Admin inbox on Resend receiving (ADR-28). ✅ Admin API + scheduled editorial task (ADR-29, `docs/ADMIN-API.md`, `docs/DAILY-TASK.md`).
+10. Next: notification preferences per kind; compare pages for bank accounts and mobile packages (need a monthly data source, not a one-off scrape); stamp duty calculator once provincial notifications are pinned down; AdSense after traffic; Search Console verification and sitemap submission by the founder.

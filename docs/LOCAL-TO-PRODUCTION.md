@@ -77,7 +77,7 @@ In Supabase: Database > Extensions > enable `pg_trgm` before reindexing (search 
 - [ ] Subscribe to the newsletter with your own address: the confirmation arrives from Resend.
 - [ ] Send a mail to hello@searchable.pk from your phone: it appears in `/admin/inbox` (instantly with the webhook, within 5 minutes without); reply from there and check it threads.
 - [ ] `curl -H "authorization: Bearer $CRON_SECRET" https://searchable.pk/api/cron/publish` returns `ran: true`; add that URL to cron-job.org every 5 minutes with the header.
-- [ ] Search Console and Bing: verify, submit both sitemaps; check the IndexNow key URL.
+- [ ] Search Console and Bing: verify (HTML tag method: put the token in `GOOGLE_SITE_VERIFICATION` / `BING_SITE_VERIFICATION` and redeploy, or add their DNS TXT records in Cloudflare), submit both sitemaps; check the IndexNow key URL.
 - [ ] Rich Results test on one tool page, one data page, one professional profile.
 
 ## 5. Photos and content
