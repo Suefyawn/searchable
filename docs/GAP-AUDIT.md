@@ -46,7 +46,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 |---|---|
 | Section, category, article routes with pagination, RSS | ✅ |
 | Tools framework: fields, compute, methodology, sources, versions, JSON-LD, share URLs, live defaults from data | ✅ |
-| Tools built | 🟡 14 of 50 (tax 3 · finance 3 · cars 3 · property 2 · utilities 1 · solar 1 · telecom 1) |
+| Tools built | 🟡 21 of 50 (tax 4 · finance 7 · cars 4 · property 2 · utilities 1 · solar 1 · telecom 1 · government 1) |
 | Embeddable widgets | ❌ |
 | Hubs: `/pta`, `/electricity` + 11 DISCOs, `/electricity/net-metering`, `/data/solar-panel-price`, `/compare/solar-inverters` | ✅ |
 
@@ -80,7 +80,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | 14 data series, history, charts, stats, API, admin entry, city sections (gold), inflation | ✅ |
 | Automated ingestion (scrapers/APIs) | ❌ |
 | Data → auto-drafted article on change | ❌ |
-| Compare pages | 🟡 1 of 8 (solar inverters); cars/banks/packages next |
+| Compare pages | 🟡 2 of 8 (new cars, solar inverters) + /compare hub; banks/packages next |
 | Reviews + moderation + owner response + report | ✅ |
 
 ## Monetization & SEO
@@ -106,6 +106,6 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 ## Next builds (in order)
 1. ✅ Directory volume tooling (import, dedupe, areas, map)
 2. More compare pages (cars, bank accounts, mobile packages) on the inverter-compare pattern.
-3. Tools to 30: sales tax, withholding 231B on cars, EOBI, stamp duty per province, FX converter, remittance, savings/NSC, car import duty.
+3. Tools to 30: ✅ sales tax, 231B, EOBI, FX converter, personal loan, increment, age · next: stamp duty per province, savings/NSC, car import duty, gas bill, freelancer tax, provident fund
 4. Typo tolerance + intent blending in search.
 5. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md`) — then AdSense, Resend, Search Console, Position Tracking.

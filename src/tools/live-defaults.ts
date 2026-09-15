@@ -16,6 +16,15 @@ const MAP: Record<string, { key: string; series: string; label: string; transfor
   ],
   "car-loan-calculator": [{ key: "rate", series: "kibor-1y", label: "1-year KIBOR + 3% spread", transform: (v) => v + 3 }],
   "home-loan-calculator": [{ key: "rate", series: "kibor-1y", label: "1-year KIBOR + 3% spread", transform: (v) => v + 3 }],
+  "personal-loan-calculator": [{ key: "rate", series: "kibor-1y", label: "1-year KIBOR + 10% spread", transform: (v) => v + 10 }],
+  "currency-converter": [
+    { key: "usd", series: "usd-pkr", label: "USD/PKR interbank" },
+    { key: "aed", series: "aed-pkr", label: "AED/PKR interbank" },
+    { key: "sar", series: "sar-pkr", label: "SAR/PKR interbank" },
+    { key: "gbp", series: "gbp-pkr", label: "GBP/PKR interbank" },
+    { key: "eur", series: "eur-pkr", label: "EUR/PKR interbank" },
+  ],
+  "salary-increment-calculator": [{ key: "inflation", series: "cpi-yoy", label: "CPI inflation (latest month)" }],
 };
 
 export async function liveDefaults(toolSlug: string): Promise<{ input: ToolInput; sources: LiveDefault[] }> {

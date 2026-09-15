@@ -1,14 +1,21 @@
 import { acRunningCostCalculator } from "./calculators/ac-running-cost-calculator";
+import { ageCalculator } from "./calculators/age-calculator";
 import { capitalGainsTaxCalculator } from "./calculators/capital-gains-tax-calculator";
 import { carLoanCalculator } from "./calculators/car-loan-calculator";
+import { carRegistrationTaxCalculator } from "./calculators/car-registration-tax-calculator";
+import { currencyConverter } from "./calculators/currency-converter";
 import { electricityBillCalculator } from "./calculators/electricity-bill-calculator";
+import { eobiCalculator } from "./calculators/eobi-calculator";
 import { fuelCostCalculator } from "./calculators/fuel-cost-calculator";
 import { homeLoanCalculator } from "./calculators/home-loan-calculator";
 import { incomeTaxCalculator } from "./calculators/income-tax-calculator";
+import { personalLoanCalculator } from "./calculators/personal-loan-calculator";
 import { plotSizeConverter } from "./calculators/plot-size-converter";
 import { propertyTaxCalculator } from "./calculators/property-tax-calculator";
 import { ptaMobileTaxCalculator } from "./calculators/pta-mobile-tax-calculator";
 import { salaryBreakdownCalculator } from "./calculators/salary-breakdown-calculator";
+import { salaryIncrementCalculator } from "./calculators/salary-increment-calculator";
+import { salesTaxCalculator } from "./calculators/sales-tax-calculator";
 import { solarPaybackCalculator } from "./calculators/solar-payback-calculator";
 import { tokenTaxCalculator } from "./calculators/token-tax-calculator";
 import { zakatCalculator } from "./calculators/zakat-calculator";
@@ -30,6 +37,13 @@ export const TOOLS: ToolDefinition[] = [
   plotSizeConverter,
   propertyTaxCalculator,
   capitalGainsTaxCalculator,
+  currencyConverter,
+  carRegistrationTaxCalculator,
+  salesTaxCalculator,
+  personalLoanCalculator,
+  salaryIncrementCalculator,
+  eobiCalculator,
+  ageCalculator,
 ];
 
 const bySlug = new Map(TOOLS.map((t) => [t.slug, t]));

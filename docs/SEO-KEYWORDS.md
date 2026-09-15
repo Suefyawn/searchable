@@ -25,7 +25,7 @@ Volumes are monthly Google searches in the Pakistan database; KD = keyword diffi
 | petrol price in pakistan today | 450,000 | 29 | /data/petrol-price | ✅ renamed |
 | petrol price today | 40,500 | 24 | same | ✅ |
 | diesel price in pakistan today | 33,100 | 21 | /data/diesel-price | ✅ renamed |
-| usd to pkr | 1,000,000 | 73 | /data/usd-pkr | 🟡 hard; target long-tail "dollar rate in pakistan today" (110k, KD64) |
+| usd to pkr | 1,000,000 | 73 | /data/usd-pkr + /tools/finance/currency-converter | 🟡 hard; converter targets "usd to pkr converter", "aed to pkr", "sar to pkr" long tail |
 | euro / pound rate in pakistan | 40,500 each | 54 / 46 | /data/eur-pkr, /data/gbp-pkr | ✅ new |
 | dirham / riyal rate in pakistan | 18,100 each | 43 / 48 | /data/aed-pkr, /data/sar-pkr | ✅ new |
 | kibor rate today / kibor rate | 14,800 / 12,100 | 19 | /data/kibor-1y | ✅ new; feeds loan calculators |
