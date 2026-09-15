@@ -42,10 +42,43 @@ export async function backfillArticlePhotos(limit = 2): Promise<{ tried: number;
     columns: { id: true, title: true, kind: true, slug: true },
     with: { category: { columns: { name: true, slug: true } } },
   });
+  /** A safe, generic photo subject per category, used when nothing specific matches. */
+  const GENERIC: Record<string, string> = {
+    cricket: "cricket ball stadium",
+    sports: "sports stadium Pakistan",
+    mma: "mixed martial arts octagon",
+    snooker: "snooker table",
+    economy: "Pakistani rupee banknotes",
+    business: "Karachi skyline",
+    markets: "stock exchange board",
+    crypto: "bitcoin coin",
+    technology: "smartphone screen",
+    telecom: "mobile phone tower",
+    politics: "Parliament House Islamabad",
+    pakistan: "Pakistan flag",
+    world: "world map",
+    "united-states": "United States Capitol",
+    entertainment: "cinema seats",
+    health: "hospital corridor",
+    education: "university library",
+    property: "Lahore houses",
+    auto: "cars traffic Lahore",
+    energy: "power lines Pakistan",
+    utilities: "electricity meter",
+    taxes: "calculator documents",
+    banking: "bank notes Pakistan",
+    government: "Islamabad government building",
+    cars: "car showroom",
+    travel: "Islamabad airport",
+    solar: "solar panels roof",
+  };
   let filled = 0;
   for (const a of rows) {
-    // The title minus numbers and punctuation is a fair photo query; the category is the fallback.
-    const query = a.title
+    const tags = await db.query.articleTags.findMany({ where: eq(schema.articleTags.articleId, a.id), with: { tag: { columns: { name: true } } }, limit: 3 });
+    const tagQuery = tags.map((t) => t.tag?.name).filter(Boolean).slice(0, 2).join(" ");
+    const generic = GENERIC[a.category?.slug ?? ""] ?? "Pakistan";
+    // Tags name the subject best; otherwise the title minus numbers and small words; the generic subject last.
+    const titleQuery = a.title
       .replace(/[^A-Za-z ]/g, " ")
       .replace(/\b(the|a|an|and|of|to|in|on|for|at|from|with|how|what|why|who|is|are|now|after|before|up|off|per|gets|set)\b/gi, " ")
       .replace(/\s+/g, " ")
@@ -53,7 +86,7 @@ export async function backfillArticlePhotos(limit = 2): Promise<{ tried: number;
       .split(" ")
       .slice(0, 5)
       .join(" ");
-    const img = await findAndImport(query || `${a.category?.name ?? "Pakistan"}`, "article", a.title, { fallbackQuery: `${a.category?.name ?? "Pakistan"} Pakistan`, budgetMs: 25_000 }).catch(() => null);
+    const img = await findAndImport(tagQuery || titleQuery || generic, "article", a.title, { fallbackQuery: generic, budgetMs: 25_000 }).catch(() => null);
     if (!img) continue;
     await db.update(schema.articles).set({ featuredImageUrl: img.url, featuredImageAlt: a.title, featuredImageCredit: img.credit, featuredImageSourceUrl: img.sourceUrl }).where(eq(schema.articles.id, a.id));
     revalidatePath(`/${a.kind === "news" ? "news" : "guides"}/${a.category?.slug ?? "general"}/${a.slug}`);
