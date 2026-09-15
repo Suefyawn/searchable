@@ -1,74 +1,88 @@
-# Local → Production
+# Local to production
 
-The local prototype uses PGlite. Production uses Supabase Postgres + Vercel. **The application code does not change**, only environment variables and a few adapters.
+Local runs on PGlite with files on disk. Production is **Vercel (Hobby for now) + Supabase Postgres (free) + Cloudflare R2 for images (free) + Resend for email (free)**. The application code does not change; only environment variables do. The budget logic that keeps us inside the free tiers is in `docs/FREE-TIER.md`.
 
-## What changes
+`npm run preflight` reads the environment and prints what is still missing. Run it with the production variables before the first deploy.
 
-| Concern | Local | Production | Where |
-|---|---|---|---|
-| Database | `DATABASE_URL=pglite://./.data/pglite` | `DATABASE_URL=postgres://…supabase.co:5432/postgres` (use the **session pooler / direct** URL for migrations, the **transaction pooler** URL for the app) | `.env.local` / Vercel env |
-| Auth secret | any 32+ char string | generated secret | `BETTER_AUTH_SECRET` |
-| Base URL | `http://localhost:3000` | `https://searchable.pk` | `NEXT_PUBLIC_SITE_URL`, `BETTER_AUTH_URL` |
-| Email | writes `.eml` files to `.data/outbox/` | Resend | `EMAIL_PROVIDER=resend`, `RESEND_API_KEY` |
-| Media uploads | `public/uploads/` | Supabase Storage bucket `media` | `STORAGE_PROVIDER=supabase`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` |
-| Analytics | first-party table only | + PostHog | `NEXT_PUBLIC_POSTHOG_KEY` |
-| Errors | console | Sentry | `SENTRY_DSN` |
-| Bot protection | off | Cloudflare Turnstile | `TURNSTILE_SECRET_KEY` |
+## 1. Accounts, in this order
+1. **GitHub**: done, `Suefyawn/searchable`, branch `main`.
+2. **Supabase**: one project, region **ap-south-1 (Mumbai)** for Pakistan latency (Singapore second). Free plan.
+3. **Cloudflare**: the domain's DNS, an R2 bucket `searchable-media` with a public custom domain (`img.searchable.pk`), an R2 API token (object read and write on that bucket), Web Analytics, Turnstile (later).
+4. **Resend**: verify `searchable.pk` (DKIM, SPF, DMARC records go in Cloudflare DNS). Sending from `daily@searchable.pk`.
+5. **Vercel**: import the GitHub repo. Framework Next.js, Node 22. Hobby plan is fine until there is revenue (it forbids commercial use; move to Pro or Cloudflare Workers when ads or paid listings start).
+6. **cron-job.org** (free): pings `/api/cron/publish` every 5 minutes so scheduled publishing and newsletters are exact; Hobby crons run once a day.
+7. Later: Google Search Console, Bing Webmaster Tools, Google News Publisher Center, AdSense.
 
-## Go-live checklist (Phase 2, Days 31–45)
+## 2. Environment variables for Vercel (Production)
+```
+NEXT_PUBLIC_SITE_URL=https://searchable.pk
+NEXT_PUBLIC_SITE_NAME=Searchable
+BETTER_AUTH_URL=https://searchable.pk
+BETTER_AUTH_SECRET=<openssl rand -hex 32>
 
-### Accounts to create (in this order)
-1. GitHub, push the repo (private).
-2. Supabase, new project, region **Singapore (ap-southeast-1)** or **Mumbai** for Pakistan latency.
-3. Vercel, import the GitHub repo.
-4. PKNIC, confirm `searchable.pk` ownership; you will set nameservers or A/CNAME records.
-5. Resend, add domain `searchable.pk` (sending from `daily@searchable.pk`, `hello@searchable.pk`).
-6. Google Search Console + Bing Webmaster Tools.
-7. PostHog (EU or US cloud), Sentry.
-8. Cloudflare (optional but recommended for DNS + Turnstile + WAF).
+# Supabase: Connect > Transaction pooler (port 6543) for the app
+DATABASE_URL=postgres://postgres.<ref>:<password>@aws-0-ap-south-1.pooler.supabase.com:6543/postgres
 
-### Database
+CRON_SECRET=<openssl rand -hex 24>
+
+EMAIL_PROVIDER=resend
+RESEND_API_KEY=re_...
+EMAIL_FROM="Searchable <daily@searchable.pk>"
+EMAIL_DAILY_CAP=95
+EMAIL_MONTHLY_CAP=2900
+EMAIL_BULK_RESERVE=15
+BILLING_EMAIL=billing@searchable.pk
+EDITORIAL_EMAIL=editorial@searchable.pk
+CLAIM_WHATSAPP_NUMBER=+92 3xx xxxxxxx
+
+STORAGE_PROVIDER=r2
+R2_ACCOUNT_ID=<cloudflare account id>
+R2_ACCESS_KEY_ID=...
+R2_SECRET_ACCESS_KEY=...
+R2_BUCKET=searchable-media
+R2_PUBLIC_URL=https://img.searchable.pk
+
+INDEXNOW_KEY=<32 hex chars>
+SEED_ADMIN_EMAIL=<your admin email>
+SEED_ADMIN_PASSWORD=<strong password, change after first login>
+
+# Off until approved / wanted
+NEXT_PUBLIC_ADSENSE_CLIENT=
+OPENVERSE_CLIENT_ID=
+OPENVERSE_CLIENT_SECRET=
+```
+Preview deployments can reuse the same variables with a second free Supabase project, or simply be disabled.
+
+## 3. Database, from this machine
 ```bash
-# 1. Point at Supabase (direct connection for migrations)
-export DATABASE_URL="postgres://postgres.[ref]:[password]@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres"
+# Session pooler (port 5432) for migrations and scripts; the app uses 6543
+export DATABASE_URL="postgres://postgres.<ref>:<password>@aws-0-ap-south-1.pooler.supabase.com:5432/postgres"
+export SEED_ADMIN_EMAIL=... SEED_ADMIN_PASSWORD=...
 
-# 2. Apply committed migrations
-npm run db:migrate
-
-# 3. Seed reference data ONLY (locations, categories, entities, tools metadata): not sample articles/businesses
-SEED_MODE=reference npm run db:seed
-
-# 4. Rebuild search index
+npm run db:migrate                 # applies drizzle/0000 to 0010
+SEED_MODE=reference npm run db:seed   # locations, categories, entities, synonyms, data series, tools, admin user; no sample articles or businesses
 npm run search:reindex
+npm run preflight                  # should print "Ready to deploy"
 ```
-Enable in Supabase: `pg_trgm` extension (Phase 5), Point-in-Time Recovery, and a daily backup check.
+In Supabase: Database > Extensions > enable `pg_trgm` before reindexing (search needs it). Turn on daily backups (free plan keeps 7 days).
 
-### Vercel
-- Framework preset: Next.js. Node 22.
-- Env vars from the table above (Production + Preview scopes; Preview points at a Supabase **branch** or a second free project).
-- Add domain `searchable.pk` and `www.searchable.pk` (redirect www → apex).
-- Enable Vercel Analytics + Speed Insights (free tier).
+## 4. First deploy checks
+- [ ] `/`, `/sitemap.xml`, `/news-sitemap.xml`, `/robots.txt`, `/llms.txt`, `/feed.xml`, `/indexnow-key.txt` respond.
+- [ ] Sign in at `/login` with the seeded admin; open `/admin` and `/admin/system` (it shows host, storage, email and budget).
+- [ ] `/admin/data` > Fetch now: petrol, USD, KIBOR, gold, KSE-100 and BTC fill from live sources.
+- [ ] Upload a photo in the article editor: it lands on `img.searchable.pk` with 480 and 960 renditions.
+- [ ] Publish an article; it appears on `/news` within a minute and shows up in `/search`.
+- [ ] Subscribe to the newsletter with your own address: the confirmation arrives from Resend.
+- [ ] `curl -H "authorization: Bearer $CRON_SECRET" https://searchable.pk/api/cron/publish` returns `ran: true`; add that URL to cron-job.org every 5 minutes with the header.
+- [ ] Search Console and Bing: verify, submit both sitemaps; check the IndexNow key URL.
+- [ ] Rich Results test on one tool page, one data page, one professional profile.
 
-### DNS (at PKNIC or Cloudflare)
-```
-A     @     76.76.21.21        (Vercel)
-CNAME www   cname.vercel-dns.com
-TXT   @     resend-verification…
-MX    send  feedback-smtp… (Resend)
-TXT   resend._domainkey   DKIM
-TXT   _dmarc  v=DMARC1; p=quarantine; rua=mailto:dmarc@searchable.pk
-```
+## 5. Photos and content
+- The 65 seeded Openverse photos live in local `public/uploads/`; re-run `npm run seed-images` against production once R2 is configured, or upload through admin.
+- Import real businesses with email addresses (`/admin/businesses/import`), then switch on claim outreach (`/admin/outreach`).
 
-### First deploy verification
-- [ ] `https://searchable.pk` renders home; `/sitemap.xml`, `/robots.txt` OK
-- [ ] Search returns results; a tool computes; an article renders with JSON-LD (test in Rich Results Test)
-- [ ] Admin login works; publish an article; it appears on site within 60s
-- [ ] Newsletter double opt-in email arrives via Resend
-- [ ] Lighthouse mobile ≥ 90 on home, article, tool, business
-- [ ] Submit sitemaps to GSC + Bing
+## 6. Rollback
+Vercel > Deployments > Promote the previous one. Migrations are forward-only: write a compensating migration rather than editing history.
 
-### Rollback
-Vercel → Deployments → Promote previous. Database migrations are forward-only; write a compensating migration rather than editing history.
-
-## Optional: Supabase local with Docker
-If Docker Desktop is installed later, `supabase init && supabase start` gives a local Supabase stack. Set `DATABASE_URL` to the printed local Postgres URL and everything works unchanged. PGlite remains the default because it needs nothing running.
+## 7. When revenue starts
+Vercel Hobby forbids commercial use. At that point either Vercel Pro (USD 20 a month) or Cloudflare Workers Paid (USD 5 a month, OpenNext adapter, Hyperdrive to the same Supabase database). The code is host-agnostic apart from `vercel.json` crons.
