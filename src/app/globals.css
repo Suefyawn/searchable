@@ -269,18 +269,20 @@
   --tw-prose-td-borders: var(--border);
   --tw-prose-bullets: var(--color-ink-400);
   --tw-prose-counters: var(--text-2);
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   max-width: 66ch;
-  font-size: 1.1875rem;
-  line-height: 1.7;
+  font-size: 1.0625rem;
+  line-height: 1.75;
 }
 .prose-searchable h2 {
+  font-family: var(--font-serif);
   font-weight: 500;
   margin-top: 2em;
   font-size: 1.5em;
   scroll-margin-top: 5rem;
 }
 .prose-searchable h3 {
+  font-family: var(--font-serif);
   font-weight: 500;
   margin-top: 1.6em;
   scroll-margin-top: 5rem;
@@ -293,8 +295,7 @@
   text-decoration-color: var(--link);
 }
 .prose-searchable table {
-  font-family: var(--font-sans);
-  font-size: 0.85em;
+  font-size: 0.9em;
 }
 .prose-searchable thead th {
   font-weight: 600;
@@ -310,10 +311,7 @@
 .prose-searchable strong {
   font-weight: 600;
 }
-.prose-searchable ul,
-.prose-searchable ol {
-  font-size: 0.97em;
-}
+
 
 @media (prefers-reduced-motion: no-preference) {
   .rise, .rise-2, .rise-3 {
