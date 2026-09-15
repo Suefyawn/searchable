@@ -44,12 +44,25 @@ async function authHeader(): Promise<Record<string, string>> {
   return { authorization: `Bearer ${cachedToken.token}` };
 }
 
+/** After a failure, Openverse is skipped for ten minutes so Commons gets the request's time budget. */
+let openverseDownUntil = 0;
+
 export async function searchOpenImages(query: string, opts: { limit?: number; minWidth?: number; orientation?: "landscape" | "portrait" | "square" } = {}): Promise<OpenImage[]> {
+  if (Date.now() < openverseDownUntil) throw new Error("Openverse marked down");
   const params = new URLSearchParams({ q: query, license: LICENSES, page_size: String(Math.min(opts.limit ?? 12, 50)), mature: "false" });
   if (opts.orientation) params.set("aspect_ratio", opts.orientation === "landscape" ? "wide" : opts.orientation === "portrait" ? "tall" : "square");
   // Openverse has bad days (502s, stalls). A slow answer must not hold a request past the function limit.
-  const res = await fetch(`${API}/images/?${params}`, { headers: { "user-agent": UA, accept: "application/json", ...(await authHeader()) }, next: { revalidate: 0 }, signal: AbortSignal.timeout(8_000) });
-  if (!res.ok) throw new Error(`Openverse search failed: ${res.status}`);
+  let res: Response;
+  try {
+    res = await fetch(`${API}/images/?${params}`, { headers: { "user-agent": UA, accept: "application/json", ...(await authHeader()) }, next: { revalidate: 0 }, signal: AbortSignal.timeout(8_000) });
+  } catch (e) {
+    openverseDownUntil = Date.now() + 10 * 60_000;
+    throw e;
+  }
+  if (!res.ok) {
+    if (res.status >= 500) openverseDownUntil = Date.now() + 10 * 60_000;
+    throw new Error(`Openverse search failed: ${res.status}`);
+  }
   const data = (await res.json()) as { results: Array<Record<string, unknown>> };
   const minWidth = opts.minWidth ?? 800;
   return data.results

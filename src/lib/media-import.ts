@@ -53,7 +53,7 @@ export async function backfillArticlePhotos(limit = 2): Promise<{ tried: number;
       .split(" ")
       .slice(0, 5)
       .join(" ");
-    const img = await findAndImport(query || `${a.category?.name ?? "Pakistan"}`, "article", a.title, { fallbackQuery: `${a.category?.name ?? "Pakistan"} Pakistan`, budgetMs: 20_000 }).catch(() => null);
+    const img = await findAndImport(query || `${a.category?.name ?? "Pakistan"}`, "article", a.title, { fallbackQuery: `${a.category?.name ?? "Pakistan"} Pakistan`, budgetMs: 25_000 }).catch(() => null);
     if (!img) continue;
     await db.update(schema.articles).set({ featuredImageUrl: img.url, featuredImageAlt: a.title, featuredImageCredit: img.credit, featuredImageSourceUrl: img.sourceUrl }).where(eq(schema.articles.id, a.id));
     revalidatePath(`/${a.kind === "news" ? "news" : "guides"}/${a.category?.slug ?? "general"}/${a.slug}`);
