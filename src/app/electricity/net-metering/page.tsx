@@ -279,7 +279,6 @@ export default function NetMeteringHub() {
             <ul className="mt-2 space-y-1.5">
               <li><Link href="/compare/solar-inverters" className="underline-offset-4 hover:underline">Solar inverter prices compared</Link></li>
               <li><Link href="/data/solar-panel-price" className="underline-offset-4 hover:underline">Solar panel price per watt today</Link></li>
-              <li><Link href="/guides/utilities/how-to-apply-for-net-metering-in-pakistan" className="underline-offset-4 hover:underline">Step-by-step guide: applying for net metering</Link></li>
               <li><Link href="/businesses/solar-companies" className="underline-offset-4 hover:underline">AEDB-certified solar installers</Link></li>
               <li><Link href="/electricity" className="underline-offset-4 hover:underline">Electricity bill check &amp; tariff</Link></li>
             </ul>

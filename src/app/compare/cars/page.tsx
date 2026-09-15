@@ -115,8 +115,8 @@ export default function CarsComparePage() {
           <div className="border border-line p-4 text-[15px]">
             <p className="eyebrow">Related</p>
             <ul className="mt-2 space-y-1.5">
-              <li><Link href="/guides/cars/how-to-register-a-vehicle-in-punjab" className="underline-offset-4 hover:underline">How to register a new car in Punjab</Link></li>
-              <li><Link href="/news/economy/filer-vs-non-filer-what-you-pay-extra-on-cars-property-and-bank-transactions" className="underline-offset-4 hover:underline">Filer vs non-filer: what you pay extra on cars</Link></li>
+              <li><Link href="/guides/cars/online-vehicle-verification-in-pakistan-punjab-sindh-islamabad-and-kp-registrati" className="underline-offset-4 hover:underline">Verify a used car online before you pay</Link></li>
+              <li><Link href="/tools/cars/car-registration-tax-calculator" className="underline-offset-4 hover:underline">Registration tax, filer vs non-filer</Link></li>
               <li><Link href="/data/petrol-price" className="underline-offset-4 hover:underline">Petrol price today</Link></li>
               <li><Link href="/businesses/car-dealers" className="underline-offset-4 hover:underline">Car dealers near you</Link></li>
             </ul>

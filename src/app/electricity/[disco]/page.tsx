@@ -48,6 +48,8 @@ export default async function DiscoPage({ params }: Props) {
   const crumbs = [{ name: "Electricity", path: "/electricity" }, { name: d.short, path: `/electricity/${d.slug}` }];
   const others = DISCOS.filter((x) => x.slug !== d.slug);
   const netMeteringHref = `/electricity/net-metering#${d.slug}`;
+  // The bill-check guide for this company, when one has been published (the seven biggest have).
+  const guide = ["fesco", "gepco", "mepco", "pesco", "iesco", "lesco", "hesco"].includes(d.slug) ? `/guides/utilities/${d.slug}-bill-check-online-reference-number-customer-id-and-duplicate-bill-2026` : null;
 
   return (
     <div className="container-x py-8 sm:py-12">
@@ -138,11 +140,13 @@ export default async function DiscoPage({ params }: Props) {
           <div className="border border-line p-4 text-[15px]">
             <p className="eyebrow">Read</p>
             <ul className="mt-2 space-y-1.5">
-              <li>
-                <Link href="/news/pakistan/electricity-bill-slabs-why-crossing-200-units-costs-so-much" className="underline-offset-4 hover:underline">
-                  Why crossing 200 units makes your bill jump
-                </Link>
-              </li>
+              {guide ? (
+                <li>
+                  <Link href={guide} className="underline-offset-4 hover:underline">
+                    {d.short} bill check online: reference number, customer ID, duplicate bill
+                  </Link>
+                </li>
+              ) : null}
               <li>
                 <Link href={netMeteringHref} className="underline-offset-4 hover:underline">
                   {d.short} net metering: 2026 rules, approved inverters, how to apply

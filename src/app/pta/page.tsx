@@ -148,9 +148,6 @@ export default async function PtaHub() {
               <li>Pay through any bank app, ATM or branch under FBR – Mobile Device Tax.</li>
               <li>The device is whitelisted within 24 hours; SMS the IMEI to 8484 again to confirm “Compliant”.</li>
             </ol>
-            <p className="mt-3 text-[15px]">
-              Full walkthrough with screenshots and error fixes: <Link href="/guides/telecom/how-to-register-phone-with-pta" className="underline underline-offset-4">How to register an imported phone with PTA</Link>.
-            </p>
           </section>
 
           <section>

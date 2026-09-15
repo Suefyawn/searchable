@@ -37,7 +37,7 @@ export function ArticleCard({ article, variant = "default", className, thumb = f
         </div>
         {thumb && article.featuredImageUrl ? (
           <Link href={href} className="shrink-0" tabIndex={-1} aria-hidden>
-            <Img src={article.featuredImageUrl} alt="" aspect="1/1" className="size-[72px]" sizes="72px" />
+            <Img src={article.featuredImageUrl} alt="" aspect="1/1" className="size-[72px]" sizes="72px" eager />
           </Link>
         ) : null}
       </article>
@@ -48,7 +48,8 @@ export function ArticleCard({ article, variant = "default", className, thumb = f
       <article className={cn("flex flex-col", className)}>
         {article.featuredImageUrl ? (
           <Link href={href} className="mb-5 block">
-            <Img src={article.featuredImageUrl} alt="" aspect="16/9" sizes="(min-width: 1024px) 760px, 100vw" />
+            {/* The lead photo of a section front is its largest paint: fetched at once, at high priority. */}
+            <Img src={article.featuredImageUrl} alt="" aspect="16/9" sizes="(min-width: 1024px) 760px, 100vw" priority />
           </Link>
         ) : null}
         <p className="eyebrow">{label}</p>

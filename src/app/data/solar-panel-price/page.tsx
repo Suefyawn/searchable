@@ -160,7 +160,7 @@ export default async function SolarPricePage() {
             <p className="eyebrow">Related</p>
             <ul className="mt-2 space-y-1.5">
               <li><Link href="/electricity/net-metering" className="underline-offset-4 hover:underline">Net metering 2026: rules, approved inverters, how to apply</Link></li>
-              <li><Link href="/news/technology/solar-boom-pakistan-what-a-5kw-system-costs-and-saves" className="underline-offset-4 hover:underline">What a 5 kW system costs and saves</Link></li>
+              <li><Link href="/tools/solar/solar-payback-calculator" className="underline-offset-4 hover:underline">What a system costs and saves: payback calculator</Link></li>
               <li><Link href="/data/usd-pkr" className="underline-offset-4 hover:underline">Dollar rate today (panels are priced in USD)</Link></li>
               <li><Link href="/electricity" className="underline-offset-4 hover:underline">Electricity bill check &amp; tariff</Link></li>
             </ul>
