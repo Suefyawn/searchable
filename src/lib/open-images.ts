@@ -65,7 +65,10 @@ export async function searchOpenImages(query: string, opts: { limit?: number; mi
   }
   const data = (await res.json()) as { results: Array<Record<string, unknown>> };
   const minWidth = opts.minWidth ?? 800;
+  // Openverse ranks loosely too (a graveyard for "National Savings prize bond"): a result must describe
+  // the query in its title, tags or description, the same test Commons results pass.
   return data.results
+    .filter((r) => isRelevant(`${r.title ?? ""} ${((r.tags as Array<{ name?: string }> | undefined) ?? []).map((t) => t.name ?? "").join(" ")} ${r.description ?? ""}`, query))
     .map((r) => ({
       id: String(r.id),
       title: String(r.title ?? ""),
@@ -102,13 +105,18 @@ export function isRelevant(hay: string, query: string): boolean {
   const words = queryWords(query);
   if (!words.length) return true;
   const h = hay.toLowerCase();
-  const matched = words.filter((w) => h.includes(w)).length;
+  const matched = words.filter((w) => h.includes(w));
   const need = words.length <= 2 ? words.length : Math.max(2, Math.ceil(words.length / 2));
-  return matched >= need;
+  // "Pakistan" or "national" matching on their own says nothing about the subject.
+  const specific = words.some((w) => !GENERIC_WORDS.has(w)) ? matched.some((w) => !GENERIC_WORDS.has(w)) : true;
+  return matched.length >= need && specific;
 }
 
+/** Words so common in captions that they never identify a subject by themselves. */
+const GENERIC_WORDS = new Set(["pakistan", "pakistani", "national", "city", "people", "photo", "image", "view", "street", "road", "building", "office", "online", "check", "guide", "2024", "2025", "2026"]);
+
 /** Files that are never a news photo: paintings, maps, diagrams, logos, scans, documents. */
-const NOT_A_PHOTO = /\b(painting|paintings|engraving|lithograph|drawing|drawings|map of|maps of|diagram|chart|logo|logos|coat of arms|emblem|seal of|scan|scanned|manuscript|document|poster|banknote|stamp|postage|screenshot|icon)\b/i;
+const NOT_A_PHOTO = /\b(painting|paintings|engraving|lithograph|drawing|drawings|map of|maps of|diagram|chart|logo|logos|coat of arms|emblem|seal of|scan|scanned|manuscript|document|poster|stamp|postage|screenshot|icon)\b/i;
 
 /**
  * A Commons file as an OpenImage, or null when it is not a usable photo: wrong type, too small, a licence we

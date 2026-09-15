@@ -112,3 +112,9 @@ test("srcSetFor leaves the master out of card srcsets", () => {
   assert.match(srcSetFor(url, 1600, { maxWidth: 960 })!, /960w$/);
   assert.match(srcSetFor(url, 900, { maxWidth: 960 })!, / 900w$/);
 });
+
+test("relevance: generic words alone do not make a match", () => {
+  assert.equal(isRelevant("A graveyard in Pakistan with a national monument", "National Savings Pakistan prize bond"), false);
+  assert.equal(isRelevant("Prize bond counter at a National Savings centre, Pakistan", "National Savings Pakistan prize bond"), true);
+  assert.equal(isRelevant("Lahore Fort at dusk", "Lahore Fort"), true);
+});

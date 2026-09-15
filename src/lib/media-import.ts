@@ -31,12 +31,12 @@ export async function importImageFromUrl(url: string, opts: { variant?: "article
 /**
  * Stories published without a photo (Openverse was down, the search found nothing) get another try later:
  * the job runner calls this every few minutes and handles two at a time so it never eats the request budget.
- * Only stories from the last three days are retried, so a hopeless query does not run forever.
+ * Only stories from the last two weeks are retried, so a hopeless query does not run forever.
  */
 export async function backfillArticlePhotos(limit = 2): Promise<{ tried: number; filled: number }> {
   const db = await getDb();
   const rows = await db.query.articles.findMany({
-    where: sql`${schema.articles.featuredImageUrl} is null and ${schema.articles.status} in ('published', 'scheduled') and ${schema.articles.updatedAt} > now() - interval '3 days'`,
+    where: sql`${schema.articles.featuredImageUrl} is null and ${schema.articles.status} in ('published', 'scheduled') and ${schema.articles.updatedAt} > now() - interval '14 days'`,
     orderBy: [desc(schema.articles.updatedAt)],
     limit,
     columns: { id: true, title: true, kind: true, slug: true },
