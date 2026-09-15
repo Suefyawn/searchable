@@ -50,6 +50,9 @@ export async function saveBusiness(raw: BusinessFormInput): Promise<{ ok: boolea
 
   if (d.primaryCategoryId) await db.insert(schema.businessCategoryLinks).values({ businessId: d.id, categoryId: d.primaryCategoryId }).onConflictDoNothing();
 
+  await db.delete(schema.businessPhotos).where(eq(schema.businessPhotos.businessId, d.id));
+  if (d.photos.length) await db.insert(schema.businessPhotos).values(d.photos.map((p, i) => ({ businessId: d.id, url: p.url, alt: p.alt ?? null, sortOrder: i })));
+
   await db.delete(schema.businessHours).where(eq(schema.businessHours.businessId, d.id));
   if (d.hours.length) await db.insert(schema.businessHours).values(d.hours.map((h) => ({ businessId: d.id, ...h })));
 

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import * as React from "react";
+import { ImageUpload } from "@/components/image-upload";
 import { Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { saveArticle, type ArticleFormInput } from "./actions";
@@ -16,6 +17,7 @@ export function ArticleEditor({ initial, categories, cities, entities }: { initi
   const [sources, setSources] = React.useState(initial.sources ?? []);
   const [faqs, setFaqs] = React.useState(initial.faqs ?? []);
   const [entitySlugs, setEntitySlugs] = React.useState<string[]>(initial.entitySlugs ?? []);
+  const [featuredImageUrl, setFeaturedImageUrl] = React.useState(initial.featuredImageUrl ?? "");
   const [busy, setBusy] = React.useState<null | "save" | "publish" | "unpublish">(null);
   const [msg, setMsg] = React.useState<{ tone: "ok" | "err"; text: string } | null>(null);
   const formRef = React.useRef<HTMLFormElement>(null);
@@ -37,7 +39,7 @@ export function ArticleEditor({ initial, categories, cities, entities }: { initi
       body,
       categoryId: get("categoryId") || undefined,
       locationId: get("locationId") || undefined,
-      featuredImageUrl: get("featuredImageUrl") || undefined,
+      featuredImageUrl: featuredImageUrl || undefined,
       seoTitle: get("seoTitle") || undefined,
       seoDescription: get("seoDescription") || undefined,
       isFeatured: fd.get("isFeatured") === "on",
@@ -173,9 +175,10 @@ export function ArticleEditor({ initial, categories, cities, entities }: { initi
           <Field label="Slug" htmlFor="slug" help="Leave blank to generate from title. Changing a published slug breaks links.">
             <Input id="slug" name="slug" defaultValue={initial.slug ?? ""} className="font-mono text-sm" />
           </Field>
-          <Field label="Featured image URL" htmlFor="featuredImageUrl">
-            <Input id="featuredImageUrl" name="featuredImageUrl" defaultValue={initial.featuredImageUrl ?? ""} />
-          </Field>
+          <div>
+            <p className="mb-1.5 text-[13px] font-semibold">Featured image</p>
+            <ImageUpload value={featuredImageUrl} onChange={setFeaturedImageUrl} variant="article" label="Upload featured image" />
+          </div>
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" name="isFeatured" defaultChecked={!!initial.isFeatured} className="accent-brand-700" /> Feature on home / section
           </label>

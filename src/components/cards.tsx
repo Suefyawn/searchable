@@ -1,6 +1,7 @@
 import { BadgeCheck, Clock, MapPin, Phone, Star } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui";
+import { Img } from "@/components/img";
 import type { ArticleListItem } from "@/db/queries/content";
 import type { BusinessCard as BusinessCardData } from "@/db/queries/directory";
 import { formatDate, timeAgo } from "@/lib/format";
@@ -37,6 +38,11 @@ export function ArticleCard({ article, variant = "default", className }: { artic
   if (variant === "feature") {
     return (
       <article className={cn("flex flex-col", className)}>
+        {article.featuredImageUrl ? (
+          <Link href={href} className="mb-5 block">
+            <Img src={article.featuredImageUrl} alt="" aspect="16/9" sizes="(min-width: 1024px) 760px, 100vw" />
+          </Link>
+        ) : null}
         <p className="eyebrow">{label}</p>
         <h2 className="mt-2 font-serif text-[2rem] font-medium leading-[1.12] sm:text-[2.6rem]">
           <Link href={href} className="headline-link">
@@ -53,6 +59,11 @@ export function ArticleCard({ article, variant = "default", className }: { artic
   }
   return (
     <article className={cn("flex flex-col py-4", className)}>
+      {article.featuredImageUrl ? (
+        <Link href={href} className="mb-3 block">
+          <Img src={article.featuredImageUrl} alt="" aspect="3/2" sizes="(min-width: 1024px) 400px, 100vw" />
+        </Link>
+      ) : null}
       <p className="eyebrow">{label}</p>
       <h3 className="mt-1.5 font-serif text-xl font-medium leading-snug">
         <Link href={href} className="headline-link">
@@ -107,7 +118,8 @@ export function BusinessCard({ business: b, className }: { business: BusinessCar
   return (
     <article className={cn("surface surface-hover flex flex-col gap-3 p-5", className)}>
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
+        {b.logoUrl ? <Img src={b.logoUrl} alt="" aspect="1/1" fit="contain" className="size-12 shrink-0 border border-line" sizes="48px" /> : null}
+        <div className="min-w-0 flex-1">
           <h3 className="font-serif text-xl font-medium leading-snug">
             <Link href={`/b/${b.slug}`} className="headline-link">
               {b.name}

@@ -7,6 +7,7 @@ import { entitiesForTarget } from "@/db/queries/entities";
 import { getBusiness, listBusinesses } from "@/db/queries/directory";
 import { formatDate } from "@/lib/format";
 import { breadcrumbJsonLd, buildMetadata, localBusinessJsonLd } from "@/lib/seo";
+import { Img } from "@/components/img";
 import { LeadForm } from "./lead-form";
 import { ReviewForm } from "@/components/directory/review-form";
 
@@ -55,8 +56,11 @@ export default async function BusinessPage({ params }: Props) {
       />
       <Breadcrumbs items={crumbs.slice(0, -1)} />
 
+      {b.coverUrl ? <Img src={b.coverUrl} alt="" aspect="21/9" className="mt-6" priority sizes="(min-width: 1024px) 1100px, 100vw" /> : null}
+
       <header className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="max-w-3xl">
+        {b.logoUrl ? <Img src={b.logoUrl} alt={`${b.name} logo`} aspect="1/1" fit="contain" className="size-20 shrink-0 border border-line" sizes="80px" /> : null}
+        <div className="max-w-3xl flex-1">
           <div className="flex flex-wrap items-center gap-2">
             {b.primaryCategory ? (
               <Link href={`/businesses/${b.primaryCategory.slug}${b.city ? `/${b.city.slug}` : ""}`}>
@@ -100,6 +104,17 @@ export default async function BusinessPage({ params }: Props) {
             <section>
               <h2 className="text-xl font-semibold">About</h2>
               <p className="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-2">{b.description}</p>
+            </section>
+          ) : null}
+
+          {b.photos.length ? (
+            <section>
+              <h2 className="text-xl font-semibold">Photos</h2>
+              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {b.photos.map((p, i) => (
+                  <Img key={p.id} src={p.url} alt={p.alt ?? `${b.name} photo ${i + 1}`} aspect="4/3" sizes="(min-width: 1024px) 300px, 50vw" />
+                ))}
+              </div>
             </section>
           ) : null}
 

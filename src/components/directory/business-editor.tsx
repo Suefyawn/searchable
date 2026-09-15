@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import * as React from "react";
+import { ImageGalleryUpload, ImageUpload } from "@/components/image-upload";
 import { Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { saveBusiness } from "@/lib/business-actions";
 import type { BusinessFormInput } from "@/lib/business-schema";
@@ -18,6 +19,9 @@ export function BusinessEditor({ initial, categories, cities, areas }: { initial
     DAYS.map((_, d) => initial.hours.find((h) => h.dayOfWeek === d) ?? { dayOfWeek: d, opens: "09:00", closes: "21:00", isClosed: false }),
   );
   const [services, setServices] = React.useState(initial.services);
+  const [logoUrl, setLogoUrl] = React.useState(initial.logoUrl ?? "");
+  const [coverUrl, setCoverUrl] = React.useState(initial.coverUrl ?? "");
+  const [photos, setPhotos] = React.useState(initial.photos ?? []);
   const [busy, setBusy] = React.useState(false);
   const [msg, setMsg] = React.useState<{ ok: boolean; text: string } | null>(null);
   const formRef = React.useRef<HTMLFormElement>(null);
@@ -44,8 +48,9 @@ export function BusinessEditor({ initial, categories, cities, areas }: { initial
       facebook: get("facebook") || undefined,
       instagram: get("instagram") || undefined,
       priceRange: Number(get("priceRange") || 0) || undefined,
-      logoUrl: get("logoUrl") || undefined,
-      coverUrl: get("coverUrl") || undefined,
+      logoUrl: logoUrl || undefined,
+      coverUrl: coverUrl || undefined,
+      photos,
       hours: hours.map((h) => (h.isClosed ? { ...h, opens: null, closes: null } : h)),
       services: services.filter((s) => s.name.trim()),
     });
@@ -186,14 +191,22 @@ export function BusinessEditor({ initial, categories, cities, areas }: { initial
           </div>
         </section>
 
-        <section className="surface p-5 space-y-4">
+        <section className="surface p-5 space-y-5">
           <h2 className="font-semibold">Images</h2>
-          <Field label="Logo URL" htmlFor="logoUrl" help="Upload support arrives with the media library; paste a URL for now.">
-            <Input id="logoUrl" name="logoUrl" defaultValue={initial.logoUrl ?? ""} />
-          </Field>
-          <Field label="Cover image URL" htmlFor="coverUrl">
-            <Input id="coverUrl" name="coverUrl" defaultValue={initial.coverUrl ?? ""} />
-          </Field>
+          <div className="grid gap-5 sm:grid-cols-[10rem_1fr]">
+            <div>
+              <p className="mb-1.5 text-[13px] font-semibold">Logo</p>
+              <ImageUpload value={logoUrl} onChange={setLogoUrl} variant="logo" businessId={initial.id} label="Upload logo" aspect="1/1" />
+            </div>
+            <div>
+              <p className="mb-1.5 text-[13px] font-semibold">Cover image</p>
+              <ImageUpload value={coverUrl} onChange={setCoverUrl} variant="cover" businessId={initial.id} label="Upload cover" aspect="21/9" />
+            </div>
+          </div>
+          <div>
+            <p className="mb-1.5 text-[13px] font-semibold">Photos</p>
+            <ImageGalleryUpload value={photos} onChange={setPhotos} businessId={initial.id} />
+          </div>
         </section>
       </div>
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArticleCard, ToolCard, articleUrl } from "@/components/cards";
+import { Img } from "@/components/img";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { Badge, Breadcrumbs, JsonLd } from "@/components/ui";
 import { getArticle, listArticles } from "@/db/queries/content";
@@ -64,6 +65,13 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
           <span>{article.readingMinutes ?? 3} min read</span>
         </div>
       </header>
+
+      {article.featuredImageUrl ? (
+        <figure className="mt-8 max-w-4xl">
+          <Img src={article.featuredImageUrl} alt={article.featuredImageAlt ?? article.title} aspect="16/9" priority sizes="(min-width: 1024px) 900px, 100vw" />
+          {article.featuredImageAlt ? <figcaption className="mt-2 text-[13px] text-3">{article.featuredImageAlt}</figcaption> : null}
+        </figure>
+      ) : null}
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div>

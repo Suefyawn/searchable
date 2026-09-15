@@ -5,7 +5,7 @@ import type { BusinessFormInput } from "@/lib/business-schema";
 /** Loads a business plus the option lists the editor needs. Shared by admin and owner pages. */
 export async function loadBusinessEditor(id: string) {
   const db = await getDb();
-  const b = await db.query.businesses.findFirst({ where: eq(schema.businesses.id, id), with: { hours: true, services: { orderBy: [asc(schema.businessServices.sortOrder)] }, city: true, primaryCategory: true } });
+  const b = await db.query.businesses.findFirst({ where: eq(schema.businesses.id, id), with: { hours: true, photos: { orderBy: [asc(schema.businessPhotos.sortOrder)] }, services: { orderBy: [asc(schema.businessServices.sortOrder)] }, city: true, primaryCategory: true } });
   if (!b) return null;
   const [categories, cities, areas] = await Promise.all([
     db.query.businessCategories.findMany({ orderBy: [asc(schema.businessCategories.name)] }),
@@ -30,6 +30,7 @@ export async function loadBusinessEditor(id: string) {
     priceRange: b.priceRange ?? undefined,
     logoUrl: b.logoUrl ?? undefined,
     coverUrl: b.coverUrl ?? undefined,
+    photos: b.photos.map((p) => ({ url: p.url, alt: p.alt ?? undefined })),
     hours: b.hours.map((h) => ({ dayOfWeek: h.dayOfWeek, opens: h.opens, closes: h.closes, isClosed: h.isClosed })),
     services: b.services.map((s) => ({ name: s.name, description: s.description ?? undefined, priceFrom: s.priceFrom ?? undefined })),
   };
