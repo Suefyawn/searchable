@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Newsreader } from "next/font/google";
+import { preconnect } from "react-dom";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { AdSenseScript } from "@/components/ads";
@@ -39,6 +40,9 @@ export const viewport: Viewport = {
 const imageHost = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // DNS, TCP and TLS to the image host are set up while the HTML is still arriving: a page's first photo
+  // saves a round trip (a few hundred milliseconds from Pakistan).
+  if (imageHost) preconnect(imageHost);
   return (
     <html lang="en" className={`${inter.variable} ${serif.variable}`}>
       <body className="min-h-dvh flex flex-col">

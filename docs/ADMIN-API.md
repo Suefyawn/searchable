@@ -46,9 +46,9 @@ Base URL: `https://searchable.pk/api/admin`. All slugs (categories, cities, seri
   "intent": "publish"                   // "publish" (default) | "schedule" (+ "scheduledFor": ISO) | "draft"
 }
 ```
-Image options: `{ "query": "..." }` picks the first usable openly licensed photo from Openverse, falling back to Wikimedia Commons when Openverse is down (credit recorded automatically); `{ "url": "https://...", "credit": "...", "sourceUrl": "...", "license": "by-sa" }` imports a photo you already know is openly licensed; an existing `https://img.searchable.pk/...` URL is reused as is. Omit `image` to keep the current one on an update. Pass `id` (or the same `slug` and `kind`) to update. Response: `{ id, status, url, image, note? }`.
+Image options: `{ "query": "...", "entities": ["Babar Azam"] }` tries the Wikipedia lead photo of each named entity (defaults to the capitalised names in the title), then the first usable openly licensed photo from Openverse, then Wikimedia Commons (only photographs whose own description matches the query; credit recorded automatically); `{ "url": "https://...", "credit": "...", "sourceUrl": "...", "license": "by-sa" }` imports a photo you already know is openly licensed; an existing `https://img.searchable.pk/...` URL is reused as is. Omit `image` to keep the current one on an update. Pass `id` (or the same `slug` and `kind`) to update. Response: `{ id, status, url, image, note? }`.
 
-`PATCH /articles/{id}` `{ "intent": "publish" | "unpublish" | "schedule", "scheduledFor"? }`. `DELETE /articles/{id}`.
+`PATCH /articles/{id}` `{ "intent": "publish" | "unpublish" | "schedule", "scheduledFor"? }` changes status; `{ "image": ... }` (same shapes as POST) swaps only the photo and keeps the status. `DELETE /articles/{id}`.
 
 ### Data
 `POST /data`

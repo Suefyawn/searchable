@@ -5,6 +5,7 @@ import { test } from "node:test";
 import { createHmac } from "node:crypto";
 import { backlogScore } from "../src/lib/backlog";
 import { srcSetFor } from "../src/lib/images";
+import { entitiesIn, isRelevant } from "../src/lib/open-images";
 import { parseAddress, verifyResendWebhook } from "../src/lib/inbox";
 import { renderMarkdown } from "../src/lib/markdown";
 import { slugify } from "../src/lib/slug";
@@ -89,4 +90,25 @@ test("no em dashes in site copy, tools, content or docs", () => {
   };
   roots.forEach(walk);
   assert.deepEqual(offenders, []);
+});
+
+test("headline entities: capitalised names and abbreviations, not sentence starts", () => {
+  assert.deepEqual(entitiesIn("Tom Aspinall vacates UFC heavyweight title, Ciryl Gane set to be undisputed champion"), ["Tom Aspinall", "UFC", "Ciryl Gane"]);
+  assert.deepEqual(entitiesIn("Why crossing 200 units makes your electricity bill jump"), []);
+  assert.deepEqual(entitiesIn("After a 0-3 loss in England, Babar Azam returns to first-class cricket"), ["Babar Azam"]);
+});
+
+test("commons relevance: the museum is not the sport, the banknote is not the rupee story", () => {
+  assert.equal(isRelevant("Washington Crossing the Delaware by Emanuel Leutze, MMA-NYC, 1851", "mixed martial arts octagon"), false);
+  assert.equal(isRelevant("UFC octagon at a mixed martial arts event", "mixed martial arts octagon"), true);
+  assert.equal(isRelevant("RBI 5-rupee note overprinted Government of Pakistan 1947", "Pakistani rupee banknotes"), false);
+  assert.equal(isRelevant("Pakistani rupee banknotes on a table, Karachi", "Pakistani rupee banknotes"), true);
+  assert.equal(isRelevant("A donkey cart in Sindh", "Babar Azam"), false);
+  assert.equal(isRelevant("Babar Azam batting, 2023", "Babar Azam"), true);
+});
+
+test("srcSetFor leaves the master out of card srcsets", () => {
+  const url = "https://img.searchable.pk/uploads/2026/09/0f8b6a9e-1e7f-4c8f-9d2e-7b2b9c9f1a11.webp";
+  assert.match(srcSetFor(url, 1600, { maxWidth: 960 })!, /960w$/);
+  assert.match(srcSetFor(url, 900, { maxWidth: 960 })!, / 900w$/);
 });

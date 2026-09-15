@@ -3,6 +3,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
 import { ApiError, withAdminApi } from "@/lib/admin-api";
+import { importImageFromUrl } from "@/lib/media-import";
+import { entitiesIn, findAndImport } from "@/lib/open-images";
 import { removeSearchDocument } from "@/lib/search";
 import { saveArticle } from "@/app/admin/articles/actions";
 
@@ -20,12 +22,45 @@ async function load(id: string) {
 /** GET /api/admin/articles/[id]: the full article (markdown body, sources, faqs, image, entities, tags). */
 export const GET = withAdminApi<{ id: string }>(async (_req, { params }) => ({ article: await load(params.id) }));
 
-const Patch = z.object({ intent: z.enum(["publish", "unpublish", "schedule"]), scheduledFor: z.string().optional(), note: z.string().max(300).optional() });
+const Patch = z.object({
+  intent: z.enum(["publish", "unpublish", "schedule"]).optional(),
+  scheduledFor: z.string().optional(),
+  /** Replace the photo only: a URL (ours or an openly licensed remote file with its credit) or a search, as on POST. */
+  image: z
+    .union([
+      z.object({ url: z.string().url(), alt: z.string().max(300).optional(), credit: z.string().max(200).optional(), sourceUrl: z.string().url().optional(), license: z.string().max(40).optional() }),
+      z.object({ query: z.string().min(2).max(120), alt: z.string().max(300).optional(), fallbackQuery: z.string().max(120).optional(), entities: z.array(z.string().min(2).max(80)).max(4).optional() }),
+    ])
+    .optional(),
+  note: z.string().max(300).optional(),
+});
 
-/** PATCH /api/admin/articles/[id] { intent: publish | unpublish | schedule, scheduledFor } */
+export const maxDuration = 60;
+
+/**
+ * PATCH /api/admin/articles/[id] { intent: publish | unpublish | schedule, scheduledFor } changes status;
+ * { image: { url | query } } swaps the photo and keeps everything else, including the current status.
+ */
 export const PATCH = withAdminApi<{ id: string }>(async (_req, { params, body }) => {
   const d = Patch.parse(body);
+  if (!d.intent && !d.image) throw new ApiError(400, "Give an intent or an image");
   const a = await load(params.id);
+  let image = { featuredImageUrl: a.featuredImageUrl ?? undefined, featuredImageAlt: a.featuredImageAlt ?? undefined, featuredImageCredit: a.featuredImageCredit ?? undefined, featuredImageSourceUrl: a.featuredImageSourceUrl ?? undefined };
+  let imageNote: string | undefined;
+  if (d.image && "query" in d.image) {
+    const img = await findAndImport(d.image.query, "article", d.image.alt ?? a.title, { fallbackQuery: d.image.fallbackQuery, budgetMs: 25_000, entities: d.image.entities ?? entitiesIn(a.title) });
+    if (img) image = { featuredImageUrl: img.url, featuredImageAlt: d.image.alt ?? a.title, featuredImageCredit: img.credit, featuredImageSourceUrl: img.sourceUrl };
+    else imageNote = `No openly licensed photo found for "${d.image.query}"; the photo is unchanged`;
+  } else if (d.image && "url" in d.image) {
+    if (d.image.url.startsWith(process.env.R2_PUBLIC_URL ?? "https://img.searchable.pk")) {
+      image = { featuredImageUrl: d.image.url, featuredImageAlt: d.image.alt ?? a.title, featuredImageCredit: d.image.credit, featuredImageSourceUrl: d.image.sourceUrl };
+    } else {
+      const img = await importImageFromUrl(d.image.url, { variant: "article", alt: d.image.alt ?? a.title, credit: d.image.credit, sourceUrl: d.image.sourceUrl, license: d.image.license });
+      image = { featuredImageUrl: img.url, featuredImageAlt: d.image.alt ?? a.title, featuredImageCredit: d.image.credit, featuredImageSourceUrl: d.image.sourceUrl };
+    }
+  }
+  // Without an intent the status stays: a scheduled story stays scheduled, a published one stays published.
+  const intent = d.intent ?? (a.status === "published" ? "publish" : a.status === "scheduled" ? "schedule" : "unpublish");
   const result = await saveArticle({
     id: a.id,
     kind: a.kind,
@@ -36,10 +71,7 @@ export const PATCH = withAdminApi<{ id: string }>(async (_req, { params, body })
     categoryId: a.categoryId ?? undefined,
     authorId: a.authorId ?? undefined,
     locationId: a.locationId ?? undefined,
-    featuredImageUrl: a.featuredImageUrl ?? undefined,
-    featuredImageAlt: a.featuredImageAlt ?? undefined,
-    featuredImageCredit: a.featuredImageCredit ?? undefined,
-    featuredImageSourceUrl: a.featuredImageSourceUrl ?? undefined,
+    ...image,
     seoTitle: a.seoTitle ?? undefined,
     seoDescription: a.seoDescription ?? undefined,
     isFeatured: a.isFeatured,
@@ -49,13 +81,13 @@ export const PATCH = withAdminApi<{ id: string }>(async (_req, { params, body })
     entitySlugs: a.entities as string[],
     tags: a.tags as string[],
     relatedIds: (a.relatedIds ?? []) as string[],
-    intent: d.intent,
-    scheduledFor: d.scheduledFor,
+    intent,
+    scheduledFor: d.scheduledFor ?? (intent === "schedule" && a.scheduledFor ? a.scheduledFor.toISOString() : undefined),
     note: d.note ?? "Via admin API",
   });
   if (!result.ok) throw new ApiError(400, result.error ?? "Could not update");
   const after = await load(params.id);
-  return { ok: true, id: after.id, status: after.status, url: after.url };
+  return { ok: true, id: after.id, status: after.status, url: after.url, image: after.featuredImageUrl, ...(imageNote ? { note: imageNote } : {}) };
 });
 
 /** DELETE /api/admin/articles/[id] */

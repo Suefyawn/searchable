@@ -1,7 +1,7 @@
 import { desc, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb, schema } from "@/db";
-import { findAndImport } from "./open-images";
+import { entitiesIn, findAndImport } from "./open-images";
 import { storeImage } from "./storage";
 
 const MAX_BYTES = 25 * 1024 * 1024;
@@ -77,7 +77,8 @@ export async function backfillArticlePhotos(limit = 2): Promise<{ tried: number;
     const tags = await db.query.articleTags.findMany({ where: eq(schema.articleTags.articleId, a.id), with: { tag: { columns: { name: true } } }, limit: 3 });
     const tagQuery = tags.map((t) => t.tag?.name).filter(Boolean).slice(0, 2).join(" ");
     const generic = GENERIC[a.category?.slug ?? ""] ?? "Pakistan";
-    // Tags name the subject best; otherwise the title minus numbers and small words; the generic subject last.
+    // Named people and bodies in the headline first (their Wikipedia photo), then the tags, then the title minus
+    // numbers and small words; the generic subject last.
     const titleQuery = a.title
       .replace(/[^A-Za-z ]/g, " ")
       .replace(/\b(the|a|an|and|of|to|in|on|for|at|from|with|how|what|why|who|is|are|now|after|before|up|off|per|gets|set)\b/gi, " ")
@@ -86,7 +87,7 @@ export async function backfillArticlePhotos(limit = 2): Promise<{ tried: number;
       .split(" ")
       .slice(0, 5)
       .join(" ");
-    const img = await findAndImport(tagQuery || titleQuery || generic, "article", a.title, { fallbackQuery: generic, budgetMs: 25_000 }).catch(() => null);
+    const img = await findAndImport(tagQuery || titleQuery || generic, "article", a.title, { fallbackQuery: generic, budgetMs: 25_000, entities: entitiesIn(a.title) }).catch(() => null);
     if (!img) continue;
     await db.update(schema.articles).set({ featuredImageUrl: img.url, featuredImageAlt: a.title, featuredImageCredit: img.credit, featuredImageSourceUrl: img.sourceUrl }).where(eq(schema.articles.id, a.id));
     revalidatePath(`/${a.kind === "news" ? "news" : "guides"}/${a.category?.slug ?? "general"}/${a.slug}`);

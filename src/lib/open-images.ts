@@ -84,66 +84,143 @@ export async function searchOpenImages(query: string, opts: { limit?: number; mi
     .filter((r) => /\.(jpe?g|png|webp)(\?|$)/i.test(r.url) || !/\.(gif|svg|tiff?)(\?|$)/i.test(r.url));
 }
 
+type CommonsPage = { title: string; imageinfo?: Array<{ url: string; thumburl?: string; descriptionurl?: string; width?: number; height?: number; mime?: string; extmetadata?: Record<string, { value?: string }> }> };
+
+const STOPWORDS = new Set(["the", "and", "for", "with", "from", "into", "over", "after", "before", "under", "about", "than", "that", "this", "what", "when", "where", "which", "who", "why", "how", "are", "was", "were", "has", "have", "had", "his", "her", "its", "their", "you", "your", "our", "new", "now", "set", "get", "gets", "off", "out", "per", "via", "not"]);
+
+/** Query words that carry meaning: three letters or more, not a stopword. */
+export function queryWords(query: string): string[] {
+  return Array.from(new Set(query.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3 && !STOPWORDS.has(w))));
+}
+
+/**
+ * Does a file's text (title, description, categories) describe the query? Commons full-text search is loose:
+ * "MMA" once found the Metropolitan Museum of Art and "rupee" a 1947 banknote. A one- or two-word query must
+ * match in full; longer ones need at least half their words, two at minimum.
+ */
+export function isRelevant(hay: string, query: string): boolean {
+  const words = queryWords(query);
+  if (!words.length) return true;
+  const h = hay.toLowerCase();
+  const matched = words.filter((w) => h.includes(w)).length;
+  const need = words.length <= 2 ? words.length : Math.max(2, Math.ceil(words.length / 2));
+  return matched >= need;
+}
+
+/** Files that are never a news photo: paintings, maps, diagrams, logos, scans, documents. */
+const NOT_A_PHOTO = /\b(painting|paintings|engraving|lithograph|drawing|drawings|map of|maps of|diagram|chart|logo|logos|coat of arms|emblem|seal of|scan|scanned|manuscript|document|poster|banknote|stamp|postage|screenshot|icon)\b/i;
+
+/**
+ * A Commons file as an OpenImage, or null when it is not a usable photo: wrong type, too small, a licence we
+ * cannot use (NC, ND, GFDL only, fair use), or one that reads as a painting, map, diagram or document.
+ * News stories also skip photos taken before 2000 unless `allowOld` is set.
+ */
+function parseCommonsPage(page: CommonsPage, opts: { minWidth: number; allowOld?: boolean; allowPng?: boolean }): OpenImage | null {
+  const ii = page.imageinfo?.[0];
+  if (!ii) return null;
+  if (!(opts.allowPng ? /^image\/(jpeg|png|webp)$/i : /^image\/(jpeg|webp)$/i).test(ii.mime ?? "")) return null;
+  const em = ii.extmetadata ?? {};
+  const text = `${page.title} ${em.ImageDescription?.value ?? ""} ${em.Categories?.value ?? ""}`.replace(/<[^>]+>/g, " ");
+  if (NOT_A_PHOTO.test(text)) return null;
+  const year = Number((em.DateTimeOriginal?.value ?? "").match(/\b(1[89]\d\d|20\d\d)\b/)?.[1] ?? 0);
+  if (!opts.allowOld && year && year < 2000) return null;
+  const short = (em.LicenseShortName?.value ?? em.License?.value ?? "").toLowerCase();
+  let license: string | null = null;
+  if (/-nc|-nd|gfdl|fair use|copyright/.test(short)) license = null; // not for us
+  else if (/cc0/.test(short)) license = "cc0";
+  else if (/public domain|^pd/.test(short)) license = "pdm";
+  else if (/cc by-sa/.test(short)) license = "by-sa";
+  else if (/cc by/.test(short)) license = "by";
+  if (!license) return null;
+  if (ii.width && ii.width < opts.minWidth) return null;
+  const artist = (em.Artist?.value ?? "").replace(/<[^>]+>/g, "").trim() || null;
+  return {
+    id: `commons:${page.title}`,
+    title: page.title.replace(/^File:/, "").replace(/\.[a-z]+$/i, "").replace(/_/g, " "),
+    creator: artist,
+    license,
+    licenseVersion: short.match(/(\d\.\d)/)?.[1] ?? null,
+    licenseUrl: null,
+    source: "wikimedia",
+    sourceUrl: ii.descriptionurl ?? `https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title)}`,
+    url: ii.thumburl ?? ii.url,
+    thumbnail: ii.thumburl ?? ii.url,
+    width: ii.thumburl ? Math.min(1600, ii.width ?? 1600) : (ii.width ?? null),
+    height: ii.height ?? null,
+  };
+}
+
+const COMMONS_FILE_PROPS = { prop: "imageinfo", iiprop: "url|extmetadata|size|mime", iiextmetadatafilter: "LicenseShortName|License|Artist|ImageDescription|Categories|DateTimeOriginal", iiurlwidth: "1600", format: "json", origin: "*" };
+
 /**
  * Wikimedia Commons, the fallback when Openverse is down (it has whole days of 502s). Same shape as an
- * Openverse result. Only files whose licence is CC0, public domain, CC BY or CC BY-SA are returned.
+ * Openverse result. Only files whose licence is CC0, public domain, CC BY or CC BY-SA are returned, only
+ * photographs, and only ones whose own text matches the query (see isRelevant).
  */
 export async function searchCommons(query: string, opts: { limit?: number; minWidth?: number } = {}): Promise<OpenImage[]> {
-  const params = new URLSearchParams({
-    action: "query",
-    generator: "search",
-    gsrsearch: `filetype:bitmap ${query}`,
-    gsrnamespace: "6",
-    gsrlimit: String(Math.min(opts.limit ?? 12, 30)),
-    prop: "imageinfo",
-    iiprop: "url|extmetadata|size|mime",
-    iiextmetadatafilter: "LicenseShortName|License|Artist|ImageDescription|Categories",
-    iiurlwidth: "1600",
-    format: "json",
-    origin: "*",
-  });
+  const params = new URLSearchParams({ action: "query", generator: "search", gsrsearch: `filetype:bitmap ${query}`, gsrnamespace: "6", gsrlimit: String(Math.min(opts.limit ?? 12, 30)), ...COMMONS_FILE_PROPS });
   const res = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, { headers: { "user-agent": UA, accept: "application/json" }, signal: AbortSignal.timeout(8_000), next: { revalidate: 0 } });
   if (!res.ok) throw new Error(`Commons search failed: ${res.status}`);
-  const data = (await res.json()) as { query?: { pages?: Record<string, { title: string; imageinfo?: Array<{ url: string; thumburl?: string; descriptionurl?: string; width?: number; height?: number; mime?: string; extmetadata?: Record<string, { value?: string }> }> }> } };
-  const minWidth = opts.minWidth ?? 800;
-  // Commons full-text search is loose (a query for a cricketer once returned a donkey). Keep a file only when
-  // a meaningful word of the query appears in its title, description or categories.
-  const words = query.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 4);
+  const data = (await res.json()) as { query?: { pages?: Record<string, CommonsPage> } };
   const out: OpenImage[] = [];
   for (const page of Object.values(data.query?.pages ?? {})) {
-    const ii = page.imageinfo?.[0];
-    if (!ii || !/^image\/(jpeg|png|webp)$/i.test(ii.mime ?? "")) continue;
-    const em = ii.extmetadata ?? {};
-    const hay = `${page.title} ${em.ImageDescription?.value ?? ""} ${em.Categories?.value ?? ""}`.toLowerCase();
-    if (words.length && !words.some((w) => hay.includes(w))) continue;
-    const short = (em.LicenseShortName?.value ?? em.License?.value ?? "").toLowerCase();
-    let license: string | null = null;
-    let licenseVersion: string | null = null;
-    if (/-nc|-nd|gfdl|fair use|copyright/.test(short)) license = null; // not for us
-    else if (/cc0/.test(short)) license = "cc0";
-    else if (/public domain|^pd/.test(short)) license = "pdm";
-    else if (/cc by-sa/.test(short)) license = "by-sa";
-    else if (/cc by/.test(short)) license = "by";
-    if (!license) continue;
-    licenseVersion = short.match(/(\d\.\d)/)?.[1] ?? null;
-    if (ii.width && ii.width < minWidth) continue;
-    const artist = (em.Artist?.value ?? "").replace(/<[^>]+>/g, "").trim() || null;
-    out.push({
-      id: `commons:${page.title}`,
-      title: page.title.replace(/^File:/, "").replace(/\.[a-z]+$/i, "").replace(/_/g, " "),
-      creator: artist,
-      license,
-      licenseVersion,
-      licenseUrl: null,
-      source: "wikimedia",
-      sourceUrl: ii.descriptionurl ?? `https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title)}`,
-      url: ii.thumburl ?? ii.url,
-      thumbnail: ii.thumburl ?? ii.url,
-      width: ii.thumburl ? Math.min(1600, ii.width ?? 1600) : (ii.width ?? null),
-      height: ii.height ?? null,
-    });
+    const em = page.imageinfo?.[0]?.extmetadata ?? {};
+    if (!isRelevant(`${page.title} ${em.ImageDescription?.value ?? ""} ${em.Categories?.value ?? ""}`, query)) continue;
+    const img = parseCommonsPage(page, { minWidth: opts.minWidth ?? 800 });
+    if (img) out.push(img);
   }
   return out;
+}
+
+/**
+ * The lead photo of the English Wikipedia article for a named thing (a cricketer, a fighter, a minister, a
+ * company, a stadium): the most relevant openly licensed photo there is for a story about them. Wikipedia only
+ * reports free images here (pilicense defaults to free); the file is then read from Commons for its licence
+ * and credit. Disambiguation pages and pages without a photo return null. A smaller minimum width than a
+ * search result: a 600 px portrait of the right person beats a 1600 px photo of the wrong thing.
+ */
+export async function wikipediaLeadImage(name: string, opts: { minWidth?: number } = {}): Promise<OpenImage | null> {
+  const params = new URLSearchParams({ action: "query", prop: "pageimages|pageprops", piprop: "name", ppprop: "disambiguation", titles: name, redirects: "1", format: "json" });
+  const res = await fetch(`https://en.wikipedia.org/w/api.php?${params}`, { headers: { "user-agent": UA, accept: "application/json" }, signal: AbortSignal.timeout(8_000), next: { revalidate: 0 } });
+  if (!res.ok) return null;
+  const data = (await res.json()) as { query?: { pages?: Record<string, { pageimage?: string; pageprops?: { disambiguation?: string } }> } };
+  const page = Object.values(data.query?.pages ?? {})[0];
+  const file = page?.pageimage;
+  if (!file || page.pageprops?.disambiguation !== undefined) return null;
+  if (!/\.(jpe?g|webp)$/i.test(file)) return null; // logos and flags are SVG or PNG
+  const fparams = new URLSearchParams({ action: "query", titles: `File:${file}`, ...COMMONS_FILE_PROPS });
+  const fres = await fetch(`https://commons.wikimedia.org/w/api.php?${fparams}`, { headers: { "user-agent": UA, accept: "application/json" }, signal: AbortSignal.timeout(8_000), next: { revalidate: 0 } });
+  if (!fres.ok) return null;
+  const fdata = (await fres.json()) as { query?: { pages?: Record<string, CommonsPage> } };
+  const fpage = Object.values(fdata.query?.pages ?? {})[0];
+  return fpage ? parseCommonsPage(fpage, { minWidth: opts.minWidth ?? 500, allowOld: true }) : null;
+}
+
+/**
+ * Named things in a headline worth looking up on Wikipedia: runs of two or more capitalised words ("Tom
+ * Aspinall", "Ciryl Gane", "State Bank") and all-caps abbreviations of three letters or more (PSX, FBR,
+ * OGRA). The sentence-initial word only counts when it starts such a run.
+ */
+export function entitiesIn(title: string): string[] {
+  const out: string[] = [];
+  const cleaned = title.replace(/[^A-Za-z0-9' -]/g, " | ");
+  for (const chunk of cleaned.split("|")) {
+    const words = chunk.trim().split(/\s+/).filter(Boolean);
+    let run: string[] = [];
+    const flush = () => {
+      if (run.length >= 2) out.push(run.join(" "));
+      run = [];
+    };
+    for (const w of words) {
+      if (/^[A-Z][a-z'-]+$/.test(w) || /^[A-Z][a-z]+-[A-Z][a-z]+$/.test(w)) run.push(w);
+      else {
+        flush();
+        if (/^[A-Z]{3,}$/.test(w)) out.push(w);
+      }
+    }
+    flush();
+  }
+  return Array.from(new Set(out.filter((e) => !STOPWORDS.has(e.toLowerCase()))));
 }
 
 const SOURCE_NAMES: Record<string, string> = { flickr: "Flickr", wikimedia: "Wikimedia Commons", stocksnap: "StockSnap", rawpixel: "Rawpixel", smithsonian: "Smithsonian", met: "The Met", nasa: "NASA", europeana: "Europeana" };
@@ -170,16 +247,25 @@ export async function importOpenImage(img: OpenImage, variant: "article" | "cove
 }
 
 /**
- * First usable result for a query, used by the seed to give pages a real photo. Tries wide, then any
- * orientation, then a relaxed width; skips candidates whose file no longer downloads.
+ * First usable photo for a story: the Wikipedia lead photo of any named entity, then a search for the query
+ * (wide, then any orientation), then the fallback query; skips candidates whose file no longer downloads.
  */
-export async function findAndImport(query: string, variant: "article" | "cover" | "photo" = "article", alt?: string, opts: { orientation?: "landscape" | "portrait" | "square"; pick?: number; fallbackQuery?: string; budgetMs?: number } = {}) {
+export async function findAndImport(query: string, variant: "article" | "cover" | "photo" = "article", alt?: string, opts: { orientation?: "landscape" | "portrait" | "square"; pick?: number; fallbackQuery?: string; budgetMs?: number; /** Named people, teams, places or organisations: their Wikipedia lead photo is tried before any search. */ entities?: string[] } = {}) {
+  const deadline = Date.now() + (opts.budgetMs ?? 25_000);
+  for (const name of (opts.entities ?? []).slice(0, 3)) {
+    if (Date.now() > deadline) break;
+    try {
+      const img = await wikipediaLeadImage(name);
+      if (img) return await importOpenImage(img, variant, alt);
+    } catch {
+      // no page, no photo or a dead file: fall through to the searches
+    }
+  }
   const attempts: Array<{ q: string; orientation?: "landscape" | "portrait" | "square"; minWidth: number }> = [
     { q: query, orientation: opts.orientation ?? "landscape", minWidth: 1000 },
     { q: query, minWidth: 800 },
     ...(opts.fallbackQuery ? [{ q: opts.fallbackQuery, orientation: "landscape" as const, minWidth: 900 }, { q: opts.fallbackQuery, minWidth: 700 }] : []),
   ];
-  const deadline = Date.now() + (opts.budgetMs ?? 25_000);
   for (const a of attempts) {
     if (Date.now() > deadline) break;
     let results: OpenImage[] = [];

@@ -48,6 +48,7 @@ On the 1st and 16th of each month (fuel price reviews), and any day OGRA moves t
 - Every rate, fee, rule or price has a dated source with a URL. If you cannot find a source, do not write the story.
 - Nothing invented: no made-up quotes, people, prices or events.
 - Photos only through "image": {"query": ...} (openly licensed, credit handled) or a URL you know is openly licensed (Wikimedia Commons, government releases). Never a press or agency photo.
+- The photo must show the subject. Name the people, teams, bodies or places the story is about in "image": {"entities": ["Babar Azam", "Gaddafi Stadium"]}: their Wikipedia photo is tried before any search. Make the "query" a concrete, photographable scene ("petrol pump Lahore", "Karachi Stock Exchange trading floor"), never an abstract ("relief", "policy"). Look at the returned image URL in the browser; if it does not show the subject, PATCH /articles/{id} with a better "image" or a generic scene for the category ("UFC octagon", "cricket stadium Pakistan", "Pakistani rupee banknotes").
 - Titles 50 to 90 characters, specific, with the number when there is one ("Petrol up Rs 2.61 from tonight: a 40-litre tank now costs Rs 15,210").
 - Dek: one or two sentences that make the reader want the story.
 
@@ -73,12 +74,12 @@ POST /articles
   "sources": [{"title": "...", "url": "https://...", "publisher": "..."}],
   "faqs": [{"question": "...", "answer": "..."}],
   "seoTitle": "optional", "seoDescription": "optional",
-  "image": {"query": "petrol pump Lahore", "alt": "..."}   or   {"url": "https://...", "credit": "...", "sourceUrl": "...", "license": "by-sa"},
+  "image": {"query": "petrol pump Lahore", "alt": "...", "entities": ["Pakistan State Oil"]}   or   {"url": "https://...", "credit": "...", "sourceUrl": "...", "license": "by-sa"},
   "intent": "publish" | "schedule" | "draft",  "scheduledFor": "2026-09-16T04:30:00Z" (when schedule)
 }
 To update an existing story: include its "id" (from /context or GET /articles) and the full new body; omit "image" to keep the photo. The URL never changes on an update.
 → { id, status, url, image, note? }
-PATCH /articles/{id} {"intent": "publish" | "unpublish" | "schedule", "scheduledFor"?}
+PATCH /articles/{id} {"intent": "publish" | "unpublish" | "schedule", "scheduledFor"?}   or   {"image": {"query", "entities"} | {"url", "credit", "sourceUrl", "license"}} to swap only the photo
 DELETE /articles/{id}
 
 GET /data → { series[] }

@@ -2,7 +2,7 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
 import { ApiError, qs, resolveCategoryId, resolveCityId, withAdminApi } from "@/lib/admin-api";
-import { findAndImport } from "@/lib/open-images";
+import { entitiesIn, findAndImport } from "@/lib/open-images";
 import { saveArticle } from "@/app/admin/articles/actions";
 import { importImageFromUrl } from "@/lib/media-import";
 
@@ -49,13 +49,20 @@ const Body = z.object({
   seoDescription: z.string().trim().max(200).optional(),
   featured: z.boolean().optional(),
   /**
-   * Photo: either an already uploaded URL, a remote openly licensed URL with its credit, or an Openverse query
-   * ("petrol pump Lahore") that picks the first usable CC photo. Omit to keep the current one.
+   * Photo: either an already uploaded URL, a remote openly licensed URL with its credit, or a search query
+   * ("petrol pump Lahore") that picks the first usable openly licensed photo, after trying the Wikipedia
+   * photo of any named entity. Omit to keep the current one.
    */
   image: z
     .union([
       z.object({ url: z.string().url(), alt: z.string().max(300).optional(), credit: z.string().max(200).optional(), sourceUrl: z.string().url().optional(), license: z.string().max(40).optional() }),
-      z.object({ query: z.string().min(2).max(120), alt: z.string().max(300).optional(), fallbackQuery: z.string().max(120).optional() }),
+      z.object({
+        query: z.string().min(2).max(120),
+        alt: z.string().max(300).optional(),
+        fallbackQuery: z.string().max(120).optional(),
+        /** Named people, teams, bodies or places the story is about, e.g. ["Babar Azam", "Gaddafi Stadium"]: their Wikipedia lead photo is tried first. Defaults to the capitalised names in the title. */
+        entities: z.array(z.string().min(2).max(80)).max(4).optional(),
+      }),
     ])
     .optional(),
   /** publish now (default), schedule at `scheduledFor` (ISO, Asia/Karachi offset allowed), or save as draft. */
@@ -82,7 +89,7 @@ export const POST = withAdminApi(async (_req, { body }) => {
     : {};
   let imageNote: string | undefined;
   if (d.image && "query" in d.image) {
-    const img = await findAndImport(d.image.query, "article", d.image.alt ?? d.title, { fallbackQuery: d.image.fallbackQuery, budgetMs: 25_000 });
+    const img = await findAndImport(d.image.query, "article", d.image.alt ?? d.title, { fallbackQuery: d.image.fallbackQuery, budgetMs: 25_000, entities: d.image.entities ?? entitiesIn(d.title) });
     if (img) imageFields = { featuredImageUrl: img.url, featuredImageAlt: d.image.alt ?? d.title, featuredImageCredit: img.credit, featuredImageSourceUrl: img.sourceUrl };
     else imageNote = `No openly licensed photo found for "${d.image.query}" right now; the photo backfill job will try again over the next days`;
   } else if (d.image && "url" in d.image) {

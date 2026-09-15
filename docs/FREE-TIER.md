@@ -37,6 +37,7 @@ Founder's rule (2026-09-15): the site must not run out of free usage on Supabase
 - `STORAGE_PROVIDER=r2` writes originals plus 480 px and 960 px renditions to Cloudflare R2 through the S3 API (SigV4 signed in `src/lib/storage.ts`, no SDK). They are served from `R2_PUBLIC_URL`, a custom domain on the bucket that Cloudflare caches at the edge. Egress is free.
 - Pages use plain `<img srcset>` (`src/components/img.tsx`, `srcSetFor()`), so Vercel's metered optimiser is never used (`images.unoptimized`).
 - `scripts/image-renditions.ts` backfills renditions for images uploaded before this change.
+- Measured from Pakistan (2026-09-15): a cached file on img.searchable.pk answers in 0.4 to 0.7 s, 0.14 s once the connection is up; a Cloudflare cache miss adds about 0.4 s while the edge fetches from R2. What keeps pages feeling fast: the root layout preconnects to the image host, the one above-the-fold image is preloaded from the head at high priority, cards never offer the 1600 px master (a 3x phone took it for every card before), and the hero carousel fetches the next slide's photo two seconds early. Every R2 object is written with `Cache-Control: public, max-age=31536000, immutable`. If misses become a problem, switch on Smart Tiered Cache for the zone in the Cloudflare dashboard (free): one origin fetch per file instead of one per edge location.
 - Supabase Storage stays supported but is not recommended: its 5 GB egress would be the first thing to go.
 
 ### Database
