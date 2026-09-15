@@ -3,6 +3,7 @@ import { ArticleCard, ToolCard, articleUrl, toolExample } from "@/components/car
 import { Change } from "@/components/data/change";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { HeroCarousel, type Slide } from "@/components/home/hero-carousel";
+import { readFrontPage, resolveFront } from "@/lib/front-page";
 import { NumbersTicker } from "@/components/home/numbers-ticker";
 import { Img } from "@/components/img";
 import { LiveFeed } from "@/components/home/live-feed";
@@ -13,7 +14,7 @@ import { listPosts } from "@/lib/community";
 import { listProfessionals } from "@/lib/professionals";
 import { activityFeed } from "@/lib/activity";
 import { fetchPress, groupBySource, groupByTopic } from "@/lib/press";
-import { listArticles } from "@/db/queries/content";
+import { listArticles, listArticlesByIds } from "@/db/queries/content";
 import { listSeriesWithLatest } from "@/db/queries/data";
 import { categoryCounts } from "@/db/queries/directory";
 import { citiesWithCounts } from "@/db/queries/geo";
@@ -27,8 +28,9 @@ function Label({ children }: { children: React.ReactNode }) {
 }
 
 export default async function HomePage() {
-  const [featured, latest, guides, cities, categories, series, feed, pressItems, worldItems, community, pros] = await Promise.all([
-    listArticles({ kind: "news", featured: true, limit: 1 }),
+  const front = await readFrontPage();
+  const [pinned, latest, guides, cities, categories, series, feed, pressItems, worldItems, community, pros] = await Promise.all([
+    listArticlesByIds([...(front.leadId ? [front.leadId] : []), ...front.pins]),
     listArticles({ kind: "news", limit: 12 }),
     listArticles({ kind: "guide", limit: 5 }),
     citiesWithCounts(8),
@@ -40,8 +42,8 @@ export default async function HomePage() {
     listPosts({ limit: 6 }),
     listProfessionals({ limit: 4 }),
   ]);
-  const lead = featured[0] ?? latest[0];
-  const ordered = lead ? [lead, ...latest.filter((a) => a.id !== lead.id)] : latest;
+  // Lead, pins and the rest: an editor's choices from /admin/front-page first, then the newest stories.
+  const { ordered } = resolveFront(front, latest, new Map(pinned.map((a) => [a.id, a])));
   const slides: Slide[] = ordered
     .filter((a) => a.featuredImageUrl)
     .slice(0, 5)

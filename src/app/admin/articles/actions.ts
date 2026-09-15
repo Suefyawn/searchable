@@ -130,6 +130,9 @@ export async function saveArticle(raw: ArticleFormInput): Promise<{ ok: boolean;
   if (d.intent === "publish") {
     await db.insert(schema.articleRevisions).values({ articleId: id, editorId: user.id, title: d.title, body: d.body, note: d.note });
   }
+  // One featured news story at a time: marking this one featured clears the flag on the others, so the
+  // homepage and the news front lead with the newest choice (src/lib/front-page.ts).
+  if (values.isFeatured && d.kind === "news") await db.update(schema.articles).set({ isFeatured: false }).where(and(eq(schema.articles.kind, "news"), ne(schema.articles.id, id)));
 
   // Entity links (replace set).
   await db.delete(schema.entityLinks).where(and(eq(schema.entityLinks.targetType, "article"), eq(schema.entityLinks.targetId, id)));

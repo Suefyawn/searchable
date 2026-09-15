@@ -156,6 +156,19 @@ export async function getTagsForArticle(articleId: string) {
     .where(eq(schema.articleTags.articleId, articleId));
 }
 
+/** Published articles by id, in no particular order (the caller orders); used for pinned and lead stories. */
+export async function listArticlesByIds(ids: string[]): Promise<ArticleListItem[]> {
+  if (!ids.length) return [];
+  const db = await getDb();
+  const rows = await db
+    .select(listSelect)
+    .from(schema.articles)
+    .leftJoin(schema.categories, eq(schema.articles.categoryId, schema.categories.id))
+    .leftJoin(schema.authors, eq(schema.articles.authorId, schema.authors.id))
+    .where(and(inArray(schema.articles.id, ids), published()));
+  return rows.map(shape);
+}
+
 export async function listArticlesByTag(tagSlug: string, limit = 30) {
   const db = await getDb();
   const tag = await db.query.tags.findFirst({ where: eq(schema.tags.slug, tagSlug) });

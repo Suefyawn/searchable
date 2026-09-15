@@ -2,6 +2,7 @@ import Link from "next/link";
 import { formatDate } from "@/lib/format";
 import { SITE } from "@/lib/utils";
 import { Wordmark } from "@/components/brand";
+import { activeBreaking, readFrontPage } from "@/lib/front-page";
 import { getMegaNav } from "@/lib/mega-nav";
 import { AuthLinks } from "./auth-links";
 import { MegaMenu } from "./mega-menu";
@@ -25,9 +26,25 @@ export function Logo({ className = "" }: { className?: string }) {
 
 export async function Header({ showSearch = true }: { showSearch?: boolean }) {
   const today = formatDate(new Date(), { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  const sections = await getMegaNav();
+  const [sections, front] = await Promise.all([getMegaNav(), readFrontPage()]);
+  const breaking = activeBreaking(front);
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-[var(--bg)]">
+      {/* Breaking bar: set from /admin/front-page or the admin API, gone when it expires. Black on every page. */}
+      {breaking ? (
+        <div className="bg-ink-900 text-white">
+          <div className="container-x flex items-center gap-3 py-1.5 text-[13.5px]">
+            <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.12em]">Breaking</span>
+            {breaking.href ? (
+              <Link href={breaking.href} className="min-w-0 truncate underline-offset-4 hover:underline">
+                {breaking.text}
+              </Link>
+            ) : (
+              <span className="min-w-0 truncate">{breaking.text}</span>
+            )}
+          </div>
+        </div>
+      ) : null}
       <div className="container-x">
         {/* Top line: date · tagline · account */}
         <div className="hidden items-center justify-between py-2 text-[12.5px] text-3 sm:flex">

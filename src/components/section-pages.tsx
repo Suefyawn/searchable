@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { ArticleListing, ArticlePage } from "@/components/article-page";
 import { ArticleCard } from "@/components/cards";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
-import { countArticles, getArticle, getCategory, listArticles, listCategories, type ArticleKind } from "@/db/queries/content";
+import { countArticles, getArticle, getCategory, listArticles, listArticlesByIds, listCategories, type ArticleKind, type ArticleListItem } from "@/db/queries/content";
+import { readFrontPage, resolveFront } from "@/lib/front-page";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { fetchPress, groupBySource } from "@/lib/press";
@@ -25,11 +26,17 @@ export function sectionMetadata(kind: "news" | "guide", page = 1): Metadata {
 
 export async function SectionHub({ kind, page = 1 }: { kind: "news" | "guide"; page?: number }) {
   const m = META[kind];
-  const [categories, items, total, pressItems] = await Promise.all([listCategories(kind), listArticles({ kind, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }), countArticles(kind), kind === "news" && page === 1 ? fetchPress({ limit: 40, perFeed: 8 }) : Promise.resolve([])]);
+  const [categories, items, total, pressItems, front] = await Promise.all([listCategories(kind), listArticles({ kind, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }), countArticles(kind), kind === "news" && page === 1 ? fetchPress({ limit: 40, perFeed: 8 }) : Promise.resolve([]), kind === "news" && page === 1 ? readFrontPage() : Promise.resolve(null)]);
   if (page > 1 && !items.length) notFound();
   const press = groupBySource(pressItems, 6);
-  const featured = page === 1 ? items.slice(0, 1) : [];
-  const rest = page === 1 ? items.slice(1) : items;
+  // The news front leads with the same story as the homepage (manual lead, featured within 48 hours, or newest).
+  let lead: ArticleListItem | null = page === 1 ? (items[0] ?? null) : null;
+  if (front) {
+    const extra = front.leadId && !items.some((a) => a.id === front.leadId) ? await listArticlesByIds([front.leadId]) : [];
+    lead = resolveFront(front, items, new Map([...items, ...extra].map((a) => [a.id, a]))).lead;
+  }
+  const featured = lead ? [lead] : [];
+  const rest = page === 1 ? items.filter((a) => a.id !== lead?.id) : items;
   return (
     <div className="container-x py-8 sm:py-12">
       <SectionHeader as="h1" title={m.name} description={m.description} />

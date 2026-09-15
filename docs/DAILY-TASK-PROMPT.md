@@ -49,6 +49,7 @@ On the 1st and 16th of each month (fuel price reviews), and any day OGRA moves t
 - Nothing invented: no made-up quotes, people, prices or events.
 - Photos only through "image": {"query": ...} (openly licensed, credit handled) or a URL you know is openly licensed (Wikimedia Commons, government releases). Never a press or agency photo.
 - The photo must show the subject. Name the people, teams, bodies or places the story is about in "image": {"entities": ["Babar Azam", "Gaddafi Stadium"]}: their Wikipedia photo is tried before any search. Make the "query" a concrete, photographable scene ("petrol pump Lahore", "Karachi Stock Exchange trading floor"), never an abstract ("relief", "policy"). Download the returned image and look at it; if it does not show the subject, PATCH /articles/{id} with a better "image" or a generic scene for the category ("UFC octagon", "cricket stadium Pakistan", "Pakistani rupee banknotes").
+- The homepage hero and the news front lead automatically with the newest story. When a story is genuinely the day's biggest (a rate decision, a fuel price change, a result the whole country followed, a disaster), publish it with "featured": true so it leads for 48 hours. For true breaking news also POST /front {"leadId": id, "leadHours": 12, "breaking": {"text": "one line, under 120 characters", "href": url, "hours": 3}}: a black bar across every page that expires on its own. At most one or two a day; never for routine stories.
 - Titles 50 to 90 characters, specific, with the number when there is one ("Petrol up Rs 2.61 from tonight: a 40-litre tank now costs Rs 15,210").
 - Dek: one or two sentences that make the reader want the story.
 
@@ -81,6 +82,9 @@ To update an existing story: include its "id" (from /context or GET /articles) a
 → { id, status, url, image, note? }
 PATCH /articles/{id} {"intent": "publish" | "unpublish" | "schedule", "scheduledFor"?}   or   {"image": {"query", "entities"} | {"url", "credit", "sourceUrl", "license"}} to swap only the photo
 DELETE /articles/{id}
+
+GET /front → { front: { leadId, leadUntil, pins[], breaking } }
+POST /front {"leadId"?: id | null, "leadHours"?: 24, "pins"?: [ids], "breaking"?: {"text", "href"?, "hours"?} | null, "featured"?: {"id", "on"}} → { ok, front }
 
 GET /data → { series[] }
 POST /data {"readings": [{"series": "petrol-price", "value": 272.61, "date": "2026-09-16", "note": "OGRA notification", "sourceUrl": "https://..."}]}
