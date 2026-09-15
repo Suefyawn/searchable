@@ -84,6 +84,9 @@ Same pipeline as the CSV importer: category by slug or alias (restaurant, dentis
 ### Media
 `POST /media`: `{ "search": "Karachi skyline" }` lists Openverse candidates; `{ "query": "...", "alt"? }` imports the first usable one; `{ "url", "alt"?, "credit"?, "sourceUrl"?, "license"? }` imports a known openly licensed image. Returns the stored URL and credit.
 
+### Reports
+`POST /report` `{ "slot", "report" (markdown), "published"?, "updated"?, "errors"? }` files a run report; it shows on `/admin/automation`. `GET /report` lists the last twenty.
+
 ### Jobs
 `POST /jobs` `{ "job": "due" | "reindex" | "prune" | "revalidate", "paths"? }`.
 

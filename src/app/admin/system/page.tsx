@@ -150,7 +150,7 @@ export default async function AdminSystem() {
             ]}
           />
         </Section>
-        <Section title="Automation" description="Writes made through the admin API by the scheduled editorial task (docs/DAILY-TASK.md). Reads are not logged.">
+        <Section title="Automation" description="Writes made through the admin API by the scheduled editorial task. Run reports and the full call log are on /admin/automation.">
           <Details
             items={[
               { label: "Key", value: process.env.ADMIN_API_KEY ? "set" : "not set (API refuses everything)" },

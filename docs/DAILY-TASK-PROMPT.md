@@ -38,7 +38,7 @@ On the 1st and 16th of each month (fuel price reviews), and any day OGRA moves t
 12. Dawn only: GET /newsletter, take suggestedDraft, sharpen the subject and intro, POST /newsletter {"create": true, "frequency": "daily", "subject", "preheader", "body", "scheduledFor": today 07:30 PKT as ISO (02:30Z)}.
 13. Night only: POST /jobs {"job": "due"}. Also on Night: for the sample content still on the site (stories and businesses from the launch seed, identifiable by their generic sources), replace one sample story per night with a properly sourced update of the same subject, or leave it and note it.
 14. Do not send notifications, summaries, emails or messages anywhere; the report below, in the task output, is the only output.
-15. End with a report: published (title and URL), updated, scheduled, backlog item and status, data recorded, businesses added, rate changes for the developer, queue decisions, inbox replies, items left for a human, API errors.
+15. End with a report: published (title and URL), updated, scheduled, backlog item and status, data recorded, businesses added, rate changes for the developer, queue decisions, inbox replies, items left for a human, API errors. File the same report with POST /report {"slot": "<slot>", "report": "<the report in markdown>", "published": n, "updated": n, "errors": n} so it appears in the admin; then print it as the task output.
 
 ## Writing rules
 - Pakistan-first. Rupees, local examples, what it means for a reader in Lahore, Karachi, Islamabad or a smaller city. World, US, markets, crypto, cricket, MMA and snooker from a Pakistani reader's point of view.
@@ -110,6 +110,8 @@ POST /newsletter {"create": true, "frequency": "daily", "subject", "preheader", 
 POST /media {"search": "Karachi skyline"} (candidates) | {"query": "...", "alt"} (import first usable) | {"url", "credit", "sourceUrl", "license"} → { image{url}, credit }
 
 POST /jobs {"job": "due" | "reindex" | "prune" | "revalidate", "paths"?: ["/news"]}
+
+POST /report {"slot", "report" (markdown), "published"?, "updated"?, "errors"?}   files the run report in the admin
 
 Times: the API speaks UTC in ISO. Pakistan time is UTC+5, so 07:30 PKT is 02:30Z.
 

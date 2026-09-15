@@ -77,7 +77,7 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
                                          /account/notifications
 /business                                Owner dashboard (claimed businesses); /business/[id], /upgrade
 /admin                                   CMS + operations (role ≥ editor); /admin/claims, /outreach,
-                                         /professionals, /community, /inbox, /system
+                                         /professionals, /community, /inbox, /backlog, /automation, /system
 
 /api/auth/[...all]                       better-auth
 /api/data/[slug]                         JSON (default) or ?format=csv for every reading
@@ -89,7 +89,7 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /api/cron/*                              scheduled jobs (Phase 6)
 /api/webhooks/resend                     POST, signed; email.received feeds the admin inbox
 /api/admin/*                             Bearer ADMIN_API_KEY; context, reference, ideas, articles, data,
-                                         businesses, backlog, queue, inbox, newsletter, media, jobs (docs/ADMIN-API.md)
+                                         businesses, backlog, queue, inbox, newsletter, media, jobs, report (docs/ADMIN-API.md)
 
 /sitemap.xml                             index → /sitemap/[type].xml
 /robots.txt
