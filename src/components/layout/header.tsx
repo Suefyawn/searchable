@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { formatDate } from "@/lib/format";
 import { SITE } from "@/lib/utils";
+import { getMegaNav } from "@/lib/mega-nav";
 import { AuthLinks } from "./auth-links";
+import { MegaMenu } from "./mega-menu";
 import { MobileNav } from "./mobile-nav";
 import { SearchBox } from "./search-box";
 
@@ -24,8 +26,9 @@ export function Logo({ className = "" }: { className?: string }) {
   );
 }
 
-export function Header({ showSearch = true }: { showSearch?: boolean }) {
+export async function Header({ showSearch = true }: { showSearch?: boolean }) {
   const today = formatDate(new Date(), { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const sections = await getMegaNav();
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-[var(--bg)]">
       <div className="container-x">
@@ -40,19 +43,13 @@ export function Header({ showSearch = true }: { showSearch?: boolean }) {
             </Link>
           </span>
         </div>
-        {/* Masthead line */}
-        <div className="flex h-14 items-center gap-4 border-t border-line sm:h-16">
+        {/* Masthead line; the mega panel is positioned against this container */}
+        <div className="relative flex h-14 items-center gap-4 border-t border-line sm:h-16">
           <Logo />
-          <nav className="ml-4 hidden items-center gap-5 lg:flex" aria-label="Primary">
-            {NAV.map((n) => (
-              <Link key={n.href} href={n.href} className="text-[14.5px] font-medium text-2 underline-offset-[6px] transition-colors hover:text-[var(--text)] hover:underline">
-                {n.label}
-              </Link>
-            ))}
-          </nav>
+          <MegaMenu sections={sections} />
           <div className="ml-auto flex items-center gap-2">
             {showSearch ? <SearchBox className="hidden w-64 md:block lg:w-72" placeholder="Search…" /> : null}
-            <MobileNav nav={NAV} />
+            <MobileNav nav={NAV} sections={sections.map((s) => ({ key: s.key, label: s.label, href: s.href, links: s.columns.flatMap((c) => c.links).slice(0, 12) }))} />
           </div>
         </div>
       </div>
