@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { ToolCard, toolExample } from "@/components/cards";
 import { CarCompare } from "@/components/compare/car-compare";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
@@ -75,7 +76,9 @@ export default function CarsComparePage() {
           <section>
             <h2 className="font-serif text-2xl">All new cars</h2>
             <p className="mt-2 mb-4 text-[15px] text-2">Ex-factory prices across variants. On-road cost adds registration, number plate, token tax and 231B withholding: use the calculators from the comparison.</p>
-            <CarCompare cars={CARS} />
+            <Suspense fallback={<p className="py-10 text-center text-[15px] text-2">Loading the comparison…</p>}>
+              <CarCompare cars={CARS} />
+            </Suspense>
             <p className="mt-2 text-xs text-3">
               Source: <a href={CARS_SOURCE.url} rel="nofollow noopener" target="_blank" className="underline-offset-2 hover:underline">{CARS_SOURCE.title}</a>, reviewed {formatDate(CARS_REVIEWED_AT)}. Specs from assembler brochures; economy figures are typical city driving, not test-cycle claims.
             </p>

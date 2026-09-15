@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { ToolCard } from "@/components/cards";
 import { InverterCompare } from "@/components/compare/inverter-compare";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
@@ -119,7 +120,9 @@ export default function SolarInverterComparePage() {
           <section>
             <h2 className="font-serif text-2xl">Compare inverters</h2>
             <p className="mt-2 mb-4 text-[15px] text-2">Every model we track, with what actually matters: MPPT count, battery voltage, net-metering eligibility and warranty.</p>
-            <InverterCompare inverters={INVERTERS} />
+            <Suspense fallback={<p className="py-10 text-center text-[15px] text-2">Loading the comparison…</p>}>
+              <InverterCompare inverters={INVERTERS} />
+            </Suspense>
             <p className="mt-2 text-xs text-3">
               {INVERTERS_SOURCE.title}. Reviewed {formatDate(INVERTERS_REVIEWED_AT)}. Prices move with the dollar rate and container arrivals; retail single-unit prices can be 5–10% higher.
             </p>
