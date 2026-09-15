@@ -23,7 +23,7 @@ export default async function BacklogPage({ searchParams }: { searchParams: Prom
   const visible = items.filter((i) => status === "all" || i.status === status);
   const count = (s: string) => (s === "all" ? items.length : items.filter((i) => i.status === s).length);
   return (
-    <AdminPage title="Content backlog" description="What people in Pakistan search for that the site does not answer well yet, from Semrush's Pakistan database. Score is monthly searches over difficulty. The scheduled task takes the top open item each run and marks it done with the URL." wide>
+    <AdminPage title="Content backlog" description="What people in Pakistan search for that the site does not answer well yet, from Semrush's Pakistan database. Score is monthly searches weighted by how likely a young site is to rank ((100 minus KD) squared). The scheduled task takes the top open item each run and marks it done with the URL." wide>
       <FilterTabs items={STATUSES.map((s) => ({ href: `/admin/backlog?status=${s}`, label: s.replace("_", " "), count: count(s), active: status === s }))} />
       {visible.length === 0 ? (
         <p className="py-10 text-center text-[15px] text-2">Nothing here.</p>

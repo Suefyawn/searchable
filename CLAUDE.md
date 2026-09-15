@@ -13,6 +13,7 @@ npm run db:generate    # generate a migration after editing src/db/schema
 npm run db:seed        # seed reference + sample data
 npm run db:reset       # wipe .data/pglite, migrate, seed
 npm run search:reindex # rebuild search_documents
+npm test              # pure-function checks, no database (calculators, slugs, markdown, webhook signatures, no em dashes)
 npm run typecheck && npm run lint && npm run build
 ```
 

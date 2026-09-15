@@ -18,7 +18,8 @@
     "db:studio": "drizzle-kit studio",
     "preflight": "tsx scripts/preflight.ts",
     "search:reindex": "tsx scripts/reindex.ts",
-    "seed:backlog": "tsx scripts/seed-backlog.ts"
+    "seed:backlog": "tsx scripts/seed-backlog.ts",
+    "test": "node --import tsx --test tests/*.test.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.8",

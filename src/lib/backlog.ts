@@ -29,9 +29,13 @@ export type BacklogItemT = z.infer<typeof BacklogItem>;
 
 const KEY = "seo:backlog";
 
-/** Higher is better: demand per unit of difficulty, so a 200k/KD 25 term beats a 1M/KD 73 one. */
+/**
+ * Higher is better: monthly searches weighted by how likely a young site is to rank, taken as ((100 - KD) / 100)
+ * squared. A 200k term at KD 25 (score 112,500) beats a 1M term at KD 73 (72,900).
+ */
 export function backlogScore(i: Pick<BacklogItemT, "volume" | "kd">) {
-  return Math.round(i.volume / (i.kd + 15));
+  const reach = (100 - Math.min(99, i.kd)) / 100;
+  return Math.round(i.volume * reach * reach);
 }
 
 export async function readBacklog(): Promise<BacklogItemT[]> {
