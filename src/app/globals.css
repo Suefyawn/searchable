@@ -108,10 +108,9 @@
   * {
     border-color: var(--border);
   }
-  /* Grid and flex children default to min-width:auto, which lets one long word or table push a phone layout
-     wider than the screen. Zero is the value nearly every layout here wants. */
-  .grid > *,
-  .flex > * {
+  /* Grid children default to min-width:auto, which lets one long word or table push a phone layout wider
+     than the screen. Zero is what every grid here wants. (Not flex: scrolling chip rows need their width.) */
+  .grid > * {
     min-width: 0;
   }
   html {
