@@ -1,10 +1,12 @@
 import { buildMetadata } from "@/lib/seo";
+import { readSiteSettings } from "@/lib/site-settings";
 import { ContactForm } from "./contact-form";
 
 export const metadata = buildMetadata({ title: "Contact", description: "Report an error, suggest a guide or tool, or ask about a listing.", path: "/contact" });
 
 export default async function ContactPage({ searchParams }: { searchParams: Promise<{ about?: string }> }) {
-  const { about } = await searchParams;
+  const [{ about }, site] = await Promise.all([searchParams, readSiteSettings()]);
+  const email = site.identity.contactEmail || "hello@searchable.pk";
   return (
     <div className="container-x py-12">
       <div className="mx-auto max-w-xl">
@@ -13,7 +15,10 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
         <div className="mt-6 surface p-6">
           <ContactForm about={about} />
         </div>
-        <p className="mt-4 text-sm text-3">Prefer email? hello@searchable.pk</p>
+        <p className="mt-4 text-sm text-3">
+          Prefer email? {email}
+          {site.identity.whatsapp ? ` · WhatsApp ${site.identity.whatsapp}` : ""}
+        </p>
       </div>
     </div>
   );
