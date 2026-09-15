@@ -118,5 +118,6 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 5. ✅ Professional profiles (ADR-26): hub, profession and city lists, profile page, editor with CV upload, owner dashboard, Verified plan, admin approval.
 6. ✅ Community (ADR-27): member profiles, posts (jobs, listings, auctions, questions, discussions) with editor approval, bids, comments and replies, likes on posts, comments and articles, reports, moderation queue with bans and member verification.
 7. ✅ Notifications (`src/lib/notify.ts`): enquiry emails to business owners (unclaimed listings get the claim link), professionals; outbid emails; one daily digest of comments, replies, likes and bids. ✅ Professional reviews with owner replies and admin moderation. ✅ Home page strips for community and professionals.
-8. Next: saved items; community search facets by city; notification preferences on the account page.
-9. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md` + `docs/FREE-TIER.md`), then AdSense, Resend, Search Console, Position Tracking.
+8. ✅ Saved items (bookmark on articles, calculators, data series, businesses, professionals and posts; `/account/saved`) and the daily digest preference.
+9. Next: notification preferences per kind; community search facets; more compare pages; tools to 30.
+10. Go-live checklist when told (`docs/LOCAL-TO-PRODUCTION.md` + `docs/FREE-TIER.md`), then AdSense, Resend, Search Console, Position Tracking.

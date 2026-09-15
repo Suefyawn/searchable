@@ -62,10 +62,32 @@ export const memberProfiles = pgTable(
     postCount: integer("post_count").default(0).notNull(),
     commentCount: integer("comment_count").default(0).notNull(),
     likesReceived: integer("likes_received").default(0).notNull(),
+    /** Daily digest of comments, replies, likes and bids on their things. */
+    notifyDigest: boolean("notify_digest").default(true).notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (t) => [index("member_profiles_handle_idx").on(t.handle)],
+);
+
+export const savedTarget = pgEnum("saved_target", ["article", "tool", "business", "professional", "post", "data_series"]);
+
+/** Bookmarks: anything with a URL a member wants to find again. */
+export const savedItems = pgTable(
+  "saved_items",
+  {
+    id: id(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    targetType: savedTarget("target_type").notNull(),
+    targetId: text("target_id").notNull(),
+    /** Denormalised so the saved list renders without joins. */
+    title: text("title").notNull(),
+    url: text("url").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex("saved_items_unique_idx").on(t.userId, t.targetType, t.targetId), index("saved_items_user_idx").on(t.userId, t.createdAt)],
 );
 
 export const posts = pgTable(

@@ -14,6 +14,7 @@ import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/utils";
 import { ProCard } from "@/components/professionals/pro-card";
 import { ReviewForm } from "@/components/directory/review-form";
+import { SaveButton } from "@/components/saved/save-button";
 import { ProLeadForm } from "./lead-form";
 
 export const revalidate = 3600;
@@ -320,6 +321,7 @@ export default async function ProfessionalPage({ params }: { params: Promise<{ s
               <ProLeadForm professionalId={p.id} name={p.name} />
             </div>
           </div>
+          <SaveButton target={{ targetType: "professional", targetId: p.id, title: `${p.name}, ${prof?.name ?? "professional"}`, url: `/p/${p.slug}` }} label="Save this profile" />
           <p className="text-[12.5px] text-3">
             Details are supplied by the professional.{p.isVerified ? " Verified means we checked identity and registration." : " Not yet verified by Searchable."}{" "}
             <Link href="/professionals/join" className="underline underline-offset-4">Are you a professional? Create your profile</Link>.

@@ -110,8 +110,8 @@ export async function sendActivityDigests(): Promise<{ sent: number }> {
   let sent = 0;
   if (byUser.size) {
     const users = await db.query.users.findMany({ where: inArray(schema.users.id, Array.from(byUser.keys())), columns: { id: true, email: true, name: true } });
-    const banned = await db.query.memberProfiles.findMany({ where: and(inArray(schema.memberProfiles.userId, users.map((u) => u.id)), eq(schema.memberProfiles.isBanned, true)), columns: { userId: true } });
-    const skip = new Set(banned.map((b) => b.userId));
+    const optedOut = await db.query.memberProfiles.findMany({ where: and(inArray(schema.memberProfiles.userId, users.map((u) => u.id)), sql`(${schema.memberProfiles.isBanned} or not ${schema.memberProfiles.notifyDigest})`), columns: { userId: true } });
+    const skip = new Set(optedOut.map((b) => b.userId));
     for (const u of users) {
       if (skip.has(u.id)) continue;
       const items = byUser.get(u.id)!;

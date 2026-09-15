@@ -33,6 +33,10 @@ export default async function AccountPage() {
             <p className="font-semibold">Your public profile</p>
             <p className="mt-1 text-[15px] text-2">Handle, photo, bio and handles shown on your posts and comments.</p>
           </Link>
+          <Link href="/account/saved" className="surface surface-hover p-5">
+            <p className="font-semibold">Saved</p>
+            <p className="mt-1 text-[15px] text-2">Articles, calculators, listings, profiles and posts you bookmarked.</p>
+          </Link>
           <Link href="/account/posts" className="surface surface-hover p-5">
             <p className="font-semibold">Your posts</p>
             <p className="mt-1 text-[15px] text-2">Jobs, listings, auctions and questions you have posted, and their status.</p>

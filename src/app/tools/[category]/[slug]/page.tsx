@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { Suspense } from "react";
 import { ArticleCard, ToolCard } from "@/components/cards";
+import { SaveButton } from "@/components/saved/save-button";
 import { CiteThis } from "@/components/cite";
 import { EmbedMode, EmbedSnippet } from "@/components/tools/embed";
 import { ToolRunner } from "@/components/tools/tool-runner";
@@ -121,7 +122,10 @@ export default async function ToolPage({ params }: Props) {
             <p className="mt-4 text-3">
               Version {tool.version} · reviewed {formatDate(tool.lastReviewed)}. Rates change with the Federal Budget and regulator notifications; we update this tool when they do. Confirm with the primary source before making financial decisions.
             </p>
-            <CiteThis title={tool.name} path={toolUrl(tool)} date={tool.lastReviewed} markdownPath={`/api/md${toolUrl(tool)}`} className="mt-4" />
+            <div className="mt-4 flex flex-wrap items-center gap-4">
+              <SaveButton target={{ targetType: "tool", targetId: tool.slug, title: tool.name, url: toolUrl(tool) }} label="Save this calculator" />
+            </div>
+            <CiteThis title={tool.name} path={toolUrl(tool)} date={tool.lastReviewed} markdownPath={`/api/md${toolUrl(tool)}`} className="mt-3" />
           </section>
 
           {entities.length ? (

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Change } from "@/components/data/change";
 import { GoldExtras } from "@/components/data/gold-extras";
 import { LineChart } from "@/components/data/line-chart";
+import { SaveButton } from "@/components/saved/save-button";
 import { CiteThis, KeyFacts } from "@/components/cite";
 import { ToolCard } from "@/components/cards";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
@@ -145,7 +146,10 @@ export default async function SeriesPage({ params }: Props) {
               </table>
             </div>
           </section>
-          <CiteThis title={series.name} path={`/data/${slug}`} date={latest?.date} markdownPath={`/api/md/data/${slug}`} className="mt-8" />
+          <div className="mt-8">
+            <SaveButton target={{ targetType: "data_series", targetId: series.id, title: series.name, url: `/data/${slug}` }} label="Save this series" />
+          </div>
+          <CiteThis title={series.name} path={`/data/${slug}`} date={latest?.date} markdownPath={`/api/md/data/${slug}`} className="mt-3" />
         </div>
 
         <aside className="space-y-4 self-start lg:sticky lg:top-24">

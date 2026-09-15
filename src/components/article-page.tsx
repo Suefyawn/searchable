@@ -9,6 +9,7 @@ import { entitiesForTarget } from "@/db/queries/entities";
 import { formatDate } from "@/lib/format";
 import { AdSlot } from "@/components/ads";
 import { CiteThis } from "@/components/cite";
+import { SaveButton } from "@/components/saved/save-button";
 import { CommentsSection } from "@/components/community/comments";
 import { reactionCount } from "@/lib/community";
 import { LikeButton } from "@/components/community/like-button";
@@ -161,6 +162,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
                 <a href="#comments" className="text-[13.5px] text-2 hover:text-[var(--text)]">
                   Comments
                 </a>
+                <SaveButton target={{ targetType: "article", targetId: article.id, title: article.title, url: path }} className="ml-auto" />
               </div>
             </LikedProvider>
             <ReportForm targetType="article" targetId={article.id} label="Spotted an error? Report it" />

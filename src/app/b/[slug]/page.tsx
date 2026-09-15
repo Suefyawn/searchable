@@ -8,6 +8,7 @@ import { getBusiness, listBusinesses } from "@/db/queries/directory";
 import { formatDate } from "@/lib/format";
 import { breadcrumbJsonLd, buildMetadata, localBusinessJsonLd } from "@/lib/seo";
 import { Img } from "@/components/img";
+import { SaveButton } from "@/components/saved/save-button";
 import { LeadForm } from "./lead-form";
 import { MapEmbed } from "@/components/directory/map-embed";
 import { TrackedLink } from "@/components/directory/tracked-link";
@@ -243,6 +244,7 @@ export default async function BusinessPage({ params }: Props) {
             </div>
           )}
           <div className="px-1">
+            <SaveButton target={{ targetType: "business", targetId: b.id, title: b.name, url: `/b/${b.slug}` }} label="Save this business" className="mb-2" />
             <ReportForm targetType="business" targetId={b.id} label="Report wrong details or a closed business" />
           </div>
         </aside>

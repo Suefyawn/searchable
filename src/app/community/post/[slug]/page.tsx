@@ -7,6 +7,7 @@ import { LikeButton } from "@/components/community/like-button";
 import { LikedProvider } from "@/components/community/liked-context";
 import { PostCard, postFigure } from "@/components/community/post-card";
 import { ReportButton } from "@/components/community/report-button";
+import { SaveButton } from "@/components/saved/save-button";
 import { Breadcrumbs, JsonLd } from "@/components/ui";
 import { getPost, kindLabel, listPosts, memberHandles } from "@/lib/community";
 import { srcSetFor } from "@/lib/images";
@@ -111,6 +112,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               <a href="#comments" className="inline-flex items-center gap-1.5 text-[13.5px] text-2 hover:text-[var(--text)]">
                 <MessageCircle className="size-4" /> {p.commentCount} comments
               </a>
+              <SaveButton target={{ targetType: "post", targetId: p.id, title: p.title, url: path }} />
               <ReportButton targetType="post" targetId={p.id} />
             </div>
           </LikedProvider>
