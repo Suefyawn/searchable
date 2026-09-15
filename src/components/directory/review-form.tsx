@@ -7,33 +7,35 @@ const subscribeNoop = () => () => {};
 import { Button, Input, Textarea } from "@/components/ui";
 import { useSession } from "@/lib/auth-client";
 import { hasAuthHint } from "@/lib/auth-hint";
-import { submitReview } from "@/lib/review-actions";
+import { submitProfessionalReview, submitReview } from "@/lib/review-actions";
 import { cn } from "@/lib/utils";
 
-/** Business profile pages are the busiest public pages; anonymous readers must not trigger a session request. */
-export function ReviewForm(props: { businessId: string; businessSlug: string }) {
+type Target = { kind?: "business" | "professional"; businessId: string; businessSlug: string };
+
+/** Profile pages are the busiest public pages; anonymous readers must not trigger a session request. `kind` picks the table (business by default). */
+export function ReviewForm(props: Target) {
   const mounted = React.useSyncExternalStore(subscribeNoop, () => true, () => false);
   if (!mounted) return null;
-  if (!hasAuthHint()) return <SignInPrompt businessSlug={props.businessSlug} />;
+  if (!hasAuthHint()) return <SignInPrompt {...props} />;
   return <ReviewFormInner {...props} />;
 }
 
-function SignInPrompt({ businessSlug }: { businessSlug: string }) {
+function SignInPrompt({ businessSlug, kind }: Target) {
   return (
     <p className="text-[15px] text-2">
-      <Link href={`/login?next=${encodeURIComponent(`/b/${businessSlug}#write-review`)}`} className="font-medium underline underline-offset-4">Sign in</Link> to write a review. Reviews are checked before they appear.
+      <Link href={`/login?next=${encodeURIComponent(`/${kind === "professional" ? "p" : "b"}/${businessSlug}#write-review`)}`} className="font-medium underline underline-offset-4">Sign in</Link> to write a review. Reviews are checked before they appear.
     </p>
   );
 }
 
-function ReviewFormInner({ businessId, businessSlug }: { businessId: string; businessSlug: string }) {
+function ReviewFormInner({ businessId, businessSlug, kind }: Target) {
   const { data, isPending } = useSession();
   const [rating, setRating] = React.useState(0);
   const [hover, setHover] = React.useState(0);
   const [state, setState] = React.useState<"idle" | "saving" | "done" | "error">("idle");
   const [error, setError] = React.useState("");
   if (isPending) return null;
-  if (!data?.user) return <SignInPrompt businessSlug={businessSlug} />;
+  if (!data?.user) return <SignInPrompt businessId={businessId} businessSlug={businessSlug} kind={kind} />;
   if (state === "done") return <p className="border border-brand-200 bg-brand-50 px-4 py-3 text-[15px] dark:border-brand-800 dark:bg-brand-950/40">Thank you. Your review is in the moderation queue and will appear once checked.</p>;
 
   return (
@@ -42,7 +44,8 @@ function ReviewFormInner({ businessId, businessSlug }: { businessId: string; bus
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
         setState("saving");
-        const res = await submitReview({ businessId, rating, title: String(fd.get("title") ?? "") || undefined, body: String(fd.get("body") ?? "") });
+        const payload = { rating, title: String(fd.get("title") ?? "") || undefined, body: String(fd.get("body") ?? "") };
+        const res = kind === "professional" ? await submitProfessionalReview({ professionalId: businessId, ...payload }) : await submitReview({ businessId, ...payload });
         if (res.ok) setState("done");
         else {
           setError(res.error ?? "Could not submit");

@@ -4,7 +4,7 @@ import { AdminPage, Empty, FilterTabs, Row, Rows, Status } from "@/components/ad
 import { Button } from "@/components/ui";
 import { getDb, schema } from "@/db";
 import { formatDate } from "@/lib/format";
-import { moderateReview } from "@/lib/review-actions";
+import { moderateProfessionalReview, moderateReview } from "@/lib/review-actions";
 
 export const dynamic = "force-dynamic";
 const STATUSES = ["pending", "published", "hidden", "all"] as const;
@@ -12,16 +12,22 @@ const STATUSES = ["pending", "published", "hidden", "all"] as const;
 export default async function AdminReviews({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
   const { status = "pending" } = await searchParams;
   const db = await getDb();
-  const [rows, counts] = await Promise.all([
-    db.query.businessReviews.findMany({
-      where: status === "all" ? undefined : eq(schema.businessReviews.status, status as (typeof schema.reviewStatus.enumValues)[number]),
-      orderBy: [desc(schema.businessReviews.createdAt)],
-      limit: 100,
-      with: { business: true },
-    }),
+  const st = status as (typeof schema.reviewStatus.enumValues)[number];
+  const [bizRows, proRows, counts, proCounts] = await Promise.all([
+    db.query.businessReviews.findMany({ where: status === "all" ? undefined : eq(schema.businessReviews.status, st), orderBy: [desc(schema.businessReviews.createdAt)], limit: 100, with: { business: true } }),
+    db.query.professionalReviews.findMany({ where: status === "all" ? undefined : eq(schema.professionalReviews.status, st), orderBy: [desc(schema.professionalReviews.createdAt)], limit: 100, with: { professional: { columns: { name: true, slug: true } } } }),
     db.select({ status: schema.businessReviews.status, n: sql<number>`count(*)::int` }).from(schema.businessReviews).groupBy(schema.businessReviews.status),
+    db.select({ status: schema.professionalReviews.status, n: sql<number>`count(*)::int` }).from(schema.professionalReviews).groupBy(schema.professionalReviews.status),
   ]);
-  const count = (s: string) => (s === "all" ? counts.reduce((a, c) => a + c.n, 0) : counts.find((c) => c.status === s)?.n ?? 0);
+  // One list, business and professional reviews together, newest first.
+  const rows = [
+    ...bizRows.map((r) => ({ ...r, kind: "business" as const, target: { name: r.business.name, href: `/b/${r.business.slug}` } })),
+    ...proRows.map((r) => ({ ...r, kind: "professional" as const, target: { name: r.professional.name, href: `/p/${r.professional.slug}` } })),
+  ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  const count = (s: string) => {
+    const all = [...counts, ...proCounts];
+    return s === "all" ? all.reduce((a, c) => a + c.n, 0) : all.filter((c) => c.status === s).reduce((a, c) => a + c.n, 0);
+  };
   return (
     <AdminPage title="Reviews" description="Publish what reads like a real visit. Hide spam, insults, and anything naming private people. Owners can reply to published reviews from their dashboard.">
       <FilterTabs items={STATUSES.map((s) => ({ href: `/admin/reviews?status=${s}`, label: s, count: count(s), active: status === s }))} />
@@ -32,14 +38,14 @@ export default async function AdminReviews({ searchParams }: { searchParams: Pro
             actions={
               <>
                 {r.status !== "published" ? (
-                  <form action={moderateReview.bind(null, r.id, "published")}>
+                  <form action={(r.kind === "professional" ? moderateProfessionalReview : moderateReview).bind(null, r.id, "published")}>
                     <Button size="sm" type="submit">
                       Publish
                     </Button>
                   </form>
                 ) : null}
                 {r.status !== "hidden" ? (
-                  <form action={moderateReview.bind(null, r.id, "hidden")}>
+                  <form action={(r.kind === "professional" ? moderateProfessionalReview : moderateReview).bind(null, r.id, "hidden")}>
                     <Button size="sm" variant="ghost" type="submit">
                       Hide
                     </Button>
@@ -49,9 +55,10 @@ export default async function AdminReviews({ searchParams }: { searchParams: Pro
             }
           >
             <p className="flex flex-wrap items-center gap-2 text-[14px]">
-              <Link href={`/b/${r.business.slug}`} className="font-medium hover:underline underline-offset-4">
-                {r.business.name}
+              <Link href={r.target.href} className="font-medium hover:underline underline-offset-4">
+                {r.target.name}
               </Link>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-3">{r.kind}</span>
               <span aria-label={`${r.rating} out of 5`} className="tracking-tight">
                 {"★".repeat(r.rating)}
                 <span className="text-ink-300">{"★".repeat(5 - r.rating)}</span>

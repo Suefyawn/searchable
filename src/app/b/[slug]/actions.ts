@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { getDb, schema } from "@/db";
+import { notifyBusinessLead } from "@/lib/notify";
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
 
 const Lead = z.object({
@@ -19,5 +20,6 @@ export async function sendLead(input: z.infer<typeof Lead>): Promise<{ ok: boole
   const db = await getDb();
   await db.insert(schema.businessLeads).values({ ...parsed.data, source: "profile" });
   await db.insert(schema.analyticsEvents).values({ name: "business_lead", props: { businessId: parsed.data.businessId } });
+  await notifyBusinessLead(parsed.data.businessId, parsed.data);
   return { ok: true };
 }

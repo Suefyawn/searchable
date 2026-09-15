@@ -3,8 +3,9 @@
 import * as React from "react";
 import { Button, Textarea } from "@/components/ui";
 import { respondToReview } from "@/lib/business-actions";
+import { respondToProfessionalReview } from "@/lib/review-actions";
 
-export function ReviewResponseForm({ reviewId, initial }: { reviewId: string; initial: string }) {
+export function ReviewResponseForm({ reviewId, initial, kind = "business" }: { reviewId: string; initial: string; kind?: "business" | "professional" }) {
   const [text, setText] = React.useState(initial);
   const [state, setState] = React.useState<"idle" | "saving" | "saved" | "error">("idle");
   return (
@@ -12,7 +13,7 @@ export function ReviewResponseForm({ reviewId, initial }: { reviewId: string; in
       onSubmit={async (e) => {
         e.preventDefault();
         setState("saving");
-        const res = await respondToReview(reviewId, text);
+        const res = kind === "professional" ? await respondToProfessionalReview(reviewId, text) : await respondToReview(reviewId, text);
         setState(res.ok ? "saved" : "error");
       }}
       className="space-y-2"
@@ -22,7 +23,7 @@ export function ReviewResponseForm({ reviewId, initial }: { reviewId: string; in
         <Button type="submit" size="sm" variant="outline" disabled={state === "saving"}>
           {state === "saving" ? "Saving…" : initial ? "Update response" : "Post response"}
         </Button>
-        {state === "saved" ? <span className="text-sm text-emerald-700">Published on your listing.</span> : null}
+        {state === "saved" ? <span className="text-sm text-2">Published on your {kind === "professional" ? "profile" : "listing"}.</span> : null}
         {state === "error" ? <span className="text-sm text-red-600">Could not save.</span> : null}
       </div>
     </form>

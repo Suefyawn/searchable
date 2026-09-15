@@ -4,6 +4,7 @@ import { publishDueArticles } from "@/app/admin/articles/actions";
 import { expireStaleClaims, sendClaimInvites } from "./claims";
 import { expireLapsedPlans } from "./commerce";
 import { closeExpiredPosts } from "./community";
+import { sendActivityDigests } from "./notify";
 import { sendDueIssues } from "./newsletter-issue";
 
 /**
@@ -18,7 +19,7 @@ import { sendDueIssues } from "./newsletter-issue";
 const JOB_INTERVAL_MS = 5 * 60_000;
 let lastLocalRun = 0;
 
-export type JobsResult = { ran: boolean; published?: number; newsletters?: unknown; lapsedPlans?: number; invites?: { sent: number; skipped: string }; at?: string };
+export type JobsResult = { ran: boolean; published?: number; newsletters?: unknown; lapsedPlans?: number; invites?: { sent: number; skipped: string }; digests?: { sent: number }; at?: string };
 
 export async function runDueJobs(opts: { force?: boolean } = {}): Promise<JobsResult> {
   const now = Date.now();
@@ -38,7 +39,8 @@ export async function runDueJobs(opts: { force?: boolean } = {}): Promise<JobsRe
   const newsletters = await sendDueIssues();
   const lapsedPlans = await expireLapsedPlans();
   const invites = await sendClaimInvites();
-  return { ran: true, published, newsletters, lapsedPlans, invites, at: new Date().toISOString() };
+  const digests = await sendActivityDigests();
+  return { ran: true, published, newsletters, lapsedPlans, invites, digests, at: new Date().toISOString() };
 }
 
 /**

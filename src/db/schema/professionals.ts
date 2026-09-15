@@ -1,6 +1,7 @@
 import { boolean, doublePrecision, index, integer, jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { createdAt, id, updatedAt } from "./_shared";
 import { users } from "./auth";
+import { reviewStatus } from "./directory";
 import { locations } from "./geo";
 
 /**
@@ -85,4 +86,25 @@ export const professionalLeads = pgTable(
     createdAt: createdAt(),
   },
   (t) => [index("professional_leads_pro_idx").on(t.professionalId, t.createdAt)],
+);
+
+/** Client reviews of a professional; same moderation flow as business reviews. */
+export const professionalReviews = pgTable(
+  "professional_reviews",
+  {
+    id: id(),
+    professionalId: text("professional_id")
+      .notNull()
+      .references(() => professionals.id, { onDelete: "cascade" }),
+    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+    authorName: text("author_name"),
+    rating: integer("rating").notNull(),
+    title: text("title"),
+    body: text("body"),
+    status: reviewStatus("status").default("pending").notNull(),
+    ownerResponse: text("owner_response"),
+    ownerRespondedAt: timestamp("owner_responded_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("professional_reviews_pro_idx").on(t.professionalId, t.status)],
 );

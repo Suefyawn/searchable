@@ -51,8 +51,12 @@ function decode(s: string): string {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;|&apos;/g, "'")
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&(nbsp|ndash|mdash|hellip|lsquo|rsquo|ldquo|rdquo|amp);/g, (_, name) => ({ nbsp: " ", ndash: "-", mdash: " - ", hellip: "...", lsquo: "\u2018", rsquo: "\u2019", ldquo: "\u201c", rdquo: "\u201d", amp: "&" })[name as string] ?? "")
     .replace(/&nbsp;/g, " ")
+    // Publishers love the em dash; house style does not.
+    .replace(/\s*\u2014\s*/g, " - ")
     .replace(/\s+/g, " ")
     .trim();
 }

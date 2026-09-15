@@ -11,6 +11,7 @@ import { rateLimit } from "@/lib/rate-limit";
 import { slugify, uniqueSlug } from "@/lib/slug";
 import { SITE } from "@/lib/utils";
 import { getMemberByUser, indexPost, isTrustedAuthor } from "./community";
+import { notifyOutbid } from "./notify";
 
 type Result = { ok: boolean; error?: string; id?: string; slug?: string };
 
@@ -139,6 +140,7 @@ export async function placeBid(postId: string, amount: number): Promise<Result &
   if (p.meta.endsAt && Date.parse(p.meta.endsAt) < Date.now()) return { ok: false, error: "This auction has ended." };
   const floor = (p.highestBid ?? (p.meta.startPrice ?? 0) - (p.meta.minIncrement ?? 1)) + (p.meta.minIncrement ?? 1);
   if (!Number.isInteger(amount) || amount < floor) return { ok: false, error: `Bid at least Rs ${floor.toLocaleString()}.` };
+  await notifyOutbid(postId, amount, user.id);
   await db.insert(schema.bids).values({ postId, userId: user.id, amount });
   await db.update(schema.posts).set({ highestBid: amount, bidCount: sql`${schema.posts.bidCount} + 1` }).where(eq(schema.posts.id, postId));
   revalidatePath(`/community/post/${p.slug}`);

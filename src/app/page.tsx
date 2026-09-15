@@ -6,6 +6,10 @@ import { HeroCarousel, type Slide } from "@/components/home/hero-carousel";
 import { Img } from "@/components/img";
 import { LiveFeed } from "@/components/home/live-feed";
 import { PhotoTile } from "@/components/photo-tiles";
+import { PostCard } from "@/components/community/post-card";
+import { ProCard } from "@/components/professionals/pro-card";
+import { listPosts } from "@/lib/community";
+import { listProfessionals } from "@/lib/professionals";
 import { activityFeed } from "@/lib/activity";
 import { fetchPress, groupBySource, groupByTopic } from "@/lib/press";
 import { listArticles } from "@/db/queries/content";
@@ -22,7 +26,7 @@ function Label({ children }: { children: React.ReactNode }) {
 }
 
 export default async function HomePage() {
-  const [featured, latest, guides, cities, categories, series, feed, pressItems, worldItems] = await Promise.all([
+  const [featured, latest, guides, cities, categories, series, feed, pressItems, worldItems, community, pros] = await Promise.all([
     listArticles({ kind: "news", featured: true, limit: 1 }),
     listArticles({ kind: "news", limit: 12 }),
     listArticles({ kind: "guide", limit: 5 }),
@@ -32,6 +36,8 @@ export default async function HomePage() {
     activityFeed(24),
     fetchPress({ limit: 40, perFeed: 8, region: "pk" }),
     fetchPress({ limit: 120, perFeed: 8, region: "world" }),
+    listPosts({ limit: 6 }),
+    listProfessionals({ limit: 4 }),
   ]);
   const lead = featured[0] ?? latest[0];
   const ordered = lead ? [lead, ...latest.filter((a) => a.id !== lead.id)] : latest;
@@ -239,6 +245,48 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Community and professionals */}
+      {community.rows.length || pros.rows.length ? (
+        <section className="grid gap-10 py-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          {community.rows.length ? (
+            <div>
+              <div className="rule flex items-baseline justify-between pt-3">
+                <h2 className="font-serif text-2xl">From the community</h2>
+                <Link href="/community" className="text-sm font-medium text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
+                  Jobs, listings, questions →
+                </Link>
+              </div>
+              <div className="mt-2">
+                {community.rows.slice(0, 5).map((p) => (
+                  <PostCard key={p.id} p={p} className="py-3" />
+                ))}
+              </div>
+              <Link href="/community/new" className="mt-3 inline-block text-sm font-medium underline-offset-4 hover:underline">
+                Post something →
+              </Link>
+            </div>
+          ) : null}
+          {pros.rows.length ? (
+            <div>
+              <div className="rule flex items-baseline justify-between pt-3">
+                <h2 className="font-serif text-2xl">Professionals</h2>
+                <Link href="/professionals" className="text-sm font-medium text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
+                  Find a professional →
+                </Link>
+              </div>
+              <div className="mt-2">
+                {pros.rows.map((p) => (
+                  <ProCard key={p.id} p={p} className="py-3" />
+                ))}
+              </div>
+              <Link href="/professionals/join" className="mt-3 inline-block text-sm font-medium underline-offset-4 hover:underline">
+                Create your profile →
+              </Link>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       {/* Newsletter */}
       <section className="rule mb-4 mt-4 grid gap-8 py-10 lg:grid-cols-2 lg:items-center">

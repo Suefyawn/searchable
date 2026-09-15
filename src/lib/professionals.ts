@@ -52,7 +52,7 @@ export async function listProfessionals(opts: { profession?: string; citySlug?: 
 
 export async function getProfessional(slug: string) {
   const db = await getDb();
-  return db.query.professionals.findFirst({ where: eq(schema.professionals.slug, slug), with: { city: true, area: true } });
+  return db.query.professionals.findFirst({ where: eq(schema.professionals.slug, slug), with: { city: true, area: true, reviews: { where: eq(schema.professionalReviews.status, "published"), orderBy: [desc(schema.professionalReviews.createdAt)], limit: 30 } } });
 }
 export async function getProfessionalById(id: string) {
   const db = await getDb();
@@ -80,11 +80,11 @@ export async function professionalCities(profession?: string, limit = 12) {
 
 export async function professionalsForUser(userId: string) {
   const db = await getDb();
-  return db.query.professionals.findMany({ where: eq(schema.professionals.ownerUserId, userId), with: { city: true, area: true, leads: { orderBy: [desc(schema.professionalLeads.createdAt)], limit: 10 } }, orderBy: [desc(schema.professionals.createdAt)] });
+  return db.query.professionals.findMany({ where: eq(schema.professionals.ownerUserId, userId), with: { city: true, area: true, leads: { orderBy: [desc(schema.professionalLeads.createdAt)], limit: 10 }, reviews: { orderBy: [desc(schema.professionalReviews.createdAt)], limit: 10 } }, orderBy: [desc(schema.professionals.createdAt)] });
 }
 
 /** Editor initial values from a row. */
-export function toFormInput(p: NonNullable<Awaited<ReturnType<typeof getProfessional>>>): ProfessionalFormInput {
+export function toFormInput(p: NonNullable<Awaited<ReturnType<typeof getProfessionalById>>>): ProfessionalFormInput {
   return {
     id: p.id,
     name: p.name,

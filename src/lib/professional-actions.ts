@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
 import { getSessionUser, hasRole, requireRole, type SessionUser } from "@/lib/auth";
+import { notifyProfessionalLead } from "@/lib/notify";
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { slugify, uniqueSlug } from "@/lib/slug";
 import { indexProfessional } from "./professionals";
@@ -108,6 +109,7 @@ export async function sendProfessionalLead(input: z.input<typeof Lead>): Promise
   const p = await db.query.professionals.findFirst({ where: eq(schema.professionals.id, parsed.data.professionalId), columns: { id: true, status: true } });
   if (!p || p.status !== "active") return { ok: false, error: "Profile not available." };
   await db.insert(schema.professionalLeads).values({ professionalId: p.id, name: parsed.data.name, phone: parsed.data.phone, email: parsed.data.email || null, message: parsed.data.message || null, source: "profile" });
+  await notifyProfessionalLead(p.id, { name: parsed.data.name, phone: parsed.data.phone, email: parsed.data.email, message: parsed.data.message });
   return { ok: true };
 }
 

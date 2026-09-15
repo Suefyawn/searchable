@@ -65,7 +65,7 @@ export default async function AdminDashboard() {
         (select count(*) from professionals where status = 'pending')::int as professionals,
         (select count(*) from posts where status = 'pending')::int as posts,
         (select count(*) from reports where status = 'open' and target_type in ('post', 'comment', 'member'))::int as community_reports,
-        (select count(*) from business_reviews where status = 'pending')::int as reviews,
+        ((select count(*) from business_reviews where status = 'pending') + (select count(*) from professional_reviews where status = 'pending'))::int as reviews,
         (select count(*) from orders where status = 'pending')::int as orders,
         (select count(*) from submissions where status in ('new', 'reviewing'))::int as submissions,
         (select count(*) from messages where status = 'new')::int as messages,

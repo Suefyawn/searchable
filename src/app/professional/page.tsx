@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ReviewResponseForm } from "@/components/directory/review-response-form";
 import { Badge, SectionHeader } from "@/components/ui";
 import { getProfession } from "@/content/professions";
 import { requireUser } from "@/lib/auth";
@@ -74,6 +75,31 @@ export default async function ProfessionalDashboard() {
                   <Link href={`/professional/${p.id}/upgrade`} className="inline-flex h-9 items-center bg-ink-900 px-3.5 text-sm font-medium text-white hover:bg-ink-800">
                     See details
                   </Link>
+                </div>
+              ) : null}
+              {p.reviews.length ? (
+                <div className="mt-5">
+                  <p className="eyebrow">Reviews</p>
+                  <ul className="mt-2 divide-y divide-[var(--border)] text-[15px]">
+                    {p.reviews.map((r) => (
+                      <li key={r.id} className="py-3">
+                        <p className="text-[13px] tracking-tight">
+                          {"★".repeat(r.rating)}
+                          <span className="text-ink-300">{"★".repeat(5 - r.rating)}</span>
+                          <span className="ml-2 text-3">
+                            {r.authorName ?? "Anonymous"} · {r.status} · {formatDate(r.createdAt)}
+                          </span>
+                        </p>
+                        {r.title ? <p className="mt-1 font-medium">{r.title}</p> : null}
+                        {r.body ? <p className="mt-0.5 text-2">{r.body}</p> : null}
+                        {r.status === "published" ? (
+                          <div className="mt-2 max-w-lg">
+                            <ReviewResponseForm reviewId={r.id} initial={r.ownerResponse ?? ""} kind="professional" />
+                          </div>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               ) : null}
               <div className="mt-5">

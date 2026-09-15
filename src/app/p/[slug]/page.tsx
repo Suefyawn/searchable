@@ -13,6 +13,7 @@ import { getProfessional, listProfessionals } from "@/lib/professionals";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/utils";
 import { ProCard } from "@/components/professionals/pro-card";
+import { ReviewForm } from "@/components/directory/review-form";
 import { ProLeadForm } from "./lead-form";
 
 export const revalidate = 3600;
@@ -251,6 +252,40 @@ export default async function ProfessionalPage({ params }: { params: Promise<{ s
               </ul>
             </section>
           ) : null}
+          <section id="write-review">
+            <h2 className="eyebrow mb-3">
+              Reviews <span className="ml-1 font-sans text-[12px] font-normal normal-case tracking-normal text-3">{p.reviews.length}</span>
+            </h2>
+            {p.reviews.length ? (
+              <ul className="divide-y divide-[var(--border)] border-y border-line">
+                {p.reviews.map((r) => (
+                  <li key={r.id} className="py-4">
+                    <div className="flex items-center justify-between gap-3 text-[14px]">
+                      <span className="font-medium">{r.authorName ?? "Anonymous"}</span>
+                      <span className="text-3">{formatDate(r.createdAt)}</span>
+                    </div>
+                    <p className="mt-0.5 text-[13px] tracking-tight" aria-label={`${r.rating} out of 5`}>
+                      {"★".repeat(r.rating)}
+                      <span className="text-ink-300">{"★".repeat(5 - r.rating)}</span>
+                    </p>
+                    {r.title ? <p className="mt-1.5 font-medium">{r.title}</p> : null}
+                    {r.body ? <p className="mt-1 text-[15px] text-2">{r.body}</p> : null}
+                    {r.ownerResponse ? (
+                      <div className="mt-3 border-l-2 border-[var(--rule)] pl-3 text-[14.5px]">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-3">Reply from {p.name.split(" ")[0]}</p>
+                        <p className="mt-1 text-2">{r.ownerResponse}</p>
+                      </div>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-[14.5px] text-2">No reviews yet. Reviews are checked before they appear and are never paid for.</p>
+            )}
+            <div className="mt-5 max-w-xl">
+              <ReviewForm kind="professional" businessId={p.id} businessSlug={p.slug} />
+            </div>
+          </section>
           <CiteThis title={`${p.name}, ${prof?.name ?? "professional"}`} path={`/p/${p.slug}`} date={p.updatedAt} />
         </div>
 

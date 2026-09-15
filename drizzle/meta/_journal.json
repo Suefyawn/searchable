@@ -64,6 +64,13 @@
       "when": 1789465120940,
       "tag": "0008_community",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1789471920413,
+      "tag": "0009_professional_reviews",
+      "breakpoints": true
     }
   ]
 }

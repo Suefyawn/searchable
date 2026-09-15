@@ -6,7 +6,7 @@ import { dataPoints, dataSeries } from "./data";
 import { locations } from "./geo";
 import { users } from "./auth";
 import { orders, submissions } from "./commerce";
-import { professionalLeads, professionals } from "./professionals";
+import { professionalLeads, professionalReviews, professionals } from "./professionals";
 import { bids, comments, memberProfiles, posts, reactions } from "./community";
 
 export const locationsRelations = relations(locations, ({ one, many }) => ({
@@ -117,6 +117,11 @@ export const professionalsRelations = relations(professionals, ({ one, many }) =
   city: one(locations, { fields: [professionals.cityId], references: [locations.id], relationName: "professionalCity" }),
   area: one(locations, { fields: [professionals.areaId], references: [locations.id], relationName: "professionalArea" }),
   leads: many(professionalLeads),
+  reviews: many(professionalReviews),
+}));
+export const professionalReviewsRelations = relations(professionalReviews, ({ one }) => ({
+  professional: one(professionals, { fields: [professionalReviews.professionalId], references: [professionals.id] }),
+  user: one(users, { fields: [professionalReviews.userId], references: [users.id] }),
 }));
 export const professionalLeadsRelations = relations(professionalLeads, ({ one }) => ({
   professional: one(professionals, { fields: [professionalLeads.professionalId], references: [professionals.id] }),
