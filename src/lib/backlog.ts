@@ -49,13 +49,13 @@ async function writeBacklog(items: BacklogItemT[]) {
 }
 
 /** Add or replace items by keyword (case-insensitive). Existing status and url survive unless given. */
-export async function upsertBacklog(incoming: BacklogItemT[]): Promise<{ added: number; updated: number }> {
+export async function upsertBacklog(incoming: (Omit<BacklogItemT, "status"> & { status?: BacklogItemT["status"] })[]): Promise<{ added: number; updated: number }> {
   const items = await readBacklog();
   let added = 0;
   let updated = 0;
   for (const it of incoming) {
     const i = items.findIndex((x) => x.keyword.toLowerCase() === it.keyword.toLowerCase());
-    const stamped = { ...it, updatedAt: new Date().toISOString() };
+    const stamped = { ...it, status: it.status ?? "open", updatedAt: new Date().toISOString() } as BacklogItemT;
     if (i === -1) {
       items.push(stamped);
       added += 1;
