@@ -22,6 +22,37 @@ export type TaxYear = {
 
 export const TAX_YEARS: TaxYear[] = [
   {
+    year: "2026-27",
+    label: "Tax Year 2027 (FY 2026-27)",
+    effectiveFrom: "2026-07-01",
+    source: {
+      title: "Finance Act 2026 — First Schedule, Part I, Division I (salaried slabs revised; s.4AB surcharge withdrawn for salaried)",
+      url: "https://fbr.gov.pk/",
+      publisher: "Federal Board of Revenue",
+    },
+    salaried: [
+      { upTo: 600_000, rate: 0, fixed: 0, over: 0 },
+      { upTo: 1_200_000, rate: 0.01, fixed: 0, over: 600_000 },
+      { upTo: 2_200_000, rate: 0.11, fixed: 6_000, over: 1_200_000 },
+      { upTo: 3_200_000, rate: 0.2, fixed: 116_000, over: 2_200_000 },
+      { upTo: 4_100_000, rate: 0.25, fixed: 316_000, over: 3_200_000 },
+      { upTo: 5_600_000, rate: 0.29, fixed: 541_000, over: 4_100_000 },
+      { upTo: 7_000_000, rate: 0.32, fixed: 976_000, over: 5_600_000 },
+      { upTo: null, rate: 0.35, fixed: 1_424_000, over: 7_000_000 },
+    ],
+    nonSalaried: [
+      { upTo: 600_000, rate: 0, fixed: 0, over: 0 },
+      { upTo: 1_200_000, rate: 0.15, fixed: 0, over: 600_000 },
+      { upTo: 1_600_000, rate: 0.2, fixed: 90_000, over: 1_200_000 },
+      { upTo: 3_200_000, rate: 0.3, fixed: 170_000, over: 1_600_000 },
+      { upTo: 5_600_000, rate: 0.4, fixed: 650_000, over: 3_200_000 },
+      { upTo: null, rate: 0.45, fixed: 1_610_000, over: 5_600_000 },
+    ],
+    surchargeThreshold: 10_000_000,
+    surchargeRateSalaried: 0,
+    surchargeRateNonSalaried: 0.1,
+  },
+  {
     year: "2025-26",
     label: "Tax Year 2026 (FY 2025-26)",
     effectiveFrom: "2025-07-01",
