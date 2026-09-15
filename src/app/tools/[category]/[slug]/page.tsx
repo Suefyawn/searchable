@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { Suspense } from "react";
 import { ArticleCard, ToolCard } from "@/components/cards";
+import { EmbedMode, EmbedSnippet } from "@/components/tools/embed";
 import { ToolRunner } from "@/components/tools/tool-runner";
 import { Badge, Breadcrumbs, JsonLd } from "@/components/ui";
 import { getArticlesBySlugs } from "@/db/queries/content";
@@ -61,6 +62,9 @@ export default async function ToolPage({ params }: Props) {
         <Suspense fallback={<div className="surface p-6 text-2">Loading calculator…</div>}>
           <ToolRunner slug={tool.slug} live={live.input} />
         </Suspense>
+        <Suspense fallback={null}>
+          <EmbedMode toolName={tool.name} toolPath={toolUrl(tool)} />
+        </Suspense>
         {live.sources.length ? (
           <p className="mt-3 text-[13px] text-3">
             Pre-filled from Searchable Data:{" "}
@@ -74,7 +78,11 @@ export default async function ToolPage({ params }: Props) {
         ) : null}
       </div>
 
-      <div className="mt-14 grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="mt-6" data-embed-hide>
+        <EmbedSnippet toolName={tool.name} toolPath={toolUrl(tool)} />
+      </div>
+
+      <div className="mt-14 grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]" data-embed-hide>
         <div className="space-y-12">
           <section>
             <h2 className="font-display text-3xl font-semibold">How this is calculated</h2>

@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import { addDataPoint } from "@/db/queries/data";
 
@@ -18,9 +18,73 @@ const UA = "SearchablePK/0.1 (https://searchable.pk; data@searchable.pk)";
 const TOLA_PER_OZ = 11.664 / 31.1035;
 
 export type Reading = { slug: string; value: number; date: string; note: string; sourceUrl: string };
-export type IngestResult = { slug: string; status: "written" | "unchanged" | "rejected" | "error" | "no-series"; value?: number; previous?: number; message?: string };
+export type IngestResult = { slug: string; status: "written" | "unchanged" | "rejected" | "error" | "no-series"; value?: number; previous?: number; message?: string; draftArticleId?: string | null };
 
 const today = () => new Date().toISOString().slice(0, 10);
+
+/** Series whose change is news: a draft article is created for the desk to check and publish. */
+const NEWSWORTHY: Record<string, { title: (v: number, prev: number) => string; body: (v: number, prev: number, note: string) => string; category: string; tool?: string }> = {
+  "petrol-price": {
+    category: "economy",
+    tool: "/tools/cars/fuel-cost-calculator",
+    title: (v, p) => `Petrol price ${v > p ? "raised" : "cut"} to Rs ${v.toFixed(2)} per litre, ${v > p ? "up" : "down"} Rs ${Math.abs(v - p).toFixed(2)}`,
+    body: (v, p, note) => `The ex-depot price of petrol (Premier Euro 5) is now **Rs ${v.toFixed(2)} per litre**, ${v > p ? "up" : "down"} from Rs ${p.toFixed(2)} — a change of Rs ${Math.abs(v - p).toFixed(2)} (${(((v - p) / p) * 100).toFixed(1)}%).
+
+Source: ${note}.
+
+## What it means
+
+- Filling a 35-litre tank now costs **Rs ${(v * 35).toFixed(0)}**, ${v > p ? "Rs " + ((v - p) * 35).toFixed(0) + " more" : "Rs " + ((p - v) * 35).toFixed(0) + " less"} than before.
+- A car doing 1,000 km a month at 12 km/l spends about **Rs ${((1000 / 12) * v).toFixed(0)}** on petrol.
+- Check your own numbers with the [Fuel Cost Calculator](/tools/cars/fuel-cost-calculator) and see the [petrol price history](/data/petrol-price).
+
+*Draft generated automatically from the data hub — verify against the OGRA notification before publishing.*`,
+  },
+  "diesel-price": {
+    category: "economy",
+    title: (v, p) => `Diesel price ${v > p ? "raised" : "cut"} to Rs ${v.toFixed(2)} per litre`,
+    body: (v, p, note) => `High-speed diesel is now **Rs ${v.toFixed(2)} per litre**, ${v > p ? "up" : "down"} from Rs ${p.toFixed(2)} (${(((v - p) / p) * 100).toFixed(1)}%). Source: ${note}.
+
+Diesel moves transport and food prices: expect goods-transport rates to follow within days. History: [diesel price](/data/diesel-price).
+
+*Draft generated automatically from the data hub — verify against the OGRA notification before publishing.*`,
+  },
+  "sbp-policy-rate": {
+    category: "economy",
+    tool: "/tools/cars/car-loan-calculator",
+    title: (v, p) => `SBP ${v > p ? "raises" : "cuts"} policy rate to ${v}%`,
+    body: (v, p, note) => `The State Bank of Pakistan's policy rate is now **${v}%**, ${v > p ? "up" : "down"} from ${p}%. Source: ${note}.
+
+## What it means for you
+
+- Bank lending rates (KIBOR + spread) follow within weeks: car and home loan instalments ${v > p ? "rise" : "fall"}.
+- Savings-account and NSC profit rates move the same way.
+- Model a loan at the new rate with the [Car Loan Calculator](/tools/cars/car-loan-calculator) or [Home Loan Calculator](/tools/finance/home-loan-calculator).
+
+*Draft generated automatically from the data hub — verify against the SBP monetary policy statement before publishing.*`,
+  },
+};
+
+/** Create a draft news article for a newsworthy change, unless one already exists for this series today. */
+async function draftArticle(slug: string, value: number, previous: number, note: string) {
+  const tpl = NEWSWORTHY[slug];
+  if (!tpl || value === previous) return null;
+  const db = await getDb();
+  const date = today();
+  const artSlug = `${slug}-${date}`;
+  const exists = await db.query.articles.findFirst({ where: and(eq(schema.articles.kind, "news"), eq(schema.articles.slug, artSlug)), columns: { id: true } });
+  if (exists) return exists.id;
+  const [category, author] = await Promise.all([
+    db.query.categories.findFirst({ where: and(eq(schema.categories.kind, "news"), eq(schema.categories.slug, tpl.category)), columns: { id: true } }),
+    db.query.authors.findFirst({ where: eq(schema.authors.slug, "searchable-editorial"), columns: { id: true } }),
+  ]);
+  const body = tpl.body(value, previous, note);
+  const [row] = await db
+    .insert(schema.articles)
+    .values({ kind: "news", status: "draft", slug: artSlug, title: tpl.title(value, previous), dek: `Automatically drafted from the data hub on ${date}; needs an editor's check before publishing.`, body, excerpt: body.slice(0, 180), categoryId: category?.id ?? null, authorId: author?.id ?? null, sources: [{ title: note, url: "" }], faqs: [], relatedIds: [] })
+    .returning({ id: schema.articles.id });
+  return row.id;
+}
 const text = async (url: string) => {
   const res = await fetch(url, { headers: { "user-agent": UA, accept: "text/html,application/json" }, cache: "no-store" });
   if (!res.ok) throw new Error(`${url} → ${res.status}`);
@@ -145,7 +209,8 @@ export async function runIngestion(opts: { maxJump?: number; only?: string[]; fo
     }
     try {
       await addDataPoint(series.id, r.date, r.value, r.note, r.sourceUrl);
-      results.push({ slug: r.slug, status: "written", value: r.value, previous: prev?.value });
+      const draftArticleId = prev && prev.value !== r.value ? await draftArticle(r.slug, r.value, prev.value, r.note) : null;
+      results.push({ slug: r.slug, status: "written", value: r.value, previous: prev?.value, draftArticleId });
     } catch (e) {
       results.push({ slug: r.slug, status: "error", message: (e as Error).message });
     }

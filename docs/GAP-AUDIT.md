@@ -47,7 +47,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | Section, category, article routes with pagination, RSS | ✅ |
 | Tools framework: fields, compute, methodology, sources, versions, JSON-LD, share URLs, live defaults from data | ✅ |
 | Tools built | 🟡 21 of 50 (tax 4 · finance 7 · cars 4 · property 2 · utilities 1 · solar 1 · telecom 1 · government 1) |
-| Embeddable widgets | ❌ |
+| Embeddable widgets (`?embed=1` mode + copyable iframe snippet with attribution link) | ✅ |
 | Hubs: `/pta`, `/electricity` + 11 DISCOs, `/electricity/net-metering`, `/data/solar-panel-price`, `/compare/solar-inverters` | ✅ |
 
 ## Directory
@@ -79,7 +79,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 |---|---|
 | 14 data series, history, charts, stats, API, admin entry, city sections (gold), inflation | ✅ |
 | Automated ingestion (SBP, er-api, PSO, spot gold/silver → 12 of 14 series; daily cron + Fetch now; 30% jump guard) | ✅ |
-| Data → auto-drafted article on change | ❌ |
+| Data → auto-drafted article on change (petrol, diesel, policy rate → draft news with worked numbers) | ✅ |
 | Compare pages | 🟡 2 of 8 (new cars, solar inverters) + /compare hub; banks/packages next |
 | Reviews + moderation + owner response + report | ✅ |
 
