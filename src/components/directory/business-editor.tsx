@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { ImageGalleryUpload, ImageUpload } from "@/components/image-upload";
+import { GalleryUpload, ImageUpload } from "@/components/upload";
 import { Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { saveBusiness } from "@/lib/business-actions";
 import type { BusinessFormInput } from "@/lib/business-schema";
@@ -207,7 +207,7 @@ export function BusinessEditor({ initial, categories, cities, areas, entities = 
           </div>
           <div>
             <p className="mb-1.5 text-[13px] font-semibold">Photos</p>
-            <ImageGalleryUpload value={photos} onChange={setPhotos} businessId={initial.id} />
+            <GalleryUpload value={photos} onChange={setPhotos} businessId={initial.id} withAlt />
           </div>
         </section>
       </div>

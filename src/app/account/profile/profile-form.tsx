@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { ImageUpload } from "@/components/image-upload";
+import { ImageUpload } from "@/components/upload";
 import { Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { saveMemberProfile } from "@/lib/community-actions";
 import type { MemberFormInput } from "@/lib/community-schema";

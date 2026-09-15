@@ -106,6 +106,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | Photo banners on city / category hubs; photo tiles on hubs | ✅ |
 | Skeletons, error states | 🟡 skeletons ✅; error pages basic |
 | Mega menu (full-width panels per section, mobile expanders) | ✅ |
+| Upload fields (`src/components/upload`): drop, paste or browse; instant preview with real progress and cancel; browser-side downscale; replace, remove, retry; multi-image gallery with parallel uploads, cover, reorder by drag or arrows, captions; PDF field; CSV picker; touch-visible controls; container-aware hints | ✅ |
 | Admin shell: grouped sidebar with queue counts, dashboard KPIs with weekly deltas and 14-day bars, needs-attention queue, consistent tabs/tables/rows, pagination, system status, editor autosave + Ctrl+S + crash recovery | ✅ |
 | Free-tier architecture (docs/FREE-TIER.md, ADR-24): R2 images with renditions, no image optimiser, session hint cookie, email budget, daily-only crons with opportunistic jobs, pruning | ✅ |
 

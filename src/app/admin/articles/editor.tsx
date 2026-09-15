@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { ImageUpload } from "@/components/image-upload";
+import { ImageUpload } from "@/components/upload";
 import { OpenImagePicker } from "@/components/open-image-picker";
 import { Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { cn } from "@/lib/utils";
@@ -259,6 +259,7 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
             }}
             variant="article"
             label="Upload featured image"
+            alt={{ value: featuredImageAlt, onChange: (v) => { setFeaturedImageAlt(v); setDirty(true); }, placeholder: "Caption / alt text (shown under the image)" }}
           />
           <OpenImagePicker
             className="mt-3"
@@ -271,7 +272,7 @@ export function ArticleEditor({ initial, categories, authors, cities, entities, 
               setDirty(true);
             }}
           />
-          <Input name="featuredImageAlt" value={featuredImageAlt} onChange={(e) => { setFeaturedImageAlt(e.target.value); setDirty(true); }} placeholder="Caption / alt text (shown under the image)" className="mt-3 h-9 text-sm" maxLength={300} />
+          {!featuredImageUrl ? <Input name="featuredImageAlt" value={featuredImageAlt} onChange={(e) => { setFeaturedImageAlt(e.target.value); setDirty(true); }} placeholder="Caption / alt text (shown under the image)" className="mt-3 h-9 text-sm" maxLength={300} /> : null}
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
             <Input value={featuredImageCredit} onChange={(e) => { setFeaturedImageCredit(e.target.value); setDirty(true); }} placeholder="Photo credit, e.g. Name / Wikimedia Commons, CC BY-SA 4.0" className="h-9 text-sm" maxLength={200} />
             <Input value={featuredImageSourceUrl} onChange={(e) => { setFeaturedImageSourceUrl(e.target.value); setDirty(true); }} placeholder="Source page URL (credit links here)" className="h-9 text-sm" maxLength={500} />

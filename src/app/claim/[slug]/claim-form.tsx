@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { ImageUpload } from "@/components/image-upload";
+import { ImageUpload } from "@/components/upload";
 import { Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { confirmCodeAction, startClaimAction, type ClaimActionState } from "./actions";
@@ -71,7 +71,7 @@ export function ClaimForm(props: ClaimFormProps) {
         ) : null}
         {method === "document" ? (
           <div className="mt-3">
-            <ImageUpload variant="evidence" value={evidenceUrl} onChange={setEvidenceUrl} label="Upload the document (JPEG, PNG or WebP, up to 8 MB)" aspect="4/3" className="max-w-sm" />
+            <ImageUpload variant="evidence" value={evidenceUrl} onChange={setEvidenceUrl} label="Upload the document" aspect="4/3" className="max-w-sm" />
             <p className="mt-1.5 text-[13px] text-3">Cover account numbers if you like; we only need the business name and address to be readable. Documents are seen by editors only.</p>
           </div>
         ) : null}

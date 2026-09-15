@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { ImageUpload } from "@/components/image-upload";
+import { DocumentUpload, ImageUpload } from "@/components/upload";
 import { Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { PROFESSION_GROUPS, PROFESSIONS, getProfession, type ProfessionGroup } from "@/content/professions";
 import { saveProfessional } from "@/lib/professional-actions";
@@ -21,7 +21,6 @@ export function ProfessionalEditor({ initial, cities, areas, afterSave = "dashbo
   const [cityId, setCityId] = React.useState(initial.cityId ?? "");
   const [photoUrl, setPhotoUrl] = React.useState(initial.photoUrl ?? "");
   const [cvUrl, setCvUrl] = React.useState(initial.cvUrl ?? "");
-  const [cvBusy, setCvBusy] = React.useState(false);
   const [skills, setSkills] = React.useState<string[]>(initial.skills ?? []);
   const [skillDraft, setSkillDraft] = React.useState("");
   const [languages, setLanguages] = React.useState<string[]>(initial.languages ?? []);
@@ -34,25 +33,6 @@ export function ProfessionalEditor({ initial, cities, areas, afterSave = "dashbo
   const formRef = React.useRef<HTMLFormElement>(null);
   const prof = getProfession(professionSlug);
   const cityAreas = areas.filter((a) => a.cityId === cityId);
-
-  async function uploadCv(file: File | undefined) {
-    if (!file) return;
-    setCvBusy(true);
-    setMsg(null);
-    try {
-      const fd = new FormData();
-      fd.set("file", file);
-      fd.set("variant", "cv");
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) throw new Error(data.error ?? "Upload failed");
-      setCvUrl(data.url);
-    } catch (e) {
-      setMsg({ tone: "err", text: e instanceof Error ? e.message : "Upload failed" });
-    } finally {
-      setCvBusy(false);
-    }
-  }
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -342,22 +322,11 @@ export function ProfessionalEditor({ initial, cities, areas, afterSave = "dashbo
         <div>
           <p className="mb-1.5 text-[13px] font-semibold">Photo</p>
           <ImageUpload variant="avatar" value={photoUrl} onChange={setPhotoUrl} label="Upload a photo" aspect="1/1" className="max-w-48" />
-          <p className="mt-1 text-[12.5px] text-3">Square, face visible. Profiles with a photo get about twice the enquiries.</p>
+          <p className="mt-1 text-[12.5px] text-3">Profiles with a photo get about twice the enquiries.</p>
         </div>
         <div>
-          <p className="mb-1.5 text-[13px] font-semibold">CV (PDF, up to 5 MB)</p>
-          {cvUrl ? (
-            <p className="text-[13.5px]">
-              <a href={cvUrl} target="_blank" rel="noopener" className="underline underline-offset-4">
-                Uploaded CV
-              </a>{" "}
-              ·{" "}
-              <button type="button" className="text-2 underline underline-offset-4" onClick={() => setCvUrl("")}>
-                remove
-              </button>
-            </p>
-          ) : null}
-          <input type="file" accept="application/pdf" onChange={(e) => uploadCv(e.target.files?.[0])} disabled={cvBusy} className="mt-1 block w-full text-[13px] file:mr-3 file:border file:border-line file:bg-surface file:px-3 file:py-1.5 file:text-[13px] file:font-medium" />
+          <p className="mb-1.5 text-[13px] font-semibold">CV</p>
+          <DocumentUpload value={cvUrl} onChange={setCvUrl} label="Upload your CV" hint="PDF up to 5 MB" fileLabel="Your CV (PDF)" />
           <label className="mt-2 flex items-center gap-2 text-[13.5px]">
             <input type="checkbox" name="cvPublic" defaultChecked={initial.cvPublic ?? true} className="accent-ink-900" /> Let visitors download it
           </label>

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { ImageUpload } from "@/components/image-upload";
+import { GalleryUpload } from "@/components/upload";
 import { Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { savePost } from "@/lib/community-actions";
 import { EMPLOYMENT_TYPES, POST_KINDS, type PostFormValues, type PostKindKey } from "@/lib/community-schema";
@@ -194,14 +194,8 @@ export function PostForm({ initial, cities, isEditor }: { initial: Partial<PostF
         </div>
         <div>
           <p className="mb-1.5 text-[13px] font-semibold">Photos (up to 8)</p>
-          <div className="grid grid-cols-2 gap-2">
-            {images.map((im, i) => (
-              <div key={im.url} className="relative">
-                <ImageUpload variant="post" value={im.url} onChange={(url) => setImages(url ? images.map((x, j) => (j === i ? { ...x, url } : x)) : images.filter((_, j) => j !== i))} aspect="4/3" />
-              </div>
-            ))}
-            {images.length < 8 ? <ImageUpload variant="post" value="" onChange={(url) => url && setImages([...images, { url }])} label="Add photo" aspect="4/3" /> : null}
-          </div>
+          <GalleryUpload value={images} onChange={setImages} variant="post" max={8} tile="aspect-[4/3]" />
+          <p className="mt-1 text-[12px] text-3">Listings with photos get about three times the replies.</p>
         </div>
       </aside>
     </form>

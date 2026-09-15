@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LocalFilePicker } from "@/components/upload";
 import * as React from "react";
 import { Alert, Badge, Button, Textarea } from "@/components/ui";
 import type { PreviewRow } from "@/lib/import";
@@ -61,10 +62,7 @@ export function Importer() {
       {!rows ? (
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-3">
-            <label className="inline-flex h-9 cursor-pointer items-center border border-line px-3 text-sm hover:bg-surface-2">
-              Choose CSV file
-              <input type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
-            </label>
+            <LocalFilePicker accept=".csv,text/csv" label="Choose a CSV file" hint="or paste below" onFile={onFile} className="min-w-64 py-3" />
             <a href="/admin/businesses/import/template.csv" className="text-sm underline underline-offset-4">
               Download template
             </a>
