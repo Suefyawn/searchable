@@ -88,6 +88,8 @@ Same pipeline as the CSV importer: category by slug or alias (restaurant, dentis
 
 `GET /prices?category=mobiles|bikes|cars[&brand=vivo]` returns the living price list for that category (item shape in `src/lib/prices-shared.ts`); `POST /prices` `{ category, items, mode?: "upsert" | "replace", remove?: [slugs], reviewedAt? }` adds or updates models (a changed price is appended to that model's history), drops discontinued ones, and revalidates `/prices/*`. Mobiles need `specs.ram`, `specs.storage` and `specs.battery`; bikes and cars need `specs.engine`; every item needs a `source` URL.
 
+`GET /posts?kind=job` lists published posts of a kind (so a vacancy is never posted twice); `POST /posts` with `kind: "job"` publishes a vacancy as the desk (title, body markdown, company, city slug, topic, employmentType, salary range, applyUrl (required, the official notice), deadline) and `{ id, intent: "close" }` closes one. Job posts expire 45 days after publishing and are pruned by the daily job.
+
 `GET /match` returns the fixtures on file grouped into today, live, upcoming and recent; `POST /match` `{ matches: [...] }` replaces the list (shape in `src/lib/match-today.ts`) and revalidates `/cricket-today`, `/today` and the home ticker, which shows the live score or today's first fixture as its first cell.
 
 `GET /today` returns the Islamic date the site shows for Pakistan, the Umm al-Qura table date and the sighting offset in force; `POST /today` `{ "days": -1|0|1, "note"?, "sourceUrl"? }` sets the offset after a Ruet-e-Hilal Committee announcement (1 when Pakistan began the month a day before the table, -1 a day after, 0 when they agree) and revalidates /islamic-date, /today and the prayer pages.

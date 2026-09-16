@@ -8,6 +8,7 @@ import { DISCOS } from "@/content/discos";
 import { PROFESSIONS } from "@/content/professions";
 import { POST_KINDS } from "@/lib/community-schema";
 import { brandSlug, PRICE_CATEGORIES, PRICE_INDEX_MIN, readPriceSet } from "@/lib/prices-data";
+import { POSTAL_GROUPS } from "@/lib/postal-codes";
 
 export const revalidate = 3600;
 
@@ -45,6 +46,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u("/today", new Date(), 0.8, "daily"),
     u("/earthquake-today", new Date(), 0.8, "hourly"),
     u("/cricket-today", new Date(), 0.9, "hourly"),
+    u("/postal-codes", undefined, 0.8, "monthly"),
+    ...POSTAL_GROUPS.map((g) => u(`/postal-codes/${g.slug}`, undefined, 0.7, "monthly")),
     u("/ramadan-calendar", new Date(), 0.8, "weekly"),
     ...cities.filter((c) => c.lat !== null).map((c) => u(`/ramadan-calendar/${c.slug}`, new Date(), 0.7, "weekly")),
     u("/prices", new Date(), 0.8, "daily"),

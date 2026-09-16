@@ -7,6 +7,8 @@ import { describeMag, fetchQuakes } from "@/lib/today/quakes";
 
 export const revalidate = 600;
 
+/** Start of the "last 24 hours" window; a helper so the page body stays free of clock calls. */
+const dayAgoMs = () => Date.now() - 86_400_000;
 const when = (d: Date) => formatDate(d, { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit", hour12: true });
 
 export async function generateMetadata() {
@@ -14,7 +16,7 @@ export async function generateMetadata() {
   const quakes = await fetchQuakes(cities, { days: 30, minMag: 2.5 });
   // The title names the latest tremor near a Pakistani city (within 400 km), not one far off in Iran or India.
   const latest = quakes?.find((q) => q.nearest && q.nearest.km <= 400) ?? quakes?.[0];
-  const dayAgo = Date.now() - 86_400_000;
+  const dayAgo = dayAgoMs();
   const todayCount = quakes?.filter((q) => q.at.getTime() > dayAgo).length ?? 0;
   return buildMetadata({
     title: latest ? `Earthquake Today in Pakistan: ${todayCount ? `${todayCount} in the Last 24 Hours` : "Latest Tremors"}, Magnitude ${latest.mag.toFixed(1)} ${latest.place.replace(/^.*of /, "near ")}` : "Earthquake Today in Pakistan: Latest Tremors and Magnitudes",
@@ -27,7 +29,7 @@ export async function generateMetadata() {
 export default async function EarthquakePage() {
   const cities = await todayCities();
   const quakes = await fetchQuakes(cities, { days: 30, minMag: 2.5 });
-  const dayAgo = Date.now() - 86_400_000;
+  const dayAgo = dayAgoMs();
   const today = quakes?.filter((q) => q.at.getTime() > dayAgo) ?? [];
   const strong = quakes?.filter((q) => q.mag >= 4.5) ?? [];
   const latest = quakes?.[0];

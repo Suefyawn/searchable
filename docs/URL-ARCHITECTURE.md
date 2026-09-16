@@ -69,6 +69,7 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /islamic-date                            Hijri date for Pakistan (Umm al-Qura + Ruet-e-Hilal offset)
 /ramadan-calendar  /ramadan-calendar/[city]   Sehri and iftar for every day of the current or next Ramadan
 /earthquake-today                        USGS tremors in and around Pakistan, 10-minute refresh
+/postal-codes  /postal-codes/[city]      Pakistan Post codes: search, and every office under a GPO (static content file)
 /cricket-today                           Today's fixtures, live score line and results, set by the task (today:match)
 
 /prices                                  Living price lists hub

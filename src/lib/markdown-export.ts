@@ -91,3 +91,46 @@ export async function dataMarkdown(slug: string): Promise<string | null> {
   L.push("", `How to cite: "${series.name}", ${SITE.name} data hub, ${latest ? formatDate(latest.date) : ""}, ${SITE.url}${path}`);
   return L.join("\n");
 }
+
+/**
+ * Markdown for a listing page: a section front, a category, the tools hub or a tool category, the data hub.
+ * Titles link to the canonical HTML pages, each of which has its own markdown rendition.
+ */
+export async function listingMarkdown(path: string): Promise<string | null> {
+  const [section, a] = path.replace(/^\//, "").split("/");
+  const { listArticles, getCategory } = await import("@/db/queries/content");
+  const { listSeriesWithLatest } = await import("@/db/queries/data");
+  const { TOOLS } = await import("@/tools/registry");
+  const { TOOL_CATEGORIES } = await import("@/tools/types");
+  if ((section === "news" || section === "guides") && (!a || a === "page")) {
+    const kind = section === "news" ? "news" : "guide";
+    const rows = await listArticles({ kind, limit: 40 });
+    const L = header(section === "news" ? "Latest news" : "Guides", `/${section}`, { kind: "Listing" });
+    for (const r of rows) L.push(`- [${r.title}](${SITE.url}/${section}/${r.category?.slug ?? "general"}/${r.slug})${r.publishedAt ? ` (${formatDate(r.publishedAt)})` : ""}${r.dek ? `: ${r.dek}` : ""}`);
+    return L.join("\n") + "\n";
+  }
+  if ((section === "news" || section === "guides") && a) {
+    const kind = section === "news" ? "news" : "guide";
+    const cat = await getCategory(kind, a);
+    if (!cat) return null;
+    const rows = await listArticles({ kind, categorySlug: a, limit: 40 });
+    const L = header(`${cat.name}: ${section === "news" ? "news" : "guides"}`, `/${section}/${a}`, { kind: "Listing" });
+    if (cat.description) L.push(cat.description, "");
+    for (const r of rows) L.push(`- [${r.title}](${SITE.url}/${section}/${a}/${r.slug})${r.publishedAt ? ` (${formatDate(r.publishedAt)})` : ""}${r.dek ? `: ${r.dek}` : ""}`);
+    return L.join("\n") + "\n";
+  }
+  if (section === "tools") {
+    const tools = a ? TOOLS.filter((t) => t.category === a) : TOOLS;
+    if (a && !tools.length) return null;
+    const L = header(a ? `${TOOL_CATEGORIES[a as keyof typeof TOOL_CATEGORIES]?.name ?? a} calculators` : "Calculators for Pakistan", a ? `/tools/${a}` : "/tools", { kind: "Listing" });
+    for (const t of tools) L.push(`- [${t.name}](${SITE.url}${toolUrl(t)}): ${t.description} (rates reviewed ${formatDate(t.lastReviewed)}; run it with POST ${SITE.url}/api/tools/${t.slug})`);
+    return L.join("\n") + "\n";
+  }
+  if (section === "data" && !a) {
+    const series = await listSeriesWithLatest();
+    const L = header("Pakistan prices and rates today", "/data", { kind: "Listing" });
+    for (const s of series) L.push(`- [${s.name}](${SITE.url}/data/${s.slug}): ${s.latest ? `${number(s.latest.value, Number.isInteger(s.latest.value) ? 0 : 2)} ${s.unit} (${formatDate(s.latest.date)})` : "no reading yet"}`);
+    return L.join("\n") + "\n";
+  }
+  return null;
+}

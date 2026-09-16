@@ -14,7 +14,7 @@ export const revalidate = 300;
 
 const DESCRIPTIONS: Record<string, string> = {
   all: "Jobs, things for sale, auctions, questions and discussions from members across Pakistan. Every post is checked by an editor before it appears.",
-  job: "Jobs posted by employers and members across Pakistan, with pay where given. Verified employers are marked.",
+  job: "Government and private vacancies across Pakistan from official notices (FPSC, PPSC, NTS, the forces, banks and companies), with pay where given, closing dates and where to apply. New jobs every day.",
   listing: "Things members are selling or renting: cars, phones, furniture, property and more, with prices and photos.",
   auction: "Open auctions from members: set a bid before the clock runs out.",
   question: "Questions about living, working and doing business in Pakistan, answered by members and our desk.",
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ kind: str
   const k = resolveKind(kind);
   if (!k) return { title: "Community" };
   const label = k === "all" ? "Community" : POST_KINDS.find((x) => x.key === k)!.plural;
-  return buildMetadata({ title: kind === "all" ? HUB_COPY.community.title : `${label} in Pakistan: Community Posts`, description: kind === "all" ? HUB_COPY.community.description : DESCRIPTIONS[k], path: `/community/${kind}`, kicker: "Community" });
+  return buildMetadata({ title: kind === "all" ? HUB_COPY.community.title : k === "job" ? "Jobs in Pakistan Today: Government and Private Vacancies, Closing Dates" : `${label} in Pakistan: Community Posts`, description: kind === "all" ? HUB_COPY.community.description : DESCRIPTIONS[k], path: `/community/${kind}`, kicker: "Community" });
 }
 
 export default async function CommunityList({ params, searchParams }: { params: Promise<{ kind: string }>; searchParams: Promise<{ city?: string; topic?: string; sort?: string; page?: string }> }) {
@@ -62,7 +62,7 @@ export default async function CommunityList({ params, searchParams }: { params: 
     <div className="container-x py-8 sm:py-10">
       <JsonLd data={breadcrumbJsonLd(crumbs)} />
       {k !== "all" ? <Breadcrumbs items={crumbs} className="mb-6" /> : null}
-      <SectionHeader as="h1" title={k === "all" ? "Community" : label} description={DESCRIPTIONS[k]} href="/community/new" hrefLabel="Post something" />
+      <SectionHeader as="h1" title={k === "all" ? "Community" : k === "job" ? "Jobs in Pakistan today" : label} description={DESCRIPTIONS[k]} href="/community/new" hrefLabel="Post something" />
 
       <nav className="-mb-px flex gap-5 overflow-x-auto no-scrollbar border-b border-line" aria-label="Kind">
         {[{ key: "all", plural: "All" }, ...POST_KINDS].map((x) => (

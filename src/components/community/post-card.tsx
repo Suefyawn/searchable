@@ -2,7 +2,7 @@ import { BadgeCheck, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { srcSetFor } from "@/lib/images";
 import { kindLabel, type PostRow } from "@/lib/community";
-import { pkr, timeAgo } from "@/lib/format";
+import { formatDate, pkr, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 /** The number that matters for each kind, if any. */
@@ -21,7 +21,8 @@ export function postFigure(p: PostRow): string | null {
 export function PostCard({ p, className, showKind = true }: { p: PostRow; className?: string; showKind?: boolean }) {
   const figure = postFigure(p);
   const img = p.images[0];
-  const sub = [p.kind === "job" ? p.meta.company : null, p.topic, p.city?.name ?? p.meta.location].filter(Boolean).join(" · ");
+  const closes = p.kind === "job" && p.meta.deadline ? `closes ${formatDate(p.meta.deadline, { day: "numeric", month: "short" })}` : null;
+  const sub = [p.kind === "job" ? p.meta.company : null, p.topic, p.city?.name ?? p.meta.location, closes].filter(Boolean).join(" · ");
   return (
     <Link href={`/community/post/${p.slug}`} className={cn("group flex gap-4 border-t border-line py-4", className)}>
       {img ? (
