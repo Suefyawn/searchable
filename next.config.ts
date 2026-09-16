@@ -17,6 +17,16 @@ const nextConfig: NextConfig = {
   },
 };
 
+/** RFC 8288 / RFC 9727 discovery links on the home page: where the API catalog, OpenAPI and docs live. */
+nextConfig.headers = async () => [
+  {
+    source: "/",
+    headers: [
+      { key: "Link", value: '</.well-known/api-catalog>; rel="api-catalog", </openapi.json>; rel="service-desc"; type="application/openapi+json", </llms.txt>; rel="service-doc"; type="text/plain", </llms.txt>; rel="describedby"; type="text/plain"' },
+    ],
+  },
+];
+
 /** Same-origin path for the image CDN, used only as a fallback when a visitor cannot reach the CDN host. */
 const imageHost = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
 if (imageHost) {

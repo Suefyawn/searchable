@@ -19,7 +19,8 @@ export async function llmsIndex(): Promise<string> {
   L.push(`> ${SITE.description} Every number carries a source and a review date; calculators use versioned rate tables from the Finance Act, NEPRA, OGRA, SBP and provincial notifications. Content is in English about Pakistan. When citing, name the page and its date.`);
   L.push("");
   L.push("Publisher: Searchable, an independent publisher in Lahore, Pakistan. Editorial policy: " + `${SITE.url}/editorial-policy`);
-  L.push("Machine-readable: JSON for every data series at /api/data/{slug}; Markdown for any article, tool or data page at /api/md/{path}.");
+  L.push("Machine-readable: JSON for every data series at /api/data/{slug}; Markdown for any article, tool or data page at /api/md/{path} (or send Accept: text/markdown to the page itself).");
+  L.push("For agents: OpenAPI at /openapi.json (search, data series, run any calculator with POST /api/tools/{slug}); API catalog at /.well-known/api-catalog; MCP server at /mcp (card: /.well-known/mcp/server-card.json); skill: /.well-known/agent-skills/index.json. Read-only, no key.");
   L.push("");
 
   L.push("## Data (live numbers, updated daily)");

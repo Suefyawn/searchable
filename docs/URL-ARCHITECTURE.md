@@ -99,7 +99,12 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /api/community/liked  /api/community/saved   Signed-in reader state (private, no-store)
 /api/md/[...path]  /llms.txt  /llms-full.txt  Markdown and LLM renditions
 /api/newsletter/subscribe                POST
-/api/tools/[slug]                        POST run (for Ask Searchable + embeds)
+/api/tools/[slug]                        GET input schema · POST { inputs } runs the calculator (no key); /run logs a browser run
+/api/health                              Liveness
+/openapi.json                            OpenAPI 3.1 for the public read API
+/mcp                                     MCP server (Streamable HTTP, JSON-RPC, read-only tools)
+/.well-known/api-catalog                 RFC 9727 linkset · /.well-known/mcp/server-card.json · /.well-known/agent-skills/index.json
+/skills/searchable-pk/SKILL.md           The skill agents fetch through the index
 /api/cron/*                              scheduled jobs (Phase 6)
 /api/webhooks/resend                     POST, signed; email.received feeds the admin inbox
 /api/admin/*                             Bearer ADMIN_API_KEY; context, reference, ideas, articles, data,
