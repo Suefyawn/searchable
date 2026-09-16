@@ -103,7 +103,7 @@ async function build(): Promise<MegaSection[]> {
     href: "/compare",
     columns: [
       { title: "Comparisons", links: [{ href: "/compare/cars", label: "New car prices" }, { href: "/compare/solar-inverters", label: "Solar inverters" }] },
-      { title: "Coming", links: [{ href: "/compare/air-conditioners", label: "Air conditioners" }, { href: "/compare/credit-cards", label: "Credit cards" }, { href: "/compare", label: "Bank accounts" }] },
+      { title: "Coming", links: [{ href: "/compare/air-conditioners", label: "Air conditioners" }, { href: "/compare/credit-cards", label: "Credit cards" }, { href: "/compare/mobile-packages", label: "Mobile packages" }] },
     ],
     footer: { href: "/compare", label: "All comparisons" },
   };

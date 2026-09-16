@@ -2,7 +2,7 @@ import { z } from "zod";
 
 /* Types and pure helpers for the living comparisons, safe to import from client components (no database). */
 
-export const LIVING_SLUGS = ["air-conditioners", "credit-cards"] as const;
+export const LIVING_SLUGS = ["air-conditioners", "credit-cards", "mobile-packages"] as const;
 export type LivingSlug = (typeof LIVING_SLUGS)[number];
 
 export const LivingItem = z.object({

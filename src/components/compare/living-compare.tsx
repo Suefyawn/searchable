@@ -49,6 +49,54 @@ function configFor(slug: LivingSlug, items: LivingItemT[]): CompareConfig<Living
       },
     };
   }
+  if (slug === "mobile-packages") {
+    const validities = [...new Set(items.map((i) => specText(s(i, "validity"))))];
+    const gb = (i: LivingItemT) => specNum(s(i, "data"));
+    const perGb = (i: LivingItemT) => {
+      const g = gb(i);
+      return g ? i.price / g : null;
+    };
+    return {
+      noun: "package",
+      max: 3,
+      id: (i) => i.id,
+      title: (i) => `${i.brand} ${i.model}`,
+      subtitle: (i) => [specText(s(i, "validity")), specText(s(i, "network")), i.priceNote].filter(Boolean).join(" · "),
+      price: (i) => rs(i.price),
+      priceNum: (i) => i.price,
+      searchText: (i) => `${i.brand} ${i.model} ${Object.values(i.specs).join(" ")} ${i.note ?? ""}`,
+      specs: [
+        { key: "data", label: "Data", get: (i) => (gb(i) !== null ? `${specText(s(i, "data"))} GB` : specText(s(i, "data"))), num: gb, best: "max", column: true, card: true, align: "right" },
+        { key: "perGb", label: "Rs per GB", get: (i) => (perGb(i) !== null ? `Rs ${perGb(i)!.toFixed(0)}` : "-"), num: perGb, best: "min", column: true, card: true, align: "right" },
+        { key: "onnet", label: "On-net minutes", get: (i) => specText(s(i, "onnetMinutes")), num: (i) => specNum(s(i, "onnetMinutes")), best: "max", column: true, card: true },
+        { key: "offnet", label: "Off-net minutes", get: (i) => specText(s(i, "offnetMinutes")), num: (i) => specNum(s(i, "offnetMinutes")), best: "max", column: true },
+        { key: "sms", label: "SMS", get: (i) => specText(s(i, "sms")), num: (i) => specNum(s(i, "sms")), best: "max" },
+        { key: "validity", label: "Validity", get: (i) => specText(s(i, "validity")), column: true },
+        { key: "code", label: "Subscribe", get: (i) => specText(s(i, "code")), card: true },
+        { key: "note", label: "Note", get: (i) => i.note ?? "-" },
+      ],
+      filters: [
+        { key: "network", label: "Network", options: brands.map((b) => ({ value: b.toLowerCase(), label: b, test: (i) => i.brand === b })) },
+        { key: "validity", label: "Validity", options: validities.map((v) => ({ value: v.toLowerCase().replace(/\s+/g, "-"), label: v, test: (i) => specText(s(i, "validity")) === v })) },
+        {
+          key: "budget",
+          label: "Price",
+          options: [
+            { value: "500", label: "Under Rs 500", test: (i) => i.price < 500 },
+            { value: "1500", label: "Rs 500 to 1,500", test: (i) => i.price >= 500 && i.price < 1500 },
+            { value: "1500plus", label: "Rs 1,500 and up", test: (i) => i.price >= 1500 },
+          ],
+        },
+      ],
+      sorts: [
+        { key: "perGb", label: "Rs per GB, low to high", compare: (a, b) => (perGb(a) ?? 9e9) - (perGb(b) ?? 9e9) },
+        { key: "price", label: "Price, low to high", compare: (a, b) => a.price - b.price },
+        { key: "data", label: "Most data", compare: (a, b) => (gb(b) ?? 0) - (gb(a) ?? 0) },
+        { key: "network", label: "Network", compare: (a, b) => a.brand.localeCompare(b.brand) || a.price - b.price },
+      ],
+      actions: (i) => [{ href: `/tools/telecom/mobile-load-tax-calculator?amount=${Math.round(i.price)}`, label: "Tax on the load" }, ...(i.url ? [{ href: i.url, label: `${i.brand} page` }] : [])],
+    };
+  }
   const banks = [...new Set(items.map((i) => specText(s(i, "bank"))))].sort();
   return {
     noun: "card",
