@@ -4,12 +4,12 @@ import { DiscoFinder } from "@/components/disco-finder";
 import { SectionHeader } from "@/components/ui";
 import { DISCOS } from "@/content/discos";
 import { buildMetadata } from "@/lib/seo";
+import { HUB_COPY } from "@/lib/seo-copy";
 import { getTool } from "@/tools/registry";
 
 export const revalidate = 86400;
 export const metadata = buildMetadata({
-  title: "Electricity Bill Check Online: LESCO, IESCO, MEPCO, K-Electric & All DISCOs",
-  description: "Check any electricity bill online in Pakistan by reference number, see the current per-unit price, and calculate your bill from units. Official portals for LESCO, IESCO, MEPCO, GEPCO, FESCO, PESCO, HESCO, SEPCO, QESCO, TESCO and K-Electric.",
+  ...HUB_COPY.electricity,
   path: "/electricity",
   kicker: "Electricity",
 });

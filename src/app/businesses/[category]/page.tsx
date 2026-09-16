@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: Props) {
   if (!cat) return {};
   const n = await countBusinesses({ categoryId: cat.id });
   return buildMetadata({
-    title: `${cat.namePlural ?? cat.name} in Pakistan`,
-    description: `${n ? `${n} ` : ""}${(cat.namePlural ?? cat.name).toLowerCase()} across Pakistan with phone, WhatsApp, hours and reviews. Choose your city.`,
+    title: `Best ${cat.namePlural ?? cat.name} in Pakistan: Lahore, Karachi, Islamabad and More`,
+    description: `${n ? `${n} ` : ""}${(cat.namePlural ?? cat.name).toLowerCase()} across Pakistan by city, with addresses, phone numbers, WhatsApp, opening hours and reviews. Verified listings first.`,
     path: `/businesses/${cat.slug}`,
     noindex: n < 5,
   });

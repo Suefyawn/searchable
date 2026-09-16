@@ -76,11 +76,11 @@ export function HeroCarousel({ slides, intervalMs = INTERVAL }: { slides: Slide[
               {x.label}
               <span className="ml-2 font-sans text-[11px] font-normal normal-case tracking-normal text-3">{x.meta}</span>
             </p>
-            <h1 className="mt-2 font-display text-[1.9rem] leading-[1.08] tracking-tight sm:text-[2.3rem] lg:text-[2.2rem] xl:text-[2.5rem]">
+            <h2 className="mt-2 font-display text-[1.9rem] leading-[1.08] tracking-tight sm:text-[2.3rem] lg:text-[2.2rem] xl:text-[2.5rem]">
               <Link href={x.href} className="headline-link" tabIndex={k === i ? 0 : -1}>
                 {x.title}
               </Link>
-            </h1>
+            </h2>
           </div>
         ))}
       </div>

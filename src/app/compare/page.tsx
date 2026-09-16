@@ -5,10 +5,10 @@ import { INVERTERS, INVERTERS_REVIEWED_AT } from "@/content/inverters";
 import { formatDate, pkr } from "@/lib/format";
 import { readLivingSet } from "@/lib/compare-data";
 import { buildMetadata } from "@/lib/seo";
+import { HUB_COPY } from "@/lib/seo-copy";
 
 export const metadata = buildMetadata({
-  title: "Compare: Cars, Solar Inverters and More, Side by Side",
-  description: "Structured comparisons with prices and the specs that matter: new cars in Pakistan, solar inverters, and more to come. Filter, pick three, compare.",
+  ...HUB_COPY.compare,
   path: "/compare",
   kicker: "Compare",
 });

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { ToolCard, toolExample } from "@/components/cards";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
+import { fallbackCategoryCopy, TOOL_CATEGORY_COPY } from "@/lib/seo-copy";
 import { getToolsByCategory, isToolCategory } from "@/tools/registry";
 import { TOOL_CATEGORIES } from "@/tools/types";
 
@@ -17,7 +18,8 @@ export async function generateMetadata({ params }: Props) {
   const { category } = await params;
   if (!isToolCategory(category)) return {};
   const c = TOOL_CATEGORIES[category];
-  return buildMetadata({ title: `${c.name} calculators`, description: `${c.description}. Free tools built for Pakistan, with sources and review dates.`, path: `/tools/${category}` });
+  const copy = TOOL_CATEGORY_COPY[category] ?? fallbackCategoryCopy("tool", c.name, `${c.description}. Free tools built for Pakistan, with sources and review dates.`);
+  return buildMetadata({ ...copy, path: `/tools/${category}` });
 }
 
 export default async function Page({ params }: Props) {

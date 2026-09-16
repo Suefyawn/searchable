@@ -22,10 +22,10 @@ export async function generateMetadata({ params }: Props) {
   if (!loc) return {};
   const f = await fetchForecast(loc.lat, loc.lng);
   const today = f?.days[0];
-  const title = f && today ? `${loc.name} Weather Today: ${Math.round(f.now.temp)}°C, ${describeSymbol(f.now.symbol)}, High ${today.max}° Low ${today.min}°` : `${loc.name} Weather Today and 7-Day Forecast`;
+  const title = f && today ? `${loc.name} Weather Today: ${Math.round(f.now.temp)}°C, ${describeSymbol(f.now.symbol)}, Hourly and 7-Day Forecast` : `${loc.name} Weather Today and 7-Day Forecast`;
   return buildMetadata({
     title,
-    description: `Current temperature, feels like, humidity, wind and rain in ${loc.name}, hour by hour for the next 24 hours and the 7-day forecast, with today's sunrise and sunset. Updated every 30 minutes.`,
+    description: `${loc.name} weather now${f && today ? `: ${Math.round(f.now.temp)}°C, high ${today.max}°, low ${today.min}°` : ""}. Hourly forecast for 24 hours, 7-day outlook, rain, humidity, wind, sunrise and sunset. Updated every 30 minutes.`,
     path: `/weather/${loc.slug}`,
     kicker: "Weather",
   });

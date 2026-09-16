@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props) {
   const t = nowInPakistan();
   const p = prayerTimes(t.y, t.m, t.d, loc.lat, loc.lng);
   return buildMetadata({
-    title: `${loc.name} Prayer Times Today: Fajr ${h12(p.fajr)}, Maghrib ${h12(p.maghrib)}`,
+    title: `${loc.name} Namaz Timings Today: Fajr ${h12(p.fajr)}, Maghrib ${h12(p.maghrib)}, Prayer Times`,
     description: `Namaz timings in ${loc.name} for ${formatDate(t.date, { day: "numeric", month: "long", year: "numeric" })}: Fajr, sunrise, Dhuhr, Asr, Maghrib and Isha, with sehri and iftar times and the week ahead. Karachi method, Hanafi Asr.`,
     path: `/prayer-times/${loc.slug}`,
     kicker: "Prayer times",
@@ -60,7 +60,7 @@ export default async function PrayerTimesPage({ params }: Props) {
     <div className="container-x py-8 sm:py-12">
       <JsonLd data={[breadcrumbJsonLd(crumbs), faqJsonLd(faqs)]} />
       <Breadcrumbs items={crumbs} className="mb-4" />
-      <SectionHeader as="h1" eyebrow={`${dateLong} · ${hijri.day} ${hijri.monthName} ${hijri.year} AH`} title={`Prayer times in ${loc.name} today`} description={`Namaz timings for ${loc.name}: Fajr, sunrise, Dhuhr, Asr, Maghrib and Isha, with sehri and iftar. Pakistan Standard Time.`} />
+      <SectionHeader as="h1" eyebrow={`${dateLong} · ${hijri.day} ${hijri.monthName} ${hijri.year} AH`} title={`${loc.name} namaz timings today`} description={`Prayer times in ${loc.name}: Fajr, sunrise, Dhuhr, Asr, Maghrib and Isha, with sehri and iftar. Pakistan Standard Time.`} />
 
       <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
         <div>

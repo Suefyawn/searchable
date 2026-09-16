@@ -21,8 +21,8 @@ export async function categoryCityMetadata(category: string, city: string, page 
   const plural = cat.namePlural ?? cat.name;
   const base = `/businesses/${cat.slug}/${loc.slug}`;
   return buildMetadata({
-    title: `${n ? `${n} best ` : ""}${plural} in ${loc.name}${page > 1 ? `, page ${page}` : ""}`,
-    description: `${plural} in ${loc.name} with phone numbers, WhatsApp, opening hours, addresses and reviews. Verified listings first.`,
+    title: `Best ${plural} in ${loc.name}${n ? ` (${n} Listed)` : ""}: Addresses, Phone Numbers, Reviews${page > 1 ? `, page ${page}` : ""}`,
+    description: `${plural} in ${loc.name} with addresses, phone numbers, WhatsApp, opening hours and reviews, verified listings first. Compare and call directly.`,
     path: page > 1 ? `${base}/page/${page}` : base,
     noindex: n < 5, // thin-page gate
   });

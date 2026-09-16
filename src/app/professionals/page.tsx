@@ -5,12 +5,12 @@ import { JsonLd, SectionHeader } from "@/components/ui";
 import { PROFESSION_GROUPS, type ProfessionGroup } from "@/content/professions";
 import { listProfessionals, professionalCities, professionCounts } from "@/lib/professionals";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
+import { HUB_COPY } from "@/lib/seo-copy";
 
 export const revalidate = 1800;
 
 export const metadata: Metadata = buildMetadata({
-  title: "Find a professional in Pakistan: doctors, electricians, engineers, architects, lawyers, tutors",
-  description: "Profiles of verified professionals with experience, qualifications, fees and direct contact. Search by profession and city, or create your own profile free.",
+  ...HUB_COPY.professionals,
   path: "/professionals",
 });
 

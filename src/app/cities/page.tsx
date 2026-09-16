@@ -3,16 +3,17 @@ import { PhotoTile } from "@/components/photo-tiles";
 import { SectionHeader } from "@/components/ui";
 import { citiesWithCounts, listCities, listProvinces } from "@/db/queries/geo";
 import { buildMetadata } from "@/lib/seo";
+import { HUB_COPY } from "@/lib/seo-copy";
 
 export const revalidate = 3600;
-export const metadata = buildMetadata({ title: "Cities", description: "Local information for every major Pakistani city: businesses, services, news and guides.", path: "/cities" });
+export const metadata = buildMetadata({ ...HUB_COPY.cities, path: "/cities" });
 
 export default async function CitiesPage() {
   const [provinces, cities, counts] = await Promise.all([listProvinces(), listCities(), citiesWithCounts(100)]);
   const countBy = new Map(counts.map((c) => [c.id, c.count]));
   return (
     <div className="container-x py-8 sm:py-12">
-      <SectionHeader as="h1" title="Cities" description="Pick your city for local businesses, services and news." />
+      <SectionHeader as="h1" title="Cities in Pakistan" description="Pick your city for local businesses, bills and services, weather, prayer times and news." />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {provinces.map((p) => {
           const list = cities.filter((c) => c.provinceId === p.id);

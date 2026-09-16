@@ -8,12 +8,13 @@ import { countArticles, getArticle, getCategory, listArticles, listArticlesByIds
 import { readFrontPage, resolveFront } from "@/lib/front-page";
 import { followRedirect } from "@/lib/redirects";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
+import { fallbackCategoryCopy, GUIDE_CATEGORY_COPY, HUB_COPY, NEWS_CATEGORY_COPY } from "@/lib/seo-copy";
 import { cn } from "@/lib/utils";
 import { timeAgo } from "@/lib/format";
 
 const META: Record<"news" | "guide", { section: string; name: string; title: string; description: string }> = {
-  news: { section: "news", name: "News", title: "Pakistan news: with the useful context", description: "What changed, what it means for you, and what to do next. Business, economy, technology, cars, property and more." },
-  guide: { section: "guides", name: "Guides", title: "Guides: how things actually work in Pakistan", description: "Step-by-step guides for taxes, banking, cars, property, government processes and utilities. With fees, timelines and the mistakes to avoid." },
+  news: { section: "news", name: "News", title: HUB_COPY.news.title, description: HUB_COPY.news.description },
+  guide: { section: "guides", name: "Guides", title: HUB_COPY.guides.title, description: HUB_COPY.guides.description },
 };
 
 const PAGE_SIZE = 18;
@@ -64,7 +65,8 @@ export async function categoryMetadata(kind: "news" | "guide", slug: string, pag
   if (!cat) return {};
   const m = META[kind];
   const base = `/${m.section}/${cat.slug}`;
-  return buildMetadata({ title: `${cat.name} ${m.name.toLowerCase()}${page > 1 ? `: page ${page}` : ""}`, description: cat.description ?? `${cat.name}: ${m.description}`, path: page > 1 ? `${base}/page/${page}` : base });
+  const copy = (kind === "news" ? NEWS_CATEGORY_COPY : GUIDE_CATEGORY_COPY)[cat.slug] ?? fallbackCategoryCopy(kind, cat.name, cat.description);
+  return buildMetadata({ title: page > 1 ? `${copy.title}: page ${page}` : copy.title, description: copy.description, path: page > 1 ? `${base}/page/${page}` : base });
 }
 
 export async function CategoryPage({ kind, slug, page = 1 }: { kind: "news" | "guide"; slug: string; page?: number }) {

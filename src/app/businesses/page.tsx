@@ -4,11 +4,11 @@ import { SectionHeader } from "@/components/ui";
 import { categoryCounts } from "@/db/queries/directory";
 import { citiesWithCounts } from "@/db/queries/geo";
 import { buildMetadata } from "@/lib/seo";
+import { HUB_COPY } from "@/lib/seo-copy";
 
 export const revalidate = 3600;
 export const metadata = buildMetadata({
-  title: "Business directory: Pakistan",
-  description: "Find restaurants, doctors, lawyers, solar companies, car dealers and more across Pakistani cities, with hours, phone and WhatsApp.",
+  ...HUB_COPY.businesses,
   path: "/businesses",
 });
 

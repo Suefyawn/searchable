@@ -7,6 +7,7 @@ import { citiesWithCounts } from "@/db/queries/geo";
 import { listPosts, postCounts, postTopics } from "@/lib/community";
 import { POST_KINDS, type PostKindKey } from "@/lib/community-schema";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
+import { HUB_COPY } from "@/lib/seo-copy";
 import { cn } from "@/lib/utils";
 
 export const revalidate = 300;
@@ -31,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ kind: str
   const k = resolveKind(kind);
   if (!k) return { title: "Community" };
   const label = k === "all" ? "Community" : POST_KINDS.find((x) => x.key === k)!.plural;
-  return buildMetadata({ title: `${label} in Pakistan`, description: DESCRIPTIONS[k], path: `/community/${kind}`, kicker: "Community" });
+  return buildMetadata({ title: kind === "all" ? HUB_COPY.community.title : `${label} in Pakistan: Community Posts`, description: kind === "all" ? HUB_COPY.community.description : DESCRIPTIONS[k], path: `/community/${kind}`, kicker: "Community" });
 }
 
 export default async function CommunityList({ params, searchParams }: { params: Promise<{ kind: string }>; searchParams: Promise<{ city?: string; topic?: string; sort?: string; page?: string }> }) {

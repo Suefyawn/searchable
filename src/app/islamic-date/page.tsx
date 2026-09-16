@@ -15,7 +15,7 @@ export async function generateMetadata() {
   const h = pakistanHijri(t.date, offset.days);
   return buildMetadata({
     title: `Islamic Date Today in Pakistan: ${h.day} ${h.monthName} ${h.year} AH`,
-    description: `Today's Hijri date in Pakistan, ${formatDate(t.date, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}, is ${h.day} ${h.monthName} ${h.year} AH, per the Ruet-e-Hilal Committee's sighting. Upcoming Islamic dates: Ramadan, Eid ul Fitr, Eid ul Adha, Muharram, 12 Rabi al-Awwal.`,
+    description: `Islamic date today in Pakistan: ${h.day} ${h.monthName} ${h.year} AH (${formatDate(t.date, { day: "numeric", month: "long", year: "numeric" })}), per the Ruet-e-Hilal sighting, with the dates of Ramadan, Eid and Muharram ahead.`,
     path: "/islamic-date",
     kicker: "Islamic date",
   });

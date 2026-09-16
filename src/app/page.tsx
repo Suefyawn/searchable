@@ -5,6 +5,8 @@ import { NewsletterForm } from "@/components/newsletter-form";
 import { HeroCarousel, type Slide } from "@/components/home/hero-carousel";
 import { readFrontPage, resolveFront } from "@/lib/front-page";
 import { readSiteSettings } from "@/lib/site-settings";
+import { buildMetadata } from "@/lib/seo";
+import { HUB_COPY } from "@/lib/seo-copy";
 import { NumbersTicker } from "@/components/home/numbers-ticker";
 import { Img } from "@/components/img";
 import { LiveFeed } from "@/components/home/live-feed";
@@ -26,6 +28,9 @@ export const revalidate = 300;
 function Label({ children }: { children: React.ReactNode }) {
   return <p className="rule pt-2 eyebrow">{children}</p>;
 }
+
+// The home title stands alone (no "· Searchable" suffix: the name is already in it) and carries the canonical.
+export const metadata = buildMetadata({ ...HUB_COPY.home, path: "", absoluteTitle: true });
 
 export default async function HomePage() {
   const [front, site] = await Promise.all([readFrontPage(), readSiteSettings()]);
@@ -64,6 +69,8 @@ export default async function HomePage() {
 
   return (
     <div className="container-x">
+      {/* One heading for the page; the hero headlines are h2 so five slides do not make five h1s. */}
+      <h1 className="sr-only">Searchable.pk: Pakistan news today, prices, guides and calculators</h1>
       {/* Numbers ticker: the day's prices and rates, a slow continuous rail above the fold */}
       {numbers.length ? (
         <NumbersTicker

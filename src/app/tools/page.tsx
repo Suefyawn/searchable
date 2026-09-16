@@ -2,12 +2,12 @@ import Link from "next/link";
 import { ToolCard, toolExample } from "@/components/cards";
 import { SectionHeader } from "@/components/ui";
 import { buildMetadata } from "@/lib/seo";
+import { HUB_COPY } from "@/lib/seo-copy";
 import { TOOLS } from "@/tools/registry";
 import { TOOL_CATEGORIES, type ToolCategory } from "@/tools/types";
 
 export const metadata = buildMetadata({
-  title: "Calculators & tools for Pakistan",
-  description: "Income tax, PTA mobile tax, electricity bills, zakat, car loans, solar payback, sourced, dated and instant. Free calculators built for Pakistan.",
+  ...HUB_COPY.tools,
   path: "/tools",
 });
 

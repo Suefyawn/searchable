@@ -20,7 +20,7 @@ const FAQS = [
 ];
 
 export const metadata = buildMetadata({
-  title: "PTA Tax Check & IMEI Check 2026: PTA Approved Check, DIRBS Registration, Tax List",
+  title: "PTA Tax Check and IMEI Check 2026: Approved Status, DIRBS, Tax List",
   description: "Check PTA tax for any phone, verify PTA approval by IMEI (SMS 8484), register on DIRBS step by step, and see the full PTA tax list for passport and CNIC registration.",
   path: "/pta",
   kicker: "PTA",

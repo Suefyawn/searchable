@@ -5,12 +5,12 @@ import { JsonLd, SectionHeader } from "@/components/ui";
 import { listSeriesWithLatest, recentPointsBySeries } from "@/db/queries/data";
 import { formatDate, number } from "@/lib/format";
 import { buildMetadata } from "@/lib/seo";
+import { HUB_COPY } from "@/lib/seo-copy";
 import { SITE } from "@/lib/utils";
 
 export const revalidate = 600;
 export const metadata = buildMetadata({
-  title: "Pakistan data: prices and rates, updated",
-  description: "Petrol and diesel prices, USD/PKR, gold rate, the SBP policy rate and more, with history, sources and dates. The numbers Pakistanis check every day.",
+  ...HUB_COPY.data,
   path: "/data",
 });
 

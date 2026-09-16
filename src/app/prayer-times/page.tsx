@@ -8,7 +8,7 @@ import { h12 } from "@/lib/today/sun";
 
 export const revalidate = 1800;
 export const metadata = buildMetadata({
-  title: "Prayer Times Today in Pakistan: Karachi, Lahore, Islamabad and Every City",
+  title: "Namaz Timings Today in Pakistan: Karachi, Lahore, Islamabad, All Cities",
   description: "Today's namaz timings for every major city in Pakistan: Fajr, sunrise, Dhuhr, Asr, Maghrib and Isha, with sehri and iftar. Karachi method, Hanafi Asr, Pakistan Standard Time.",
   path: "/prayer-times",
   kicker: "Prayer times",
