@@ -117,4 +117,6 @@ test("relevance: generic words alone do not make a match", () => {
   assert.equal(isRelevant("A graveyard in Pakistan with a national monument", "National Savings Pakistan prize bond"), false);
   assert.equal(isRelevant("Prize bond counter at a National Savings centre, Pakistan", "National Savings Pakistan prize bond"), true);
   assert.equal(isRelevant("Lahore Fort at dusk", "Lahore Fort"), true);
+  assert.equal(isRelevant("Lahore airport, view from the road", "traffic cars Lahore road"), false);
+  assert.equal(isRelevant("Cars in traffic on Mall Road, Lahore", "traffic cars Lahore road"), true);
 });

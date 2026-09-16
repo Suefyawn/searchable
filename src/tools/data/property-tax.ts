@@ -91,7 +91,7 @@ export const PROVINCES: Record<"punjab" | "sindh" | "islamabad", ProvinceCharges
     localTaxLabel: "TMA / local government transfer tax",
     verified: "Stamp duty 1% (urban and rural) confirmed by the Stamp (Amendment) Ordinance 2026 of 10 April 2026. Registration fee 1% and TMA tax 1% are the long-standing Punjab schedule figures; some districts cap the registration fee.",
     sources: [
-      { title: "Stamp (Amendment) Ordinance 2026: uniform 1% stamp duty on immovable property", url: "https://propertyai.pk/punjab-property-stamp-duty-1-percent-2026/", publisher: "Government of Punjab (reported)", date: "2026-04-10" },
+      { title: "The Punjab Gazette, 10 April 2026: Stamp (Amendment) Ordinance 2026 (VI of 2026), 1% stamp duty on conveyance in urban and rural areas", url: "https://punjabcode.punjab.gov.pk/uploads/articles/stamp-amendment-ordinance-2026-pdf.pdf", publisher: "Government of the Punjab", date: "2026-04-10" },
       { title: "e-Registration fee schedule", url: "https://punjab-zameen.gov.pk/", publisher: "Board of Revenue Punjab" },
     ],
   },

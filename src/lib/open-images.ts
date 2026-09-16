@@ -109,7 +109,11 @@ export function isRelevant(hay: string, query: string): boolean {
   const need = words.length <= 2 ? words.length : Math.max(2, Math.ceil(words.length / 2));
   // "Pakistan" or "national" matching on their own says nothing about the subject.
   const specific = words.some((w) => !GENERIC_WORDS.has(w)) ? matched.some((w) => !GENERIC_WORDS.has(w)) : true;
-  return matched.length >= need && specific;
+  // The subject comes first in a query ("traffic cars Lahore"): one of the first two specific words must
+  // match, or a photo of anything in Lahore would pass ("Lahore airport" did).
+  const subject = words.filter((w) => !GENERIC_WORDS.has(w)).slice(0, 2);
+  const onSubject = !subject.length || subject.some((w) => h.includes(w));
+  return matched.length >= need && specific && onSubject;
 }
 
 /** Words so common in captions that they never identify a subject by themselves. */

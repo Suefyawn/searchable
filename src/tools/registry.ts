@@ -15,6 +15,7 @@ import { personalLoanCalculator } from "./calculators/personal-loan-calculator";
 import { plotSizeConverter } from "./calculators/plot-size-converter";
 import { providentFundCalculator } from "./calculators/provident-fund-calculator";
 import { propertyTaxCalculator } from "./calculators/property-tax-calculator";
+import { stampDutyCalculator } from "./calculators/stamp-duty-calculator";
 import { ptaMobileTaxCalculator } from "./calculators/pta-mobile-tax-calculator";
 import { salaryBreakdownCalculator } from "./calculators/salary-breakdown-calculator";
 import { salaryIncrementCalculator } from "./calculators/salary-increment-calculator";
@@ -51,6 +52,7 @@ export const TOOLS: ToolDefinition[] = [
   acRunningCostCalculator,
   plotSizeConverter,
   propertyTaxCalculator,
+  stampDutyCalculator,
   capitalGainsTaxCalculator,
   currencyConverter,
   carRegistrationTaxCalculator,
