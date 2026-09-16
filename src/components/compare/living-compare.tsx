@@ -97,6 +97,39 @@ function configFor(slug: LivingSlug, items: LivingItemT[]): CompareConfig<Living
       actions: (i) => [{ href: `/tools/telecom/mobile-load-tax-calculator?amount=${Math.round(i.price)}`, label: "Tax on the load" }, ...(i.url ? [{ href: i.url, label: `${i.brand} page` }] : [])],
     };
   }
+  if (slug === "national-savings") {
+    const payouts = [...new Set(items.map((i) => specText(s(i, "payout"))))];
+    return {
+      noun: "scheme",
+      max: 3,
+      id: (i) => i.id,
+      title: (i) => i.model,
+      subtitle: (i) => [specText(s(i, "term")), specText(s(i, "payout")) + " profit", i.priceNote].filter(Boolean).join(" · "),
+      price: (i) => `${i.price.toFixed(2)}% a year`,
+      priceNum: (i) => i.price,
+      searchText: (i) => `${i.model} ${Object.values(i.specs).join(" ")} ${i.note ?? ""}`,
+      specs: [
+        { key: "payout", label: "Profit paid", get: (i) => specText(s(i, "payout")), column: true, card: true },
+        { key: "term", label: "Term", get: (i) => specText(s(i, "term")), column: true, card: true },
+        { key: "min", label: "Minimum", get: (i) => (specNum(s(i, "min")) !== null ? rs(specNum(s(i, "min"))!) : "-"), num: (i) => specNum(s(i, "min")), best: "min", column: true, align: "right", card: true },
+        { key: "max", label: "Maximum", get: (i) => (specNum(s(i, "max")) !== null ? rs(specNum(s(i, "max"))!) : "No limit"), column: true, align: "right" },
+        { key: "who", label: "Who can buy", get: (i) => specText(s(i, "who")), card: true },
+        { key: "withholding", label: "Withholding tax", get: (i) => specText(s(i, "withholding")), column: true },
+        { key: "note", label: "Note", get: (i) => i.note ?? "-" },
+      ],
+      filters: [
+        { key: "payout", label: "Profit paid", options: payouts.map((v) => ({ value: v.toLowerCase().replace(/\s+/g, "-"), label: v, test: (i) => specText(s(i, "payout")) === v })) },
+        { key: "who", label: "For", options: [{ value: "anyone", label: "Anyone", test: (i) => /anyone/i.test(specText(s(i, "who"))) }, { value: "seniors", label: "Seniors, widows, pensioners", test: (i) => !/anyone/i.test(specText(s(i, "who"))) }] },
+        { key: "islamic", label: "Type", options: [{ value: "islamic", label: "Islamic", test: (i) => yes(s(i, "islamic")) }, { value: "conventional", label: "Conventional", test: (i) => !yes(s(i, "islamic")) }] },
+      ],
+      sorts: [
+        { key: "rate", label: "Profit rate, high to low", compare: (a, b) => b.price - a.price },
+        { key: "min", label: "Lowest minimum first", compare: (a, b) => (specNum(s(a, "min")) ?? 0) - (specNum(s(b, "min")) ?? 0) },
+        { key: "name", label: "Name", compare: (a, b) => a.model.localeCompare(b.model) },
+      ],
+      actions: (i) => [{ href: `/tools/finance/national-savings-calculator?scheme=${i.id}`, label: "Monthly profit on your amount" }, ...(i.url ? [{ href: i.url, label: "National Savings page" }] : [])],
+    };
+  }
   const banks = [...new Set(items.map((i) => specText(s(i, "bank"))))].sort();
   return {
     noun: "card",

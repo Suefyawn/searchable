@@ -45,9 +45,10 @@ const PAGES = [
 export const revalidate = 3600;
 
 export default async function CompareHub() {
-  const [acs, cards, packs] = await Promise.all([readLivingSet("air-conditioners"), readLivingSet("credit-cards"), readLivingSet("mobile-packages")]);
+  const [acs, cards, packs, nsc] = await Promise.all([readLivingSet("air-conditioners"), readLivingSet("credit-cards"), readLivingSet("mobile-packages"), readLivingSet("national-savings")]);
   const living = [
     { href: "/compare/air-conditioners", title: "Air conditioners", count: acs.items.length ? `${acs.items.length} models` : "Being compiled", range: acs.items.length ? `${pkr(Math.min(...acs.items.map((i) => i.price)))} to ${pkr(Math.max(...acs.items.map((i) => i.price)))}` : "Inverter and non-inverter, 1 to 2 ton", facets: ["Tonnage", "Brand", "Type"], specs: "Brand list price, EER, T3, heat and cool, warranty", tools: "AC running cost, electricity bill", reviewed: acs.reviewedAt },
+    { href: "/compare/national-savings", title: "National Savings schemes", count: nsc.items.length ? `${nsc.items.length} schemes` : "Being compiled", range: nsc.items.length ? `${Math.min(...nsc.items.map((i) => i.price)).toFixed(2)}% to ${Math.max(...nsc.items.map((i) => i.price)).toFixed(2)}% a year` : "Behbood, Regular Income, Defence, Special Savings", facets: ["Profit paid", "For", "Type"], specs: "Profit rate, payout, term, minimum, maximum, withholding", tools: "National Savings, zakat", reviewed: nsc.reviewedAt },
     { href: "/compare/mobile-packages", title: "Mobile packages", count: packs.items.length ? `${packs.items.length} bundles` : "Being compiled", range: packs.items.length ? `${pkr(Math.min(...packs.items.map((i) => i.price)))} to ${pkr(Math.max(...packs.items.map((i) => i.price)))}` : "Jazz, Zong, Telenor, Ufone", facets: ["Network", "Validity", "Price"], specs: "Data, rupees per GB, minutes, SMS, validity, code", tools: "Load tax", reviewed: packs.reviewedAt },
     { href: "/compare/credit-cards", title: "Credit cards", count: cards.items.length ? `${cards.items.length} cards` : "Being compiled", range: cards.items.length ? `Annual fee ${pkr(Math.min(...cards.items.map((i) => i.price)))} to ${pkr(Math.max(...cards.items.map((i) => i.price)))}` : "Fees, mark-up, minimum income", facets: ["Bank", "Annual fee", "Type"], specs: "Annual fee, mark-up, minimum income, cashback, lounge, fuel", tools: "Personal loan, income tax", reviewed: cards.reviewedAt },
   ];
@@ -73,7 +74,7 @@ export default async function CompareHub() {
         ))}
       </div>
       <p className="mt-10 max-w-2xl text-[15px] text-2">
-        Coming next: bank accounts and profit rates, motorcycles. Suggest one at{" "}
+        Coming next: bank deposit rates, motorcycles. Suggest one at{" "}
         <a href="mailto:editorial@searchable.pk" className="underline underline-offset-4">
           editorial@searchable.pk
         </a>

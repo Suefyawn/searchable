@@ -27,6 +27,7 @@ export const REQUIRED_SPECS: Record<LivingSlug, string[]> = {
   "air-conditioners": ["tonnage", "inverter"],
   "credit-cards": ["bank", "network"],
   "mobile-packages": ["network", "validity", "data"],
+  "national-savings": ["payout", "term"],
 };
 
 export async function readLivingSet(slug: LivingSlug): Promise<LivingSetT> {
