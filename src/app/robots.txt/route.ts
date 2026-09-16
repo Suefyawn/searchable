@@ -32,8 +32,8 @@ export function GET() {
     "",
   ];
   for (const ua of AI_AGENTS) {
-    lines.push(`User-Agent: ${ua}`, CONTENT_SIGNAL, "Allow: /", "Allow: /llms.txt", "Allow: /llms-full.txt", "Allow: /api/data/", "Allow: /api/tools/", "Allow: /api/md/", "Allow: /api/health", "Allow: /openapi.json", "Allow: /.well-known/", "Allow: /mcp", ...PRIVATE.filter((p) => p !== "/api/").map((p) => `Disallow: ${p}`), "");
+    lines.push(`User-Agent: ${ua}`, CONTENT_SIGNAL, "Allow: /", "Allow: /llms.txt", "Allow: /llms-full.txt", "Allow: /api/data/", "Allow: /api/tools/", "Allow: /api/md/", "Allow: /api/health", "Allow: /openapi.json", "Allow: /.well-known/", "Allow: /mcp", "Allow: /a2a", "Allow: /auth.md", ...PRIVATE.filter((p) => p !== "/api/").map((p) => `Disallow: ${p}`), "");
   }
-  lines.push(`Sitemap: ${SITE.url}/sitemap.xml`, `Sitemap: ${SITE.url}/news-sitemap.xml`, `Host: ${SITE.url}`, "");
+  lines.push(`Agentmap: ${SITE.url}/.well-known/ai-catalog.json`, `Sitemap: ${SITE.url}/sitemap.xml`, `Sitemap: ${SITE.url}/news-sitemap.xml`, `Host: ${SITE.url}`, "");
   return new Response(lines.join("\n"), { headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "public, max-age=3600, s-maxage=86400" } });
 }
