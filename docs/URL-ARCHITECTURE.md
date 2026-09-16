@@ -69,6 +69,7 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /islamic-date                            Hijri date for Pakistan (Umm al-Qura + Ruet-e-Hilal offset)
 /ramadan-calendar  /ramadan-calendar/[city]   Sehri and iftar for every day of the current or next Ramadan
 /earthquake-today                        USGS tremors in and around Pakistan, 10-minute refresh
+/cricket-today                           Today's fixtures, live score line and results, set by the task (today:match)
 
 /prices                                  Living price lists hub
 /prices/[category]                       mobiles · bikes · cars (noindex under 10 models)
@@ -103,7 +104,7 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /api/webhooks/resend                     POST, signed; email.received feeds the admin inbox
 /api/admin/*                             Bearer ADMIN_API_KEY; context, reference, ideas, articles, data,
                                          businesses, backlog, queue, inbox, newsletter, media, jobs, report,
-                                         compare, front, today, prices (docs/ADMIN-API.md)
+                                         compare, front, today, prices, match (docs/ADMIN-API.md)
 
 /sitemap.xml                             index → /sitemap/[type].xml
 /robots.txt

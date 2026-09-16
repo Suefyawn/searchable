@@ -88,7 +88,7 @@ async function build(): Promise<MegaSection[]> {
     label: "Data",
     href: "/data",
     columns: [
-      { title: "Today", href: "/today", links: [{ href: "/prayer-times/karachi", label: "Prayer times" }, { href: "/weather/lahore", label: "Weather" }, { href: "/islamic-date", label: "Islamic date today" }, { href: "/ramadan-calendar", label: "Ramadan calendar" }, { href: "/earthquake-today", label: "Earthquake today" }, { href: "/electricity", label: "Electricity bill check" }] },
+      { title: "Today", href: "/today", links: [{ href: "/prayer-times/karachi", label: "Prayer times" }, { href: "/weather/lahore", label: "Weather" }, { href: "/islamic-date", label: "Islamic date today" }, { href: "/cricket-today", label: "Cricket today" }, { href: "/ramadan-calendar", label: "Ramadan calendar" }, { href: "/earthquake-today", label: "Earthquake today" }, { href: "/electricity", label: "Electricity bill check" }] },
       { title: "Prices", href: "/prices", links: [{ href: "/prices/mobiles", label: "Mobile prices" }, { href: "/prices/bikes", label: "Bike prices" }, { href: "/prices/cars", label: "Car prices" }, ...withLatest.filter((s) => ["petrol-price", "diesel-price", "gold-24k-tola", "gold-22k-tola", "silver-tola", "solar-panel-per-watt"].includes(s.slug)).map(seriesLink)] },
       { title: "Currency", links: withLatest.filter((s) => s.slug.endsWith("-pkr")).map(seriesLink) },
       { title: "Rates & markets", links: withLatest.filter((s) => ["sbp-policy-rate", "kibor-1y", "cpi-yoy", "kse-100", "btc-usd", "eth-usd"].includes(s.slug)).map(seriesLink) },

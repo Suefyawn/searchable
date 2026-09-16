@@ -7,6 +7,7 @@ import { formatDate, formatReading } from "@/lib/format";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { nowInPakistan, todayCities } from "@/lib/today";
 import { pakistanHijri, readHijriOffset } from "@/lib/today/hijri";
+import { groupMatches, readMatches } from "@/lib/match-today";
 import { prayerTimes } from "@/lib/today/prayer";
 import { h12 } from "@/lib/today/sun";
 import { describeSymbol, fetchForecast } from "@/lib/today/weather";
@@ -22,7 +23,9 @@ export const metadata = buildMetadata({
 const PRICE_SLUGS = ["petrol-price", "diesel-price", "gold-24k-tola", "gold-22k-tola", "silver-tola", "usd-pkr", "sar-pkr", "aed-pkr", "gbp-pkr", "eur-pkr", "kse-100", "sbp-policy-rate"];
 
 export default async function TodayHub() {
-  const [series, cities, offset] = await Promise.all([listSeriesWithLatest(), todayCities(), readHijriOffset()]);
+  const [series, cities, offset, matches] = await Promise.all([listSeriesWithLatest(), todayCities(), readHijriOffset(), readMatches()]);
+  const g = groupMatches(matches);
+  const match = g.live[0] ?? g.today[0] ?? g.upcoming[0];
   const t = nowInPakistan();
   const hijri = pakistanHijri(t.date, offset.days);
   const big = cities.slice(0, 8);
@@ -120,10 +123,10 @@ export default async function TodayHub() {
           </p>
         </div>
         <div>
-          <p className="eyebrow">Sport</p>
+          <p className="eyebrow">Cricket today</p>
           <p className="mt-1 text-[15px]">
-            <Link href="/news/cricket" className="underline-offset-4 hover:underline">
-              Cricket today
+            <Link href="/cricket-today" className="underline-offset-4 hover:underline">
+              {match ? `${match.title}, ${formatDate(match.startAt, { weekday: "short", hour: "numeric", minute: "2-digit", hour12: true })}${match.status === "live" && match.score ? ` (live: ${match.score})` : ""}` : "Fixtures and scores"}
             </Link>
             {" · "}
             <Link href="/news/sports" className="underline-offset-4 hover:underline">

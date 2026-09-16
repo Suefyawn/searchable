@@ -18,6 +18,7 @@ import { listProfessionals } from "@/lib/professionals";
 import { activityFeed } from "@/lib/activity";
 import { listArticles, listArticlesByIds } from "@/db/queries/content";
 import { listSeriesWithLatest } from "@/db/queries/data";
+import { readMatches, tickerLine } from "@/lib/match-today";
 import { categoryCounts } from "@/db/queries/directory";
 import { citiesWithCounts } from "@/db/queries/geo";
 import { number, timeAgo } from "@/lib/format";
@@ -33,7 +34,8 @@ function Label({ children }: { children: React.ReactNode }) {
 export const metadata = buildMetadata({ ...HUB_COPY.home, path: "", absoluteTitle: true });
 
 export default async function HomePage() {
-  const [front, site] = await Promise.all([readFrontPage(), readSiteSettings()]);
+  const [front, site, matches] = await Promise.all([readFrontPage(), readSiteSettings(), readMatches()]);
+  const matchLead = tickerLine(matches);
   const [pinned, latest, guides, cities, categories, series, feed, wider, community, pros] = await Promise.all([
     listArticlesByIds([...(front.leadId ? [front.leadId] : []), ...front.pins]),
     listArticles({ kind: "news", limit: 12 }),
@@ -74,6 +76,7 @@ export default async function HomePage() {
       {/* Numbers ticker: the day's prices and rates, a slow continuous rail above the fold */}
       {numbers.length ? (
         <NumbersTicker
+          leads={matchLead ? [matchLead] : []}
           items={numbers.map((s) => ({
             id: s.id,
             slug: s.slug,

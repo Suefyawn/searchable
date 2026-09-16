@@ -6,6 +6,8 @@ import { Change } from "@/components/data/change";
 import { formatReading } from "@/lib/format";
 
 export type TickerItem = { id: string; slug: string; name: string; unit: string; value: number; previous: number | null };
+/** A plain cell ahead of the numbers: today's match, a live score. */
+export type TickerLead = { name: string; text: string; href: string };
 
 /**
  * The numbers strip under the masthead: a slow, continuous ticker like a broadcast rail. The track is
@@ -13,7 +15,7 @@ export type TickerItem = { id: string; slug: string; name: string; unit: string;
  * everything fits) it is simply a scrollable row. Speed is set from the track length so it reads at
  * walking pace on every screen.
  */
-export function NumbersTicker({ items }: { items: TickerItem[] }) {
+export function NumbersTicker({ items, leads = [] }: { items: TickerItem[]; leads?: TickerLead[] }) {
   const trackRef = React.useRef<HTMLDivElement>(null);
   const [state, setState] = React.useState<{ duration: number; animate: boolean }>({ duration: 60, animate: false });
 
@@ -41,11 +43,19 @@ export function NumbersTicker({ items }: { items: TickerItem[] }) {
     </Link>
   );
 
+  const leadCell = (l: TickerLead, k: string, hidden: boolean) => (
+    <Link key={k} href={l.href} className="flex shrink-0 items-baseline gap-2 border-r border-line bg-surface-2 px-4 py-2.5 text-[13px] hover:bg-surface-3" aria-hidden={hidden} tabIndex={hidden ? -1 : 0}>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-700">{l.name}</span>
+      <span className="font-medium">{l.text}</span>
+    </Link>
+  );
+
   return (
     <section className="group -mx-5 overflow-x-auto no-scrollbar border-b border-line sm:mx-0" aria-label="Today's numbers">
       <div ref={trackRef} className="flex w-max" style={state.animate ? { animation: `ticker ${state.duration}s linear infinite` } : undefined}>
+        {leads.map((l, i) => leadCell(l, `lead-${i}`, false))}
         {items.map((s) => cell(s, s.id, false))}
-        {state.animate ? items.map((s) => cell(s, `${s.id}-dup`, true)) : null}
+        {state.animate ? [...leads.map((l, i) => leadCell(l, `lead-${i}-dup`, true)), ...items.map((s) => cell(s, `${s.id}-dup`, true))] : null}
       </div>
       <style>{`
         @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }

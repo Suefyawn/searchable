@@ -44,6 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u("/data", new Date(), 0.8, "daily"),
     u("/today", new Date(), 0.8, "daily"),
     u("/earthquake-today", new Date(), 0.8, "hourly"),
+    u("/cricket-today", new Date(), 0.9, "hourly"),
     u("/ramadan-calendar", new Date(), 0.8, "weekly"),
     ...cities.filter((c) => c.lat !== null).map((c) => u(`/ramadan-calendar/${c.slug}`, new Date(), 0.7, "weekly")),
     u("/prices", new Date(), 0.8, "daily"),
