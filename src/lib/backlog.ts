@@ -22,7 +22,7 @@ export const BacklogItem = z.object({
   status: z.enum(["open", "in_progress", "done", "dropped"]).default("open"),
   /** Published URL once done. */
   url: z.string().trim().max(300).optional(),
-  note: z.string().trim().max(300).optional(),
+  note: z.string().trim().max(600).optional(),
   updatedAt: z.string().optional(),
 });
 export type BacklogItemT = z.infer<typeof BacklogItem>;

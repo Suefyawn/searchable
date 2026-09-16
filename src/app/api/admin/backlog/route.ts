@@ -18,7 +18,7 @@ export const GET = withAdminApi(async (req) => {
 
 const Body = z.union([
   z.object({ items: z.array(BacklogItem).min(1).max(200) }),
-  z.object({ keyword: z.string().min(1), status: z.enum(["open", "in_progress", "done", "dropped"]), url: z.string().max(300).optional(), note: z.string().max(300).optional() }),
+  z.object({ keyword: z.string().min(1), status: z.enum(["open", "in_progress", "done", "dropped"]), url: z.string().max(300).optional(), note: z.string().max(600).optional() }),
   z.object({ keyword: z.string().min(1), remove: z.literal(true) }),
 ]);
 

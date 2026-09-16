@@ -26,8 +26,8 @@ export const TAX_YEARS: TaxYear[] = [
     label: "Tax Year 2027 (FY 2026-27)",
     effectiveFrom: "2026-07-01",
     source: {
-      title: "Finance Act 2026: First Schedule, Part I, Division I (salaried slabs revised; s.4AB surcharge withdrawn for salaried)",
-      url: "https://fbr.gov.pk/",
+      title: "Finance Act 2026 (Gazette of Pakistan, 26 June 2026): First Schedule, Part I, Division I (salaried slabs; s.4AB surcharge withdrawn for salaried)",
+      url: "https://download1.fbr.gov.pk/Docs/20266291261044366FinanceAct2026.pdf",
       publisher: "Federal Board of Revenue",
     },
     salaried: [
