@@ -28,3 +28,6 @@ npm-debug.log*
 next-env.d.ts
 .turbo/
 coverage/
+
+# graphify knowledge graph output (local tooling)
+graphify-out/
