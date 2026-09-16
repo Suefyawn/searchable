@@ -1,0 +1,89 @@
+"use client";
+
+import { Comparator, type CompareConfig } from "@/components/compare/comparator";
+import { specNum, specText, type LivingItemT, type LivingSlug } from "@/lib/compare-data";
+
+const rs = (n: number) => `Rs ${Math.round(n).toLocaleString("en-PK")}`;
+const yes = (v: unknown) => v === true || v === "yes" || v === "Yes";
+
+/** Column, filter and sort definitions for each living comparison; the items come from the settings row. */
+function configFor(slug: LivingSlug, items: LivingItemT[]): CompareConfig<LivingItemT> {
+  const brands = [...new Set(items.map((i) => i.brand))].sort();
+  const s = (i: LivingItemT, k: string) => i.specs[k];
+  if (slug === "air-conditioners") {
+    const tons = [...new Set(items.map((i) => specText(s(i, "tonnage"))))].sort();
+    return {
+      noun: "air conditioner",
+      max: 3,
+      id: (i) => i.id,
+      title: (i) => `${i.brand} ${i.model}`,
+      subtitle: (i) => [specText(s(i, "tonnage")) + " ton", yes(s(i, "inverter")) ? "inverter" : "non-inverter", i.priceNote].filter(Boolean).join(" · "),
+      price: (i) => rs(i.price),
+      priceNum: (i) => i.price,
+      searchText: (i) => `${i.brand} ${i.model} ${Object.values(i.specs).join(" ")} ${i.note ?? ""}`,
+      specs: [
+        { key: "tonnage", label: "Tonnage", get: (i) => `${specText(s(i, "tonnage"))} ton`, num: (i) => specNum(s(i, "tonnage")), column: true, card: true },
+        { key: "inverter", label: "Inverter", get: (i) => specText(s(i, "inverter")), column: true, card: true },
+        { key: "heatCool", label: "Heat and cool", get: (i) => specText(s(i, "heatCool")), column: true, card: true },
+        { key: "t3", label: "T3 (works to 55°C)", get: (i) => specText(s(i, "t3")), column: true },
+        { key: "eer", label: "EER", get: (i) => specText(s(i, "eer")), num: (i) => specNum(s(i, "eer")), best: "max", column: true, align: "right", card: true },
+        { key: "wifi", label: "Wi-Fi", get: (i) => specText(s(i, "wifi")) },
+        { key: "warranty", label: "Compressor warranty", get: (i) => specText(s(i, "warranty")), num: (i) => specNum(s(i, "warranty")), best: "max" },
+        { key: "note", label: "Note", get: (i) => i.note ?? "-" },
+      ],
+      filters: [
+        { key: "ton", label: "Tonnage", options: tons.map((t) => ({ value: t, label: `${t} ton`, test: (i) => specText(s(i, "tonnage")) === t })) },
+        { key: "brand", label: "Brand", options: brands.map((b) => ({ value: b.toLowerCase(), label: b, test: (i) => i.brand === b })) },
+        { key: "kind", label: "Type", options: [{ value: "inverter", label: "Inverter", test: (i) => yes(s(i, "inverter")) }, { value: "fixed", label: "Non-inverter", test: (i) => !yes(s(i, "inverter")) }] },
+      ],
+      sorts: [
+        { key: "price", label: "Price, low to high", compare: (a, b) => a.price - b.price },
+        { key: "priceDesc", label: "Price, high to low", compare: (a, b) => b.price - a.price },
+        { key: "eer", label: "Efficiency (EER)", compare: (a, b) => (specNum(s(b, "eer")) ?? 0) - (specNum(s(a, "eer")) ?? 0) },
+        { key: "brand", label: "Brand", compare: (a, b) => a.brand.localeCompare(b.brand) || a.price - b.price },
+      ],
+      actions: (i) => {
+        const ton = specNum(s(i, "tonnage")) ?? 1.5;
+        const type = `${ton === 1 ? "1" : ton >= 2 ? "2" : "1.5"}-${yes(s(i, "inverter")) ? "inverter" : "fixed"}`;
+        return [{ href: `/tools/utilities/ac-running-cost-calculator?type=${type}`, label: "Monthly running cost" }, { href: `/tools/utilities/electricity-bill-calculator`, label: "Bill with this AC" }];
+      },
+    };
+  }
+  const banks = [...new Set(items.map((i) => specText(s(i, "bank"))))].sort();
+  return {
+    noun: "card",
+    max: 3,
+    id: (i) => i.id,
+    title: (i) => `${i.brand} ${i.model}`,
+    subtitle: (i) => [specText(s(i, "network")), yes(s(i, "islamic")) ? "Islamic" : null, i.priceNote].filter(Boolean).join(" · "),
+    price: (i) => (i.price === 0 ? "No annual fee" : `${rs(i.price)} a year`),
+    priceNum: (i) => i.price,
+    searchText: (i) => `${i.brand} ${i.model} ${Object.values(i.specs).join(" ")} ${i.note ?? ""}`,
+    specs: [
+      { key: "apr", label: "Mark-up (APR)", get: (i) => (specNum(s(i, "apr")) !== null ? `${specText(s(i, "apr"))}% a year` : "-"), num: (i) => specNum(s(i, "apr")), best: "min", column: true, align: "right", card: true },
+      { key: "minIncome", label: "Minimum income", get: (i) => (specNum(s(i, "minIncome")) !== null ? `${rs(specNum(s(i, "minIncome"))!)} a month` : "-"), num: (i) => specNum(s(i, "minIncome")), best: "min", column: true, align: "right", card: true },
+      { key: "cashback", label: "Cashback or rewards", get: (i) => specText(s(i, "cashback")), column: true, card: true },
+      { key: "lounge", label: "Airport lounge", get: (i) => specText(s(i, "lounge")), column: true, card: true },
+      { key: "fuel", label: "Fuel discount", get: (i) => specText(s(i, "fuel")) },
+      { key: "freeFirstYear", label: "First year free", get: (i) => specText(s(i, "freeFirstYear")) },
+      { key: "network", label: "Network", get: (i) => specText(s(i, "network")) },
+      { key: "note", label: "Note", get: (i) => i.note ?? "-" },
+    ],
+    filters: [
+      { key: "bank", label: "Bank", options: banks.map((b) => ({ value: b.toLowerCase().replace(/\s+/g, "-"), label: b, test: (i) => specText(s(i, "bank")) === b })) },
+      { key: "fee", label: "Annual fee", options: [{ value: "free", label: "No fee", test: (i) => i.price === 0 }, { value: "under5k", label: "Under Rs 5,000", test: (i) => i.price > 0 && i.price < 5000 }, { value: "5kplus", label: "Rs 5,000 and up", test: (i) => i.price >= 5000 }] },
+      { key: "type", label: "Type", options: [{ value: "islamic", label: "Islamic", test: (i) => yes(s(i, "islamic")) }, { value: "conventional", label: "Conventional", test: (i) => !yes(s(i, "islamic")) }] },
+    ],
+    sorts: [
+      { key: "fee", label: "Annual fee, low to high", compare: (a, b) => a.price - b.price },
+      { key: "apr", label: "Mark-up, low to high", compare: (a, b) => (specNum(s(a, "apr")) ?? 99) - (specNum(s(b, "apr")) ?? 99) },
+      { key: "income", label: "Minimum income", compare: (a, b) => (specNum(s(a, "minIncome")) ?? 9e9) - (specNum(s(b, "minIncome")) ?? 9e9) },
+      { key: "bank", label: "Bank", compare: (a, b) => specText(s(a, "bank")).localeCompare(specText(s(b, "bank"))) || a.price - b.price },
+    ],
+    actions: (i) => [{ href: `/tools/finance/personal-loan-calculator`, label: "Cost of carrying a balance" }, ...(i.url ? [{ href: i.url, label: `${specText(s(i, "bank"))} page` }] : [])],
+  };
+}
+
+export function LivingCompare({ slug, items }: { slug: LivingSlug; items: LivingItemT[] }) {
+  return <Comparator items={items} config={configFor(slug, items)} />;
+}

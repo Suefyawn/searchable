@@ -3,6 +3,7 @@ import { SectionHeader } from "@/components/ui";
 import { CARS, CARS_REVIEWED_AT } from "@/content/cars";
 import { INVERTERS, INVERTERS_REVIEWED_AT } from "@/content/inverters";
 import { formatDate, pkr } from "@/lib/format";
+import { readLivingSet } from "@/lib/compare-data";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
@@ -41,12 +42,19 @@ const PAGES = [
   },
 ];
 
-export default function CompareHub() {
+export const revalidate = 3600;
+
+export default async function CompareHub() {
+  const [acs, cards] = await Promise.all([readLivingSet("air-conditioners"), readLivingSet("credit-cards")]);
+  const living = [
+    { href: "/compare/air-conditioners", title: "Air conditioners", count: acs.items.length ? `${acs.items.length} models` : "Being compiled", range: acs.items.length ? `${pkr(Math.min(...acs.items.map((i) => i.price)))} to ${pkr(Math.max(...acs.items.map((i) => i.price)))}` : "Inverter and non-inverter, 1 to 2 ton", facets: ["Tonnage", "Brand", "Type"], specs: "Brand list price, EER, T3, heat and cool, warranty", tools: "AC running cost, electricity bill", reviewed: acs.reviewedAt },
+    { href: "/compare/credit-cards", title: "Credit cards", count: cards.items.length ? `${cards.items.length} cards` : "Being compiled", range: cards.items.length ? `Annual fee ${pkr(Math.min(...cards.items.map((i) => i.price)))} to ${pkr(Math.max(...cards.items.map((i) => i.price)))}` : "Fees, mark-up, minimum income", facets: ["Bank", "Annual fee", "Type"], specs: "Annual fee, mark-up, minimum income, cashback, lounge, fuel", tools: "Personal loan, income tax", reviewed: cards.reviewedAt },
+  ];
   return (
     <div className="container-x py-8 sm:py-12">
       <SectionHeader as="h1" eyebrow="Compare" title="Compare before you buy" description="Prices and specifications in one place, filters that match how people shop (budget, type, fuel), and a side-by-side for the final three that marks the best value in every row. Reviewed on a schedule; every page shows its date and source." />
       <div className="grid gap-6 md:grid-cols-2">
-        {PAGES.map((p) => (
+        {[...PAGES, ...living].map((p) => (
           <Link key={p.href} href={p.href} className="group flex flex-col border-t-2 border-[var(--rule)] pt-4 hover:bg-surface-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-3">{p.count}</p>
             <h2 className="mt-1 font-serif text-3xl font-medium leading-tight group-hover:underline underline-offset-4">{p.title}</h2>
@@ -59,12 +67,12 @@ export default function CompareHub() {
               <dt className="text-3">Then work out</dt>
               <dd>{p.tools}</dd>
             </dl>
-            <p className="mt-4 text-[12.5px] text-3">Prices reviewed {formatDate(p.reviewed)}</p>
+            <p className="mt-4 text-[12.5px] text-3">{p.reviewed ? `Prices reviewed ${formatDate(p.reviewed)}` : "Sources checked before the first publication"}</p>
           </Link>
         ))}
       </div>
       <p className="mt-10 max-w-2xl text-[15px] text-2">
-        Coming next: credit cards, bank accounts and profit rates, mobile and internet packages, inverter ACs, motorcycles. Suggest one at{" "}
+        Coming next: bank accounts and profit rates, mobile and internet packages, motorcycles. Suggest one at{" "}
         <a href="mailto:editorial@searchable.pk" className="underline underline-offset-4">
           editorial@searchable.pk
         </a>
