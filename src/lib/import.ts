@@ -84,6 +84,12 @@ export type PreviewRow = {
 
 const CATEGORY_ALIASES: Record<string, string> = { restaurant: "restaurants", food: "restaurants", cafe: "cafes", coffee: "cafes", doctor: "doctors", physician: "doctors", hospital: "hospitals", pharmacy: "pharmacies", "medical store": "pharmacies", dentist: "dentists", lawyer: "lawyers", advocate: "lawyers", "tax consultant": "tax-consultants", accountant: "tax-consultants", "solar company": "solar-companies", solar: "solar-companies", electrician: "electricians", plumber: "plumbers", "car dealer": "car-dealers", showroom: "car-dealers", workshop: "car-workshops", mechanic: "car-workshops", "mobile shop": "mobile-shops", "real estate": "real-estate-agents", "property dealer": "real-estate-agents", school: "schools", university: "universities", gym: "gyms", salon: "salons", parlour: "salons", hotel: "hotels", bank: "banks", photographer: "photographers", "wedding hall": "wedding-halls", marquee: "wedding-halls", tailor: "tailors", "it company": "it-companies", software: "it-companies" };
 
+/** "Mayo Hospital Lahore" in Lahore is mayo-hospital-lahore, not mayo-hospital-lahore-lahore. */
+export function businessSlug(name: string, citySlug: string): string {
+  const base = slugify(name);
+  return base.endsWith(`-${citySlug}`) || base === citySlug ? base : slugify(`${base}-${citySlug}`);
+}
+
 export async function previewImport(csv: string): Promise<{ rows: PreviewRow[]; header: string[]; error?: string }> {
   const table = parseCsv(csv);
   if (table.length < 2) return { rows: [], header: [], error: "Need a header row and at least one data row." };
@@ -148,7 +154,7 @@ export async function previewImport(csv: string): Promise<{ rows: PreviewRow[]; 
       input: d,
       status: fatal ? "invalid" : duplicates.length ? "duplicate" : "new",
       problems,
-      resolved: category && city ? { categoryId: category.id, categoryName: category.namePlural ?? category.name, cityId: city.id, cityName: city.name, areaId: area?.id ?? null, areaName: area?.name ?? null, phone, whatsapp, website, lat: Number.isFinite(lat as number) ? lat : null, lng: Number.isFinite(lng as number) ? lng : null, hours, services, priceRange, slug: slugify(`${d.name}-${city.slug}`) } : undefined,
+      resolved: category && city ? { categoryId: category.id, categoryName: category.namePlural ?? category.name, cityId: city.id, cityName: city.name, areaId: area?.id ?? null, areaName: area?.name ?? null, phone, whatsapp, website, lat: Number.isFinite(lat as number) ? lat : null, lng: Number.isFinite(lng as number) ? lng : null, hours, services, priceRange, slug: businessSlug(d.name, city.slug) } : undefined,
       duplicates,
     });
   }

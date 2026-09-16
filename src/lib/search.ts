@@ -320,6 +320,8 @@ export async function logSearch(query: string, resultCount: number, sessionId?: 
   const db = await getDb();
   const normalized = normalizeQuery(query);
   if (!normalized) return;
+  // Crawlers hit the SearchAction template literally; that is not a reader's question.
+  if (/search_term_string|\{[a-z_]+\}/i.test(query)) return;
   await db.insert(schema.searchQueries).values({ query: query.slice(0, 200), normalized, resultCount, sessionId });
 }
 

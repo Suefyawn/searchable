@@ -5,6 +5,7 @@ import { test } from "node:test";
 import { createHmac } from "node:crypto";
 import { backlogScore } from "../src/lib/backlog";
 import { normalizePhone } from "../src/lib/dedupe";
+import { businessSlug } from "../src/lib/import";
 import { srcSetFor } from "../src/lib/images";
 import { entitiesIn, isRelevant } from "../src/lib/open-images";
 import { parseAddress, verifyResendWebhook } from "../src/lib/inbox";
@@ -130,4 +131,9 @@ test("normalizePhone drops line ranges and rejects impossible lengths", () => {
   assert.equal(normalizePhone("+9242354016206"), null);
   assert.equal(normalizePhone("+92-042-35459807"), "+924235459807");
   assert.equal(normalizePhone("45550"), null);
+});
+
+test("business slug does not repeat the city", () => {
+  assert.equal(businessSlug("Mayo Hospital Lahore", "lahore"), "mayo-hospital-lahore");
+  assert.equal(businessSlug("Mayo Hospital", "lahore"), "mayo-hospital-lahore");
 });
