@@ -1,6 +1,9 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
+import { LivingItem, LIVING_SLUGS, type LivingSlug } from "./compare-shared";
+
+export { LivingItem, LIVING_SLUGS, specNum, specText, type LivingItemT, type LivingSlug } from "./compare-shared";
 
 /*
  * Living comparisons: the page's columns, filters and sorts are code (src/components/compare/living/*), the
@@ -9,23 +12,7 @@ import { getDb, schema } from "@/db";
  * move with retailers and banks every month, so they live in a settings row with a review date and source.
  */
 
-export const LIVING_SLUGS = ["air-conditioners", "credit-cards"] as const;
-export type LivingSlug = (typeof LIVING_SLUGS)[number];
 
-export const LivingItem = z.object({
-  /** Stable id, e.g. "haier-hsu-18hfcf" or "hbl-platinum". */
-  id: z.string().trim().min(2).max(80).regex(/^[a-z0-9-]+$/, "lowercase letters, digits and hyphens"),
-  brand: z.string().trim().min(1).max(60),
-  model: z.string().trim().min(1).max(120),
-  /** Headline price in rupees (for a card: the annual fee). */
-  price: z.number().nonnegative(),
-  priceNote: z.string().trim().max(120).optional(),
-  /** Where the number came from (the brand's store page, the bank's schedule of charges). */
-  url: z.string().trim().url().max(300).optional(),
-  specs: z.record(z.string(), z.union([z.string().max(200), z.number(), z.boolean(), z.null()])).default({}),
-  note: z.string().trim().max(200).optional(),
-});
-export type LivingItemT = z.infer<typeof LivingItem>;
 
 export const LivingSet = z.object({
   items: z.array(LivingItem).max(200).default([]),
@@ -61,6 +48,3 @@ export async function writeLivingSet(slug: LivingSlug, set: Omit<LivingSetT, "up
   await db.insert(schema.settings).values({ key: `compare:${slug}`, value }).onConflictDoUpdate({ target: schema.settings.key, set: { value, updatedAt: new Date() } });
   return value;
 }
-
-export const specText = (v: string | number | boolean | null | undefined): string => (v === null || v === undefined || v === "" ? "-" : typeof v === "boolean" ? (v ? "Yes" : "No") : String(v));
-export const specNum = (v: string | number | boolean | null | undefined): number | null => (typeof v === "number" ? v : typeof v === "string" && /^-?\d+(\.\d+)?$/.test(v) ? Number(v) : null);

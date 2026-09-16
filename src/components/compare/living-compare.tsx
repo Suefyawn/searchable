@@ -1,7 +1,7 @@
 "use client";
 
 import { Comparator, type CompareConfig } from "@/components/compare/comparator";
-import { specNum, specText, type LivingItemT, type LivingSlug } from "@/lib/compare-data";
+import { specNum, specText, type LivingItemT, type LivingSlug } from "@/lib/compare-shared";
 
 const rs = (n: number) => `Rs ${Math.round(n).toLocaleString("en-PK")}`;
 const yes = (v: unknown) => v === true || v === "yes" || v === "Yes";
