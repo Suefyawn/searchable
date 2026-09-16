@@ -15,7 +15,7 @@ A scheduled Claude task keeps the site alive between human sessions: six runs a 
 | Midday | 12:30 | Markets open (PSX, USD/PKR), one explainer or guide update, inbox replies. |
 | Afternoon | 15:30 | Business, tech, government notifications (OGRA, SBP, FBR, NEPRA): record readings by hand with sources. Queue pass. |
 | Evening | 18:30 | Sport (cricket, MMA, snooker), entertainment, one evergreen guide refresh. |
-| Night | 22:00 | Day wrap: update stories that moved, weekly guide audit (one guide per night gets its numbers checked), housekeeping `POST /jobs {job:"due"}`, report. |
+| Night | 22:30 | Day wrap: update stories that moved, weekly guide audit (one guide per night gets its numbers checked), housekeeping `POST /jobs {job:"due"}`, report. |
 
 On the 1st and 16th of the month (petrol price reviews), the Afternoon and Night runs check OGRA and update `petrol-price` and `diesel-price` the moment the notification is out, and publish the "what a full tank costs now" story.
 
