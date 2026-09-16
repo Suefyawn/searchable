@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ApiError, withAdminApi } from "@/lib/admin-api";
 import { importImageFromUrl } from "@/lib/media-import";
-import { entitiesIn, findAndImport, searchPhotos } from "@/lib/open-images";
+import { entitiesIn, findAndImport, searchPhotos, usedSources } from "@/lib/open-images";
 
 export const dynamic = "force-dynamic";
 // Photo imports, ingestion and sends take longer than the 10 s default; Hobby allows up to 60.
@@ -22,7 +22,12 @@ const Body = z.union([
  */
 export const POST = withAdminApi(async (_req, { body }) => {
   const d = Body.parse(body);
-  if ("search" in d) return { candidates: await searchPhotos(d.search, { limit: 12, orientation: d.orientation, minWidth: 800, entities: d.entities ?? entitiesIn(d.search) }) };
+  if ("search" in d) {
+    // Candidates the site already uses are flagged so the task picks something fresh.
+    const candidates = await searchPhotos(d.search, { limit: 12, orientation: d.orientation, minWidth: 800, entities: d.entities ?? entitiesIn(d.search) });
+    const used = await usedSources(candidates);
+    return { candidates: candidates.map((c) => ({ ...c, alreadyUsed: used.has(c.sourceUrl) })) };
+  }
   if ("query" in d) {
     const img = await findAndImport(d.query, d.variant, d.alt, { fallbackQuery: d.fallbackQuery });
     if (!img) throw new ApiError(404, `No openly licensed photo found for "${d.query}"`);

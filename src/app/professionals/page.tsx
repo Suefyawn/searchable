@@ -60,7 +60,7 @@ export default async function ProfessionalsHub() {
 
         <aside className="space-y-8 self-start text-[14.5px] lg:sticky lg:top-24">
           <div className="border-y-2 border-[var(--rule)] py-4">
-            <p className="font-serif text-xl font-medium">Are you a professional?</p>
+            <p className="font-display text-xl ">Are you a professional?</p>
             <p className="mt-1 text-2">A profile is free: experience, qualifications, services, CV, handles and an enquiry form. Verified profiles rank first.</p>
             <Link href="/professionals/join" className="mt-3 inline-flex h-10 items-center bg-ink-900 px-4 text-sm font-medium text-white hover:bg-ink-800">
               Create your profile

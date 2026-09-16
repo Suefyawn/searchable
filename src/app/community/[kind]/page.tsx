@@ -128,7 +128,7 @@ export default async function CommunityList({ params, searchParams }: { params: 
         </div>
         <aside className="space-y-8 self-start text-[14.5px] lg:sticky lg:top-24">
           <div className="border-y-2 border-[var(--rule)] py-4">
-            <p className="font-serif text-xl font-medium">Post something</p>
+            <p className="font-display text-xl ">Post something</p>
             <p className="mt-1 text-2">A job, something to sell, an auction, a question. Free. Checked by an editor before it goes up.</p>
             <Link href="/community/new" className="mt-3 inline-flex h-10 items-center bg-ink-900 px-4 text-sm font-medium text-white hover:bg-ink-800">
               New post

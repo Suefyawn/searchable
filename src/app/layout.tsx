@@ -1,17 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Newsreader } from "next/font/google";
+import { Geist } from "next/font/google";
 import { preconnect } from "react-dom";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { AdSenseScript } from "@/components/ads";
+import { ClarityScript } from "@/components/clarity";
 import { JsonLd } from "@/components/ui";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 import { brandCss, readSiteSettings } from "@/lib/site-settings";
 import { SITE } from "@/lib/utils";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const serif = Newsreader({ subsets: ["latin"], variable: "--font-serif", display: "swap", axes: ["opsz"], style: ["normal", "italic"] });
+// One family for everything (ADR-33): Geist at 400 and 500 for text, 600 with tight tracking for headlines.
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -46,7 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   if (imageHost) preconnect(imageHost);
   const settings = await readSiteSettings();
   return (
-    <html lang="en" className={`${inter.variable} ${serif.variable}`}>
+    <html lang="en" className={geist.variable}>
       <body className="min-h-dvh flex flex-col">
         {/* The brand kit from /admin/settings: five tokens every colour in globals.css derives from. Hoisted
             into <head> after the stylesheet, so a change here needs no deployment. */}
@@ -56,6 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {imageHost ? <script dangerouslySetInnerHTML={{ __html: `(function(h){window.addEventListener('error',function(e){var t=e.target;if(!t||t.tagName!=='IMG')return;var s=t.currentSrc||t.src||'';if(s.indexOf(h)!==0||t.dataset.retried===s)return;t.dataset.retried=s;t.removeAttribute('srcset');t.src='/media'+s.slice(h.length);},true);})(${JSON.stringify(imageHost)})` }} /> : null}
         <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
         <AdSenseScript />
+        <ClarityScript />
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:bg-ink-900 focus:px-3 focus:py-2 focus:text-white">
           Skip to content
         </a>

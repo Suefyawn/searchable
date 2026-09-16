@@ -13,7 +13,7 @@ export function AdminPage({ title, description, actions, children, wide }: { tit
     <div className={cn(!wide && "max-w-6xl")}>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b-2 border-[var(--rule)] pb-4">
         <div className="min-w-0">
-          <h1 className="font-serif text-3xl font-medium leading-tight">{title}</h1>
+          <h1 className="font-display text-3xl leading-tight">{title}</h1>
           {description ? <p className="mt-1 max-w-3xl text-[15px] text-2">{description}</p> : null}
         </div>
         {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
@@ -165,7 +165,7 @@ export function Stat({ label, value, delta, hint, href }: { label: string; value
   const body = (
     <>
       <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-3">{label}</p>
-      <p className="mt-1.5 font-serif text-[1.75rem] leading-none tabular">{value}</p>
+      <p className="mt-1.5 font-display text-[1.75rem] leading-none tabular">{value}</p>
       {delta || hint ? (
         <p className="mt-1.5 text-[12.5px] text-3">
           {delta ? <span className={cn("font-medium", delta.up === true && "text-[var(--text)]", delta.up === false && "text-2")}>{delta.text}</span> : null}

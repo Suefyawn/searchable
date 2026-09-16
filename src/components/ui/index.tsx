@@ -108,7 +108,7 @@ export function SectionHeader({ eyebrow, title, description, href, hrefLabel = "
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
         <div className="max-w-2xl">
           {eyebrow ? <p className="eyebrow mb-2">{eyebrow}</p> : null}
-          <Tag className={cn("font-serif", isPage ? "text-4xl font-medium sm:text-5xl" : "text-2xl font-medium sm:text-[1.75rem]")}>{title}</Tag>
+          <Tag className={cn("font-display", isPage ? "text-4xl sm:text-5xl" : "text-2xl sm:text-[1.75rem]")}>{title}</Tag>
           {description ? <p className={cn("mt-2 text-2", isPage ? "text-lg" : "text-[15px]")}>{description}</p> : null}
         </div>
         {href ? (
@@ -125,7 +125,7 @@ export function SectionHeader({ eyebrow, title, description, href, hrefLabel = "
 export function EmptyState({ title, description, action }: { title: string; description?: string; action?: React.ReactNode }) {
   return (
     <div className="hairline py-14 text-center">
-      <p className="font-serif text-2xl">{title}</p>
+      <p className="font-display text-2xl">{title}</p>
       {description ? <p className="mt-1.5 max-w-md mx-auto text-2">{description}</p> : null}
       {action ? <div className="mt-5">{action}</div> : null}
     </div>

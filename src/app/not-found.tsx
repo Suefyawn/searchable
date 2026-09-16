@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <div className="container-x py-24 text-center">
       <p className="eyebrow">404</p>
-      <h1 className="mt-2 font-serif text-4xl">We could not find that page</h1>
+      <h1 className="mt-2 font-display text-4xl">We could not find that page</h1>
       <p className="mt-2 text-2">It may have moved. Try searching for what you need.</p>
       <div className="mx-auto mt-6 max-w-xl">
         <SearchBox size="lg" />

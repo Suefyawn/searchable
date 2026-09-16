@@ -44,12 +44,12 @@ export default function NetMeteringHub() {
             <dl className="mt-3 grid gap-x-8 gap-y-3 sm:grid-cols-2">
               <div>
                 <dt className="text-sm text-3">Export credit: new agreements</dt>
-                <dd className="font-serif text-3xl tabular">Rs {RULES.exportRateNew.approx[0]}–{RULES.exportRateNew.approx[1]}<span className="text-base text-3"> /unit</span></dd>
+                <dd className="font-display text-3xl tabular">Rs {RULES.exportRateNew.approx[0]}–{RULES.exportRateNew.approx[1]}<span className="text-base text-3"> /unit</span></dd>
                 <dd className="text-sm text-2">{RULES.exportRateNew.label}, set by NEPRA</dd>
               </div>
               <div>
                 <dt className="text-sm text-3">Export credit: existing agreements, until expiry</dt>
-                <dd className="font-serif text-3xl tabular">Rs {RULES.exportRateExisting.approx[0]}–{RULES.exportRateExisting.approx[1]}<span className="text-base text-3"> /unit</span></dd>
+                <dd className="font-display text-3xl tabular">Rs {RULES.exportRateExisting.approx[0]}–{RULES.exportRateExisting.approx[1]}<span className="text-base text-3"> /unit</span></dd>
                 <dd className="text-sm text-2">{RULES.exportRateExisting.label}</dd>
               </div>
               <div>
@@ -75,7 +75,7 @@ export default function NetMeteringHub() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Is solar still worth it?</h2>
+            <h2 className="font-display text-2xl">Is solar still worth it?</h2>
             <p className="mt-2 text-[16px] leading-relaxed">
               For a house using 800 units a month, a 6 kW system generating ~750 units in summer: if 60% is used directly you save roughly 450 × Rs 45 = {pkr(450 * 45)} on import plus 300 × Rs 11 = {pkr(300 * 11)} in export credit, about {pkr(450 * 45 + 300 * 11)} a month, a payback of 3–4 years on a Rs 900,000 system. The same system exporting 80% earns far less. Size to your daytime load and shift ACs, pumps and washing into daylight; a battery only makes sense for outages, not for export.
             </p>
@@ -85,7 +85,7 @@ export default function NetMeteringHub() {
           </section>
 
           <section id="eligibility">
-            <h2 className="font-serif text-2xl">Eligibility</h2>
+            <h2 className="font-display text-2xl">Eligibility</h2>
             <ul className="mt-3 list-disc space-y-2 pl-5 text-[16px] leading-relaxed">
               <li><strong>Connection:</strong> {RULES.eligibility} (reg. 2). Single-phase houses must upgrade first.</li>
               <li><strong>Size:</strong> {RULES.capacityRange}. {RULES.capacityCap} (reg. 3(2)).</li>
@@ -97,7 +97,7 @@ export default function NetMeteringHub() {
           </section>
 
           <section id="apply">
-            <h2 className="font-serif text-2xl">How to apply: with the legal time limits</h2>
+            <h2 className="font-display text-2xl">How to apply: with the legal time limits</h2>
             <p className="mt-2 text-[15px] text-2">Working days each step is allowed under regulations 3 and 4. Add them up and the process should take about {totalDays} working days ({Math.round(totalDays / 5)} weeks) if nothing is returned.</p>
             <ol className="mt-3 divide-y divide-[var(--border)] border-y border-line">
               <li className="grid gap-x-4 py-3 sm:grid-cols-[2.5rem_1fr_6rem_5rem]">
@@ -125,7 +125,7 @@ export default function NetMeteringHub() {
           </section>
 
           <section id="costs">
-            <h2 className="font-serif text-2xl">Costs</h2>
+            <h2 className="font-display text-2xl">Costs</h2>
             <table className="mt-3 w-full text-[15px]">
               <tbody className="divide-y divide-[var(--border)] border-y border-line">
                 <tr><td className="py-2 pr-3">NEPRA concurrence fee (Schedule IV)</td><td className="py-2 text-right tabular">{pkr(RULES.nepraFeePerKw)} per kW: {pkr(RULES.nepraFeePerKw * 5)} for 5 kW, {pkr(RULES.nepraFeePerKw * 10)} for 10 kW</td></tr>
@@ -138,7 +138,7 @@ export default function NetMeteringHub() {
           </section>
 
           <section id="approved-inverters">
-            <h2 className="font-serif text-2xl">Approved inverters for net metering</h2>
+            <h2 className="font-display text-2xl">Approved inverters for net metering</h2>
             <p className="mt-2 text-[15px] leading-relaxed text-2">
               No DISCO publishes a standing model list. The net-metering desk checks the datasheet and the UL 1741 / IEC 62116 anti-islanding certificate your installer attaches, and the same NEPRA standard applies at every DISCO and K-Electric. <strong>Routine</strong> means the brand’s paperwork is accepted without query nationwide; <strong>with certificates</strong> means it is accepted when the test certificate is attached, ask the seller for it before buying.
             </p>
@@ -181,7 +181,7 @@ export default function NetMeteringHub() {
           </section>
 
           <section id="discos">
-            <h2 className="font-serif text-2xl">Net metering by DISCO</h2>
+            <h2 className="font-display text-2xl">Net metering by DISCO</h2>
             <p className="mt-2 text-[15px] text-2">Where to apply, what the meter estimate usually comes to, and what is specific to each company. The regulations, standards and approved-inverter test are the same everywhere.</p>
             <div className="mt-3 divide-y divide-[var(--border)] border-y border-line">
               {DISCO_NET_METERING.map((n) => {
@@ -189,7 +189,7 @@ export default function NetMeteringHub() {
                 if (!d) return null;
                 return (
                   <article key={n.slug} id={n.slug} className="py-4">
-                    <h3 className="font-serif text-xl">
+                    <h3 className="font-display text-xl">
                       <Link href={`/electricity/${d.slug}`} className="headline-link">{d.short} net metering</Link> <span className="text-base text-3">: {d.region}</span>
                     </h3>
                     <dl className="mt-2 grid gap-x-6 gap-y-1.5 text-[15px] sm:grid-cols-[9rem_1fr]">
@@ -227,7 +227,7 @@ export default function NetMeteringHub() {
           </section>
 
           <section id="existing">
-            <h2 className="font-serif text-2xl">Already on net metering?</h2>
+            <h2 className="font-display text-2xl">Already on net metering?</h2>
             <ul className="mt-3 list-disc space-y-2 pl-5 text-[16px] leading-relaxed">
               <li>Your licence and agreement under the 2015 regulations remain valid to expiry (reg. 21(2)).</li>
               <li>From the billing cycle after notification, exports are credited at the NAPPP (≈ Rs {RULES.exportRateExisting.approx[0]}–{RULES.exportRateExisting.approx[1]}) instead of unit-for-unit, and settled monthly.</li>
@@ -237,7 +237,7 @@ export default function NetMeteringHub() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Frequently asked questions</h2>
+            <h2 className="font-display text-2xl">Frequently asked questions</h2>
             <dl className="mt-4 divide-y divide-[var(--border)] border-y border-line">
               {FAQS.map((f) => (
                 <div key={f.question} className="py-4">
@@ -249,7 +249,7 @@ export default function NetMeteringHub() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Sources</h2>
+            <h2 className="font-display text-2xl">Sources</h2>
             <ul className="mt-3 space-y-1.5 text-[15px]">
               {NET_METERING_SOURCES.map((s) => (
                 <li key={s.url}>

@@ -76,7 +76,7 @@ export function HeroCarousel({ slides, intervalMs = INTERVAL }: { slides: Slide[
               {x.label}
               <span className="ml-2 font-sans text-[11px] font-normal normal-case tracking-normal text-3">{x.meta}</span>
             </p>
-            <h1 className="mt-2 font-serif text-[1.9rem] font-medium leading-[1.08] tracking-tight sm:text-[2.3rem] lg:text-[2.2rem] xl:text-[2.5rem]">
+            <h1 className="mt-2 font-display text-[1.9rem] leading-[1.08] tracking-tight sm:text-[2.3rem] lg:text-[2.2rem] xl:text-[2.5rem]">
               <Link href={x.href} className="headline-link" tabIndex={k === i ? 0 : -1}>
                 {x.title}
               </Link>
@@ -88,7 +88,7 @@ export function HeroCarousel({ slides, intervalMs = INTERVAL }: { slides: Slide[
         <div className="grid">
           {slides.map((x, k) => (
             <div key={x.id} className={cn("[grid-area:1/1]", k !== i && "invisible")} aria-hidden={k !== i}>
-              {x.dek ? <p className="font-serif text-[1.05rem] leading-relaxed text-2 lg:pt-6">{x.dek}</p> : null}
+              {x.dek ? <p className="font-display text-[1.05rem] leading-relaxed text-2 lg:pt-6">{x.dek}</p> : null}
               <Link href={x.href} className="mt-3 inline-block text-sm font-medium underline underline-offset-4" tabIndex={k === i ? 0 : -1}>
                 Read the story →
               </Link>

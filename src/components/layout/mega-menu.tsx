@@ -48,7 +48,7 @@ export function MegaMenu({ sections }: { sections: MegaSection[] }) {
 
   return (
     <div ref={rootRef} className="contents" onMouseLeave={hide}>
-      <nav className="ml-4 hidden items-center gap-5 lg:flex" aria-label="Primary">
+      <nav className="ml-6 hidden items-center gap-6 lg:flex" aria-label="Primary">
         {sections.map((s) => {
           const current = pathname === s.href || pathname.startsWith(s.href + "/");
           return (
@@ -65,7 +65,7 @@ export function MegaMenu({ sections }: { sections: MegaSection[] }) {
                     (rootRef.current?.querySelector(`[data-panel="${s.key}"] a`) as HTMLElement | null)?.focus();
                   }
                 }}
-                className={cn("inline-flex h-16 items-center border-b-2 text-[14.5px] font-medium transition-colors", open === s.key || current ? "border-[var(--text)] text-[var(--text)]" : "border-transparent text-2 hover:text-[var(--text)]")}
+                className={cn("inline-flex h-[60px] items-center border-b-2 text-[15px] font-medium tracking-[-0.01em] transition-colors", open === s.key || current ? "border-[var(--text)] text-[var(--text)]" : "border-transparent text-2 hover:text-[var(--text)]")}
               >
                 {s.label}
               </Link>

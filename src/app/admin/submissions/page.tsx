@@ -46,7 +46,7 @@ export default async function AdminSubmissions({ searchParams }: { searchParams:
                     </Link>
                   ) : null}
                 </p>
-                <h2 className="mt-1 font-serif text-xl">{s.title}</h2>
+                <h2 className="mt-1 font-display text-xl">{s.title}</h2>
                 <p className="text-sm text-2">
                   {s.name}{s.company ? `, ${s.company}` : ""} · <a href={`mailto:${s.email}`} className="underline-offset-4 hover:underline">{s.email}</a>{s.phone ? ` · ${s.phone}` : ""}{s.website ? ` · ${s.website}` : ""}{s.category ? ` · ${s.category}` : ""}
                 </p>

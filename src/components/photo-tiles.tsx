@@ -12,11 +12,11 @@ export function PhotoTile({ href, title, meta, imageUrl, aspect = "4/3", classNa
       {imageUrl ? (
         <Img src={imageUrl} alt="" aspect={aspect} sizes={sizes} className="transition-opacity group-hover:opacity-90" />
       ) : (
-        <div className="flex items-center justify-center bg-surface-2 font-serif text-3xl text-ink-300" style={{ aspectRatio: aspect }}>
+        <div className="flex items-center justify-center bg-surface-2 font-display text-3xl text-ink-300" style={{ aspectRatio: aspect }}>
           {title.charAt(0)}
         </div>
       )}
-      <p className="mt-2 font-serif text-lg leading-tight group-hover:underline group-hover:underline-offset-4">{title}</p>
+      <p className="mt-2 font-display text-lg leading-tight group-hover:underline group-hover:underline-offset-4">{title}</p>
       {meta ? <p className="text-xs text-3">{meta}</p> : null}
     </Link>
   );

@@ -24,7 +24,7 @@ export default function ElectricityHub() {
       <div className="grid gap-x-8 gap-y-2 border-t border-line sm:grid-cols-2">
         {DISCOS.map((d) => (
           <Link key={d.slug} href={`/electricity/${d.slug}`} className="border-b border-line py-4 hover:bg-surface-2">
-            <p className="font-serif text-xl">{d.short} bill check</p>
+            <p className="font-display text-xl">{d.short} bill check</p>
             <p className="mt-0.5 text-sm text-2">
               {d.name} · {d.cities.slice(0, 3).join(", ")}
               {d.cities.length > 3 ? ` +${d.cities.length - 3}` : ""}
@@ -34,7 +34,7 @@ export default function ElectricityHub() {
       </div>
       <div className="mt-8 border-y-2 border-[var(--rule)] py-4">
         <p className="eyebrow">Solar</p>
-        <p className="mt-1 font-serif text-xl">
+        <p className="mt-1 font-display text-xl">
           <Link href="/electricity/net-metering" className="headline-link">Net metering in 2026: new NEPRA rules, approved inverters and how to apply at your DISCO</Link>
         </p>
         <p className="mt-1 text-sm text-2">Net billing replaced net metering in February 2026: export credit, eligibility, time limits and costs explained.</p>

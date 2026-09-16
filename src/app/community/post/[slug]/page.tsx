@@ -86,7 +86,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             {p.status === "closed" ? <span>Closed</span> : null}
             {p.topic ? <span>{p.topic}</span> : null}
           </p>
-          <h1 className="mt-2 font-serif text-3xl font-medium leading-tight sm:text-4xl">{p.title}</h1>
+          <h1 className="mt-2 font-display text-3xl leading-tight sm:text-4xl">{p.title}</h1>
           <p className="mt-3 flex flex-wrap items-center gap-x-3 text-[13.5px] text-2">
             {handle ? (
               <Link href={`/u/${handle}`} className="font-medium text-[var(--text)] underline-offset-4 hover:underline">
@@ -127,7 +127,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
         <aside className="space-y-6 self-start lg:sticky lg:top-24">
           <div className="border-y-2 border-[var(--rule)] py-4">
-            {figure ? <p className="font-serif text-3xl tabular">{figure}</p> : null}
+            {figure ? <p className="font-display text-3xl tabular">{figure}</p> : null}
             {p.kind === "job" ? (
               <dl className="mt-2 grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 text-[14px]">
                 {m.company ? (

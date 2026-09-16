@@ -77,7 +77,7 @@ export default async function PtaHub() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">PTA tax list 2026: by phone value</h2>
+            <h2 className="font-display text-2xl">PTA tax list 2026: by phone value</h2>
             <p className="mt-2 text-[15px] text-2">
               Fixed amount per slab; slabs above $200 also add sales tax on the phone’s rupee value. Rupee figures below use the dollar rate of {usdPkr.toFixed(2)}{usdDate ? ` (${formatDate(usdDate)})` : ""}.
             </p>
@@ -114,7 +114,7 @@ export default async function PtaHub() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">PTA tax on popular phones</h2>
+            <h2 className="font-display text-2xl">PTA tax on popular phones</h2>
             <table className="mt-3 w-full text-[15px]">
               <thead className="text-left text-xs uppercase tracking-wider text-3">
                 <tr className="border-b border-[var(--rule)]">
@@ -139,7 +139,7 @@ export default async function PtaHub() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">How to register on DIRBS</h2>
+            <h2 className="font-display text-2xl">How to register on DIRBS</h2>
             <ol className="mt-3 list-decimal space-y-2 pl-5 text-[16px]">
               <li>Create an account at dirbs.pta.gov.pk (local Pakistani, overseas Pakistani, or foreigner).</li>
               <li>Choose <strong>Individual COC</strong> (Certificate of Compliance) and enter the IMEI(s).</li>
@@ -151,7 +151,7 @@ export default async function PtaHub() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Frequently asked questions</h2>
+            <h2 className="font-display text-2xl">Frequently asked questions</h2>
             <dl className="mt-4 divide-y divide-[var(--border)] border-y border-line">
               {FAQS.map((f) => (
                 <div key={f.question} className="py-4">

@@ -19,7 +19,7 @@ export default async function ProfessionalDashboard() {
       <SectionHeader as="h1" title="Your professional profiles" description="Keep your profile current, answer enquiries quickly, and get verified to rank first in your profession and city." href="/professionals/join" hrefLabel="Create another profile" />
       {!profiles.length ? (
         <div className="border-y-2 border-[var(--rule)] py-10 text-center">
-          <p className="font-serif text-2xl">No profile yet</p>
+          <p className="font-display text-2xl">No profile yet</p>
           <p className="mt-1 text-2">A profile takes ten minutes and is free.</p>
           <Link href="/professionals/join" className="mt-4 inline-flex h-10 items-center bg-ink-900 px-4 text-sm font-medium text-white hover:bg-ink-800">
             Create your profile
@@ -33,7 +33,7 @@ export default async function ProfessionalDashboard() {
             <section key={p.id} className="border-t-2 border-[var(--rule)] pt-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h2 className="font-serif text-2xl font-medium">
+                  <h2 className="font-display text-2xl ">
                     {p.status === "active" ? (
                       <Link href={`/p/${p.slug}`} className="hover:underline underline-offset-4">
                         {p.name}

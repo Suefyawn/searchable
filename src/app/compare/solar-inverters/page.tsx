@@ -100,7 +100,7 @@ export default function SolarInverterComparePage() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Which type do you need?</h2>
+            <h2 className="font-display text-2xl">Which type do you need?</h2>
             <dl className="mt-3 divide-y divide-[var(--border)] border-y border-line">
               {TYPE_ORDER.map((t) => {
                 const [lo, hi] = range(INVERTERS.filter((i) => i.type === t));
@@ -118,7 +118,7 @@ export default function SolarInverterComparePage() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Compare inverters</h2>
+            <h2 className="font-display text-2xl">Compare inverters</h2>
             <p className="mt-2 mb-4 text-[15px] text-2">Every model we track, with what actually matters: MPPT count, battery voltage, net-metering eligibility and warranty.</p>
             <Suspense fallback={<p className="py-10 text-center text-[15px] text-2">Loading the comparison…</p>}>
               <InverterCompare inverters={INVERTERS} />
@@ -129,7 +129,7 @@ export default function SolarInverterComparePage() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Lithium battery prices (for hybrids)</h2>
+            <h2 className="font-display text-2xl">Lithium battery prices (for hybrids)</h2>
             <table className="mt-3 w-full text-[15px]">
               <thead className="text-left text-xs uppercase tracking-wider text-3">
                 <tr className="border-b border-[var(--rule)]">
@@ -158,7 +158,7 @@ export default function SolarInverterComparePage() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">How to choose</h2>
+            <h2 className="font-display text-2xl">How to choose</h2>
             <ol className="mt-3 list-decimal space-y-2 pl-5 text-[16px] leading-relaxed">
               <li><strong>Size to your load, not your roof.</strong> Add up what runs at once on a summer evening (each 1.5-ton inverter AC ≈ 1.2–1.8 kW). A 6 kW single-phase hybrid covers most 5–10 marla houses; go three-phase above 8 kW or if your meter is three-phase.</li>
               <li><strong>Two MPPTs minimum.</strong> Roofs facing two directions, or partial shade, need independent strings. Budget off-grid units have one.</li>
@@ -170,7 +170,7 @@ export default function SolarInverterComparePage() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Frequently asked questions</h2>
+            <h2 className="font-display text-2xl">Frequently asked questions</h2>
             <dl className="mt-4 divide-y divide-[var(--border)] border-y border-line">
               {FAQS.map((f) => (
                 <div key={f.question} className="py-4">

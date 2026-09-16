@@ -41,7 +41,7 @@ export function PostCard({ p, className, showKind = true }: { p: PostRow; classN
           {p.isPinned ? <span>Pinned</span> : null}
           {p.status === "closed" ? <span>Closed</span> : null}
         </p>
-        <h3 className="mt-1 font-serif text-lg font-medium leading-snug group-hover:underline underline-offset-4">{p.title}</h3>
+        <h3 className="mt-1 font-display text-lg leading-snug group-hover:underline underline-offset-4">{p.title}</h3>
         {sub ? <p className="mt-0.5 text-[13.5px] text-2">{sub}</p> : null}
         <p className="mt-1.5 flex flex-wrap items-center gap-x-3 text-[12.5px] text-3">
           <span>{p.author.name}</span>
@@ -53,7 +53,7 @@ export function PostCard({ p, className, showKind = true }: { p: PostRow; classN
           {p.kind === "auction" ? <span>{p.bidCount} bids</span> : null}
         </p>
       </div>
-      {figure ? <p className="shrink-0 self-start font-serif text-lg tabular">{figure}</p> : null}
+      {figure ? <p className="shrink-0 self-start font-display text-lg tabular">{figure}</p> : null}
     </Link>
   );
 }

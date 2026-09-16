@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import { storeImage } from "./storage";
 
@@ -246,6 +246,19 @@ export function creditLine(img: Pick<OpenImage, "creator" | "license" | "license
 }
 
 /** Download an Openverse result, normalise it through the storage adapter, and record licence + source. */
+/**
+ * Source pages already imported once. A photo that is on the site should not be the cover of a second story:
+ * the same rupee notes on five economy stories reads as filler. Wikipedia lead photos of a named entity are
+ * exempt (Babar Azam's photo can head every Babar Azam story).
+ */
+export async function usedSources(candidates: OpenImage[]): Promise<Set<string>> {
+  const urls = [...new Set(candidates.map((c) => c.sourceUrl).filter(Boolean))];
+  if (!urls.length) return new Set();
+  const db = await getDb();
+  const rows = await db.select({ sourceUrl: schema.media.sourceUrl }).from(schema.media).where(inArray(schema.media.sourceUrl, urls));
+  return new Set(rows.map((r) => r.sourceUrl!).filter(Boolean));
+}
+
 export async function importOpenImage(img: OpenImage, variant: "article" | "cover" | "photo" = "article", alt?: string) {
   const res = await fetch(img.url, { headers: { "user-agent": UA, referer: img.sourceUrl }, signal: AbortSignal.timeout(12_000) });
   if (!res.ok) throw new Error(`Image download failed: ${res.status}`);
@@ -313,7 +326,9 @@ export async function findAndImport(query: string, variant: "article" | "cover" 
         continue;
       }
     }
-    const ordered = opts.pick ? [...results.slice(opts.pick), ...results.slice(0, opts.pick)] : results;
+    const used = await usedSources(results);
+    const fresh = results.filter((r) => !used.has(r.sourceUrl));
+    const ordered = opts.pick ? [...fresh.slice(opts.pick), ...fresh.slice(0, opts.pick)] : fresh;
     for (const candidate of ordered.slice(0, 4)) {
       if (Date.now() > deadline) break;
       try {

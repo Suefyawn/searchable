@@ -49,7 +49,7 @@ export default async function SolarPricePage() {
             <section className="border-y-2 border-[var(--rule)] py-6">
               <p className="eyebrow">Tier-1 panel price per watt</p>
               <p className="mt-1 flex flex-wrap items-baseline gap-3">
-                <span className="font-serif text-5xl tabular">Rs {number(latest.value, 2)}</span>
+                <span className="font-display text-5xl tabular">Rs {number(latest.value, 2)}</span>
                 <span className="text-lg text-3">per watt</span>
                 {previous ? <Change latest={latest.value} previous={previous.value} unit="PKR" /> : null}
               </p>
@@ -61,7 +61,7 @@ export default async function SolarPricePage() {
 
           {points.length > 1 ? (
             <section>
-              <h2 className="font-serif text-2xl">Price trend</h2>
+              <h2 className="font-display text-2xl">Price trend</h2>
               <div className="mt-3 text-brand-700">
                 <LineChart points={points.map((p) => ({ date: p.date, value: p.value }))} unit="Rs per watt" />
               </div>
@@ -69,7 +69,7 @@ export default async function SolarPricePage() {
           ) : null}
 
           <section>
-            <h2 className="font-serif text-2xl">Solar panel prices by brand</h2>
+            <h2 className="font-display text-2xl">Solar panel prices by brand</h2>
             <table className="mt-3 w-full text-[15px]">
               <thead className="text-left text-xs uppercase tracking-wider text-3">
                 <tr className="border-b border-[var(--rule)]">
@@ -101,7 +101,7 @@ export default async function SolarPricePage() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Inverter and battery prices</h2>
+            <h2 className="font-display text-2xl">Inverter and battery prices</h2>
             <table className="mt-3 w-full text-[15px]">
               <tbody className="divide-y divide-[var(--border)] border-y border-line">
                 {SOLAR_PRICES.inverters.map((i) => (
@@ -120,7 +120,7 @@ export default async function SolarPricePage() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Solar system price in Pakistan (installed)</h2>
+            <h2 className="font-display text-2xl">Solar system price in Pakistan (installed)</h2>
             <p className="mt-2 text-[15px] text-2">On-grid systems with tier-1 panels, branded inverter, structure, wiring and labour. Net-metering processing is usually extra (Rs 25,000–60,000).</p>
             <table className="mt-3 w-full text-[15px]">
               <tbody className="divide-y divide-[var(--border)] border-y border-line">
@@ -141,7 +141,7 @@ export default async function SolarPricePage() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Frequently asked questions</h2>
+            <h2 className="font-display text-2xl">Frequently asked questions</h2>
             <dl className="mt-4 divide-y divide-[var(--border)] border-y border-line">
               {FAQS.map((f) => (
                 <div key={f.question} className="py-4">

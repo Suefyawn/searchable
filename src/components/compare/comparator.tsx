@@ -199,7 +199,7 @@ export function Comparator<T>({ items, config }: { items: T[]; config: CompareCo
               <li key={id} id={id} className={cn("flex flex-col border p-4", on ? "border-[var(--text)]" : "border-line")}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-serif text-[1.15rem] font-medium leading-snug">{config.title(it)}</p>
+                    <p className="font-display text-[1.15rem] leading-snug">{config.title(it)}</p>
                     {config.subtitle ? <p className="mt-0.5 text-[12.5px] text-3">{config.subtitle(it)}</p> : null}
                   </div>
                   <button type="button" onClick={() => toggle(id)} disabled={full} aria-pressed={on} className={cn("shrink-0 border px-2 py-1 text-[12px] font-medium", on ? "border-[var(--text)] bg-ink-900 text-white" : "border-line text-2 hover:border-ink-500 hover:text-[var(--text)] disabled:opacity-40")}>
@@ -238,7 +238,7 @@ export function Comparator<T>({ items, config }: { items: T[]; config: CompareCo
       {compared.length ? (
         <section ref={sideRef} id="compare" className="mt-10 border-t-2 border-[var(--rule)] pt-4">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <h3 className="font-serif text-2xl">Side by side</h3>
+            <h3 className="font-display text-2xl">Side by side</h3>
             <p className="text-[13px] text-3">
               {compared.length < MAX ? `Pick ${MAX - compared.length} more, or ` : ""}
               <button type="button" onClick={() => set({ pick: null })} className="underline underline-offset-4 hover:text-[var(--text)]">
@@ -253,7 +253,7 @@ export function Comparator<T>({ items, config }: { items: T[]; config: CompareCo
                   <th className="py-2 pr-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-3">Spec</th>
                   {compared.map((it) => (
                     <th key={config.id(it)} className="py-2 pr-3 align-bottom">
-                      <span className="block font-serif text-[1.05rem] font-medium leading-snug">{config.title(it)}</span>
+                      <span className="block font-display text-[1.05rem] leading-snug">{config.title(it)}</span>
                       <button type="button" onClick={() => toggle(config.id(it))} className="mt-1 text-[12px] font-normal text-3 underline-offset-4 hover:underline">
                         remove
                       </button>

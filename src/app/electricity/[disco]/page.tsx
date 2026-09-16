@@ -78,7 +78,7 @@ export default async function DiscoPage({ params }: Props) {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">{d.short} per-unit price (residential, {formatDate(ELECTRICITY.reviewedAt, { month: "long", year: "numeric" })})</h2>
+            <h2 className="font-display text-2xl">{d.short} per-unit price (residential, {formatDate(ELECTRICITY.reviewedAt, { month: "long", year: "numeric" })})</h2>
             <p className="mt-2 text-[15px] text-2">NEPRA’s uniform tariff applies to {d.short}. Energy charge only: GST ({ELECTRICITY.gstRate * 100}%), FC surcharge (Rs {ELECTRICITY.fcSurchargePerUnit}/unit), electricity duty and fuel price adjustment are added on the bill.</p>
             <div className="mt-4 grid gap-6 sm:grid-cols-2">
               <table className="w-full text-[15px]">
@@ -108,7 +108,7 @@ export default async function DiscoPage({ params }: Props) {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Frequently asked questions</h2>
+            <h2 className="font-display text-2xl">Frequently asked questions</h2>
             <dl className="mt-4 divide-y divide-[var(--border)] border-y border-line">
               {faqs.map((f) => (
                 <div key={f.question} className="py-4">
@@ -120,7 +120,7 @@ export default async function DiscoPage({ params }: Props) {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Other electricity companies</h2>
+            <h2 className="font-display text-2xl">Other electricity companies</h2>
             <p className="mt-3 text-[15px] leading-loose">
               {others.map((o, i) => (
                 <span key={o.slug}>

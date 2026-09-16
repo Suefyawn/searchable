@@ -106,7 +106,7 @@ export function ToolRunner({ slug, live = {} }: { slug: string; live?: ToolInput
           <>
             <div className="border-y-2 border-[var(--rule)] py-6">
               <p className="eyebrow">{result.headline.label}</p>
-              <p className="mt-2 font-serif text-5xl tabular tracking-tight sm:text-6xl">{result.headline.value}</p>
+              <p className="mt-2 font-display text-5xl tabular tracking-tight sm:text-6xl">{result.headline.value}</p>
               {result.summary ? <p className="mt-4 max-w-prose text-[15px] leading-relaxed text-2">{result.summary}</p> : null}
             </div>
             {result.sections.map((s, i) => (

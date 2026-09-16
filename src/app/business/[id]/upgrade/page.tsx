@@ -27,7 +27,7 @@ export default async function UpgradePage({ params }: { params: Promise<{ id: st
       <p className="mb-2 text-sm">
         <Link href="/business" className="text-2 underline-offset-4 hover:underline">← Your businesses</Link>
       </p>
-      <h1 className="font-serif text-3xl">Upgrade {b.name}</h1>
+      <h1 className="font-display text-3xl">Upgrade {b.name}</h1>
       <p className="mt-2 text-[15px] text-2">
         Current plan: <Badge tone={b.tier === "free" ? "neutral" : "brand"}>{b.tier}</Badge>
         {b.tierExpiresAt ? <span> · until {formatDate(b.tierExpiresAt)}</span> : null}
@@ -40,7 +40,7 @@ export default async function UpgradePage({ params }: { params: Promise<{ id: st
             <input type="hidden" name="businessId" value={b.id} />
             <input type="hidden" name="productCode" value={p.code} />
             <p className="eyebrow">{p.name}{p.popular ? " · Most popular" : ""}</p>
-            <p className="mt-2 font-serif text-3xl tabular">{pkr(p.pricePkr)}</p>
+            <p className="mt-2 font-display text-3xl tabular">{pkr(p.pricePkr)}</p>
             <p className="text-sm text-2">per {p.periodDays === 365 ? "year" : "month"}</p>
             <p className="mt-3 text-[15px]">{p.blurb}</p>
             <ul className="mt-3 flex-1 space-y-1.5 text-[14px] text-2">
@@ -62,7 +62,7 @@ export default async function UpgradePage({ params }: { params: Promise<{ id: st
 
       {orders.length ? (
         <section className="mt-10">
-          <h2 className="rule pt-3 font-serif text-2xl">Invoices</h2>
+          <h2 className="rule pt-3 font-display text-2xl">Invoices</h2>
           <table className="mt-3 w-full text-[15px]">
             <tbody className="divide-y divide-[var(--border)]">
               {orders.map((o) => (

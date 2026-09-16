@@ -43,12 +43,12 @@ export default async function MemberPage({ params }: { params: Promise<{ handle:
             // eslint-disable-next-line @next/next/no-img-element
             <img src={m.avatarUrl} srcSet={srcSetFor(m.avatarUrl)} sizes="96px" alt={m.displayName} className="size-full object-cover" />
           ) : (
-            <div className="flex size-full items-center justify-center font-serif text-4xl text-3">{m.displayName.slice(0, 1)}</div>
+            <div className="flex size-full items-center justify-center font-display text-4xl text-3">{m.displayName.slice(0, 1)}</div>
           )}
         </div>
         <div className="min-w-0 flex-1">
           <p className="eyebrow">Member{m.city ? ` · ${m.city.name}` : ""}</p>
-          <h1 className="mt-1 flex flex-wrap items-center gap-x-3 font-serif text-3xl font-medium leading-tight">
+          <h1 className="mt-1 flex flex-wrap items-center gap-x-3 font-display text-3xl leading-tight">
             {m.displayName}
             {m.isVerified ? (
               <span className="inline-flex items-center gap-1 border border-line px-2 py-0.5 font-sans text-[11px] font-bold uppercase tracking-[0.1em]">

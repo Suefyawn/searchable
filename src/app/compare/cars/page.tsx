@@ -74,7 +74,7 @@ export default function CarsComparePage() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">All new cars</h2>
+            <h2 className="font-display text-2xl">All new cars</h2>
             <p className="mt-2 mb-4 text-[15px] text-2">Ex-factory prices across variants. On-road cost adds registration, number plate, token tax and 231B withholding: use the calculators from the comparison.</p>
             <Suspense fallback={<p className="py-10 text-center text-[15px] text-2">Loading the comparison…</p>}>
               <CarCompare cars={CARS} />
@@ -85,7 +85,7 @@ export default function CarsComparePage() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">What the price does not include</h2>
+            <h2 className="font-display text-2xl">What the price does not include</h2>
             <ul className="mt-3 list-disc space-y-2 pl-5 text-[16px] leading-relaxed">
               <li><strong>Registration and number plate</strong>, provincial Excise fee (roughly 1–4% of value by engine size) plus plate and smart-card charges.</li>
               <li><strong>Withholding tax u/s 231B</strong>, collected at registration; non-filers pay about three times the filer rate. Getting on the ATL before booking is the single biggest saving.</li>
@@ -96,7 +96,7 @@ export default function CarsComparePage() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Frequently asked questions</h2>
+            <h2 className="font-display text-2xl">Frequently asked questions</h2>
             <dl className="mt-4 divide-y divide-[var(--border)] border-y border-line">
               {FAQS.map((f) => (
                 <div key={f.question} className="py-4">

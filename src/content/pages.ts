@@ -36,8 +36,8 @@ Every factual claim has a source. Money-affecting numbers show an effective date
 ## What we do not do
 We do not sell personal data. We do not show behavioural advertising based on your searches.
 
-## Cookies
-A session cookie if you sign in. Analytics are first-party and aggregated.
+## Cookies and analytics
+A session cookie if you sign in. Our own analytics are first-party and aggregated. We also use Microsoft Clarity to see how pages are used (heatmaps and anonymised session recordings); Clarity sets its own cookies and is covered by [Microsoft's privacy statement](https://privacy.microsoft.com/privacystatement). Text you type into forms is masked before it reaches Clarity.
 
 ## Contact
 privacy@searchable.pk`,

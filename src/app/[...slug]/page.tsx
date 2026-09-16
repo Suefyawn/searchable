@@ -28,7 +28,7 @@ export default async function CatchAll({ params }: Props) {
   if (p) {
     return (
       <div className="container-x py-10 sm:py-14">
-        <h1 className="font-serif text-4xl sm:text-5xl">{p.title}</h1>
+        <h1 className="font-display text-4xl sm:text-5xl">{p.title}</h1>
         <p className="mt-3 max-w-[68ch] text-lg text-2">{p.description}</p>
         <div className="prose prose-searchable mt-8" dangerouslySetInnerHTML={{ __html: renderMarkdown(p.body) }} />
       </div>

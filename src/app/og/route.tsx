@@ -3,12 +3,11 @@ import path from "node:path";
 import { ImageResponse } from "next/og";
 import { SITE } from "@/lib/utils";
 
-/** The Newsreader S outline used by the lens mark (see src/components/brand.tsx). */
-const S_PATH = "M34.38 17.86L34.38 17.86L31.76 17.40L33.83 15.72L34.63 15.72L35.67 23.64L34.38 23.81L31.25 18.56L32.30 19.78Q31.40 19.13 30.40 18.83Q29.39 18.52 28.26 18.52L28.26 18.52Q26.08 18.52 24.98 19.36Q23.89 20.21 23.89 21.70L23.89 21.70Q23.89 22.72 24.37 23.39Q24.86 24.06 25.70 24.52Q26.54 24.98 27.61 25.34Q28.68 25.70 29.85 26.05L29.85 26.05Q31.03 26.43 32.20 26.92Q33.37 27.41 34.34 28.16Q35.31 28.91 35.90 30.07Q36.48 31.24 36.48 32.96L36.48 32.96Q36.48 35.39 35.30 37.01Q34.12 38.63 32.03 39.46Q29.94 40.28 27.20 40.28L27.20 40.28Q25.35 40.28 23.89 40.07Q22.44 39.86 20.88 39.30L20.88 39.30L19.52 32.84L20.84 32.84L25.37 39.25L21.66 36.81Q23.05 37.53 24.17 37.83Q25.28 38.14 26.61 38.14L26.61 38.14Q28.53 38.14 29.79 37.72Q31.04 37.29 31.66 36.45Q32.28 35.61 32.28 34.33L32.28 34.33Q32.28 33.16 31.69 32.39Q31.09 31.63 30.13 31.14Q29.16 30.66 27.99 30.30Q26.83 29.95 25.69 29.57L25.69 29.57Q24.55 29.18 23.51 28.69Q22.48 28.20 21.68 27.47Q20.88 26.75 20.42 25.68Q19.96 24.61 19.96 23.08L19.96 23.08Q19.96 21.02 20.99 19.54Q22.02 18.06 23.93 17.26Q25.84 16.47 28.46 16.47L28.46 16.47Q30.11 16.47 31.51 16.79Q32.91 17.11 34.38 17.86Z";
+import { MARK_HANDLE, MARK_RING } from "@/components/brand";
 
 export const runtime = "nodejs";
 
-/** Newsreader for the headline, Inter for everything else; read once per instance from the files beside this route. */
+/** Geist throughout (600 for the headline); read once per instance from the files beside this route. */
 type Font = { name: string; data: ArrayBuffer; weight: 400 | 600; style: "normal" };
 let fonts: Promise<Font[]> | null = null;
 function loadFonts() {
@@ -16,7 +15,7 @@ function loadFonts() {
     const b = await readFile(path.join(process.cwd(), "src/app/og", file));
     return { name, data: b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer, weight, style: "normal" };
   };
-  fonts ??= Promise.all([read("newsreader-600.ttf", "Newsreader", 600), read("inter-400.ttf", "Inter", 400), read("inter-600.ttf", "Inter", 600)]);
+  fonts ??= Promise.all([read("geist-400.ttf", "Geist", 400), read("geist-600.ttf", "Geist", 600)]);
   return fonts;
 }
 
@@ -30,18 +29,18 @@ export async function GET(req: Request) {
   // Immutable per title: the CDN keeps it for a year, so a share never re-renders the card.
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "64px 72px", background: "#fdfdfc", color: "#1f1d1a", fontFamily: "Newsreader, Georgia, serif", fontWeight: 600 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "Inter", fontWeight: 400, fontSize: 22, letterSpacing: 3, textTransform: "uppercase", color: "#1f1d1a" }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "64px 72px", background: "#fdfdfc", color: "#1f1d1a", fontFamily: "Geist, sans-serif", fontWeight: 600 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "Geist", fontWeight: 400, fontSize: 22, letterSpacing: 3, textTransform: "uppercase", color: "#1f1d1a" }}>
           <span>{kicker || "Searchable"}</span>
           <span style={{ color: "#8a8680" }}>searchable.pk</span>
         </div>
-        <div style={{ display: "flex", fontSize: big ? 78 : 60, lineHeight: 1.08, letterSpacing: -1, maxWidth: 1000 }}>{title}</div>
+        <div style={{ display: "flex", fontSize: big ? 78 : 60, lineHeight: 1.08, letterSpacing: -2, maxWidth: 1000 }}>{title}</div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "2px solid #1f1d1a", paddingTop: 22, fontSize: 30 }}>
           <span style={{ display: "flex", alignItems: "center" }}>
-            <svg width="34" height="34" viewBox="0 0 64 64"><circle cx="28" cy="28" r="23" fill="none" stroke="#1f1d1a" strokeWidth="5" /><path d="M45 45 L62 62" stroke="#1f1d1a" strokeWidth="7" /><path d={S_PATH} fill="#1f1d1a" /></svg>
-            <span style={{ fontFamily: "Inter", fontWeight: 600, letterSpacing: -1, marginLeft: 10 }}>searchable<span style={{ color: "#8a8680" }}>.pk</span></span>
+            <svg width="34" height="34" viewBox="0 0 64 64"><path d={MARK_RING} fill="#00458E" fillRule="evenodd" /><path d={MARK_HANDLE} fill="#359EB4" /></svg>
+            <span style={{ fontFamily: "Geist", fontWeight: 600, letterSpacing: -1, marginLeft: 10 }}>searchable<span style={{ color: "#1A74A3" }}>.pk</span></span>
           </span>
-          <span style={{ fontFamily: "Inter", fontWeight: 400, fontSize: 22, color: "#8a8680" }}>Find what you need. Know what matters.</span>
+          <span style={{ fontFamily: "Geist", fontWeight: 400, fontSize: 22, color: "#8a8680" }}>Find what you need. Know what matters.</span>
         </div>
       </div>
     ),

@@ -64,12 +64,12 @@ export async function LivingPage({ def }: { def: LivingPageDef }) {
             </section>
           ) : (
             <section className="border-y-2 border-[var(--rule)] py-8">
-              <p className="font-serif text-2xl">Being compiled</p>
+              <p className="font-display text-2xl">Being compiled</p>
               <p className="mt-2 max-w-[60ch] text-[15px] text-2">The {def.priceWord} for every model is being checked against the {def.slug === "credit-cards" ? "banks' published schedules of charges" : "brands' own price lists"} before it goes up. Check back within the week, or ask for a model by email and we will add it first.</p>
             </section>
           )}
           <section className="max-w-[70ch]">
-            <h2 className="font-serif text-2xl">How this comparison is compiled</h2>
+            <h2 className="font-display text-2xl">How this comparison is compiled</h2>
             <p className="mt-2 text-[15px] leading-relaxed text-2">{def.howWeCompiled}</p>
             {set.source ? (
               <p className="mt-2 text-[14px] text-3">
@@ -80,7 +80,7 @@ export async function LivingPage({ def }: { def: LivingPageDef }) {
             ) : null}
           </section>
           <section className="max-w-[70ch]">
-            <h2 className="font-serif text-2xl">Questions</h2>
+            <h2 className="font-display text-2xl">Questions</h2>
             <dl className="mt-3 divide-y divide-[var(--border)] border-y border-line">
               {def.faqs.map((f) => (
                 <div key={f.question} className="py-3">

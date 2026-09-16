@@ -24,7 +24,7 @@ export function MobileNav({ nav, sections = [] }: { nav: { href: string; label: 
       {open ? (
         <div className="fixed inset-0 z-50 bg-[var(--bg)]">
           <div className="container-x flex h-14 items-center justify-between border-b border-line">
-            <span className="font-serif text-xl">Menu</span>
+            <span className="font-display text-xl">Menu</span>
             <button type="button" onClick={() => setOpen(false)} aria-label="Close menu" className="grid size-10 place-items-center">
               <X className="size-5" />
             </button>
@@ -38,7 +38,7 @@ export function MobileNav({ nav, sections = [] }: { nav: { href: string; label: 
                 return (
                   <div key={n.href}>
                     <div className="flex items-center justify-between">
-                      <Link href={n.href} onClick={() => setOpen(false)} className="block py-3.5 font-serif text-2xl">
+                      <Link href={n.href} onClick={() => setOpen(false)} className="block py-3.5 font-display text-2xl">
                         {n.label}
                       </Link>
                       {sec?.links.length ? (
@@ -61,10 +61,10 @@ export function MobileNav({ nav, sections = [] }: { nav: { href: string; label: 
                   </div>
                 );
               })}
-              <Link href="/newsletter" onClick={() => setOpen(false)} className="block py-3.5 font-serif text-2xl">
+              <Link href="/newsletter" onClick={() => setOpen(false)} className="block py-3.5 font-display text-2xl">
                 Newsletter
               </Link>
-              <Link href="/account" onClick={() => setOpen(false)} className="block py-3.5 font-serif text-2xl">
+              <Link href="/account" onClick={() => setOpen(false)} className="block py-3.5 font-display text-2xl">
                 Account
               </Link>
             </nav>

@@ -25,7 +25,7 @@ export default async function ManagePage({ searchParams }: { searchParams: Promi
   if (!sub) {
     return (
       <div className="container-x py-20 text-center">
-        <h1 className="font-serif text-3xl">Link not recognised</h1>
+        <h1 className="font-display text-3xl">Link not recognised</h1>
         <p className="mt-2 text-2">Use the “manage preferences” link at the bottom of any Searchable Daily email.</p>
       </div>
     );
@@ -36,7 +36,7 @@ export default async function ManagePage({ searchParams }: { searchParams: Promi
     <div className="container-x py-12">
       <div className="mx-auto max-w-lg">
         <p className="eyebrow">Searchable Daily</p>
-        <h1 className="mt-2 font-serif text-3xl">Your preferences</h1>
+        <h1 className="mt-2 font-display text-3xl">Your preferences</h1>
         <p className="mt-1 text-sm text-2">
           {sub.email} · status: {sub.status}
         </p>

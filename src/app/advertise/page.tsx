@@ -32,11 +32,11 @@ export default function AdvertisePage() {
       <SectionHeader as="h1" eyebrow="Advertise" title="Reach people at the moment they are looking" description="Searchable's readers are calculating a tax, comparing a loan, choosing a solar installer or finding a dentist. Every placement is labelled; editorial content and calculator results are never for sale." />
 
       <section>
-        <h2 className="rule pt-3 font-serif text-2xl">Business listings</h2>
+        <h2 className="rule pt-3 font-display text-2xl">Business listings</h2>
         <div className="mt-5 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <div className="border-t-2 border-line pt-4">
             <p className="eyebrow">Free</p>
-            <p className="mt-2 font-serif text-3xl">Rs 0</p>
+            <p className="mt-2 font-display text-3xl">Rs 0</p>
             <p className="mt-1 text-sm text-2">Always</p>
             <ul className="mt-4 space-y-1.5 text-[15px]">
               {FREE_FEATURES.map((f) => (
@@ -48,7 +48,7 @@ export default function AdvertisePage() {
           {plans.map((p) => (
             <div key={p.code} className={`border-t-2 pt-4 ${p.popular ? "border-[var(--text)]" : "border-line"}`}>
               <p className="eyebrow">{p.name}{p.popular ? " · Most popular" : ""}</p>
-              <p className="mt-2 font-serif text-3xl tabular">{pkr(p.pricePkr)}</p>
+              <p className="mt-2 font-display text-3xl tabular">{pkr(p.pricePkr)}</p>
               <p className="mt-1 text-sm text-2">per {p.periodDays === 365 ? "year" : "month"}</p>
               <p className="mt-3 text-[15px]">{p.blurb}</p>
               <ul className="mt-4 space-y-1.5 text-[15px]">
@@ -64,12 +64,12 @@ export default function AdvertisePage() {
       </section>
 
       <section className="mt-14">
-        <h2 className="rule pt-3 font-serif text-2xl">Sponsored content</h2>
+        <h2 className="rule pt-3 font-display text-2xl">Sponsored content</h2>
         <div className="mt-5 grid gap-6 md:grid-cols-2">
           {content.map((p) => (
             <div key={p.code} className="border-t-2 border-line pt-4">
               <p className="eyebrow">{p.name}</p>
-              <p className="mt-2 font-serif text-3xl tabular">{pkr(p.pricePkr)}</p>
+              <p className="mt-2 font-display text-3xl tabular">{pkr(p.pricePkr)}</p>
               <p className="mt-3 text-[15px]">{p.blurb}</p>
               <ul className="mt-4 space-y-1.5 text-[15px]">
                 {p.features.map((f) => (
@@ -84,12 +84,12 @@ export default function AdvertisePage() {
       </section>
 
       <section className="mt-14">
-        <h2 className="rule pt-3 font-serif text-2xl">Placements</h2>
+        <h2 className="rule pt-3 font-display text-2xl">Placements</h2>
         <div className="mt-5 grid gap-6 md:grid-cols-2">
           {placements.map((p) => (
             <div key={p.code} className="border-t-2 border-line pt-4">
               <p className="eyebrow">{p.name}</p>
-              <p className="mt-2 font-serif text-3xl tabular">{pkr(p.pricePkr)} <span className="text-base text-3">/ month</span></p>
+              <p className="mt-2 font-display text-3xl tabular">{pkr(p.pricePkr)} <span className="text-base text-3">/ month</span></p>
               <p className="mt-3 text-[15px]">{p.blurb}</p>
               <ul className="mt-4 space-y-1.5 text-[15px]">
                 {p.features.map((f) => (
@@ -106,7 +106,7 @@ export default function AdvertisePage() {
       </section>
 
       <section className="mt-14">
-        <h2 className="font-serif text-2xl">Frequently asked questions</h2>
+        <h2 className="font-display text-2xl">Frequently asked questions</h2>
         <dl className="mt-4 divide-y divide-[var(--border)] border-y border-line">
           {FAQS.map((f) => (
             <div key={f.question} className="py-4">

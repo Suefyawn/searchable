@@ -69,8 +69,8 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
             </Link>
           ) : null}
         </div>
-        <h1 className="mt-4 font-serif text-4xl font-medium leading-[1.1] sm:text-5xl lg:text-[3.25rem]">{article.title}</h1>
-        {article.dek ? <p className="mt-4 font-serif text-xl leading-relaxed text-2 sm:text-[1.35rem]">{article.dek}</p> : null}
+        <h1 className="mt-4 font-display text-4xl leading-[1.1] sm:text-5xl lg:text-[3.25rem]">{article.title}</h1>
+        {article.dek ? <p className="mt-4 font-display text-xl leading-relaxed text-2 sm:text-[1.35rem]">{article.dek}</p> : null}
         <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 border-y border-line py-3 text-[13px] text-3">
           {article.contributorName ? (
             <span className="font-medium text-2">{article.contributorName}</span>
@@ -143,7 +143,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
 
           {article.faqs.length ? (
             <section className="mt-12 max-w-[68ch]">
-              <h2 className="font-serif text-2xl">Frequently asked questions</h2>
+              <h2 className="font-display text-2xl">Frequently asked questions</h2>
               <dl className="mt-4 divide-y divide-[var(--border)] border-y border-line">
                 {article.faqs.map((f) => (
                   <div key={f.question} className="py-4">
@@ -259,7 +259,7 @@ export async function ArticlePage({ article, kind }: { article: Article; kind: "
 
       {related.length ? (
         <section className="mt-16">
-          <h2 className="rule mb-2 pt-3 font-serif text-2xl">More in {article.category?.name ?? sectionName}</h2>
+          <h2 className="rule mb-2 pt-3 font-display text-2xl">More in {article.category?.name ?? sectionName}</h2>
           <div className="grid gap-x-8 sm:grid-cols-2 sm:divide-x sm:divide-[var(--border)] lg:grid-cols-4">
             {related.map((a) => (
               <ArticleCard key={a.id} article={a} className="sm:[&:not(:first-child)]:pl-8" />

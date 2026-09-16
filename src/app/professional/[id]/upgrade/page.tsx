@@ -31,7 +31,7 @@ export default async function ProfessionalUpgradePage({ params }: { params: Prom
           ← Your profiles
         </Link>
       </p>
-      <h1 className="font-serif text-3xl">Verified badge for {p.name}</h1>
+      <h1 className="font-display text-3xl">Verified badge for {p.name}</h1>
       <p className="mt-2 text-[15px] text-2">
         Current: <Badge tone={p.isVerified ? "success" : "neutral"}>{p.isVerified ? "verified" : "not verified"}</Badge>
         {p.tierExpiresAt ? <span> · until {formatDate(p.tierExpiresAt)}</span> : null}
@@ -69,7 +69,7 @@ export default async function ProfessionalUpgradePage({ params }: { params: Prom
           <input type="hidden" name="professionalId" value={p.id} />
           <input type="hidden" name="productCode" value={plan.code} />
           <p className="eyebrow">{plan.name}</p>
-          <p className="mt-2 font-serif text-3xl tabular">{pkr(plan.pricePkr)}</p>
+          <p className="mt-2 font-display text-3xl tabular">{pkr(plan.pricePkr)}</p>
           <p className="text-sm text-2">per year</p>
           <p className="mt-3 text-[15px]">{plan.blurb}</p>
           <label className="mt-4 block text-xs text-3">
@@ -85,7 +85,7 @@ export default async function ProfessionalUpgradePage({ params }: { params: Prom
 
       {orders.length ? (
         <section className="mt-10">
-          <h2 className="rule pt-3 font-serif text-2xl">Invoices</h2>
+          <h2 className="rule pt-3 font-display text-2xl">Invoices</h2>
           <table className="mt-3 w-full text-[15px]">
             <tbody className="divide-y divide-[var(--border)]">
               {orders.map((o) => (

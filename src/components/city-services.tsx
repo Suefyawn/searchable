@@ -9,13 +9,29 @@ const GUIDED = new Set(["fesco", "gepco", "mepco", "pesco", "iesco", "lesco", "h
  * provincial vehicle and property portals, and the calculators preset for the province. Built from the
  * reference data, so every city page has something useful on day one, before the directory fills.
  */
-export function CityServices({ city, province }: { city: string; province?: string | null }) {
+export function CityServices({ city, slug, province }: { city: string; slug?: string; province?: string | null }) {
   const disco = DISCOS.find((d) => d.cities.some((c) => c.toLowerCase() === city.toLowerCase()));
   const p = (province ?? "").toLowerCase();
   const south = /sindh|balochistan/.test(p) || /karachi|hyderabad|sukkur|quetta|gwadar/i.test(city);
   const gas = south ? { name: "SSGC", full: "Sui Southern Gas Company" } : { name: "SNGPL", full: "Sui Northern Gas Pipelines" };
   const provKey = /sindh/.test(p) || /karachi|hyderabad|sukkur/i.test(city) ? "sindh" : /islamabad/i.test(city) ? "islamabad" : "punjab";
   const rows: { label: string; value: React.ReactNode }[] = [
+    ...(slug
+      ? [
+          {
+            label: "Today",
+            value: (
+              <>
+                <Link href={`/weather/${slug}`} className="underline underline-offset-4">{city} weather</Link>
+                {" · "}
+                <Link href={`/prayer-times/${slug}`} className="underline underline-offset-4">prayer times</Link>
+                {" · "}
+                <Link href="/islamic-date" className="underline underline-offset-4">Islamic date</Link>
+              </>
+            ),
+          },
+        ]
+      : []),
     ...(disco
       ? [
           {

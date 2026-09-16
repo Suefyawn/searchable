@@ -19,6 +19,8 @@ import { sendDueIssues } from "./newsletter-issue";
  * anyone is on the site.
  */
 const JOB_INTERVAL_MS = 5 * 60_000;
+/** Photo backfill, mailbox mirror, invites and digests: every half hour is plenty, and it keeps function time low. */
+const HEAVY_INTERVAL_MS = 30 * 60_000;
 let lastLocalRun = 0;
 
 export type JobsResult = { ran: boolean; published?: number; newsletters?: unknown; lapsedPlans?: number; invites?: { sent: number; skipped: string }; digests?: { sent: number }; inbox?: { added: number; skipped?: string }; photos?: { tried: number; filled: number }; at?: string };
@@ -28,18 +30,23 @@ export async function runDueJobs(opts: { force?: boolean } = {}): Promise<JobsRe
   if (!opts.force && now - lastLocalRun < JOB_INTERVAL_MS) return { ran: false };
   const db = await getDb();
   // Cross-instance guard: claim the slot only if the last run is older than the interval.
-  const claimed = await rawQuery<{ key: string }>(
+  // The row also remembers when the slow work last ran (heavyAt), so a five-minute pinger does not pay for
+  // photo searches and mailbox polling 288 times a day: those run every HEAVY_INTERVAL, the rest every time.
+  const claimed = await rawQuery<{ key: string; value: { heavyAt?: string } | null }>(
     db,
     sql`insert into settings (key, value, updated_at) values ('jobs:last', ${JSON.stringify({ at: new Date(now).toISOString() })}::jsonb, now())
-        on conflict (key) do update set value = excluded.value, updated_at = now()
+        on conflict (key) do update set value = coalesce(settings.value, '{}'::jsonb) || excluded.value, updated_at = now()
         where ${opts.force ? sql`true` : sql`settings.updated_at < now() - interval '4 minutes 30 seconds'`}
-        returning key`,
+        returning key, value`,
   );
   lastLocalRun = now;
   if (!claimed.length) return { ran: false };
   const published = await publishDueArticles();
   const newsletters = await sendDueIssues();
   const lapsedPlans = await expireLapsedPlans();
+  const heavyAt = Date.parse(claimed[0].value?.heavyAt ?? "") || 0;
+  if (now - heavyAt < HEAVY_INTERVAL_MS) return { ran: true, published, newsletters, lapsedPlans, at: new Date().toISOString() };
+  await rawQuery(db, sql`update settings set value = value || ${JSON.stringify({ heavyAt: new Date(now).toISOString() })}::jsonb where key = 'jobs:last'`);
   const invites = await sendClaimInvites();
   const digests = await sendActivityDigests();
   // Mirror new mail into the admin inbox; the webhook is faster, this is the safety net.

@@ -115,7 +115,7 @@ export default async function AdminDashboard() {
                 {attention.map((a) => (
                   <li key={a.href}>
                     <Link href={a.href} className="flex items-baseline gap-3 py-2 text-[15px] hover:underline underline-offset-4">
-                      <span className="w-8 shrink-0 font-serif text-xl tabular">{a.n}</span>
+                      <span className="w-8 shrink-0 font-display text-xl tabular">{a.n}</span>
                       <span>{a.label}</span>
                       <span className="ml-auto text-3">→</span>
                     </Link>
@@ -136,7 +136,7 @@ export default async function AdminDashboard() {
                 <div key={s.label} className="flex items-end justify-between gap-4 border-b border-line pb-3">
                   <div>
                     <p className="text-[12.5px] text-3">{s.label}</p>
-                    <p className="font-serif text-2xl tabular">{s.values.reduce((a, b) => a + b, 0).toLocaleString()}</p>
+                    <p className="font-display text-2xl tabular">{s.values.reduce((a, b) => a + b, 0).toLocaleString()}</p>
                   </div>
                   <Bars values={s.values} title={`${s.label}, last 14 days`} />
                 </div>

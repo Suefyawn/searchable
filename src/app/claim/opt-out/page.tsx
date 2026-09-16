@@ -11,7 +11,7 @@ export default async function OptOutPage({ searchParams }: { searchParams: Promi
   return (
     <div className="container-x py-16">
       <div className="mx-auto max-w-lg text-[15px]">
-        <h1 className="font-serif text-3xl font-medium">{ok ? "Done. We will not email this address again." : "That link is not valid"}</h1>
+        <h1 className="font-display text-3xl ">{ok ? "Done. We will not email this address again." : "That link is not valid"}</h1>
         <p className="mt-3 text-2">
           {ok ? "The listing stays online as public information. If it is wrong or the business has closed, use the report link on the listing page and we will fix or remove it." : "The link may have expired. If you want us to stop emailing, reply to the email you received or write to us from the contact page."}
         </p>

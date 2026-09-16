@@ -12,6 +12,10 @@ import { entitiesIn, isRelevant } from "../src/lib/open-images";
 import { parseAddress, verifyResendWebhook } from "../src/lib/inbox";
 import { renderMarkdown } from "../src/lib/markdown";
 import { slugify } from "../src/lib/slug";
+import { umalquraDate } from "../src/lib/today/hijri";
+import { currentPrayer, prayerTimes } from "../src/lib/today/prayer";
+import { h12, hhmm, sunTimes } from "../src/lib/today/sun";
+import { describeSymbol, feelsLike } from "../src/lib/today/weather";
 import { TOOLS } from "../src/tools/registry";
 
 /*
@@ -144,4 +148,38 @@ test("formatPhone writes numbers the way people dial them", () => {
   assert.equal(formatPhone("+923001234567"), "0300 1234567");
   assert.equal(formatPhone("+9251111644911"), "051 111 644 911");
   assert.equal(formatPhone("+92616222952"), "061 6222952");
+});
+
+test("sun: Karachi's longest and shortest days match the almanac to two minutes", () => {
+  const june = sunTimes(2026, 6, 21, 24.8607, 67.0011);
+  const dec = sunTimes(2026, 12, 21, 24.8607, 67.0011);
+  assert.equal(hhmm(june.sunrise), "05:43");
+  assert.equal(hhmm(june.sunset), "19:24");
+  assert.equal(hhmm(dec.sunrise), "07:12");
+  assert.equal(hhmm(dec.sunset), "17:48");
+  assert.equal(h12(june.sunset), "7:24 pm");
+});
+
+test("prayer times run in order and Hanafi Asr is later than Shafi", () => {
+  const p = prayerTimes(2026, 9, 17, 31.5204, 74.3587);
+  const shafi = prayerTimes(2026, 9, 17, 31.5204, 74.3587, { asr: "shafi" });
+  assert.ok(p.fajr < p.sunrise && p.sunrise < p.dhuhr && p.dhuhr < p.asr && p.asr < p.maghrib && p.maghrib < p.isha);
+  assert.ok(p.asr > shafi.asr);
+  assert.equal(hhmm(p.maghrib), hhmm(sunTimes(2026, 9, 17, 31.5204, 74.3587).sunset + 1 / 60));
+  assert.equal(currentPrayer(p, 13).next, "asr");
+  assert.equal(currentPrayer(p, 23).next, "fajr");
+});
+
+test("hijri: the Umm al-Qura table gives a sane date and month name", () => {
+  const h = umalquraDate(new Date("2026-09-17T06:00:00Z"));
+  assert.ok(h.day >= 1 && h.day <= 30 && h.month >= 1 && h.month <= 12);
+  assert.equal(h.year, 1448);
+  assert.ok(h.monthName.length > 0 && h.monthUrdu.length > 0);
+});
+
+test("weather: symbols read as plain words and feels-like follows the heat index", () => {
+  assert.equal(describeSymbol("partlycloudy_night"), "Partly cloudy");
+  assert.equal(describeSymbol("heavyrainshowersandthunder_day"), "Heavy showers with thunder");
+  assert.ok(feelsLike(38, 60, 10) > 44);
+  assert.equal(feelsLike(20, 50, 10), 20);
 });

@@ -72,3 +72,10 @@ No Sentry. Next's `onRequestError` hook (`src/instrumentation.ts`) writes every 
 
 ## ISR gotcha (found 2026-09-15, evening)
 A route with a dynamic segment (`/news/[category]/[slug]`, `/data/[slug]`, `/b/[slug]`, every list) is only cached when it exports `generateStaticParams`, even one that returns `[]`. Without it `export const revalidate` is ignored and the page renders on every request (`Cache-Control: private, no-store`), which is what happened for the first day live. Every public dynamic-segment page now exports the empty function and is built on first visit, then served from the CDN for its `revalidate` window; writes call `revalidatePath` as before. Check with `curl -I`: `s-maxage=…` is cached, `private, no-store` is not.
+
+## Daily pages and the five-minute pinger
+- Weather: MET Norway Locationforecast, no key, CC BY 4.0 with credit on the page. One fetch per city per 30 minutes through the Next data cache (20 cities, under 1,000 calls a day, far inside their fair-use terms); the User-Agent names the site and a contact address as their terms require.
+- Prayer times, sunrise, sunset and the Hijri date are computed (`src/lib/today`), no API at all.
+- `runDueJobs` splits its work: publishing, newsletter sends and plan expiry on every ping (every 5 minutes from cron-job.org); photo backfill, mailbox mirroring, claim invites and digests every 30 minutes (`heavyAt` in the `jobs:last` settings row). Before this, every ping could spend up to 25 s in photo searches, which is where the Vercel function-duration budget was going.
+- Microsoft Clarity loads after hydration on public pages only (not admin, account or dashboards); it is free and adds nothing to Vercel usage.
+

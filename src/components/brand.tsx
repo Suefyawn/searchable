@@ -1,34 +1,36 @@
 import Link from "next/link";
 import { SITE } from "@/lib/utils";
 
-/** The S from Newsreader 600 as an outline, so the mark never depends on a font being loaded. */
-const S_PATH = "M34.38 17.86L34.38 17.86L31.76 17.40L33.83 15.72L34.63 15.72L35.67 23.64L34.38 23.81L31.25 18.56L32.30 19.78Q31.40 19.13 30.40 18.83Q29.39 18.52 28.26 18.52L28.26 18.52Q26.08 18.52 24.98 19.36Q23.89 20.21 23.89 21.70L23.89 21.70Q23.89 22.72 24.37 23.39Q24.86 24.06 25.70 24.52Q26.54 24.98 27.61 25.34Q28.68 25.70 29.85 26.05L29.85 26.05Q31.03 26.43 32.20 26.92Q33.37 27.41 34.34 28.16Q35.31 28.91 35.90 30.07Q36.48 31.24 36.48 32.96L36.48 32.96Q36.48 35.39 35.30 37.01Q34.12 38.63 32.03 39.46Q29.94 40.28 27.20 40.28L27.20 40.28Q25.35 40.28 23.89 40.07Q22.44 39.86 20.88 39.30L20.88 39.30L19.52 32.84L20.84 32.84L25.37 39.25L21.66 36.81Q23.05 37.53 24.17 37.83Q25.28 38.14 26.61 38.14L26.61 38.14Q28.53 38.14 29.79 37.72Q31.04 37.29 31.66 36.45Q32.28 35.61 32.28 34.33L32.28 34.33Q32.28 33.16 31.69 32.39Q31.09 31.63 30.13 31.14Q29.16 30.66 27.99 30.30Q26.83 29.95 25.69 29.57L25.69 29.57Q24.55 29.18 23.51 28.69Q22.48 28.20 21.68 27.47Q20.88 26.75 20.42 25.68Q19.96 24.61 19.96 23.08L19.96 23.08Q19.96 21.02 20.99 19.54Q22.02 18.06 23.93 17.26Q25.84 16.47 28.46 16.47L28.46 16.47Q30.11 16.47 31.51 16.79Q32.91 17.11 34.38 17.86Z";
-
-/**
- * The lens monogram: a ring with a square-cut handle and the serif S inside. One colour, drawn with
- * currentColor so it takes the text colour of wherever it sits (ink on paper, white on ink).
+/*
+ * The mark (ADR-33): a square lens. A heavy square ring in the brand navy with a square-cut handle in the
+ * teal accent, the search glass redrawn with the site's own geometry (no rounded corners anywhere). Two
+ * paths, no font, so it renders identically in the header, the favicon and social cards.
  */
-export function LensMark({ size = 28, className = "" }: { size?: number; className?: string }) {
+export const MARK_RING = "M4 4h42v42H4z M13 13v24h24V13z";
+export const MARK_HANDLE = "M39.5 46.5 L46.5 39.5 L62 55 L55 62 Z";
+
+export function LensMark({ size = 28, className = "", tone = "brand" }: { size?: number; className?: string; /** brand: navy ring, teal handle. current: both in the text colour (dark surfaces). */ tone?: "brand" | "current" }) {
+  const ring = tone === "brand" ? "var(--color-brand-800)" : "currentColor";
+  const handle = tone === "brand" ? "var(--color-brand-500)" : "currentColor";
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" className={className} aria-hidden="true" focusable="false">
-      <circle cx="28" cy="28" r="23" fill="none" stroke="currentColor" strokeWidth="5" />
-      <path d="M45 45 L62 62" stroke="currentColor" strokeWidth="7" />
-      <path d={S_PATH} fill="currentColor" />
+      <path d={MARK_RING} fill={ring} fillRule="evenodd" />
+      <path d={MARK_HANDLE} fill={handle} />
     </svg>
   );
 }
 
-/** Mark plus the lowercase wordmark. `pkClassName` lets dark surfaces lighten the ".pk". */
-export function Wordmark({ size = 26, className = "", pkClassName = "text-ink-500", href = "/" }: { size?: number; className?: string; pkClassName?: string; href?: string | null }) {
+/** Mark plus the lowercase wordmark. `pkClassName` colours the ".pk" (blue on paper, lighter on ink). */
+export function Wordmark({ size = 26, className = "", pkClassName = "text-brand-700", tone = "brand", href = "/" }: { size?: number; className?: string; pkClassName?: string; tone?: "brand" | "current"; href?: string | null }) {
   const inner = (
     <>
-      <LensMark size={size} className="shrink-0" />
-      <span className="font-sans font-semibold leading-none tracking-[-0.035em]" style={{ fontSize: size * 0.86 }}>
+      <LensMark size={size} tone={tone} className="shrink-0" />
+      <span className="font-sans font-semibold leading-none tracking-[-0.04em]" style={{ fontSize: size * 0.9 }}>
         searchable<span className={pkClassName}>.pk</span>
       </span>
     </>
   );
-  const cls = `inline-flex items-center gap-[0.32em] ${className}`;
+  const cls = `inline-flex items-center gap-[0.3em] ${className}`;
   return href ? (
     <Link href={href} className={cls} aria-label={`${SITE.name} home`}>
       {inner}

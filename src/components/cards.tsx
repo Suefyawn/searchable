@@ -25,10 +25,10 @@ export function ArticleCard({ article, variant = "default", className, thumb = f
   if (variant === "compact") {
     return (
       <article className={cn("flex gap-4 py-3.5", className)}>
-        {index !== undefined ? <span className="w-6 shrink-0 pt-0.5 font-serif text-2xl leading-none text-ink-300 tabular dark:text-ink-600">{index}</span> : null}
+        {index !== undefined ? <span className="w-6 shrink-0 pt-0.5 font-display text-2xl leading-none text-ink-300 tabular dark:text-ink-600">{index}</span> : null}
         <div className="min-w-0 flex-1">
           <p className="eyebrow">{label}</p>
-          <h3 className="mt-1 font-serif text-[19px] font-medium leading-snug">
+          <h3 className="mt-1 font-display text-[19px] leading-snug">
             <Link href={href} className="headline-link">
               {article.title}
             </Link>
@@ -53,12 +53,12 @@ export function ArticleCard({ article, variant = "default", className, thumb = f
           </Link>
         ) : null}
         <p className="eyebrow">{label}</p>
-        <h2 className="mt-2 font-serif text-[2rem] font-medium leading-[1.12] sm:text-[2.6rem]">
+        <h2 className="mt-2 font-display text-[2rem] leading-[1.12] sm:text-[2.6rem]">
           <Link href={href} className="headline-link">
             {article.title}
           </Link>
         </h2>
-        {article.dek ? <p className="mt-4 max-w-2xl font-serif text-lg leading-relaxed text-2">{article.dek}</p> : null}
+        {article.dek ? <p className="mt-4 max-w-2xl font-display text-lg leading-relaxed text-2">{article.dek}</p> : null}
         <p className="mt-4 text-[13px] text-3">
           {article.author?.name ? `${article.author.name} · ` : ""}
           {article.publishedAt ? formatDate(article.publishedAt) : ""} · {article.readingMinutes ?? 3} min read
@@ -74,7 +74,7 @@ export function ArticleCard({ article, variant = "default", className, thumb = f
         </Link>
       ) : null}
       <p className="eyebrow">{label}</p>
-      <h3 className="mt-1.5 font-serif text-xl font-medium leading-snug">
+      <h3 className="mt-1.5 font-display text-xl leading-snug">
         <Link href={href} className="headline-link">
           {article.title}
         </Link>
@@ -101,12 +101,12 @@ export function ToolCard({ tool, className, example }: { tool: Pick<ToolDefiniti
   return (
     <Link href={toolUrl(tool)} className={cn("group surface surface-hover flex flex-col p-5", className)}>
       <p className="eyebrow">{TOOL_CATEGORIES[tool.category].name}</p>
-      <h3 className="mt-2 font-serif text-xl font-medium leading-snug group-hover:underline underline-offset-4 decoration-1 decoration-ink-400">{tool.shortName ?? tool.name}</h3>
+      <h3 className="mt-2 font-display text-xl leading-snug group-hover:underline underline-offset-4 decoration-1 decoration-ink-400">{tool.shortName ?? tool.name}</h3>
       <p className="mt-1.5 text-[14.5px] leading-relaxed text-2 line-clamp-2">{tool.description}</p>
       {example ? (
         <p className="mt-3 border-t border-line pt-3 text-[13px] text-3">
           <span className="block truncate">{example.label}</span>
-          <span className="font-serif text-xl text-[var(--text)] tabular">{example.value}</span>
+          <span className="font-display text-xl text-[var(--text)] tabular">{example.value}</span>
         </p>
       ) : null}
       <p className="mt-auto pt-4 text-[13px] font-medium text-3">Calculator →</p>
@@ -146,7 +146,7 @@ export function BusinessCard({ business: b, className }: { business: BusinessCar
       <div className="flex items-start justify-between gap-3">
         {b.logoUrl ? <Img src={b.logoUrl} alt="" aspect="1/1" fit="contain" className="size-12 shrink-0 border border-line" sizes="48px" /> : null}
         <div className="min-w-0 flex-1">
-          <h3 className="font-serif text-xl font-medium leading-snug">
+          <h3 className="font-display text-xl leading-snug">
             <Link href={`/b/${b.slug}`} className="headline-link">
               {b.name}
             </Link>

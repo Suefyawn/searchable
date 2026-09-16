@@ -48,7 +48,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="grid gap-8 lg:grid-cols-[190px_minmax(0,1fr)]">
         <aside className="min-w-0 self-start lg:sticky lg:top-24">
           <div className="mb-4 flex items-baseline justify-between px-2">
-            <p className="font-serif text-lg">Admin</p>
+            <p className="font-display text-lg">Admin</p>
             <Link href="/" className="text-[12.5px] text-3 hover:text-[var(--text)]">
               View site →
             </Link>

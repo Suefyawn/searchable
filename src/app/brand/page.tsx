@@ -30,7 +30,7 @@ export default async function BrandPage() {
         <div className="grid gap-6 sm:grid-cols-3">
           <div className="border border-line p-6">
             <LensMark size={64} />
-            <p className="mt-4 text-[14px] font-medium">Lens mark, black</p>
+            <p className="mt-4 text-[14px] font-medium">Square lens, navy and teal</p>
             <p className="text-[13px] text-3">
               <a href="/brand/mark.svg" download className="underline underline-offset-4">
                 mark.svg
@@ -39,8 +39,8 @@ export default async function BrandPage() {
             </p>
           </div>
           <div className="border border-line bg-ink-900 p-6 text-white">
-            <LensMark size={64} className="text-white" />
-            <p className="mt-4 text-[14px] font-medium">Lens mark, white</p>
+            <LensMark size={64} tone="current" className="text-white" />
+            <p className="mt-4 text-[14px] font-medium">Square lens, white</p>
             <p className="text-[13px] opacity-70">
               <a href="/brand/mark-white.svg" download className="underline underline-offset-4">
                 mark-white.svg
@@ -50,7 +50,7 @@ export default async function BrandPage() {
           <div className="border border-line p-6">
             <Wordmark size={30} href={null} />
             <p className="mt-4 text-[14px] font-medium">Wordmark</p>
-            <p className="text-[13px] text-3">Lowercase Inter 600, the .pk in slate. Never stretched, recoloured or set on a photo.</p>
+            <p className="text-[13px] text-3">Lowercase Geist 600, tracked tight, the .pk in the link blue. Never stretched, recoloured or set on a photo.</p>
           </div>
         </div>
       </section>
@@ -76,12 +76,12 @@ export default async function BrandPage() {
         <h2 className="eyebrow mb-3 border-b-2 border-[var(--rule)] pb-1.5">Type</h2>
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="border border-line p-6">
-            <p className="font-serif text-4xl font-medium leading-tight">Newsreader</p>
-            <p className="mt-2 text-[14px] text-2">Headlines, deks, pull figures. Weight 500, tight leading, balanced wrapping. The S in the mark is Newsreader 600.</p>
+            <p className="font-display text-4xl leading-tight">Geist 600</p>
+            <p className="mt-2 text-[14px] text-2">Headlines, deks, pull figures. Weight 600, letter-spacing -0.022em, tight leading, balanced wrapping.</p>
           </div>
           <div className="border border-line p-6">
-            <p className="text-4xl font-semibold leading-tight">Inter</p>
-            <p className="mt-2 text-[14px] text-2">Everything else: body at 16 to 18 px, labels in small caps with 0.14em tracking, numbers with tabular figures.</p>
+            <p className="text-4xl leading-tight">Geist 400 and 500</p>
+            <p className="mt-2 text-[14px] text-2">Everything else: body at 16 to 18 px, labels in small caps with 0.14em tracking, numbers with tabular figures. One family across the site.</p>
           </div>
         </div>
       </section>

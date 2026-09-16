@@ -17,11 +17,11 @@ export function ProCard({ p, className }: { p: ProfessionalCard; className?: str
           // eslint-disable-next-line @next/next/no-img-element
           <img src={p.photoUrl} srcSet={srcSetFor(p.photoUrl)} sizes="64px" alt="" loading="lazy" className="size-full object-cover" />
         ) : (
-          <div className="flex size-full items-center justify-center font-serif text-2xl text-3">{p.name.slice(0, 1)}</div>
+          <div className="flex size-full items-center justify-center font-display text-2xl text-3">{p.name.slice(0, 1)}</div>
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="flex flex-wrap items-center gap-x-2 font-serif text-lg font-medium leading-tight group-hover:underline underline-offset-4">
+        <p className="flex flex-wrap items-center gap-x-2 font-display text-lg leading-tight group-hover:underline underline-offset-4">
           {p.name}
           {p.isVerified ? <BadgeCheck className="size-4 text-[var(--text)]" aria-label="Verified" /> : null}
         </p>

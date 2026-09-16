@@ -66,7 +66,7 @@ export async function Footer() {
         <div className="grid gap-10 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
           <div className="max-w-sm">
             <Wordmark size={24} href={null} />
-            <p className="mt-2 font-serif text-[15px] italic text-2">{site.identity.tagline}</p>
+            <p className="mt-2 text-[15px] text-2">{site.identity.tagline}</p>
             {site.features.newsletterCapture ? (
               <>
                 <p className="mt-6 text-[13px] font-semibold uppercase tracking-[0.12em] text-3">Searchable Daily</p>

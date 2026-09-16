@@ -129,7 +129,7 @@ export default async function SeriesPage({ params }: Props) {
               )}
             </p>
             <p className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <span className="font-serif text-5xl font-medium tabular tracking-tight sm:text-6xl">{latest ? fmt(latest.value) : "-"}</span>
+              <span className="font-display text-5xl tabular tracking-tight sm:text-6xl">{latest ? fmt(latest.value) : "-"}</span>
               {latest && series.unit !== "%" ? <span className="text-lg text-3">{series.unit}</span> : null}
               {latest && previous ? (
                 <span className="text-[15px]">

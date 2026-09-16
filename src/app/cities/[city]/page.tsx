@@ -92,7 +92,7 @@ export default async function CityPage({ params }: Props) {
         )}
       </section>
 
-      <CityServices city={loc.name} province={loc.parent?.name} />
+      <CityServices city={loc.name} slug={typeof loc.lat === "number" && typeof loc.lng === "number" ? loc.slug : undefined} province={loc.parent?.name} />
 
       {top.length ? (
         <section className="mt-12">

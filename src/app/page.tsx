@@ -94,7 +94,7 @@ export default async function HomePage() {
       {world.length && site.features.homeWorld ? (
         <section className="border-t border-line py-8">
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-            <h2 className="font-serif text-2xl">Around the world</h2>
+            <h2 className="font-display text-2xl">Around the world</h2>
             <p className="text-xs text-3">World, markets, sport and tech from a Pakistani reader&rsquo;s side, in our own words</p>
           </div>
           <div className="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -124,7 +124,7 @@ export default async function HomePage() {
       {headlines.length ? (
         <section className="border-t border-line py-8">
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-            <h2 className="font-serif text-2xl">Latest</h2>
+            <h2 className="font-display text-2xl">Latest</h2>
             <Link href="/news" className="text-sm font-medium text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
               All news →
             </Link>
@@ -147,7 +147,7 @@ export default async function HomePage() {
       {/* Calculators */}
       <section className="py-8">
         <div className="rule flex items-baseline justify-between pt-3">
-          <h2 className="font-serif text-2xl">Calculators</h2>
+          <h2 className="font-display text-2xl">Calculators</h2>
           <Link href="/tools" className="text-sm font-medium text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
             All {TOOLS.length} tools →
           </Link>
@@ -164,7 +164,7 @@ export default async function HomePage() {
       <section className="grid gap-x-10 gap-y-10 py-8 lg:grid-cols-[1.7fr_1fr]">
         <div>
           <div className="rule flex items-baseline justify-between pt-3">
-            <h2 className="font-serif text-2xl">Guides</h2>
+            <h2 className="font-display text-2xl">Guides</h2>
             <Link href="/guides" className="text-sm font-medium text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
               All guides →
             </Link>
@@ -180,7 +180,7 @@ export default async function HomePage() {
                   ) : null}
                   <div>
                   <p className="eyebrow">{g.category?.name ?? "Guide"}</p>
-                  <h3 className="mt-1 font-serif text-xl font-medium leading-snug">
+                  <h3 className="mt-1 font-display text-xl leading-snug">
                     <Link href={articleUrl(g)} className="headline-link">
                       {g.title}
                     </Link>
@@ -214,7 +214,7 @@ export default async function HomePage() {
       {/* Cities */}
       <section className="py-8">
         <div className="rule flex items-baseline justify-between pt-3">
-          <h2 className="font-serif text-2xl">Cities</h2>
+          <h2 className="font-display text-2xl">Cities</h2>
           <Link href="/cities" className="text-sm font-medium text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
             All cities →
           </Link>
@@ -232,7 +232,7 @@ export default async function HomePage() {
           {community.rows.length && site.features.homeCommunity ? (
             <div>
               <div className="rule flex items-baseline justify-between pt-3">
-                <h2 className="font-serif text-2xl">From the community</h2>
+                <h2 className="font-display text-2xl">From the community</h2>
                 <Link href="/community" className="text-sm font-medium text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
                   Jobs, listings, questions →
                 </Link>
@@ -250,7 +250,7 @@ export default async function HomePage() {
           {pros.rows.length ? (
             <div>
               <div className="rule flex items-baseline justify-between pt-3">
-                <h2 className="font-serif text-2xl">Professionals</h2>
+                <h2 className="font-display text-2xl">Professionals</h2>
                 <Link href="/professionals" className="text-sm font-medium text-2 underline-offset-4 hover:text-[var(--text)] hover:underline">
                   Find a professional →
                 </Link>
@@ -272,7 +272,7 @@ export default async function HomePage() {
       <section className="rule mb-4 mt-4 grid gap-8 py-10 lg:grid-cols-2 lg:items-center">
         <div>
           <p className="eyebrow">Searchable Daily</p>
-          <h2 className="mt-2 font-serif text-3xl">The useful morning email about Pakistan</h2>
+          <h2 className="mt-2 font-display text-3xl">The useful morning email about Pakistan</h2>
           <p className="mt-3 text-[15px] text-2">Top stories, what changed, one useful number, a tool of the day. Two minutes to read, every morning at 7.</p>
         </div>
         <NewsletterForm source="home" />

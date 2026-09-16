@@ -45,7 +45,7 @@ export function GoldExtras({ slug, latestPerTola, date }: { slug: string; latest
     <>
       <JsonLd data={faqJsonLd(faqs)} />
       <section>
-        <h2 className="font-serif text-2xl">Gold rate by weight and purity</h2>
+        <h2 className="font-display text-2xl">Gold rate by weight and purity</h2>
         <p className="mt-2 text-[15px] text-2">Derived from today’s 24K per-tola rate. 1 tola = 11.664 g; 1 troy ounce = 31.1035 g.</p>
         <table className="mt-3 w-full text-[15px]">
           <thead className="text-left text-xs uppercase tracking-wider text-3">
@@ -75,14 +75,14 @@ export function GoldExtras({ slug, latestPerTola, date }: { slug: string; latest
       </section>
 
       <section>
-        <h2 className="font-serif text-2xl">Gold rate today by city</h2>
+        <h2 className="font-display text-2xl">Gold rate today by city</h2>
         <p className="mt-2 text-[15px] text-2">Same base rate everywhere; the figures below add each market’s typical premium. Jewellers quote higher after making charges.</p>
         <div className="mt-3 divide-y divide-[var(--border)] border-y border-line">
           {CITIES.map((c) => {
             const tola24 = per24Tola + c.premium;
             return (
               <div key={c.slug} id={c.slug} className="grid gap-x-6 gap-y-1 py-3 sm:grid-cols-[10rem_1fr_auto]">
-                <h3 className="font-serif text-lg">
+                <h3 className="font-display text-lg">
                   <Link href={`/cities/${c.slug}`} className="headline-link">
                     {c.name}
                   </Link>
@@ -102,7 +102,7 @@ export function GoldExtras({ slug, latestPerTola, date }: { slug: string; latest
       </section>
 
       <section>
-        <h2 className="font-serif text-2xl">Frequently asked questions</h2>
+        <h2 className="font-display text-2xl">Frequently asked questions</h2>
         <dl className="mt-4 divide-y divide-[var(--border)] border-y border-line">
           {faqs.map((f) => (
             <div key={f.question} className="py-4">

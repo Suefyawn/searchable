@@ -185,7 +185,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                       {trending.map((t, i) => (
                         <li key={t.query}>
                           <Link href={`/search?q=${encodeURIComponent(t.query)}`} className="flex items-baseline gap-3 py-1.5 text-2 hover:text-[var(--text)]">
-                            <span className="w-4 shrink-0 font-serif text-3">{i + 1}</span>
+                            <span className="w-4 shrink-0 font-display text-3">{i + 1}</span>
                             <span>{t.query}</span>
                           </Link>
                         </li>
@@ -239,7 +239,7 @@ function EmptyQuery({ popular, trending }: { popular: { query: string }[]; trend
             { href: "/compare", title: "Compare", body: "New car prices and solar inverters side by side." },
           ].map((b) => (
             <Link key={b.href} href={b.href} className="group border-t border-line pt-3">
-              <p className="font-serif text-lg font-medium group-hover:underline underline-offset-4">{b.title}</p>
+              <p className="font-display text-lg group-hover:underline underline-offset-4">{b.title}</p>
               <p className="mt-0.5 text-[14.5px] text-2">{b.body}</p>
             </Link>
           ))}
@@ -262,7 +262,7 @@ function EmptyQuery({ popular, trending }: { popular: { query: string }[]; trend
 function NoResults({ q, popular, typeKey, city, qs }: { q: string; popular: { query: string }[]; typeKey: string; city?: string; qs: (extra: Record<string, string | undefined>) => string }) {
   return (
     <div className="mt-8 max-w-2xl">
-      <p className="font-serif text-2xl">Nothing found for “{q}”</p>
+      <p className="font-display text-2xl">Nothing found for “{q}”</p>
       <ul className="mt-3 list-disc space-y-1 pl-5 text-[15px] text-2">
         {typeKey || city ? (
           <li>
@@ -321,7 +321,7 @@ function Answer({ hit }: { hit: SearchHit }) {
         </div>
         {figure ? (
           <div className="border-t border-line pt-3 sm:min-w-44 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0 sm:text-right">
-            <p className="font-serif text-3xl leading-none tabular sm:text-4xl">{figure.value}</p>
+            <p className="font-display text-3xl leading-none tabular sm:text-4xl">{figure.value}</p>
             <p className="mt-1.5 text-[12.5px] text-3">{figure.label}</p>
           </div>
         ) : null}
@@ -357,7 +357,7 @@ function Hit({ hit }: { hit: SearchHit }) {
           </p>
         </div>
         {hit.entityType === "data_series" && meta.latest ? (
-          <span className="shrink-0 self-center font-serif text-xl tabular">{meta.unit === "%" ? `${number(meta.latest.value, 2)}%` : number(meta.latest.value, Number.isInteger(meta.latest.value) ? 0 : 2)}</span>
+          <span className="shrink-0 self-center font-display text-xl tabular">{meta.unit === "%" ? `${number(meta.latest.value, 2)}%` : number(meta.latest.value, Number.isInteger(meta.latest.value) ? 0 : 2)}</span>
         ) : null}
       </Link>
     </li>

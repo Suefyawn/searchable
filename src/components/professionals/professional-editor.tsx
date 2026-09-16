@@ -339,7 +339,7 @@ export function ProfessionalEditor({ initial, cities, areas, afterSave = "dashbo
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="space-y-4">
-      <h2 className="border-b-2 border-[var(--rule)] pb-1.5 font-serif text-xl font-medium">{title}</h2>
+      <h2 className="border-b-2 border-[var(--rule)] pb-1.5 font-display text-xl ">{title}</h2>
       {children}
     </section>
   );

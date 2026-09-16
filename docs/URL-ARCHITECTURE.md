@@ -63,6 +63,11 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /data                                    Data hub (Phase 6)
 /data/[series]                           e.g. /data/petrol-price · /data/usd-pkr · /data/gold-rate
 
+/today                                   Daily hub: prices, weather, prayer times, Islamic date
+/weather  /weather/[city]                MET Norway forecast per city (cities with coordinates), ISR 30 min
+/prayer-times  /prayer-times/[city]      Computed namaz times, sehri and iftar, week ahead
+/islamic-date                            Hijri date for Pakistan (Umm al-Qura + Ruet-e-Hilal offset)
+
 /compare                                 (Phase 6)
 /compare/[slug]                          e.g. /compare/toyota-corolla-vs-honda-civic
 
@@ -91,7 +96,8 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /api/cron/*                              scheduled jobs (Phase 6)
 /api/webhooks/resend                     POST, signed; email.received feeds the admin inbox
 /api/admin/*                             Bearer ADMIN_API_KEY; context, reference, ideas, articles, data,
-                                         businesses, backlog, queue, inbox, newsletter, media, jobs, report (docs/ADMIN-API.md)
+                                         businesses, backlog, queue, inbox, newsletter, media, jobs, report,
+                                         compare, front, today (docs/ADMIN-API.md)
 
 /sitemap.xml                             index → /sitemap/[type].xml
 /robots.txt

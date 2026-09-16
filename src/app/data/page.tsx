@@ -56,7 +56,7 @@ export default async function DataPage() {
         {groups.map((g) => (
           <section key={g.title}>
             <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b-2 border-[var(--rule)] pb-2">
-              <h2 className="font-serif text-2xl">{g.title}</h2>
+              <h2 className="font-display text-2xl">{g.title}</h2>
               {g.blurb ? <p className="text-[13.5px] text-3">{g.blurb}</p> : null}
             </div>
             <div className="grid border-l border-t border-line sm:grid-cols-2 lg:grid-cols-3">
@@ -66,7 +66,7 @@ export default async function DataPage() {
                   {s.latest ? (
                     <>
                       <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2">
-                        <span className="font-serif text-[2rem] font-medium tabular leading-none tracking-tight">{fmt(s.unit, s.latest.value)}</span>
+                        <span className="font-display text-[2rem] tabular leading-none tracking-tight">{fmt(s.unit, s.latest.value)}</span>
                         {s.unit !== "%" ? <span className="text-[13px] text-3">{s.unit}</span> : null}
                       </p>
                       <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-3">

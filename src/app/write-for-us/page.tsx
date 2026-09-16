@@ -39,7 +39,7 @@ export default async function WriteForUsPage({ searchParams }: { searchParams: P
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-10">
           <section>
-            <h2 className="rule pt-3 font-serif text-2xl">Three ways to appear on Searchable</h2>
+            <h2 className="rule pt-3 font-display text-2xl">Three ways to appear on Searchable</h2>
             <div className="mt-4 divide-y divide-[var(--border)] border-y border-line">
               <div className="grid gap-x-6 gap-y-1 py-4 sm:grid-cols-[11rem_1fr_auto]">
                 <p className="font-medium">Guest article</p>
@@ -61,7 +61,7 @@ export default async function WriteForUsPage({ searchParams }: { searchParams: P
           </section>
 
           <section>
-            <h2 className="rule pt-3 font-serif text-2xl">What gets accepted</h2>
+            <h2 className="rule pt-3 font-display text-2xl">What gets accepted</h2>
             <ul className="mt-4 list-disc space-y-2 pl-5 text-[16px] leading-relaxed">
               <li><strong>Specific and practical.</strong> “How to get a sales tax refund as an exporter” beats “Tax tips for businesses”. Include fees, timelines, forms, and what goes wrong.</li>
               <li><strong>From experience.</strong> Say what you do and how you know. We may ask for a quick call to verify.</li>
@@ -73,14 +73,14 @@ export default async function WriteForUsPage({ searchParams }: { searchParams: P
           </section>
 
           <section id="submit">
-            <h2 className="rule pt-3 font-serif text-2xl">Submit</h2>
+            <h2 className="rule pt-3 font-display text-2xl">Submit</h2>
             <div className="mt-5">
               <PitchForm initialKind={kind} categories={cats.map((c) => ({ slug: c.slug, name: c.name }))} />
             </div>
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl">Frequently asked questions</h2>
+            <h2 className="font-display text-2xl">Frequently asked questions</h2>
             <dl className="mt-4 divide-y divide-[var(--border)] border-y border-line">
               {FAQS.map((f) => (
                 <div key={f.question} className="py-4">

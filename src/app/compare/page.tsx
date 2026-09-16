@@ -59,7 +59,7 @@ export default async function CompareHub() {
         {[...PAGES, ...living].map((p) => (
           <Link key={p.href} href={p.href} className="group flex flex-col border-t-2 border-[var(--rule)] pt-4 hover:bg-surface-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-3">{p.count}</p>
-            <h2 className="mt-1 font-serif text-3xl font-medium leading-tight group-hover:underline underline-offset-4">{p.title}</h2>
+            <h2 className="mt-1 font-display text-3xl leading-tight group-hover:underline underline-offset-4">{p.title}</h2>
             <p className="mt-2 text-[15px] text-2">{p.range}</p>
             <dl className="mt-4 grid gap-y-1.5 text-[14px] sm:grid-cols-[7rem_1fr]">
               <dt className="text-3">Filter by</dt>

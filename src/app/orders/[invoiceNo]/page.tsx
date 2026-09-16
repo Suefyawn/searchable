@@ -27,7 +27,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ invoic
       <div className="flex flex-wrap items-baseline justify-between gap-3 border-b-2 border-[var(--rule)] pb-4">
         <div>
           <p className="eyebrow">Invoice</p>
-          <h1 className="font-serif text-3xl">{order.invoiceNo}</h1>
+          <h1 className="font-display text-3xl">{order.invoiceNo}</h1>
         </div>
         <Badge tone={TONE[order.status] ?? "neutral"}>{order.status}</Badge>
       </div>
@@ -58,12 +58,12 @@ export default async function InvoicePage({ params }: { params: Promise<{ invoic
           </>
         ) : null}
         <dt className="text-3">Amount</dt>
-        <dd className="font-serif text-3xl tabular">{pkr(order.amountPkr)}</dd>
+        <dd className="font-display text-3xl tabular">{pkr(order.amountPkr)}</dd>
       </dl>
 
       {order.status === "pending" ? (
         <section className="mt-8 border-t border-line pt-6">
-          <h2 className="font-serif text-2xl">How to pay</h2>
+          <h2 className="font-display text-2xl">How to pay</h2>
           {PAYMENT_DETAILS_SET ? (
             <>
               <dl className="mt-3 grid gap-x-8 gap-y-2 text-[15px] sm:grid-cols-[10rem_1fr]">

@@ -42,7 +42,7 @@ export function BrandEditor({ brand }: { brand: BrandT }) {
         <p className="eyebrow mb-2">Preview</p>
         <div style={vars} className="brand-scope border border-line p-5">
           <p className="eyebrow">Economy</p>
-          <h3 className="mt-1 font-serif text-2xl font-medium leading-tight">Petrol up Rs 2.61 from tonight: a 40-litre tank now costs Rs 15,210</h3>
+          <h3 className="mt-1 font-display text-2xl leading-tight">Petrol up Rs 2.61 from tonight: a 40-litre tank now costs Rs 15,210</h3>
           <p className="mt-2 text-[15px] text-2">The fortnightly OGRA review lifts petrol and diesel; here is what a full tank, a month of commuting and a rickshaw fare look like now.</p>
           <p className="mt-2 text-[15px]">
             Read the <a className="text-brand-700 underline underline-offset-4">petrol price history</a> or try the <a className="text-brand-700 underline underline-offset-4">fuel cost calculator</a>.

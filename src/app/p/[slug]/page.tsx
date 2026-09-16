@@ -101,12 +101,12 @@ export default async function ProfessionalPage({ params }: { params: Promise<{ s
             // eslint-disable-next-line @next/next/no-img-element
             <img src={p.photoUrl} srcSet={srcSetFor(p.photoUrl)} sizes="144px" alt={p.name} className="size-full object-cover" />
           ) : (
-            <div className="flex size-full items-center justify-center font-serif text-5xl text-3">{p.name.slice(0, 1)}</div>
+            <div className="flex size-full items-center justify-center font-display text-5xl text-3">{p.name.slice(0, 1)}</div>
           )}
         </div>
         <div className="min-w-0 flex-1">
           <p className="eyebrow">{prof?.name ?? "Professional"}{p.city ? ` · ${p.city.name}` : ""}</p>
-          <h1 className="mt-1 flex flex-wrap items-center gap-x-3 font-serif text-3xl font-medium leading-tight sm:text-4xl">
+          <h1 className="mt-1 flex flex-wrap items-center gap-x-3 font-display text-3xl leading-tight sm:text-4xl">
             {p.name}
             {p.isVerified ? (
               <span className="inline-flex items-center gap-1 border border-line px-2 py-0.5 font-sans text-[11px] font-bold uppercase tracking-[0.1em]">

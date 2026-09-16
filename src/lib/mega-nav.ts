@@ -68,70 +68,36 @@ async function build(): Promise<MegaSection[]> {
   const tools: MegaSection = { key: "tools", label: "Tools", href: "/tools", columns: [...big, ...(small.length ? [{ title: "More", links: small.flatMap((c) => c.links) }] : [])], footer: { href: "/tools", label: `All ${TOOLS.length} calculators` } };
 
   const topCats = bizCats.filter((c) => c.count > 0);
-  const businesses: MegaSection = {
-    key: "businesses",
-    label: "Businesses",
+  const directory: MegaSection = {
+    key: "directory",
+    label: "Directory",
     href: "/businesses",
     columns: [
-      { title: "Popular", links: topCats.slice(0, 8).map((c) => ({ href: `/businesses/${c.slug}`, label: c.namePlural ?? c.name, meta: String(c.count) })) },
-      { title: "More categories", links: topCats.slice(8, 16).map((c) => ({ href: `/businesses/${c.slug}`, label: c.namePlural ?? c.name, meta: String(c.count) })) },
-      { title: "By city", links: cities.slice(0, 8).map((c) => ({ href: `/cities/${c.slug}`, label: c.name, meta: c.count ? String(c.count) : undefined })) },
+      { title: "Businesses", href: "/businesses", links: [...topCats.slice(0, 7).map((c) => ({ href: `/businesses/${c.slug}`, label: c.namePlural ?? c.name, meta: String(c.count) })), { href: "/add-business", label: "Add your business (free)" }] },
       { title: "Professionals", href: "/professionals", links: [...[...pros].sort((a, b) => b.count - a.count).slice(0, 6).map((p) => ({ href: `/professionals/${p.slug}`, label: p.plural, meta: p.count ? String(p.count) : undefined })), { href: "/professionals/join", label: "Create your profile" }] },
-      { title: "For owners", links: [{ href: "/add-business", label: "Add your business (free)" }, { href: "/business", label: "Owner dashboard" }, { href: "/advertise", label: "Verified & Premium plans" }] },
+      { title: "Cities", href: "/cities", links: cities.slice(0, 8).map((c) => ({ href: `/cities/${c.slug}`, label: c.name, meta: c.count ? String(c.count) : undefined })) },
+      { title: "Community", href: "/community", links: [{ href: "/community/job", label: "Jobs" }, { href: "/community/listing", label: "For sale" }, { href: "/community/auction", label: "Auctions" }, { href: "/community/question", label: "Questions" }, { href: "/community/discussion", label: "Discussions" }, { href: "/community/new", label: "Post something" }] },
     ],
     footer: { href: "/businesses", label: "Browse the directory" },
   };
 
   const withLatest = series.filter((s) => s.latest);
   const fmt = (v: number, unit: string) => (unit === "%" ? `${number(v, 2)}%` : number(v, Number.isInteger(v) ? 0 : 2));
+  const seriesLink = (s: (typeof withLatest)[number]): MegaLink => ({ href: s.slug === "solar-panel-per-watt" ? "/data/solar-panel-price" : `/data/${s.slug}`, label: s.name.replace(/ in Pakistan.*$/i, "").replace(/ today$/i, ""), meta: fmt(s.latest!.value, s.unit) });
   const dataSection: MegaSection = {
     key: "data",
     label: "Data",
     href: "/data",
     columns: [
-      { title: "Prices", links: withLatest.filter((s) => ["petrol-price", "diesel-price", "gold-24k-tola", "gold-22k-tola", "silver-tola", "solar-panel-per-watt"].includes(s.slug)).map((s) => ({ href: s.slug === "solar-panel-per-watt" ? "/data/solar-panel-price" : `/data/${s.slug}`, label: s.name.replace(/ in Pakistan.*$/i, "").replace(/ today$/i, ""), meta: fmt(s.latest!.value, s.unit) })) },
-      { title: "Currency", links: withLatest.filter((s) => s.slug.endsWith("-pkr")).map((s) => ({ href: `/data/${s.slug}`, label: s.name.replace(/ in Pakistan.*$/i, "").replace(/ today$/i, ""), meta: fmt(s.latest!.value, s.unit) })) },
-      { title: "Rates & markets", links: withLatest.filter((s) => ["sbp-policy-rate", "kibor-1y", "cpi-yoy", "kse-100", "btc-usd", "eth-usd"].includes(s.slug)).map((s) => ({ href: `/data/${s.slug}`, label: s.name.replace(/ in Pakistan.*$/i, "").replace(/ today$/i, ""), meta: fmt(s.latest!.value, s.unit) })) },
-      { title: "Hubs", links: [{ href: "/electricity", label: "Electricity bill check" }, { href: "/electricity/net-metering", label: "Net metering 2026" }, { href: "/pta", label: "PTA tax & IMEI" }, { href: "/data/solar-panel-price", label: "Solar panel prices" }] },
+      { title: "Today", href: "/today", links: [{ href: "/prayer-times/karachi", label: "Prayer times" }, { href: "/weather/lahore", label: "Weather" }, { href: "/islamic-date", label: "Islamic date today" }, { href: "/electricity", label: "Electricity bill check" }, { href: "/pta", label: "PTA tax & IMEI" }] },
+      { title: "Prices", links: withLatest.filter((s) => ["petrol-price", "diesel-price", "gold-24k-tola", "gold-22k-tola", "silver-tola", "solar-panel-per-watt"].includes(s.slug)).map(seriesLink) },
+      { title: "Currency", links: withLatest.filter((s) => s.slug.endsWith("-pkr")).map(seriesLink) },
+      { title: "Rates & markets", links: withLatest.filter((s) => ["sbp-policy-rate", "kibor-1y", "cpi-yoy", "kse-100", "btc-usd", "eth-usd"].includes(s.slug)).map(seriesLink) },
+      { title: "Compare", href: "/compare", links: [{ href: "/compare/cars", label: "New car prices" }, { href: "/compare/solar-inverters", label: "Solar inverters" }, { href: "/compare/air-conditioners", label: "Air conditioners" }, { href: "/compare/credit-cards", label: "Credit cards" }, { href: "/compare/mobile-packages", label: "Mobile packages" }, { href: "/compare/national-savings", label: "National Savings rates" }] },
     ],
     footer: { href: "/data", label: "All data series" },
   };
-
-  const compare: MegaSection = {
-    key: "compare",
-    label: "Compare",
-    href: "/compare",
-    columns: [
-      { title: "Comparisons", links: [{ href: "/compare/cars", label: "New car prices" }, { href: "/compare/solar-inverters", label: "Solar inverters" }] },
-      { title: "Coming", links: [{ href: "/compare/air-conditioners", label: "Air conditioners" }, { href: "/compare/credit-cards", label: "Credit cards" }, { href: "/compare/mobile-packages", label: "Mobile packages" }, { href: "/compare/national-savings", label: "National Savings rates" }] },
-    ],
-    footer: { href: "/compare", label: "All comparisons" },
-  };
-
-  const citiesSection: MegaSection = {
-    key: "cities",
-    label: "Cities",
-    href: "/cities",
-    columns: [
-      { title: "Major cities", links: cities.slice(0, 6).map((c) => ({ href: `/cities/${c.slug}`, label: c.name })) },
-      { title: " ", links: cities.slice(6, 12).map((c) => ({ href: `/cities/${c.slug}`, label: c.name })) },
-      { title: "Utilities by city", links: [{ href: "/electricity/lesco", label: "LESCO (Lahore)" }, { href: "/electricity/k-electric", label: "K-Electric (Karachi)" }, { href: "/electricity/iesco", label: "IESCO (Islamabad)" }, { href: "/electricity/mepco", label: "MEPCO (Multan)" }] },
-    ],
-    footer: { href: "/cities", label: "All cities" },
-  };
-
-  const community: MegaSection = {
-    key: "community",
-    label: "Community",
-    href: "/community",
-    columns: [
-      { title: "Browse", links: [{ href: "/community/job", label: "Jobs" }, { href: "/community/listing", label: "For sale" }, { href: "/community/auction", label: "Auctions" }, { href: "/community/question", label: "Questions" }, { href: "/community/discussion", label: "Discussions" }] },
-      { title: "Take part", links: [{ href: "/community/new", label: "Post something" }, { href: "/account/profile", label: "Your profile" }, { href: "/account/posts", label: "Your posts" }] },
-      { title: "People", links: [{ href: "/professionals", label: "Find a professional" }, { href: "/professionals/join", label: "Create a professional profile" }, { href: "/add-business", label: "List a business" }] },
-    ],
-    footer: { href: "/community", label: "Community home" },
-  };
-  return [news, guidesSection, tools, businesses, dataSection, compare, citiesSection, community];
+  return [news, guidesSection, tools, directory, dataSection];
 }
 
 /** Cached for 10 minutes so the header never adds noticeable work to a request. */

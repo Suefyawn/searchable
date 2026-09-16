@@ -19,7 +19,7 @@ export default async function CitiesPage() {
           if (!list.length) return null;
           return (
             <section key={p.id} className="lg:col-span-3">
-              <h2 className="rule pt-3 font-serif text-2xl">{p.name}</h2>
+              <h2 className="rule pt-3 font-display text-2xl">{p.name}</h2>
               <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-5">
                 {list.map((c) => (
                   <li key={c.id}>

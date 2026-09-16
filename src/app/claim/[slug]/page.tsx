@@ -30,7 +30,7 @@ export default async function ClaimPage({ params, searchParams }: { params: Prom
     <div className="container-x py-10 sm:py-14">
       <div className="mx-auto max-w-2xl">
         <p className="eyebrow">Claim a listing</p>
-        <h1 className="mt-2 font-serif text-3xl font-medium leading-tight sm:text-4xl">{b.name}</h1>
+        <h1 className="mt-2 font-display text-3xl leading-tight sm:text-4xl">{b.name}</h1>
         <p className="mt-2 text-[15px] text-2">
           {[b.primaryCategory?.name, b.area?.name, b.city?.name].filter(Boolean).join(" · ")}
           {b.phone ? ` · ${b.phone}` : ""} · <Link href={`/b/${b.slug}`} className="underline underline-offset-4">see the listing</Link>
@@ -39,7 +39,7 @@ export default async function ClaimPage({ params, searchParams }: { params: Prom
         <ol className="mt-6 flex flex-wrap gap-x-6 gap-y-1 border-y border-line py-2.5 text-[13px] text-3">
           {STEPS.map((s, i) => (
             <li key={s} className="flex items-center gap-2">
-              <span className="font-serif text-base text-[var(--text)]">{i + 1}</span> {s}
+              <span className="font-display text-base text-[var(--text)]">{i + 1}</span> {s}
             </li>
           ))}
         </ol>
