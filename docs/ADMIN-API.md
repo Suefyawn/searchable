@@ -14,7 +14,7 @@ Base URL: `https://searchable.pk/api/admin`. All slugs (categories, cities, seri
 ## Read first
 | Route | Returns |
 |---|---|
-| `GET /context` | Karachi time, last 40 published articles (do not repeat them), drafts, scheduled, queue counts, every data series with latest and previous reading, top searches, searches that found nothing, email budget left, last job and ingestion run |
+| `GET /context` | Karachi time, last 40 published articles (do not repeat them), drafts, scheduled, queue counts, every data series with latest and previous reading, top searches, searches that found nothing, email budget left, last job and ingestion run, `directory` counts by city and category, `newsDesks` (every news category with its story count and hours since its newest story, stalest first) |
 | `GET /reference` | news and guide categories, business categories, cities and areas, entities, data series, professions, calculators with URLs, authors |
 | `GET /ideas?topic=&region=&limit=` | headlines from the press feeds: title, source, URL, time. Topics: general, business, tech, world, cricket, entertainment, markets, crypto, us, mma, snooker. Region pk or world |
 | `GET /backlog?status=` | search-demand backlog (Semrush, Pakistan): keyword, volume, KD, score, type, target, brief, status; `POST /backlog` sets status or upserts items |
