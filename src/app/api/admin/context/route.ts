@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 export const GET = withAdminApi(async () => {
   const db = await getDb();
   const since = new Date(Date.now() - 7 * 86_400_000);
-  const [recent, drafts, scheduled, queues, series, searches, misses, allowance, jobs, ingest] = await Promise.all([
+  const [recent, drafts, scheduled, queues, series, searches, misses, allowance, jobs, ingest, byCity, byCategory] = await Promise.all([
     db.query.articles.findMany({ where: eq(schema.articles.status, "published"), orderBy: [desc(schema.articles.publishedAt)], limit: 40, columns: { id: true, kind: true, slug: true, title: true, publishedAt: true, categoryId: true }, with: { category: { columns: { slug: true } } } }),
     db.query.articles.findMany({ where: sql`${schema.articles.status} in ('draft', 'research', 'editing', 'fact_check')`, orderBy: [desc(schema.articles.updatedAt)], limit: 20, columns: { id: true, kind: true, slug: true, title: true, status: true, updatedAt: true } }),
     db.query.articles.findMany({ where: eq(schema.articles.status, "scheduled"), orderBy: [schema.articles.scheduledFor], limit: 20, columns: { id: true, kind: true, slug: true, title: true, scheduledFor: true } }),
@@ -44,6 +44,8 @@ export const GET = withAdminApi(async () => {
     emailAllowance("transactional"),
     db.query.settings.findFirst({ where: eq(schema.settings.key, "jobs:last") }),
     db.query.settings.findFirst({ where: eq(schema.settings.key, "ingest:last") }),
+    rawQuery<{ city: string; n: number }>(db, sql`select l.slug as city, count(*)::int as n from businesses b join locations l on l.id = b.city_id where b.status = 'active' group by l.slug order by n desc`),
+    rawQuery<{ category: string; n: number }>(db, sql`select c.slug as category, count(*)::int as n from businesses b join business_categories c on c.id = b.primary_category_id where b.status = 'active' group by c.slug order by n desc`),
   ]);
   const articleUrl = (a: { kind: string; slug: string; category?: { slug: string } | null }) => `/${a.kind === "news" ? "news" : "guides"}/${a.category?.slug ?? "general"}/${a.slug}`;
   return {
@@ -54,6 +56,9 @@ export const GET = withAdminApi(async () => {
     drafts,
     scheduled,
     queues,
+    // Where the directory is thin, so the next additions go where they count (every category and city
+    // is listed; zero means nothing live there yet).
+    directory: { live: (queues as { businesses_live?: number }).businesses_live ?? 0, byCity, byCategory },
     data: series.map((s) => ({ slug: s.slug, name: s.name, unit: s.unit, frequency: s.frequency, latest: s.latest, previous: s.previous })),
     topSearches: searches,
     searchesWithNoResults: misses,
