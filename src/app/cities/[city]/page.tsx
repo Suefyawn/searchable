@@ -2,6 +2,7 @@ import { and, desc, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleCard, BusinessCard } from "@/components/cards";
+import { CityServices } from "@/components/city-services";
 import { HubBanner, PhotoTile } from "@/components/photo-tiles";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
 import { getDb, schema } from "@/db";
@@ -91,9 +92,11 @@ export default async function CityPage({ params }: Props) {
         )}
       </section>
 
+      <CityServices city={loc.name} province={loc.parent?.name} />
+
       {top.length ? (
         <section className="mt-12">
-          <SectionHeader title={`Top rated in ${loc.name}`} as="h2" />
+          <SectionHeader title={top.some((b) => b.ratingCount) ? `Top rated in ${loc.name}` : `Listed in ${loc.name}`} as="h2" />
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {top.map((b) => (
               <BusinessCard key={b.id} business={b} />
