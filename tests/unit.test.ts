@@ -4,6 +4,7 @@ import path from "node:path";
 import { test } from "node:test";
 import { createHmac } from "node:crypto";
 import { backlogScore } from "../src/lib/backlog";
+import { normalizePhone } from "../src/lib/dedupe";
 import { srcSetFor } from "../src/lib/images";
 import { entitiesIn, isRelevant } from "../src/lib/open-images";
 import { parseAddress, verifyResendWebhook } from "../src/lib/inbox";
@@ -119,4 +120,14 @@ test("relevance: generic words alone do not make a match", () => {
   assert.equal(isRelevant("Lahore Fort at dusk", "Lahore Fort"), true);
   assert.equal(isRelevant("Lahore airport, view from the road", "traffic cars Lahore road"), false);
   assert.equal(isRelevant("Cars in traffic on Mall Road, Lahore", "traffic cars Lahore road"), true);
+});
+
+test("normalizePhone drops line ranges and rejects impossible lengths", () => {
+  assert.equal(normalizePhone("042-35401620-6"), "+924235401620");
+  assert.equal(normalizePhone("+92-42-35963421-30"), "+924235963421");
+  assert.equal(normalizePhone("0300 1234567"), "+923001234567");
+  assert.equal(normalizePhone("051-111-644-911"), "+9251111644911");
+  assert.equal(normalizePhone("+9242354016206"), null);
+  assert.equal(normalizePhone("+92-042-35459807"), "+924235459807");
+  assert.equal(normalizePhone("45550"), null);
 });

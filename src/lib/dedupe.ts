@@ -8,15 +8,22 @@ import { getDb, schema } from "@/db";
  *  3. similar name (Dice coefficient ≥ 0.8) within 300 m, or ≥ 0.9 in the same city without coordinates
  */
 
-/** Pakistani numbers → +92XXXXXXXXXX. Landlines keep their city code. Returns null if too short. */
+/**
+ * Pakistani numbers → +92XXXXXXXXXX. Landlines keep their city code. A trailing line range ("35401620-6",
+ * "35963421-30") is dropped, since it is not part of the number. Nine or ten national digits are valid
+ * (mobiles are ten; landlines are a two- or three-digit city code plus six to eight), plus eleven-digit UANs.
+ */
 export function normalizePhone(raw: string | null | undefined): string | null {
   if (!raw) return null;
-  let d = raw.replace(/[^\d+]/g, "");
+  const trimmed = raw.trim().replace(/[\s-]+(\d{1,2})$/, (m, tail: string) => (raw.replace(/\D/g, "").length - tail.length >= 9 ? "" : m));
+  let d = trimmed.replace(/[^\d+]/g, "");
   if (d.startsWith("+")) d = d.slice(1);
   if (d.startsWith("0092")) d = d.slice(4);
   else if (d.startsWith("92") && d.length >= 11) d = d.slice(2);
-  else if (d.startsWith("0")) d = d.slice(1);
-  if (d.length < 9 || d.length > 11) return null;
+  if (d.startsWith("0")) d = d.slice(1); // "+92-042-..." keeps the trunk zero by mistake
+  // UANs (city code + 111 + six digits, e.g. 051 111 644 911) are the one valid eleven-digit form.
+  const uan = d.length === 11 && /^\d{2,3}111\d{6}$/.test(d);
+  if (d.length < 9 || (d.length > 10 && !uan)) return null;
   return `+92${d}`;
 }
 
