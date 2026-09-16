@@ -138,7 +138,7 @@ export async function previewImport(csv: string): Promise<{ rows: PreviewRow[]; 
     const website = d.website ? (/^https?:\/\//i.test(d.website) ? d.website : `https://${d.website}`) : null;
     const closed = new Set(d.closed_days.split(/[;,\s]+/).map((x) => DAY_INDEX[x.slice(0, 3).toLowerCase()]).filter((x) => x !== undefined));
     const hours = d.opens && d.closes ? Array.from({ length: 7 }, (_, dow) => ({ dayOfWeek: dow, opens: closed.has(dow) ? null : d.opens, closes: closed.has(dow) ? null : d.closes, isClosed: closed.has(dow) })) : [];
-    const services = d.services.split(";").map((s) => s.trim()).filter(Boolean).slice(0, 40);
+    const services = d.services.split(/[;|]/).map((s) => s.trim()).filter(Boolean).slice(0, 40);
     const priceRange = d.price_range ? Math.min(4, Math.max(1, parseInt(d.price_range, 10) || 0)) || null : null;
 
     const fatal = !category || !city || problems.some((p) => p.startsWith("Phone") || p.startsWith("Coordinates"));

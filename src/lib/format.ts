@@ -43,3 +43,20 @@ export function readingMinutes(markdown: string): number {
   const words = markdown.trim().split(/\s+/).length;
   return Math.max(1, Math.round(words / 220));
 }
+
+/**
+ * A stored +92 number the way people write it: mobiles as 0300 1234567, landlines as 042 35905000, UANs as
+ * 051 111 644 911. Anything that is not a normalised +92 number is shown as it is.
+ */
+export function formatPhone(raw: string | null | undefined): string {
+  if (!raw) return "";
+  const m = raw.match(/^\+92(\d{9,11})$/);
+  if (!m) return raw;
+  const d = m[1];
+  if (d.length === 10 && d.startsWith("3")) return `0${d.slice(0, 3)} ${d.slice(3)}`;
+  const cityLen = /^(21|42|51|41|61|71|91|81|22|52|55|53|44|48|46|47|49|56|57|62|63|64|65|66|67|68|86|92|94|95|96|97|98|99)/.test(d) ? 2 : 3;
+  const city = d.slice(0, cityLen);
+  const rest = d.slice(cityLen);
+  if (rest.startsWith("111") && rest.length === 9) return `0${city} 111 ${rest.slice(3, 6)} ${rest.slice(6)}`;
+  return `0${city} ${rest}`;
+}

@@ -5,7 +5,7 @@ import { BusinessCard, OpenNow, PriceRange, Rating } from "@/components/cards";
 import { Badge, Breadcrumbs, JsonLd } from "@/components/ui";
 import { entitiesForTarget } from "@/db/queries/entities";
 import { getBusiness, listBusinesses } from "@/db/queries/directory";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatPhone } from "@/lib/format";
 import { followRedirect } from "@/lib/redirects";
 import { breadcrumbJsonLd, buildMetadata, localBusinessJsonLd } from "@/lib/seo";
 import { Img } from "@/components/img";
@@ -100,7 +100,7 @@ export default async function BusinessPage({ params }: Props) {
         <div className="flex flex-wrap gap-2 sm:shrink-0">
           {b.phone ? (
             <TrackedLink businessId={b.id} kind="call" href={`tel:${b.phone}`} className="inline-flex h-10 items-center gap-2 border border-line bg-surface px-4 text-sm font-medium hover:bg-surface-2">
-              <Phone className="size-4" /> {b.phone}
+              <Phone className="size-4" /> {formatPhone(b.phone)}
             </TrackedLink>
           ) : null}
           {wa ? (

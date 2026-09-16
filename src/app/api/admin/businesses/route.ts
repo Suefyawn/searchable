@@ -54,7 +54,7 @@ const Row = z.object({
 const Body = z.object({ businesses: z.array(Row).min(1).max(200), publish: z.boolean().default(true), includeDuplicates: z.boolean().default(false) });
 
 function csvCell(v: unknown) {
-  const s = v === undefined || v === null ? "" : Array.isArray(v) ? v.join("|") : String(v);
+  const s = v === undefined || v === null ? "" : Array.isArray(v) ? v.join(";") : String(v);
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
