@@ -5,7 +5,7 @@ import { categoryCounts } from "@/db/queries/directory";
 import { citiesWithCounts } from "@/db/queries/geo";
 import { professionCounts } from "./professionals";
 import { articleUrl } from "@/components/cards";
-import { number } from "./format";
+import { formatReading } from "./format";
 import { TOOLS, toolUrl } from "@/tools/registry";
 import { TOOL_CATEGORIES } from "@/tools/types";
 
@@ -82,8 +82,7 @@ async function build(): Promise<MegaSection[]> {
   };
 
   const withLatest = series.filter((s) => s.latest);
-  const fmt = (v: number, unit: string) => (unit === "%" ? `${number(v, 2)}%` : number(v, Number.isInteger(v) ? 0 : 2));
-  const seriesLink = (s: (typeof withLatest)[number]): MegaLink => ({ href: s.slug === "solar-panel-per-watt" ? "/data/solar-panel-price" : `/data/${s.slug}`, label: s.name.replace(/ in Pakistan.*$/i, "").replace(/ today$/i, ""), meta: fmt(s.latest!.value, s.unit) });
+  const seriesLink = (s: (typeof withLatest)[number]): MegaLink => ({ href: s.slug === "solar-panel-per-watt" ? "/data/solar-panel-price" : `/data/${s.slug}`, label: s.name.replace(/ in Pakistan.*$/i, "").replace(/ today$/i, ""), meta: formatReading(s.latest!.value, s.unit) });
   const dataSection: MegaSection = {
     key: "data",
     label: "Data",

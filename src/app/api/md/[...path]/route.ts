@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { articleMarkdown, dataMarkdown, toolMarkdown } from "@/lib/markdown-export";
 
-export const revalidate = 600;
+export const revalidate = 3600;
 
 /**
  * Markdown version of a page: /api/md/news/economy/slug, /api/md/guides/taxes/slug, /api/md/tools/tax/slug,

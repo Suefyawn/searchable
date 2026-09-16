@@ -23,7 +23,7 @@ import { citiesWithCounts } from "@/db/queries/geo";
 import { number, timeAgo } from "@/lib/format";
 import { TOOLS } from "@/tools/registry";
 
-export const revalidate = 300;
+export const revalidate = 900;
 
 function Label({ children }: { children: React.ReactNode }) {
   return <p className="rule pt-2 eyebrow">{children}</p>;

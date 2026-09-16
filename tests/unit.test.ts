@@ -6,7 +6,7 @@ import { createHmac } from "node:crypto";
 import { backlogScore } from "../src/lib/backlog";
 import { normalizePhone } from "../src/lib/dedupe";
 import { businessSlug } from "../src/lib/import";
-import { formatPhone } from "../src/lib/format";
+import { formatPhone, formatReading } from "../src/lib/format";
 import { srcSetFor } from "../src/lib/images";
 import { entitiesIn, isRelevant } from "../src/lib/open-images";
 import { parseAddress, verifyResendWebhook } from "../src/lib/inbox";
@@ -212,4 +212,12 @@ test("quakes: distance and magnitude words", () => {
   assert.ok(Math.abs(distanceKm(31.5204, 74.3587, 33.6844, 73.0479) - 270) < 15);
   assert.equal(describeMag(6.2), "Strong");
   assert.equal(describeMag(3.1), "Minor");
+});
+
+test("formatReading carries the unit", () => {
+  assert.equal(formatReading(384.34, "PKR per litre"), "Rs 384.34/litre");
+  assert.equal(formatReading(451664, "PKR"), "Rs 451,664");
+  assert.equal(formatReading(76911, "USD"), "$76,911");
+  assert.equal(formatReading(11.5, "%"), "11.5%");
+  assert.equal(formatReading(169579.52, "points"), "169,579.52 pts");
 });

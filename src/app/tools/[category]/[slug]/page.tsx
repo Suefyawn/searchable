@@ -18,7 +18,7 @@ import { liveDefaults } from "@/tools/live-defaults";
 
 type Props = { params: Promise<{ category: string; slug: string }> };
 
-export const revalidate = 600;
+export const revalidate = 86400;
 
 export function generateStaticParams() {
   return TOOLS.map((t) => ({ category: t.category, slug: t.slug }));

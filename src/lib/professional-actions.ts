@@ -74,7 +74,6 @@ export async function saveProfessional(raw: ProfessionalFormInput): Promise<{ ok
       .where(eq(schema.professionals.id, d.id));
     await indexProfessional(d.id);
     revalidatePath(`/p/${before.slug}`);
-    revalidatePath("/professionals/[profession]", "page");
     revalidatePath("/professional");
     return { ok: true, id: d.id, slug: before.slug };
   }

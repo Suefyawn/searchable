@@ -8,7 +8,7 @@ import { buildMetadata } from "@/lib/seo";
 import { HUB_COPY } from "@/lib/seo-copy";
 import { SITE } from "@/lib/utils";
 
-export const revalidate = 600;
+export const revalidate = 3600;
 export const metadata = buildMetadata({
   ...HUB_COPY.data,
   path: "/data",

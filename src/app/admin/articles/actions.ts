@@ -166,15 +166,19 @@ export async function saveArticle(raw: ArticleFormInput): Promise<{ ok: boolean;
     ]);
     await recordRedirect(`/${section}/${oldCat?.slug ?? "general"}/${existing.slug}`, `/${section}/${newCat?.slug ?? "general"}/${slug}`);
   }
+  // Targeted invalidation (ISR writes are metered): this story, its category page and the fronts. A
+  // pattern-wide revalidatePath("/news/[category]/[slug]") would re-render every story on the next crawl.
+  const cat = d.categoryId ? await db.query.categories.findFirst({ where: eq(schema.categories.id, d.categoryId), columns: { slug: true } }) : null;
+  const catSlug = cat?.slug ?? "general";
   revalidateTag("articles", "max");
   revalidatePath("/");
   revalidatePath(`/${section}`);
-  revalidatePath(`/${section}/[category]`, "page");
-  revalidatePath(`/${section}/[category]/[slug]`, "page");
+  revalidatePath(`/${section}/${catSlug}`);
+  revalidatePath(`/${section}/${catSlug}/${slug}`);
+  if (existing && existing.slug !== slug) revalidatePath(`/${section}/${catSlug}/${existing.slug}`);
   revalidatePath("/feed.xml");
   if (d.intent === "publish") {
-    const cat = d.categoryId ? await db.query.categories.findFirst({ where: eq(schema.categories.id, d.categoryId), columns: { slug: true } }) : null;
-    void pingIndexNow([`/${section}/${cat?.slug ?? "general"}/${slug}`, `/${section}`, "/"]);
+    void pingIndexNow([`/${section}/${catSlug}/${slug}`, `/${section}`, "/"]);
   }
   return { ok: true, id };
 }

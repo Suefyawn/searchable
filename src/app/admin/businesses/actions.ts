@@ -9,13 +9,21 @@ import { removeSearchDocument } from "@/lib/search";
 
 type Status = (typeof schema.businessStatus.enumValues)[number];
 
+/** The profile URL of one listing, for targeted revalidation (ISR writes are metered; never the whole /b/[slug] tree). */
+async function profilePath(id: string) {
+  const db = await getDb();
+  const b = await db.query.businesses.findFirst({ where: eq(schema.businesses.id, id), columns: { slug: true } });
+  return b ? `/b/${b.slug}` : null;
+}
+
 export async function setBusinessStatus(id: string, status: Status) {
   await requireRole("editor");
   const db = await getDb();
   await db.update(schema.businesses).set({ status }).where(eq(schema.businesses.id, id));
   await indexBusiness(id);
+  const path = await profilePath(id);
   revalidatePath("/businesses");
-  revalidatePath("/b/[slug]", "page");
+  if (path) revalidatePath(path);
   revalidatePath("/admin/businesses");
 }
 
@@ -36,7 +44,8 @@ export async function markDuplicateOf(formData: FormData) {
   await removeSearchDocument("business", id);
   await indexBusiness(canonicalId);
   revalidatePath("/admin/businesses");
-  revalidatePath("/b/[slug]", "page");
+  revalidatePath(`/b/${dupe.slug}`);
+  revalidatePath(`/b/${canonical.slug}`);
 }
 
 export async function setBusinessVerified(id: string, verified: boolean) {
@@ -44,7 +53,8 @@ export async function setBusinessVerified(id: string, verified: boolean) {
   const db = await getDb();
   await db.update(schema.businesses).set({ isVerified: verified, verifiedAt: verified ? new Date() : null, lastVerifiedAt: verified ? new Date() : undefined, tier: verified ? "verified" : "free" }).where(eq(schema.businesses.id, id));
   await indexBusiness(id);
-  revalidatePath("/b/[slug]", "page");
+  const path = await profilePath(id);
+  if (path) revalidatePath(path);
   revalidatePath("/admin/businesses");
 }
 

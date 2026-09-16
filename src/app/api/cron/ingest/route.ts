@@ -13,9 +13,10 @@ export async function GET(req: Request) {
   const result = await runIngestion();
   const pruned = await pruneOldRows();
   const jobs = await runDueJobs({ force: true });
-  if (result.results.some((r) => r.status === "written")) {
+  const written = result.results.filter((r) => r.status === "written");
+  if (written.length) {
+    for (const r of written) revalidatePath(`/data/${r.slug}`);
     revalidatePath("/data");
-    revalidatePath("/data/[slug]", "page");
     revalidatePath("/");
   }
   return NextResponse.json({ ok: true, ...result, pruned, jobs });

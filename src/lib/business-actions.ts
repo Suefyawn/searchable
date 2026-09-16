@@ -68,7 +68,6 @@ export async function saveBusiness(raw: BusinessFormInput): Promise<{ ok: boolea
   await indexBusiness(d.id);
   const b = await db.query.businesses.findFirst({ where: eq(schema.businesses.id, d.id), columns: { slug: true } });
   if (b) revalidatePath(`/b/${b.slug}`);
-  revalidatePath("/businesses/[category]/[city]", "page");
   revalidatePath("/business");
   return { ok: true };
 }

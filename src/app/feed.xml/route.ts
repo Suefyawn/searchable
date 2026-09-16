@@ -2,7 +2,7 @@ import { listArticles } from "@/db/queries/content";
 import { articleUrl } from "@/components/cards";
 import { SITE } from "@/lib/utils";
 
-export const revalidate = 600;
+export const revalidate = 3600;
 
 function esc(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");

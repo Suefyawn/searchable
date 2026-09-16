@@ -80,3 +80,6 @@ A route with a dynamic segment (`/news/[category]/[slug]`, `/data/[slug]`, `/b/[
 - Microsoft Clarity loads after hydration on public pages only (not admin, account or dashboards); it is free and adds nothing to Vercel usage.
 - USGS earthquake feed: public domain, no key, one request per 10 minutes through the fetch cache.
 - `src/proxy.ts` runs only on article, guide, tool and data paths (the matcher), so middleware invocations stay a fraction of page views.
+- ISR writes (the metered Vercel line that ran hottest, 48k in the first two days): every revalidatePath is now targeted (this story, this profile, this series), never a whole `[slug]` tree; article and tool pages revalidate daily, category pages hourly, fronts every 15 minutes, all of them refreshed on demand the moment something is published or a reading lands. Owner edits to a listing or profile no longer re-render every category-city page.
+- Functions storage counts every retained deployment; delete old deployments in the Vercel dashboard (Deployments, filter older than a week) when it climbs.
+

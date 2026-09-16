@@ -36,8 +36,9 @@ export const POST = withAdminApi(async (_req, { body }) => {
   const d = Body.parse(body);
   if ("ingest" in d) {
     const r = await runIngestion({ force: d.force, only: d.only });
+    // Only the series that got a new reading re-render (ISR writes are metered).
+    for (const x of r.results) if (x.status === "written") revalidatePath(`/data/${x.slug}`);
     revalidatePath("/data");
-    revalidatePath("/data/[slug]", "page");
     revalidatePath("/");
     return { ok: true, ...r };
   }
@@ -49,8 +50,8 @@ export const POST = withAdminApi(async (_req, { body }) => {
     await indexDataSeries(s.id);
     out.push({ series: r.series, date: r.date ?? today, value: r.value, unit: s.unit });
   }
+  for (const x of out) revalidatePath(`/data/${x.series}`);
   revalidatePath("/data");
-  revalidatePath("/data/[slug]", "page");
   revalidatePath("/");
   return { ok: true, recorded: out };
 });
@@ -72,8 +73,8 @@ export const DELETE = withAdminApi(async (_req, { body }) => {
     if (r.length) removed.push(date);
   }
   await indexDataSeries(s.id);
+  revalidatePath(`/data/${d.series}`);
   revalidatePath("/data");
-  revalidatePath("/data/[slug]", "page");
   revalidatePath("/");
   return { ok: true, series: d.series, removed, missing: d.dates.filter((x) => !removed.includes(x)) };
 });

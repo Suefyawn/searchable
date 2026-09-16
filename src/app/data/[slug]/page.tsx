@@ -18,7 +18,7 @@ import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/utils";
 import { getTool } from "@/tools/registry";
 
-export const revalidate = 600;
+export const revalidate = 3600;
 // Nothing is prerendered at build time, but exporting this is what makes the route ISR: without it a dynamic
 // segment renders on every request. Pages are built on first visit and cached for `revalidate` seconds.
 export function generateStaticParams() {

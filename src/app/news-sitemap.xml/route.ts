@@ -2,7 +2,7 @@ import { listArticles } from "@/db/queries/content";
 import { articleUrl } from "@/components/cards";
 import { SITE } from "@/lib/utils";
 
-export const revalidate = 300;
+export const revalidate = 900;
 
 /** Google News sitemap: articles from the last 48 hours (the News namespace requires recency). */
 export async function GET() {

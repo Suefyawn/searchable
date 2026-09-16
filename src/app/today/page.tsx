@@ -3,7 +3,7 @@ import { Change } from "@/components/data/change";
 import { WeatherIcon } from "@/components/today/weather-icon";
 import { JsonLd, SectionHeader } from "@/components/ui";
 import { listSeriesWithLatest } from "@/db/queries/data";
-import { formatDate, number } from "@/lib/format";
+import { formatDate, formatReading } from "@/lib/format";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { nowInPakistan, todayCities } from "@/lib/today";
 import { pakistanHijri, readHijriOffset } from "@/lib/today/hijri";
@@ -28,7 +28,6 @@ export default async function TodayHub() {
   const big = cities.slice(0, 8);
   const weather = await Promise.all(big.map(async (c) => ({ ...c, f: await fetchForecast(c.lat, c.lng) })));
   const prices = PRICE_SLUGS.map((slug) => series.find((s) => s.slug === slug)).filter((s): s is NonNullable<typeof s> => !!s?.latest);
-  const fmt = (v: number, unit: string) => (unit === "%" ? `${number(v, 2)}%` : number(v, Number.isInteger(v) ? 0 : 2));
   const crumbs = [{ name: "Today", path: "/today" }];
   return (
     <div className="container-x py-8 sm:py-12">
@@ -41,7 +40,7 @@ export default async function TodayHub() {
           return (
             <Link key={s.slug} href={`/data/${s.slug}`} className="bg-[var(--bg)] px-4 py-3 hover:bg-surface-2">
               <p className="text-[13px] text-2">{s.name.replace(/ in Pakistan.*$/i, "").replace(/ today$/i, "")}</p>
-              <p className="mt-0.5 font-display text-2xl tabular">{fmt(s.latest!.value, s.unit)}</p>
+              <p className="mt-0.5 font-display text-2xl tabular">{formatReading(s.latest!.value, s.unit)}</p>
               <p className="text-[12.5px] text-3">
                 <Change latest={s.latest!.value} previous={s.previous?.value ?? null} unit={s.unit} /> · {formatDate(s.latest!.date, { day: "numeric", month: "short" })}
               </p>

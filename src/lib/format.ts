@@ -15,6 +15,23 @@ export function pkrCompact(value: number): string {
   return pkr(value);
 }
 
+/**
+ * A data reading with its unit the way a reader expects it: "Rs 384.34/litre", "Rs 451,664", "$76,911",
+ * "11.5%", "169,580 pts". Units come from the data_series rows (PKR, PKR per litre, USD, %, points).
+ */
+export function formatReading(value: number, unit: string): string {
+  const digits = Number.isInteger(value) ? 0 : 2;
+  const n = number(value, digits);
+  if (unit === "%") return `${number(value, 2)}%`;
+  if (unit === "points") return `${n} pts`;
+  if (unit === "USD") return `$${n}`;
+  if (unit.startsWith("PKR")) {
+    const per = unit.match(/per (\w+)/)?.[1];
+    return `Rs ${n}${per ? `/${per === "litre" ? "litre" : per === "watt" ? "W" : per}` : ""}`;
+  }
+  return `${n} ${unit}`;
+}
+
 export function pct(fraction: number, digits = 1): string {
   return `${(fraction * 100).toFixed(digits).replace(/\.0+$/, "")}%`;
 }
