@@ -12,7 +12,8 @@ const when = (d: Date) => formatDate(d, { weekday: "short", day: "numeric", mont
 export async function generateMetadata() {
   const cities = await todayCities();
   const quakes = await fetchQuakes(cities, { days: 30, minMag: 2.5 });
-  const latest = quakes?.[0];
+  // The title names the latest tremor near a Pakistani city (within 400 km), not one far off in Iran or India.
+  const latest = quakes?.find((q) => q.nearest && q.nearest.km <= 400) ?? quakes?.[0];
   const dayAgo = Date.now() - 86_400_000;
   const todayCount = quakes?.filter((q) => q.at.getTime() > dayAgo).length ?? 0;
   return buildMetadata({
