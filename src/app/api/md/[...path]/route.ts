@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { llmsIndex } from "@/lib/llms";
 import { articleMarkdown, dataMarkdown, toolMarkdown } from "@/lib/markdown-export";
 
 export const revalidate = 3600;
@@ -11,7 +12,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ path: string[]
   const { path } = await ctx.params;
   const [section, a, b] = path;
   let md: string | null = null;
-  if ((section === "news" || section === "guides") && a && b) md = await articleMarkdown(section === "news" ? "news" : "guide", b);
+  // "home": the front page as markdown (the llms.txt map), for agents that ask the root with Accept: text/markdown.
+  if (section === "home") md = await llmsIndex();
+  else if ((section === "news" || section === "guides") && a && b) md = await articleMarkdown(section === "news" ? "news" : "guide", b);
   else if (section === "tools" && a && b) md = toolMarkdown(b);
   else if (section === "data" && a) md = await dataMarkdown(a === "solar-panel-price" ? "solar-panel-per-watt" : a);
   if (!md) return NextResponse.json({ error: "Not found" }, { status: 404 });
