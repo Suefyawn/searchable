@@ -29,7 +29,7 @@ export type IngestResult = { slug: string; status: "written" | "unchanged" | "re
 const today = () => new Date().toISOString().slice(0, 10);
 
 /** Every series a source can fill; the rest are entered by hand (CPI, solar, and SBP's when its site blocks us). */
-export const AUTO_SERIES = ["usd-pkr", "aed-pkr", "sar-pkr", "gbp-pkr", "eur-pkr", "kibor-1y", "sbp-policy-rate", "petrol-price", "diesel-price", "gold-24k-tola", "gold-22k-tola", "silver-tola", "kse-100", "btc-usd", "eth-usd"] as const;
+export const AUTO_SERIES = ["usd-pkr", "aed-pkr", "sar-pkr", "gbp-pkr", "eur-pkr", "kibor-1y", "sbp-policy-rate", "petrol-price", "diesel-price", "gold-24k-tola", "gold-22k-tola", "gold-21k-tola", "silver-tola", "kse-100", "btc-usd", "eth-usd"] as const;
 
 /** Series whose change is news: a draft article is created for the desk to check and publish. */
 const NEWSWORTHY: Record<string, { title: (v: number, prev: number) => string; body: (v: number, prev: number, note: string) => string; category: string; tool?: string }> = {
@@ -186,6 +186,7 @@ export async function collectReadings(): Promise<{ readings: Reading[]; errors: 
     const tola24 = Math.round(xau * TOLA_PER_OZ * fx);
     readings.push({ slug: "gold-24k-tola", value: tola24, date, note: `Spot $${xau.toFixed(0)}/oz × Rs ${fx.toFixed(2)} (auto; Sarafa quotes track spot within ~1%)`, sourceUrl: "https://gold-api.com" });
     readings.push({ slug: "gold-22k-tola", value: Math.round(tola24 * (22 / 24)), date, note: "22/24 of the 24K reading (auto)", sourceUrl: "https://gold-api.com" });
+    readings.push({ slug: "gold-21k-tola", value: Math.round(tola24 * (21 / 24)), date, note: "21/24 of the 24K reading (auto)", sourceUrl: "https://gold-api.com" });
     readings.push({ slug: "silver-tola", value: Math.round(xag * TOLA_PER_OZ * fx), date, note: `Spot $${xag.toFixed(2)}/oz × Rs ${fx.toFixed(2)} (auto)`, sourceUrl: "https://gold-api.com" });
   } catch (e) {
     errors.push(`Gold: ${(e as Error).message}`);

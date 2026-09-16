@@ -99,3 +99,18 @@ export function upcomingIslamicDates(now: Date, offsetDays: number): { name: str
   }
   return out.sort((a, b) => a.on.getTime() - b.on.getTime());
 }
+
+/** The Ramadan to show: the current one while it runs, otherwise the next. */
+export function ramadanWindow(now: Date, offsetDays: number) {
+  const h = pakistanHijri(now, offsetDays);
+  const year = h.month > 9 ? h.year + 1 : h.year;
+  const first = gregorianFor({ day: 1, month: 9, year }, offsetDays, now);
+  if (!first) return null;
+  const days: { n: number; date: Date }[] = [];
+  for (let n = 1; n <= 30; n++) {
+    const d = new Date(first.getTime() + (n - 1) * 86_400_000);
+    if (pakistanHijri(d, offsetDays).month !== 9) break;
+    days.push({ n, date: d });
+  }
+  return { year, first, days, running: h.month === 9 };
+}

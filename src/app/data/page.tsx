@@ -18,7 +18,7 @@ export const metadata = buildMetadata({
 const GROUPS: { title: string; blurb: string; slugs: string[] }[] = [
   { title: "Fuel", blurb: "Government-notified pump prices, revised on the 1st and 16th or sooner.", slugs: ["petrol-price", "diesel-price"] },
   { title: "Currency", blurb: "Interbank rates from the State Bank; the open market runs a few rupees above.", slugs: ["usd-pkr", "aed-pkr", "sar-pkr", "gbp-pkr", "eur-pkr"] },
-  { title: "Gold and silver", blurb: "Per tola, from the Karachi Sarafa quote that the rest of the country follows.", slugs: ["gold-24k-tola", "gold-22k-tola", "silver-tola"] },
+  { title: "Gold and silver", blurb: "Per tola, from the Karachi Sarafa quote that the rest of the country follows.", slugs: ["gold-24k-tola", "gold-22k-tola", "gold-21k-tola", "silver-tola"] },
   { title: "Markets", blurb: "The PSX benchmark and the two largest crypto assets in dollars.", slugs: ["kse-100", "btc-usd", "eth-usd"] },
   { title: "Rates and inflation", blurb: "What loans and savings are priced on, and the CPI the State Bank targets.", slugs: ["sbp-policy-rate", "kibor-1y", "cpi-yoy"] },
   { title: "Energy", blurb: "What a watt of solar costs at the dealer this week.", slugs: ["solar-panel-per-watt"] },

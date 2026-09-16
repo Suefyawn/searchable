@@ -12,7 +12,9 @@ import { entitiesIn, isRelevant } from "../src/lib/open-images";
 import { parseAddress, verifyResendWebhook } from "../src/lib/inbox";
 import { renderMarkdown } from "../src/lib/markdown";
 import { slugify } from "../src/lib/slug";
-import { umalquraDate } from "../src/lib/today/hijri";
+import { ramadanWindow, umalquraDate } from "../src/lib/today/hijri";
+import { brandSlug, mergePriceItems, priceRange, type PriceItemT } from "../src/lib/prices-shared";
+import { describeMag, distanceKm } from "../src/lib/today/quakes";
 import { currentPrayer, prayerTimes } from "../src/lib/today/prayer";
 import { h12, hhmm, sunTimes } from "../src/lib/today/sun";
 import { describeSymbol, feelsLike } from "../src/lib/today/weather";
@@ -182,4 +184,32 @@ test("weather: symbols read as plain words and feels-like follows the heat index
   assert.equal(describeSymbol("heavyrainshowersandthunder_day"), "Heavy showers with thunder");
   assert.ok(feelsLike(38, 60, 10) > 44);
   assert.equal(feelsLike(20, 50, 10), 20);
+});
+
+test("prices: merge keeps history on a price move and adds new models", () => {
+  const src = { title: "Vivo Pakistan price list", url: "https://www.vivo.com/pk" };
+  const cur: PriceItemT[] = [{ slug: "vivo-y29", brand: "Vivo", model: "Y29", price: 44999, specs: { ram: "6 GB", storage: "128 GB", battery: "6500 mAh" }, source: src, history: [{ date: "2026-09-01", price: 44999 }] }];
+  const r = mergePriceItems(cur, [{ ...cur[0], price: 42999, history: [] }, { slug: "vivo-v60", brand: "Vivo", model: "V60", price: 149999, specs: { ram: "12 GB", storage: "256 GB", battery: "6500 mAh" }, source: src, history: [] }], "2026-09-17");
+  assert.equal(r.added, 1);
+  assert.equal(r.updated, 1);
+  assert.deepEqual(r.priceMoves, [{ slug: "vivo-y29", from: 44999, to: 42999 }]);
+  const y29 = r.items.find((i) => i.slug === "vivo-y29")!;
+  assert.equal(y29.history.length, 2);
+  assert.equal(y29.history[1].price, 42999);
+  assert.equal(r.items.find((i) => i.slug === "vivo-v60")!.history[0].date, "2026-09-17");
+  assert.equal(brandSlug("Road Prince"), "road-prince");
+  assert.deepEqual(priceRange({ ...y29, variants: [{ name: "8/256", price: 49999 }] }), { min: 42999, max: 49999 });
+});
+
+test("ramadan window: thirty consecutive days in month nine", () => {
+  const w = ramadanWindow(new Date("2026-09-17T06:00:00Z"), 0)!;
+  assert.ok(w.days.length >= 29 && w.days.length <= 30);
+  assert.equal(w.days[0].n, 1);
+  assert.ok(w.first.getTime() > Date.parse("2026-09-17"));
+});
+
+test("quakes: distance and magnitude words", () => {
+  assert.ok(Math.abs(distanceKm(31.5204, 74.3587, 33.6844, 73.0479) - 270) < 15);
+  assert.equal(describeMag(6.2), "Strong");
+  assert.equal(describeMag(3.1), "Minor");
 });

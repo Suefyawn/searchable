@@ -78,4 +78,5 @@ A route with a dynamic segment (`/news/[category]/[slug]`, `/data/[slug]`, `/b/[
 - Prayer times, sunrise, sunset and the Hijri date are computed (`src/lib/today`), no API at all.
 - `runDueJobs` splits its work: publishing, newsletter sends and plan expiry on every ping (every 5 minutes from cron-job.org); photo backfill, mailbox mirroring, claim invites and digests every 30 minutes (`heavyAt` in the `jobs:last` settings row). Before this, every ping could spend up to 25 s in photo searches, which is where the Vercel function-duration budget was going.
 - Microsoft Clarity loads after hydration on public pages only (not admin, account or dashboards); it is free and adds nothing to Vercel usage.
-
+- USGS earthquake feed: public domain, no key, one request per 10 minutes through the fetch cache.
+- `src/proxy.ts` runs only on article, guide, tool and data paths (the matcher), so middleware invocations stay a fraction of page views.

@@ -67,6 +67,12 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /weather  /weather/[city]                MET Norway forecast per city (cities with coordinates), ISR 30 min
 /prayer-times  /prayer-times/[city]      Computed namaz times, sehri and iftar, week ahead
 /islamic-date                            Hijri date for Pakistan (Umm al-Qura + Ruet-e-Hilal offset)
+/ramadan-calendar  /ramadan-calendar/[city]   Sehri and iftar for every day of the current or next Ramadan
+/earthquake-today                        USGS tremors in and around Pakistan, 10-minute refresh
+
+/prices                                  Living price lists hub
+/prices/[category]                       mobiles · bikes · cars (noindex under 10 models)
+/prices/[category]/[slug]                A brand (vivo, honda) or a model (vivo-y29, honda-cd-70)
 
 /compare                                 (Phase 6)
 /compare/[slug]                          e.g. /compare/toyota-corolla-vs-honda-civic
@@ -97,7 +103,7 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /api/webhooks/resend                     POST, signed; email.received feeds the admin inbox
 /api/admin/*                             Bearer ADMIN_API_KEY; context, reference, ideas, articles, data,
                                          businesses, backlog, queue, inbox, newsletter, media, jobs, report,
-                                         compare, front, today (docs/ADMIN-API.md)
+                                         compare, front, today, prices (docs/ADMIN-API.md)
 
 /sitemap.xml                             index → /sitemap/[type].xml
 /robots.txt

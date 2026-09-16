@@ -89,8 +89,8 @@ async function build(): Promise<MegaSection[]> {
     label: "Data",
     href: "/data",
     columns: [
-      { title: "Today", href: "/today", links: [{ href: "/prayer-times/karachi", label: "Prayer times" }, { href: "/weather/lahore", label: "Weather" }, { href: "/islamic-date", label: "Islamic date today" }, { href: "/electricity", label: "Electricity bill check" }, { href: "/pta", label: "PTA tax & IMEI" }] },
-      { title: "Prices", links: withLatest.filter((s) => ["petrol-price", "diesel-price", "gold-24k-tola", "gold-22k-tola", "silver-tola", "solar-panel-per-watt"].includes(s.slug)).map(seriesLink) },
+      { title: "Today", href: "/today", links: [{ href: "/prayer-times/karachi", label: "Prayer times" }, { href: "/weather/lahore", label: "Weather" }, { href: "/islamic-date", label: "Islamic date today" }, { href: "/ramadan-calendar", label: "Ramadan calendar" }, { href: "/earthquake-today", label: "Earthquake today" }, { href: "/electricity", label: "Electricity bill check" }] },
+      { title: "Prices", href: "/prices", links: [{ href: "/prices/mobiles", label: "Mobile prices" }, { href: "/prices/bikes", label: "Bike prices" }, { href: "/prices/cars", label: "Car prices" }, ...withLatest.filter((s) => ["petrol-price", "diesel-price", "gold-24k-tola", "gold-22k-tola", "silver-tola", "solar-panel-per-watt"].includes(s.slug)).map(seriesLink)] },
       { title: "Currency", links: withLatest.filter((s) => s.slug.endsWith("-pkr")).map(seriesLink) },
       { title: "Rates & markets", links: withLatest.filter((s) => ["sbp-policy-rate", "kibor-1y", "cpi-yoy", "kse-100", "btc-usd", "eth-usd"].includes(s.slug)).map(seriesLink) },
       { title: "Compare", href: "/compare", links: [{ href: "/compare/cars", label: "New car prices" }, { href: "/compare/solar-inverters", label: "Solar inverters" }, { href: "/compare/air-conditioners", label: "Air conditioners" }, { href: "/compare/credit-cards", label: "Credit cards" }, { href: "/compare/mobile-packages", label: "Mobile packages" }, { href: "/compare/national-savings", label: "National Savings rates" }] },
