@@ -6,19 +6,23 @@ import { createHmac } from "node:crypto";
 import { backlogScore } from "../src/lib/backlog";
 import { normalizePhone } from "../src/lib/dedupe";
 import { businessSlug } from "../src/lib/import";
-import { formatPhone, formatReading } from "../src/lib/format";
+import { inviteToken, readInviteToken } from "../src/lib/claims";
+import { formatPhone, formatReading, pkr } from "../src/lib/format";
 import { srcSetFor } from "../src/lib/images";
 import { entitiesIn, isRelevant } from "../src/lib/open-images";
 import { parseAddress, verifyResendWebhook } from "../src/lib/inbox";
-import { renderMarkdown } from "../src/lib/markdown";
-import { slugify } from "../src/lib/slug";
+import { renderMarkdown, renderUserMarkdown } from "../src/lib/markdown";
+import { slugify, uniqueSlug } from "../src/lib/slug";
 import { ramadanWindow, umalquraDate } from "../src/lib/today/hijri";
 import { brandSlug, mergePriceItems, priceRange, type PriceItemT } from "../src/lib/prices-shared";
 import { describeMag, distanceKm } from "../src/lib/today/quakes";
 import { currentPrayer, prayerTimes } from "../src/lib/today/prayer";
 import { h12, hhmm, sunTimes } from "../src/lib/today/sun";
 import { describeSymbol, feelsLike } from "../src/lib/today/weather";
-import { TOOLS } from "../src/tools/registry";
+import { CURRENT_TAX_YEAR, computeIncomeTax, getTaxYear } from "../src/tools/data/income-tax";
+import { wht236K } from "../src/tools/data/property-tax";
+import { ZAKAT } from "../src/tools/data/rates";
+import { TOOL_CATEGORIES, TOOLS } from "../src/tools/registry";
 
 /*
  * Pure-function checks that do not need a database. Run with `npm test` (Node's own runner through tsx).
@@ -42,6 +46,18 @@ test("markdown tables get a scrolling wrapper and links stay safe", () => {
   assert.match(html, /<div class="table-scroll"><table>/);
   assert.match(html, /style="text-align:right"/);
   assert.match(html, /rel="noopener"/);
+});
+
+test("member markdown: raw HTML is shown as text, script links are neutralised", () => {
+  const html = renderUserMarkdown("Hi <img src=x onerror=alert(1)>\n\n<script>alert(1)</script>\n\n[x](javascript:alert(1)) [y](java\tscript:alert(1)) [z](https://example.com/?a=1&b=2)");
+  assert.ok(!html.includes("<img"), "inline html must be escaped");
+  assert.ok(!html.includes("<script"), "block html must be escaped");
+  assert.ok(!/javascript:/i.test(html), "script links must not survive");
+  assert.ok(html.includes('href="https://example.com/?a=1&amp;b=2"'), "ordinary links keep working, attributes escaped");
+  // Editor markdown keeps raw HTML (cite blocks, embeds) but still refuses script links.
+  const trusted = renderMarkdown("<div class=\"cite\">ok</div>\n\n[x](javascript:alert(1))");
+  assert.ok(trusted.includes('<div class="cite">'));
+  assert.ok(!/javascript:/i.test(trusted));
 });
 
 test("inbox address parsing", () => {
@@ -220,4 +236,110 @@ test("formatReading carries the unit", () => {
   assert.equal(formatReading(76911, "USD"), "$76,911");
   assert.equal(formatReading(11.5, "%"), "11.5%");
   assert.equal(formatReading(169579.52, "points"), "169,579.52 pts");
+});
+
+/* ───────────── Money paths: the product is the number ───────────── */
+
+test("income tax 2026-27: tax is continuous at every slab boundary and the next rupee is taxed at the next rate", () => {
+  for (const kind of ["salaried", "nonSalaried"] as const) {
+    const slabs = CURRENT_TAX_YEAR[kind];
+    for (let i = 0; i < slabs.length - 1; i++) {
+      const edge = slabs[i].upTo!;
+      const at = computeIncomeTax(edge, CURRENT_TAX_YEAR, kind);
+      assert.equal(at.baseTax, slabs[i + 1].fixed, `${kind}: tax at ${edge} must equal the next slab's fixed amount`);
+      const above = computeIncomeTax(edge + 1, CURRENT_TAX_YEAR, kind);
+      assert.equal(above.marginalRate, slabs[i + 1].rate, `${kind}: one rupee over ${edge} is in the next slab`);
+      assert.ok(above.baseTax - at.baseTax <= 1 + slabs[i + 1].rate, `${kind}: one rupee over ${edge} adds at most one rupee of tax`);
+    }
+  }
+  // Worked example, FY 2026-27 salaried: Rs 250,000 a month = Rs 3,000,000 a year → 116,000 + 20% of 800,000.
+  assert.equal(computeIncomeTax(3_000_000, CURRENT_TAX_YEAR, "salaried").totalTax, 276_000);
+  assert.equal(computeIncomeTax(599_999, CURRENT_TAX_YEAR, "salaried").totalTax, 0);
+  assert.equal(computeIncomeTax(-5, CURRENT_TAX_YEAR, "salaried").totalTax, 0);
+});
+
+test("income tax surcharge: withdrawn for salaried from 2026-27, 9% in 2025-26, 10% for business income in both", () => {
+  const income = 10_000_001;
+  const y27 = getTaxYear("2026-27");
+  const y26 = getTaxYear("2025-26");
+  assert.equal(computeIncomeTax(income, y27, "salaried").surcharge, 0);
+  const s26 = computeIncomeTax(income, y26, "salaried");
+  assert.equal(s26.surcharge, Math.round(s26.baseTax * 0.09));
+  for (const y of [y27, y26]) {
+    const b = computeIncomeTax(income, y, "nonSalaried");
+    assert.equal(b.surcharge, Math.round(b.baseTax * 0.1));
+    assert.equal(computeIncomeTax(10_000_000, y, "nonSalaried").surcharge, 0, "surcharge starts above the threshold, not at it");
+  }
+});
+
+test("sales tax: inclusive amounts back out the tax, further tax only on goods", () => {
+  const tool = TOOLS.find((t) => t.slug === "sales-tax-calculator")!;
+  const inclusive = tool.compute({ amount: 118_000, kind: "goods", mode: "inclusive", unregistered: false });
+  assert.equal(inclusive.headline.value, pkr(18_000));
+  assert.ok(inclusive.summary?.includes(pkr(100_000)));
+  const unregistered = tool.compute({ amount: 100_000, kind: "goods", mode: "exclusive", unregistered: true });
+  assert.equal(unregistered.headline.value, pkr(22_000));
+  const sindh = tool.compute({ amount: 100_000, kind: "sindh", mode: "exclusive", unregistered: true });
+  assert.equal(sindh.headline.value, pkr(15_000), "services carry no further tax");
+});
+
+test("property 236K bands: filer flat, non-filer steps at Rs 50M and Rs 100M", () => {
+  assert.equal(wht236K(1, true), 0.0125);
+  assert.equal(wht236K(500_000_000, true), 0.0125);
+  assert.equal(wht236K(50_000_000, false), 0.105);
+  assert.equal(wht236K(50_000_001, false), 0.145);
+  assert.equal(wht236K(100_000_000, false), 0.145);
+  assert.equal(wht236K(100_000_001, false), 0.185);
+});
+
+test("zakat: due at the nisab, not one rupee below; the gold basis moves the threshold", () => {
+  const tool = TOOLS.find((t) => t.slug === "zakat-calculator")!;
+  const silverPrice = 500;
+  const goldPrice = 30_000;
+  const silverNisab = ZAKAT.nisabSilverGrams * silverPrice;
+  const base = { goldGrams: 0, silverGrams: 0, investments: 0, receivables: 0, debts: 0, goldPrice, silverPrice };
+  assert.equal(tool.compute({ ...base, cash: silverNisab, nisabBasis: "silver" }).headline.value, pkr(silverNisab * ZAKAT.rate));
+  assert.equal(tool.compute({ ...base, cash: silverNisab - 1, nisabBasis: "silver" }).headline.value, pkr(0));
+  const goldNisab = ZAKAT.nisabGoldGrams * goldPrice;
+  assert.equal(tool.compute({ ...base, cash: silverNisab, nisabBasis: "gold" }).headline.value, pkr(0), "above silver nisab but below gold nisab");
+  assert.equal(tool.compute({ ...base, cash: goldNisab, nisabBasis: "gold" }).headline.value, pkr(goldNisab * ZAKAT.rate));
+  assert.equal(tool.compute({ ...base, cash: silverNisab + 100_000, debts: 100_001, nisabBasis: "silver" }).headline.value, pkr(0), "debts come off first");
+});
+
+test("gratuity: six months round up, under a year is not due", () => {
+  const tool = TOOLS.find((t) => t.slug === "gratuity-calculator")!;
+  assert.equal(tool.compute({ wage: 60_000, years: 5, months: 6 }).headline.value, pkr(360_000));
+  assert.equal(tool.compute({ wage: 60_000, years: 5, months: 5 }).headline.value, pkr(300_000));
+  assert.equal(tool.compute({ wage: 60_000, years: 1, months: 0 }).headline.value, pkr(60_000));
+  assert.equal(tool.compute({ wage: 60_000, years: 0, months: 11 }).headline.value, "Not yet due");
+});
+
+/* ───────────── Identity and links ───────────── */
+
+test("uniqueSlug appends -2, -3 until the slug is free", async () => {
+  const taken = new Set(["lahore", "lahore-2"]);
+  assert.equal(await uniqueSlug("lahore", async (s) => taken.has(s)), "lahore-3");
+  assert.equal(await uniqueSlug("karachi", async (s) => taken.has(s)), "karachi");
+});
+
+test("claim invite tokens: round-trip, tampered signature and expiry are refused", () => {
+  const token = inviteToken("biz_1", "Owner@Example.com");
+  assert.deepEqual(readInviteToken(token), { businessId: "biz_1", email: "owner@example.com" });
+  assert.equal(readInviteToken(token.slice(0, -2) + "xx"), null, "tampered signature");
+  assert.equal(readInviteToken("a.b.c"), null, "wrong shape");
+  const [id, , emailB64] = token.split(".");
+  const expired = `${id}.${Date.now() - 1000}.${emailB64}`;
+  const sig = createHmac("sha256", process.env.BETTER_AUTH_SECRET ?? "dev-secret").update(expired).digest("base64url");
+  assert.equal(readInviteToken(`${expired}.${sig}`), null, "expired token with a valid signature");
+});
+
+test("registry integrity: unique slugs, known categories, https sources", () => {
+  const slugs = new Set<string>();
+  for (const t of TOOLS) {
+    assert.ok(!slugs.has(t.slug), `duplicate slug ${t.slug}`);
+    slugs.add(t.slug);
+    assert.ok(t.category in TOOL_CATEGORIES, `${t.slug}: unknown category ${t.category}`);
+    for (const s of t.sources) assert.ok(!s.url || s.url.startsWith("https://"), `${t.slug}: source "${s.title}" is not https`);
+    for (const r of t.related?.tools ?? []) assert.ok(TOOLS.some((o) => o.slug === r), `${t.slug}: related tool ${r} does not exist`);
+  }
 });
