@@ -54,12 +54,12 @@ export function runTool(slug: string, inputs: Record<string, unknown>) {
 }
 
 export async function agentSearch(q: string, type?: string, limit = 10) {
-  const r = await search(q, { types: type ? [type as SearchEntityType] : undefined, limit: Math.min(50, Math.max(1, limit)) });
+  const r = await search(q, { types: type ? [type as SearchEntityType] : undefined, limit: Math.min(50, Math.max(1, Number(limit) || 10)) });
   return { query: q, total: r.total, results: r.hits.map((x) => ({ ...x, url: x.url.startsWith("http") ? x.url : `${SITE.url}${x.url}` })) };
 }
 
 export async function agentSeries(slug: string, limit = 30) {
-  const d = await getSeries(slug, Math.min(365, Math.max(1, limit)));
+  const d = await getSeries(slug, Math.min(365, Math.max(1, Number(limit) || 30)));
   if (!d) return null;
   const points = d.points;
   const latest = points[points.length - 1];

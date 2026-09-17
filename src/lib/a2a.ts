@@ -3,6 +3,7 @@ import { listSeriesWithLatest } from "@/db/queries/data";
 import { agentMarkdown, agentSearch, agentSeries, runTool, TOOL_LIST, toolSchema } from "@/lib/agent-api";
 import { formatReading } from "@/lib/format";
 import { SITE } from "@/lib/utils";
+import type { RpcMessage as Rpc } from "@/lib/json-rpc";
 
 /*
  * A2A agent (a2a-protocol.org): other agents send a question over JSON-RPC and get one text answer built
@@ -40,14 +41,17 @@ export async function answer(question: string): Promise<string> {
 
   // A calculator, when the question names one and carries a number.
   const tool = TOOL_LIST.find((t) => lower.includes(t.name.toLowerCase().replace(/ calculator.*$/i, "")) || lower.includes(t.slug.replace(/-calculator$/, "").replace(/-/g, " ")));
-  const numbers = q.match(/\d[\d,]*(?:\.\d+)?/g)?.map((n) => Number(n.replace(/,/g, ""))) ?? [];
+  // ponytail: the first number in the question goes into the calculator's first numeric field; years and
+  // model numbers (iPhone 17) are skipped, and the answer states the assumption so a wrong guess is visible.
+  const numbers = (q.match(/\d[\d,]*(?:\.\d+)?/g)?.map((n) => Number(n.replace(/,/g, ""))) ?? []).filter((n) => n >= 100 && !(n >= 1900 && n <= 2100));
   if (tool && numbers.length) {
     const schema = toolSchema(tool.slug);
-    const firstNumberKey = Object.entries(schema?.inputSchema.properties ?? {}).find(([, v]) => (v as { type?: string }).type === "number")?.[0];
-    if (firstNumberKey) {
-      const r = runTool(tool.slug, { [firstNumberKey]: numbers[0] });
+    const field = Object.entries(schema?.inputSchema.properties ?? {}).find(([, v]) => (v as { type?: string }).type === "number");
+    if (field) {
+      const [key, def] = field as [string, { description?: string }];
+      const r = runTool(tool.slug, { [key]: numbers[0] });
       if (r) {
-        const lines = [`${r.result.headline.label}: ${r.result.headline.value}`, r.result.summary ?? "", `Run it yourself: ${r.url}`, r.sources.length ? `Source: ${r.sources.map((s) => s.title).join("; ")} (reviewed ${r.lastReviewed}).` : ""];
+        const lines = [`${r.result.headline.label}: ${r.result.headline.value}`, `Assuming ${(def.description ?? key).split(".")[0].toLowerCase()} = ${numbers[0].toLocaleString("en-PK")}; other inputs at their defaults.`, r.result.summary ?? "", `Run it yourself: ${r.url}`, r.sources.length ? `Source: ${r.sources.map((s) => s.title).join("; ")} (reviewed ${r.lastReviewed}).` : ""];
         return lines.filter(Boolean).join("\n");
       }
     }
@@ -76,7 +80,6 @@ export async function answer(question: string): Promise<string> {
   return [head, "", others.length ? "Also on Searchable.pk:" : "", ...others].filter(Boolean).join("\n");
 }
 
-type Rpc = { jsonrpc: "2.0"; id?: string | number | null; method: string; params?: unknown };
 
 /** Handle one A2A JSON-RPC message. Messages only: every answer is immediate, so no task is created. */
 export async function handleA2a(msg: Rpc): Promise<unknown | null> {

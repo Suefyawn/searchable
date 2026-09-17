@@ -1,6 +1,7 @@
 import { agentMarkdown, agentSearch, agentSeries, API_VERSION, runTool, TOOL_LIST, toolSchema } from "@/lib/agent-api";
 import { listSeriesWithLatest } from "@/db/queries/data";
 import { SITE } from "@/lib/utils";
+import type { RpcMessage as Rpc } from "@/lib/json-rpc";
 
 /*
  * A small Model Context Protocol server over Streamable HTTP (POST /mcp with JSON-RPC 2.0, JSON responses,
@@ -73,7 +74,6 @@ export const MCP_TOOLS: ToolDef[] = [
   },
 ];
 
-type Rpc = { jsonrpc: "2.0"; id?: string | number | null; method: string; params?: Json };
 
 const reply = (id: Rpc["id"], result: unknown) => ({ jsonrpc: "2.0", id: id ?? null, result });
 const fail = (id: Rpc["id"], code: number, message: string) => ({ jsonrpc: "2.0", id: id ?? null, error: { code, message } });
@@ -87,11 +87,12 @@ export async function handleMcp(msg: Rpc): Promise<unknown | null> {
   if (msg.method === "ping") return reply(msg.id, {});
   if (msg.method === "tools/list") return reply(msg.id, { tools: MCP_TOOLS.map((t) => ({ name: t.name, description: t.description, inputSchema: t.inputSchema })) });
   if (msg.method === "tools/call") {
-    const name = String(msg.params?.name ?? "");
+    const params = (msg.params ?? {}) as Json;
+    const name = String(params.name ?? "");
     const tool = MCP_TOOLS.find((t) => t.name === name);
     if (!tool) return fail(msg.id, -32602, `Unknown tool ${name}`);
     try {
-      return reply(msg.id, await tool.run((msg.params?.arguments as Json) ?? {}));
+      return reply(msg.id, await tool.run((params.arguments as Json) ?? {}));
     } catch (e) {
       return reply(msg.id, { content: [{ type: "text", text: (e as Error).message }], isError: true });
     }
