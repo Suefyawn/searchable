@@ -1,12 +1,9 @@
 import { listArticles } from "@/db/queries/content";
 import { articleUrl } from "@/components/cards";
+import { escapeHtml as esc } from "@/lib/markdown";
 import { SITE } from "@/lib/utils";
 
 export const revalidate = 3600;
-
-function esc(s: string) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
 
 /** RSS 2.0 feed of the latest news and guides. */
 export async function GET() {

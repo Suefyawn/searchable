@@ -1,4 +1,5 @@
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import Link from "next/link";
 import { AdminPage, FilterTabs, Status } from "@/components/admin";
 import { Button } from "@/components/ui";
@@ -12,7 +13,7 @@ const STATUSES = ["open", "in_progress", "done", "dropped", "all"] as const;
 async function setStatus(keyword: string, status: "open" | "in_progress" | "done" | "dropped") {
   "use server";
   await requireRole("editor");
-  await setBacklogStatus(keyword, { status });
+  await setBacklogStatus(keyword, { status: z.enum(["open", "in_progress", "done", "dropped"]).parse(status) });
   revalidatePath("/admin/backlog");
 }
 

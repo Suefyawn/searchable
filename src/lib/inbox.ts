@@ -1,7 +1,8 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { getDb, schema } from "@/db";
-import { escape, layout } from "./claims";
+import { layout } from "./claims";
+import { escapeHtml } from "./markdown";
 import { sendEmail } from "./email";
 import { SITE } from "./utils";
 
@@ -175,10 +176,10 @@ export async function replyToInboxMessage(id: string, body: string, signedBy: st
   const text = `${body.trim()}\n\n${signedBy}\n${SITE.name}\n\nOn ${m.receivedAt.toUTCString()}, ${m.fromName ?? m.fromAddress} wrote:\n${quoted}`;
   const html = layout(
     subject,
-    `<div style="white-space:pre-wrap">${escape(body.trim())}</div>
-     <p style="margin-top:18px">${escape(signedBy)}<br><span style="color:#888">${SITE.name}</span></p>
-     <p style="color:#888;font-size:12px;margin-top:24px">On ${escape(m.receivedAt.toUTCString())}, ${escape(m.fromName ?? m.fromAddress)} wrote:</p>
-     <blockquote style="margin:0;padding-left:12px;border-left:2px solid #ddd;color:#555;white-space:pre-wrap">${escape(m.text ?? m.snippet)}</blockquote>`,
+    `<div style="white-space:pre-wrap">${escapeHtml(body.trim())}</div>
+     <p style="margin-top:18px">${escapeHtml(signedBy)}<br><span style="color:#888">${SITE.name}</span></p>
+     <p style="color:#888;font-size:12px;margin-top:24px">On ${escapeHtml(m.receivedAt.toUTCString())}, ${escapeHtml(m.fromName ?? m.fromAddress)} wrote:</p>
+     <blockquote style="margin:0;padding-left:12px;border-left:2px solid #ddd;color:#555;white-space:pre-wrap">${escapeHtml(m.text ?? m.snippet)}</blockquote>`,
   );
   const headers: Record<string, string> = {};
   if (m.messageId) {

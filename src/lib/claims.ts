@@ -2,6 +2,7 @@ import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import { and, asc, desc, eq, isNull, lt, or, sql } from "drizzle-orm";
 import { getDb, rawQuery, schema } from "@/db";
 import { emailAllowance, sendEmail } from "./email";
+import { escapeHtml } from "./markdown";
 import { SITE } from "./utils";
 
 /**
@@ -128,7 +129,7 @@ export async function startClaim(input: StartClaimInput): Promise<{ claimId: str
       await sendEmail({
         to: sentTo,
         subject: `${code} is your ${SITE.name} verification code`,
-        html: layout(`Verify ${escape(business.name)}`, `<p>Someone (${escape(input.contactName)}) is claiming <strong>${escape(business.name)}</strong> on ${SITE.name} and asked us to send the code to this mailbox.</p><p style="font-size:28px;letter-spacing:6px;font-family:monospace;margin:18px 0"><strong>${code}</strong></p><p>Enter it on the claim page within 24 hours. If this was not you, ignore this email; nothing changes without the code.</p>`),
+        html: layout(`Verify ${escapeHtml(business.name)}`, `<p>Someone (${escapeHtml(input.contactName)}) is claiming <strong>${escapeHtml(business.name)}</strong> on ${SITE.name} and asked us to send the code to this mailbox.</p><p style="font-size:28px;letter-spacing:6px;font-family:monospace;margin:18px 0"><strong>${code}</strong></p><p>Enter it on the claim page within 24 hours. If this was not you, ignore this email; nothing changes without the code.</p>`),
         text: `Your ${SITE.name} verification code for ${business.name}: ${code} (valid 24 hours)`,
       });
     } catch (e) {
@@ -186,7 +187,7 @@ export async function approveClaim(claimId: string, reviewerId: string | null, n
     to,
     subject: `You now manage ${c.business.name} on ${SITE.name}`,
     html: layout(
-      `${escape(c.business.name)} is yours`,
+      `${escapeHtml(c.business.name)} is yours`,
       `<p>Your claim is approved. From your dashboard you can update details and hours, add photos and services, answer enquiries and reply to reviews.</p>
        <p><a href="${SITE.url}/business/${c.business.id}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600">Open your dashboard</a></p>
        <p>Want the <strong>Verified</strong> badge? It shows customers the listing is checked, ranks you above free listings, and gives your website a followed link. It is Rs 9,900 a year, from the Upgrade tab in your dashboard.</p>`,
@@ -203,7 +204,7 @@ export async function rejectClaim(claimId: string, reviewerId: string, note?: st
   await sendEmail({
     to: c.contactEmail || c.user.email,
     subject: `About your claim for ${c.business.name}`,
-    html: layout(`We could not verify this claim`, `<p>We were not able to confirm that you run <strong>${escape(c.business.name)}</strong>.${note ? ` ${escape(note)}` : ""}</p><p>You can try again with a different proof: a code sent to your website's email, a WhatsApp message from the listed number, or a document showing the business name. <a href="${SITE.url}/claim/${c.business.slug}">Claim again</a>, or reply to this email if you think we got it wrong.</p>`),
+    html: layout(`We could not verify this claim`, `<p>We were not able to confirm that you run <strong>${escapeHtml(c.business.name)}</strong>.${note ? ` ${escapeHtml(note)}` : ""}</p><p>You can try again with a different proof: a code sent to your website's email, a WhatsApp message from the listed number, or a document showing the business name. <a href="${SITE.url}/claim/${c.business.slug}">Claim again</a>, or reply to this email if you think we got it wrong.</p>`),
     text: `We could not verify your claim for ${c.business.name}. ${note ?? ""} Try again: ${SITE.url}/claim/${c.business.slug}`,
   }).catch(() => {});
 }
@@ -266,10 +267,10 @@ export function renderInvite(b: { id: string; slug: string; name: string; email:
   const url = inviteUrl(b);
   const subject = reminder ? `Reminder: ${b.name} is listed on ${SITE.name}, is it yours?` : `${b.name} is on ${SITE.name}. Claim your free listing`;
   const html = layout(
-    reminder ? `Still unclaimed: ${escape(b.name)}` : `Is ${escape(b.name)} yours?`,
-    `<p>${SITE.name} lists <strong>${escape(b.name)}</strong>${b.primaryCategory ? ` under ${escape(b.primaryCategory.name)}` : ""}${b.city ? ` in ${escape(b.city.name)}` : ""}, with the phone number, address and hours we could find${b.viewCount ? `; it has been viewed ${b.viewCount.toLocaleString()} times` : ""}.</p>
+    reminder ? `Still unclaimed: ${escapeHtml(b.name)}` : `Is ${escapeHtml(b.name)} yours?`,
+    `<p>${SITE.name} lists <strong>${escapeHtml(b.name)}</strong>${b.primaryCategory ? ` under ${escapeHtml(b.primaryCategory.name)}` : ""}${b.city ? ` in ${escapeHtml(b.city.name)}` : ""}, with the phone number, address and hours we could find${b.viewCount ? `; it has been viewed ${b.viewCount.toLocaleString()} times` : ""}.</p>
      <p>The listing is free and stays free. Claiming it takes a minute and lets you correct details, add photos and services, get enquiries by WhatsApp and reply to reviews. This link is personal to this email address, so no code or paperwork is needed:</p>
-     <p><a href="${url}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600">Claim ${escape(b.name)}</a></p>
+     <p><a href="${url}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600">Claim ${escapeHtml(b.name)}</a></p>
      <p style="color:#555;font-size:14px">Once claimed, you can also get the Verified badge (Rs 9,900 a year), which ranks you above free listings and links to your website. Entirely optional.</p>
      <p style="color:#777;font-size:13px">See the listing: <a href="${SITE.url}/b/${b.slug}">${SITE.url}/b/${b.slug}</a>. Not your business, or prefer we did not write again? <a href="${optOutUrl(b)}">One click and we will not email this address again</a>.</p>`,
   );
@@ -315,9 +316,6 @@ export async function optOut(token: string): Promise<boolean> {
 
 /* ───────────── Email chrome ───────────── */
 
-export function escape(s: string) {
-  return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
-}
 export function layout(title: string, body: string) {
   return `<div style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;max-width:560px;margin:auto;padding:24px;line-height:1.6;color:#111">
   <p style="font-family:Georgia,serif;font-size:20px;margin:0 0 18px;padding-bottom:10px;border-bottom:2px solid #111">${SITE.name}<span style="color:#888">.pk</span></p>

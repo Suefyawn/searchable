@@ -1,4 +1,4 @@
-import { CURRENT_TAX_YEAR, TAX_YEARS, computeIncomeTax, getTaxYear } from "../data/income-tax";
+import { CURRENT_TAX_YEAR, INCOME_TAX_REVIEWED_AT, TAX_YEARS, computeIncomeTax, getTaxYear } from "../data/income-tax";
 import { num, str, type ToolDefinition } from "../types";
 import { pkr, pct } from "@/lib/format";
 
@@ -11,7 +11,7 @@ export const incomeTaxCalculator: ToolDefinition = {
   description: "Free salary tax calculator for Pakistan: enter your monthly salary and see income tax under the FBR 2026-27 slabs, your take-home, effective rate and slab.",
   keywords: ["income tax calculator pakistan", "salary tax calculator pakistan", "tax calculator pakistan", "income tax slabs 2026-27", "income tax slabs 2025-26", "fbr tax calculator", "salary tax slabs", "income tax on salary in pakistan", "tax on 100000 salary in pakistan", "tax on 200000 salary", "tax on 300000 salary in pakistan", "income tax rates in pakistan"],
   version: "1.2.0",
-  lastReviewed: "2026-09-15",
+  lastReviewed: INCOME_TAX_REVIEWED_AT,
   featured: true,
   sources: [CURRENT_TAX_YEAR.source],
   fields: [

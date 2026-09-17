@@ -202,10 +202,3 @@ export async function commitImport(rows: PreviewRow[], opts: { publish: boolean;
   return { created, skipped };
 }
 
-/** Does a business with a similar name already exist in this city? (used by the public add form) */
-export async function quickDuplicateCheck(name: string, cityId: string, phone?: string) {
-  const db = await getDb();
-  const city = await db.query.locations.findFirst({ where: eq(schema.locations.id, cityId), columns: { name: true } });
-  return findDuplicates({ name, phone, cityId, cityName: city?.name });
-}
-

@@ -1,4 +1,4 @@
-import { CURRENT_TAX_YEAR, computeIncomeTax } from "../data/income-tax";
+import { CURRENT_TAX_YEAR, INCOME_TAX_REVIEWED_AT, computeIncomeTax } from "../data/income-tax";
 import { LABOUR } from "../data/rates";
 import { bool, num, type ToolDefinition } from "../types";
 import { pkr, pct } from "@/lib/format";
@@ -11,7 +11,7 @@ export const salaryBreakdownCalculator: ToolDefinition = {
   description: "See exactly what lands in your account: gross salary minus income tax, EOBI and provident fund, with an annual view.",
   keywords: ["take home salary", "net salary calculator", "salary after tax", "in-hand salary pakistan", "provident fund", "EOBI deduction", "gross to net"],
   version: "1.0.0",
-  lastReviewed: "2026-09-15",
+  lastReviewed: INCOME_TAX_REVIEWED_AT,
   featured: true,
   sources: [CURRENT_TAX_YEAR.source, LABOUR.source],
   fields: [

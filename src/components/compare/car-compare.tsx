@@ -2,9 +2,9 @@
 
 import { Comparator, type CompareConfig } from "@/components/compare/comparator";
 import { BODY_LABELS, FUEL_LABELS, type Body, type Car, type Fuel } from "@/content/cars";
+import { pkrCompact } from "@/lib/format";
 
-const lakh = (n: number) => (n >= 1e7 ? `${(n / 1e7).toFixed(2).replace(/\.?0+$/, "")} crore` : `${(n / 1e5).toFixed(2).replace(/\.?0+$/, "")} lakh`);
-const priceRange = (c: Car) => (c.price[0] === c.price[1] ? `Rs ${lakh(c.price[0])}` : `Rs ${lakh(c.price[0])} to ${lakh(c.price[1])}`);
+const priceRange = (c: Car) => (c.price[0] === c.price[1] ? pkrCompact(c.price[0]) : `${pkrCompact(c.price[0])} to ${pkrCompact(c.price[1])}`);
 /** Typical city km per litre from the published range; electric cars are ranked first on running cost. */
 const kmpl = (c: Car) => (c.fuel === "electric" ? 99 : parseFloat(c.economy) || 0);
 const airbags = (c: Car) => parseInt(c.airbags, 10) || 0;
@@ -52,7 +52,7 @@ export function CarCompare({ cars }: { cars: Car[] }) {
       { key: "brand", label: "Brand", compare: (a, b) => a.brand.localeCompare(b.brand) || a.price[0] - b.price[0] },
     ],
     actions: (c) => [
-      { href: `/tools/cars/car-loan-calculator?price=${c.price[0]}`, label: `Instalment on Rs ${lakh(c.price[0])}` },
+      { href: `/tools/cars/car-loan-calculator?price=${c.price[0]}`, label: `Instalment on ${pkrCompact(c.price[0])}` },
       { href: `/tools/cars/token-tax-calculator?cc=${c.fuel === "electric" ? 1000 : c.engine}&invoice=${c.price[0]}`, label: "Token tax" },
       { href: `/tools/cars/fuel-cost-calculator`, label: "Monthly fuel" },
     ],

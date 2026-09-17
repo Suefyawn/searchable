@@ -7,6 +7,7 @@
  * duty + FED + sales tax (imported).
  */
 export const WHT_231B = {
+  reviewedAt: "2026-09-15",
   effectiveFrom: "2025-07-01",
   source: { title: "Income Tax Ordinance 2001, First Schedule, Part IV, Division VII (s.231B): Finance Act 2025, unchanged by Finance Act 2026", url: "https://www.fbr.gov.pk/", publisher: "Federal Board of Revenue" },
   nonFilerMultiple: 3,

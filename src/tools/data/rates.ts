@@ -42,6 +42,38 @@ export const REFERENCE_RATES = {
   kibor1y: 12.3,
 };
 
+// ── Fuel: fortnightly notified pump prices (fallbacks; the data hub's reading replaces them at render) ──
+export const FUEL = {
+  reviewedAt: "2026-09-15",
+  source: { title: "Fortnightly petroleum prices", url: "https://ogra.org.pk", publisher: "OGRA / Finance Division" },
+  petrolPerLitre: 267.5,
+  dieselPerLitre: 273.4,
+};
+
+// ── FX: typical spreads around the interbank rate ──
+export const FX_SPREADS = {
+  reviewedAt: "2026-09-15",
+  source: { title: "Exchange Companies Association of Pakistan: open market rates", publisher: "ECAP" },
+  /** Banks buy remittances a touch below interbank. */
+  bankBuy: -0.0025,
+  /** Exchange companies sell cash above it. */
+  openMarketSell: 0.008,
+};
+
+// ── Air conditioners: rated draw and duty cycle by size and type ──
+export const AC_POWER = {
+  reviewedAt: "2026-09-15",
+  source: { title: "Typical rated power draw from manufacturer datasheets (Gree, Haier, Dawlance, Orient)", publisher: "Searchable" },
+  types: {
+    "1-inverter": { label: "1 ton inverter", kw: 1.0, dutyFactor: 0.6 },
+    "1.5-inverter": { label: "1.5 ton inverter", kw: 1.4, dutyFactor: 0.6 },
+    "2-inverter": { label: "2 ton inverter", kw: 1.9, dutyFactor: 0.6 },
+    "1-fixed": { label: "1 ton non-inverter", kw: 1.2, dutyFactor: 0.75 },
+    "1.5-fixed": { label: "1.5 ton non-inverter", kw: 1.8, dutyFactor: 0.75 },
+    "2-fixed": { label: "2 ton non-inverter", kw: 2.4, dutyFactor: 0.75 },
+  } as Record<string, { label: string; kw: number; dutyFactor: number }>,
+};
+
 // ── Zakat ───────────────────────────────────────────────────────────────────
 export const ZAKAT = {
   rate: 0.025,

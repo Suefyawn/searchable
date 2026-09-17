@@ -4,6 +4,8 @@ import { Clock, Search, TrendingUp, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import type { SearchEntityType } from "@/lib/search";
+import { TYPE_LABEL, TYPE_ORDER as SEARCH_TYPE_ORDER } from "@/lib/search-types";
 
 /**
  * Site search box with instant suggestions.
@@ -16,8 +18,7 @@ type Suggestion = { entityType: string; url: string; title: string; meta?: strin
 type IndexEntry = { t: string; u: string; k: string; y: string; c?: string; m?: string };
 type SuggestIndex = { entries: IndexEntry[]; popular: string[] };
 
-const TYPE_LABEL: Record<string, string> = { tool: "Calculator", guide: "Guide", news: "News", business: "Business", professional: "Professional", post: "Community", location: "Place", entity: "Topic", data_series: "Data", comparison: "Compare" };
-const TYPE_ORDER = ["tool", "data_series", "guide", "comparison", "professional", "business", "location", "entity", "news", "post"];
+const TYPE_ORDER: readonly string[] = SEARCH_TYPE_ORDER;
 const RECENT_KEY = "sp:recent-searches";
 
 let indexPromise: Promise<SuggestIndex> | null = null;
@@ -322,7 +323,7 @@ export function SearchBox({
             <>
               {groups.map((g) => (
                 <div key={g.type} className="border-b border-line py-1.5 last:border-b-0">
-                  <p className="px-4 pb-1 pt-1 text-[10.5px] font-bold uppercase tracking-[0.12em] text-3">{TYPE_LABEL[g.type] ?? g.type}</p>
+                  <p className="px-4 pb-1 pt-1 text-[10.5px] font-bold uppercase tracking-[0.12em] text-3">{TYPE_LABEL[g.type as SearchEntityType] ?? g.type}</p>
                   <ul>
                     {g.items.map((it) => {
                       const i = cursor++;

@@ -6,7 +6,8 @@ import { SearchBox } from "@/components/layout/search-box";
 import { ResultsTracker } from "@/components/search/results-tracker";
 import { citiesWithCounts } from "@/db/queries/geo";
 import { formatDate, number, timeAgo } from "@/lib/format";
-import { TYPE_LABEL, didYouMean, groupHits, logSearch, popularSearches, relatedSearches, search, trendingSearches, type SearchEntityType, type SearchHit, type SearchResult } from "@/lib/search";
+import { didYouMean, groupHits, logSearch, popularSearches, relatedSearches, search, trendingSearches, type SearchEntityType, type SearchHit, type SearchResult } from "@/lib/search";
+import { TYPE_LABEL, TYPE_ORDER, TYPE_PLURAL as PLURAL } from "@/lib/search-types";
 import { cn } from "@/lib/utils";
 import { TOOLS } from "@/tools/registry";
 
@@ -19,8 +20,6 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   return { title: q ? `“${q}”` : "Search", robots: { index: false, follow: true } };
 }
 
-const TYPE_ORDER: SearchEntityType[] = ["tool", "data_series", "guide", "comparison", "professional", "business", "news", "post", "location", "entity"];
-const PLURAL: Record<SearchEntityType, string> = { tool: "Calculators", guide: "Guides", news: "News", business: "Businesses", entity: "Topics", location: "Places", data_series: "Data", comparison: "Comparisons", professional: "Professionals", post: "Community" };
 const FILTERS: { value: SearchEntityType | ""; label: string }[] = [
   { value: "", label: "All" },
   { value: "tool", label: "Calculators" },

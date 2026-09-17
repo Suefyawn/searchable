@@ -17,7 +17,7 @@ export const personalLoanCalculator: ToolDefinition = {
   description: "Monthly instalment and total mark-up on a personal or salary loan in Pakistan for any amount, rate and tenure, with the year-by-year balance so you can see how much is interest.",
   keywords: ["personal loan calculator pakistan", "loan calculator pakistan", "emi calculator pakistan", "instalment calculator", "bank loan calculator", "salary loan calculator", "hbl personal loan calculator", "ubl personal loan", "meezan personal finance", "loan markup calculator"],
   version: "1.0.0",
-  lastReviewed: "2026-09-15",
+  lastReviewed: REFERENCE_RATES.reviewedAt,
   sources: [{ title: "State Bank of Pakistan: KIBOR and consumer financing regulations", url: "https://www.sbp.org.pk/", publisher: "State Bank of Pakistan" }],
   fields: [
     { key: "amount", label: "Loan amount", type: "number", unit: "PKR", default: 1_000_000, min: 10_000, step: 10_000 },

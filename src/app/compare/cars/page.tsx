@@ -4,11 +4,9 @@ import { ToolCard, toolExample } from "@/components/cards";
 import { CarCompare } from "@/components/compare/car-compare";
 import { Breadcrumbs, JsonLd, SectionHeader } from "@/components/ui";
 import { BODY_LABELS, CARS, CARS_REVIEWED_AT, CARS_SOURCE, type Body } from "@/content/cars";
-import { formatDate } from "@/lib/format";
+import { formatDate, pkrCompact } from "@/lib/format";
 import { breadcrumbJsonLd, buildMetadata, faqJsonLd } from "@/lib/seo";
 import { getTool } from "@/tools/registry";
-
-const lakh = (n: number) => (n >= 1e7 ? `Rs ${(n / 1e7).toFixed(2).replace(/\.?0+$/, "")} crore` : `Rs ${(n / 1e5).toFixed(2).replace(/\.?0+$/, "")} lakh`);
 
 const FAQS = [
   { question: "What is the Suzuki Alto price in Pakistan?", answer: "Rs 29.95 lakh for the VX to Rs 33.26 lakh for the VXL AGS (ex-factory, September 2026). Registration, token tax and withholding tax add roughly Rs 1.5–3 lakh depending on province and filer status." },
@@ -65,7 +63,7 @@ export default function CarsComparePage() {
                     <tr key={b}>
                       <td className="py-2 pr-3 font-medium">{BODY_LABELS[b]}</td>
                       <td className="py-2 pr-3"><a href={`#${c.id}`} className="underline-offset-4 hover:underline">{c.brand} {c.model}</a> <span className="text-2">· {c.engineLabel}</span></td>
-                      <td className="py-2 text-right tabular whitespace-nowrap">{lakh(c.price[0])}</td>
+                      <td className="py-2 text-right tabular whitespace-nowrap">{pkrCompact(c.price[0])}</td>
                     </tr>
                   );
                 })}

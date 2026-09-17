@@ -1,5 +1,6 @@
 import { desc, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { AdminPage, Empty, FilterTabs, Row, Rows, Status } from "@/components/admin";
 import { Button } from "@/components/ui";
 import { getDb, schema } from "@/db";
@@ -12,8 +13,9 @@ const STATUSES = ["new", "replied", "archived", "all"] as const;
 async function setStatus(id: string, status: string) {
   "use server";
   await requireRole("editor");
+  const next = z.enum(["new", "replied", "archived"]).parse(status);
   const db = await getDb();
-  await db.update(schema.messages).set({ status }).where(eq(schema.messages.id, id));
+  await db.update(schema.messages).set({ status: next }).where(eq(schema.messages.id, id));
   revalidatePath("/admin/messages");
   revalidatePath("/admin");
 }

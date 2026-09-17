@@ -2,8 +2,8 @@
 
 import { Comparator, type CompareConfig } from "@/components/compare/comparator";
 import { specNum, specText, type LivingItemT, type LivingSlug } from "@/lib/compare-shared";
+import { pkr as rs } from "@/lib/format";
 
-const rs = (n: number) => `Rs ${Math.round(n).toLocaleString("en-PK")}`;
 const yes = (v: unknown) => v === true || v === "yes" || v === "Yes";
 
 /** Column, filter and sort definitions for each living comparison; the items come from the settings row. */

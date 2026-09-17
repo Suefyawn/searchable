@@ -1,4 +1,4 @@
-import { CURRENT_TAX_YEAR, computeIncomeTax } from "../data/income-tax";
+import { CURRENT_TAX_YEAR, INCOME_TAX_REVIEWED_AT, computeIncomeTax } from "../data/income-tax";
 import { num, str, type ToolDefinition } from "../types";
 import { pct, pkr } from "@/lib/format";
 
@@ -11,7 +11,7 @@ export const salaryIncrementCalculator: ToolDefinition = {
   description: "Enter your salary and the raise (percent or amount) to see the new gross, how much extra income tax you'll pay under the 2026-27 slabs, and what actually lands in your account.",
   keywords: ["salary increment calculator", "increment calculator pakistan", "salary raise calculator", "new salary after increment", "percentage increase salary", "tax on salary increment", "take home after increment", "annual increment calculator", "how to calculate increment percentage"],
   version: "1.0.0",
-  lastReviewed: "2026-09-15",
+  lastReviewed: INCOME_TAX_REVIEWED_AT,
   sources: [CURRENT_TAX_YEAR.source],
   fields: [
     { key: "salary", label: "Current monthly salary (gross)", type: "number", unit: "PKR", default: 150_000, min: 0, step: 1000 },

@@ -11,7 +11,7 @@ export const solarPaybackCalculator: ToolDefinition = {
   description: "How many kW of solar you need, what a 5kW or 10kW system costs in Pakistan, your monthly saving with net metering and the payback period.",
   keywords: ["solar system price in pakistan", "5kw solar system price in pakistan", "10kw solar system price in pakistan", "solar panel price in pakistan", "solar calculator pakistan", "solar system size calculator", "net metering savings", "solar payback period", "solar for home pakistan"],
   version: "1.0.0",
-  lastReviewed: "2026-09-15",
+  lastReviewed: ELECTRICITY.reviewedAt,
   featured: true,
   sources: [ELECTRICITY.source, { title: "Typical installed cost per kW from Searchable directory quotes (2026)", publisher: "Searchable" }],
   fields: [

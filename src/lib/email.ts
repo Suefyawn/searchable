@@ -87,7 +87,7 @@ export async function sendEmail(email: Email, kind: EmailKind = "transactional")
       .map(([k, v]) => `${k}: ${v}\n`)
       .join("");
     writeFileSync(file, `From: ${from}\nTo: ${email.to}\nSubject: ${email.subject}\nDate: ${new Date().toUTCString()}\n${extra}Content-Type: text/html; charset=utf-8\n\n${email.html}`);
-    console.log(`[email:local] ${email.subject} -> ${email.to}  (${file})`);
+    console.info(`[email:local] ${email.subject} -> ${email.to}  (${file})`);
   }
   budget.dayCount += 1;
   budget.monthCount += 1;

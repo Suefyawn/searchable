@@ -106,17 +106,3 @@ export async function fetchPress(opts: { limit?: number; perFeed?: number; topic
   }
   return merged.slice(0, opts.limit ?? 40);
 }
-
-export const TOPIC_LABELS: Record<PressTopic, string> = { general: "Pakistan", business: "Business", tech: "Technology", world: "World", cricket: "Cricket", entertainment: "Entertainment", markets: "Markets", crypto: "Crypto", us: "United States", mma: "MMA", snooker: "Snooker" };
-
-/** Group for a topic-led section: one column per topic (or topic group), newest first. */
-export function groupByTopic(items: PressItem[], columns: { label: string; topics: PressTopic[] }[], perColumn = 5): { label: string; items: PressItem[] }[] {
-  return columns.map((c) => ({ label: c.label, items: items.filter((i) => c.topics.includes(i.topic)).slice(0, perColumn) })).filter((c) => c.items.length);
-}
-
-/** Group for a "from the press" section: one column per source, newest first. */
-export function groupBySource(items: PressItem[], perSource = 5): { source: string; sourceSlug: string; items: PressItem[] }[] {
-  const groups = new Map<string, PressItem[]>();
-  for (const i of items) (groups.get(i.sourceSlug) ?? groups.set(i.sourceSlug, []).get(i.sourceSlug)!).push(i);
-  return PRESS_FEEDS.filter((f) => groups.has(f.slug)).map((f) => ({ source: f.name, sourceSlug: f.slug, items: groups.get(f.slug)!.slice(0, perSource) }));
-}

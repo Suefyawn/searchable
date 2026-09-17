@@ -36,19 +36,6 @@ export const TYPE_BOOST: Record<SearchEntityType, number> = {
   post: 0.9,
 };
 
-export const TYPE_LABEL: Record<SearchEntityType, string> = {
-  tool: "Tool",
-  guide: "Guide",
-  news: "News",
-  business: "Business",
-  entity: "Topic",
-  location: "Place",
-  data_series: "Data",
-  comparison: "Compare",
-  professional: "Professional",
-  post: "Community",
-};
-
 /**
  * Query intent → per-type rank multipliers (blended on top of TYPE_BOOST). Cheap keyword rules; the log
  * of zero-result and low-click queries in /admin/search-log is where new rules come from.

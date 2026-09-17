@@ -4,7 +4,7 @@ import { listArticles } from "@/db/queries/content";
 import { listSeriesWithLatest } from "@/db/queries/data";
 import { EmailBudgetExceeded, emailAllowance, sendEmail } from "./email";
 import { formatDate, number } from "./format";
-import { renderMarkdown } from "./markdown";
+import { escapeHtml, renderMarkdown } from "./markdown";
 import { trendingSearches } from "./search";
 import { SITE } from "./utils";
 import { TOOLS, toolUrl } from "@/tools/registry";
@@ -94,10 +94,6 @@ export function renderIssueHtml(issue: { subject: string; preheader: string | nu
   <br>${escapeHtml(SITE.name)} · Lahore, Pakistan
 </td></tr>
 </table></td></tr></table></body></html>`;
-}
-
-function escapeHtml(s: string) {
-  return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 }
 
 function plainTextOf(body: string) {

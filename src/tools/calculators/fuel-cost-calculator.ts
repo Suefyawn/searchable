@@ -1,8 +1,6 @@
+import { FUEL } from "../data/rates";
 import { num, str, type ToolDefinition } from "../types";
 import { pkr } from "@/lib/format";
-
-const DEFAULT_PETROL = 267.5;
-const DEFAULT_DIESEL = 273.4;
 
 export const fuelCostCalculator: ToolDefinition = {
   slug: "fuel-cost-calculator",
@@ -13,18 +11,18 @@ export const fuelCostCalculator: ToolDefinition = {
   description: "Monthly and per-kilometre fuel cost from your driving and mileage at today’s petrol or diesel price in Pakistan.",
   keywords: ["fuel cost calculator", "petrol cost calculator", "petrol cost per km", "monthly fuel expense", "petrol price in pakistan today", "car running cost", "fuel average calculator"],
   version: "1.0.0",
-  lastReviewed: "2026-09-15",
-  sources: [{ title: "Fortnightly petroleum prices", url: "https://ogra.org.pk", publisher: "OGRA / Finance Division" }],
+  lastReviewed: FUEL.reviewedAt,
+  sources: [FUEL.source],
   fields: [
     { key: "km", label: "Distance per month", type: "number", unit: "km", default: 1200, min: 0, step: 50, help: "A 20 km daily commute is ~1,000 km a month with weekends." },
     { key: "kmpl", label: "Mileage", type: "number", unit: "km/l", default: 12, min: 1, max: 60, step: 0.5, help: "Alto/Cultus ≈ 15–18, Corolla/City ≈ 11–13, SUV ≈ 7–9 in city driving." },
     { key: "fuel", label: "Fuel", type: "select", options: [{ value: "petrol", label: "Petrol" }, { value: "diesel", label: "Diesel" }], default: "petrol" },
-    { key: "price", label: "Price per litre", type: "number", unit: "PKR", default: DEFAULT_PETROL, min: 0, step: 0.5, help: "Defaults to the latest notified price; edit if it changed." },
+    { key: "price", label: "Price per litre", type: "number", unit: "PKR", default: FUEL.petrolPerLitre, min: 0, step: 0.5, help: "Defaults to the latest notified price; edit if it changed." },
   ],
   compute(input) {
     const km = num(input, "km");
     const kmpl = Math.max(1, num(input, "kmpl", 12));
-    const price = num(input, "price", str(input, "fuel") === "diesel" ? DEFAULT_DIESEL : DEFAULT_PETROL);
+    const price = num(input, "price", str(input, "fuel") === "diesel" ? FUEL.dieselPerLitre : FUEL.petrolPerLitre);
     const litres = km / kmpl;
     const monthly = litres * price;
     const perKm = price / kmpl;

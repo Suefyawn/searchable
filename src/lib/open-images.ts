@@ -47,7 +47,7 @@ async function authHeader(): Promise<Record<string, string>> {
 /** After a failure, Openverse is skipped for ten minutes so Commons gets the request's time budget. */
 let openverseDownUntil = 0;
 
-export async function searchOpenImages(query: string, opts: { limit?: number; minWidth?: number; orientation?: "landscape" | "portrait" | "square" } = {}): Promise<OpenImage[]> {
+async function searchOpenImages(query: string, opts: { limit?: number; minWidth?: number; orientation?: "landscape" | "portrait" | "square" } = {}): Promise<OpenImage[]> {
   if (Date.now() < openverseDownUntil) throw new Error("Openverse marked down");
   const params = new URLSearchParams({ q: query, license: LICENSES, page_size: String(Math.min(opts.limit ?? 12, 50)), mature: "false" });
   if (opts.orientation) params.set("aspect_ratio", opts.orientation === "landscape" ? "wide" : opts.orientation === "portrait" ? "tall" : "square");
@@ -169,7 +169,7 @@ const COMMONS_FILE_PROPS = { prop: "imageinfo", iiprop: "url|extmetadata|size|mi
  * Openverse result. Only files whose licence is CC0, public domain, CC BY or CC BY-SA are returned, only
  * photographs, and only ones whose own text matches the query (see isRelevant).
  */
-export async function searchCommons(query: string, opts: { limit?: number; minWidth?: number } = {}): Promise<OpenImage[]> {
+async function searchCommons(query: string, opts: { limit?: number; minWidth?: number } = {}): Promise<OpenImage[]> {
   const params = new URLSearchParams({ action: "query", generator: "search", gsrsearch: `filetype:bitmap ${query}`, gsrnamespace: "6", gsrlimit: String(Math.min(opts.limit ?? 12, 30)), ...COMMONS_FILE_PROPS });
   const res = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, { headers: { "user-agent": UA, accept: "application/json" }, signal: AbortSignal.timeout(8_000), next: { revalidate: 0 } });
   if (!res.ok) throw new Error(`Commons search failed: ${res.status}`);
@@ -191,7 +191,7 @@ export async function searchCommons(query: string, opts: { limit?: number; minWi
  * and credit. Disambiguation pages and pages without a photo return null. A smaller minimum width than a
  * search result: a 600 px portrait of the right person beats a 1600 px photo of the wrong thing.
  */
-export async function wikipediaLeadImage(name: string, opts: { minWidth?: number } = {}): Promise<OpenImage | null> {
+async function wikipediaLeadImage(name: string, opts: { minWidth?: number } = {}): Promise<OpenImage | null> {
   const params = new URLSearchParams({ action: "query", prop: "pageimages|pageprops", piprop: "name", ppprop: "disambiguation", titles: name, redirects: "1", format: "json" });
   const res = await fetch(`https://en.wikipedia.org/w/api.php?${params}`, { headers: { "user-agent": UA, accept: "application/json" }, signal: AbortSignal.timeout(8_000), next: { revalidate: 0 } });
   if (!res.ok) return null;
@@ -237,7 +237,7 @@ export function entitiesIn(title: string): string[] {
 
 const SOURCE_NAMES: Record<string, string> = { flickr: "Flickr", wikimedia: "Wikimedia Commons", stocksnap: "StockSnap", rawpixel: "Rawpixel", smithsonian: "Smithsonian", met: "The Met", nasa: "NASA", europeana: "Europeana" };
 
-export function creditLine(img: Pick<OpenImage, "creator" | "license" | "licenseVersion" | "source">): string {
+function creditLine(img: Pick<OpenImage, "creator" | "license" | "licenseVersion" | "source">): string {
   const lic = img.license === "pdm" ? "Public domain" : img.license === "cc0" ? "CC0" : `CC ${img.license.toUpperCase()}${img.licenseVersion ? ` ${img.licenseVersion}` : ""}`;
   // Some Flickr accounts stuff licence boilerplate into the name; keep the first line, no markup, 60 chars.
   const raw = (img.creator ?? "").replace(/<[^>]+>/g, "").split(String.fromCharCode(10))[0].split(String.fromCharCode(13))[0].trim();

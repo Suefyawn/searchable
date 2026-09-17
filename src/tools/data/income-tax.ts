@@ -113,6 +113,8 @@ export const TAX_YEARS: TaxYear[] = [
 ];
 
 export const CURRENT_TAX_YEAR = TAX_YEARS[0];
+/** When the slabs above were last checked against the Finance Act; every calculator on this table shows it. */
+export const INCOME_TAX_REVIEWED_AT = "2026-09-15";
 
 export function getTaxYear(year: string): TaxYear {
   return TAX_YEARS.find((t) => t.year === year) ?? CURRENT_TAX_YEAR;

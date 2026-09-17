@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
-import { search, TYPE_LABEL, type SearchEntityType } from "@/lib/search";
+import { search, type SearchEntityType } from "@/lib/search";
+import { TYPE_LABEL } from "@/lib/search-types";
 
 export async function GET(req: Request) {
   const rl = await rateLimit("search", LIMITS.search.limit, LIMITS.search.windowMs);

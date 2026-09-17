@@ -11,7 +11,7 @@ export const carRegistrationTaxCalculator: ToolDefinition = {
   description: "See what a new car really costs on the road: section 231B advance tax by engine size (filer vs non-filer), Punjab registration fee and number plate, so you know the total before you book.",
   keywords: ["car registration tax", "231b tax", "tax on car registration pakistan", "advance tax on vehicle registration", "on road price calculator pakistan", "filer non filer car tax", "new car registration charges punjab", "withholding tax on cars", "vehicle registration fee punjab"],
   version: "1.0.0",
-  lastReviewed: "2026-09-15",
+  lastReviewed: WHT_231B.reviewedAt,
   featured: true,
   sources: [WHT_231B.source, REGISTRATION_FEE_PUNJAB.source],
   fields: [

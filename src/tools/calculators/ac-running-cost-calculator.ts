@@ -1,14 +1,8 @@
+import { AC_POWER } from "../data/rates";
 import { num, str, type ToolDefinition } from "../types";
 import { pkr } from "@/lib/format";
 
-const AC_TYPES: Record<string, { label: string; kw: number; dutyFactor: number }> = {
-  "1-inverter": { label: "1 ton inverter", kw: 1.0, dutyFactor: 0.6 },
-  "1.5-inverter": { label: "1.5 ton inverter", kw: 1.4, dutyFactor: 0.6 },
-  "2-inverter": { label: "2 ton inverter", kw: 1.9, dutyFactor: 0.6 },
-  "1-fixed": { label: "1 ton non-inverter", kw: 1.2, dutyFactor: 0.75 },
-  "1.5-fixed": { label: "1.5 ton non-inverter", kw: 1.8, dutyFactor: 0.75 },
-  "2-fixed": { label: "2 ton non-inverter", kw: 2.4, dutyFactor: 0.75 },
-};
+const AC_TYPES = AC_POWER.types;
 
 export const acRunningCostCalculator: ToolDefinition = {
   slug: "ac-running-cost-calculator",
@@ -18,8 +12,8 @@ export const acRunningCostCalculator: ToolDefinition = {
   description: "How many units an air conditioner adds to your bill and what it costs per month, for inverter and non-inverter 1, 1.5 and 2 ton units.",
   keywords: ["ac electricity cost", "ac units per hour", "1.5 ton ac bill", "inverter ac bill", "ac running cost pakistan", "how many units does ac use", "ac bill calculator"],
   version: "1.0.0",
-  lastReviewed: "2026-09-15",
-  sources: [{ title: "Typical rated power draw from manufacturer datasheets (Gree, Haier, Dawlance, Orient)", publisher: "Searchable" }],
+  lastReviewed: AC_POWER.reviewedAt,
+  sources: [AC_POWER.source],
   fields: [
     { key: "type", label: "AC type", type: "select", options: Object.entries(AC_TYPES).map(([value, t]) => ({ value, label: t.label })), default: "1.5-inverter" },
     { key: "hours", label: "Hours per day", type: "number", unit: "h", default: 8, min: 0, max: 24, step: 0.5 },

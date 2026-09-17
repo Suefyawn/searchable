@@ -1,4 +1,4 @@
-import { REFERENCE_RATES } from "../data/rates";
+import { FX_SPREADS, REFERENCE_RATES } from "../data/rates";
 import { num, str, type ToolDefinition } from "../types";
 import { number, pkr } from "@/lib/format";
 
@@ -6,9 +6,7 @@ import { number, pkr } from "@/lib/format";
 const FALLBACK: Record<string, number> = { usd: REFERENCE_RATES.usdPkr, eur: 330, gbp: 381, aed: 76.5, sar: 75 };
 const NAMES: Record<string, { name: string; symbol: string }> = { usd: { name: "US dollar", symbol: "$" }, eur: { name: "Euro", symbol: "€" }, gbp: { name: "British pound", symbol: "£" }, aed: { name: "UAE dirham", symbol: "AED" }, sar: { name: "Saudi riyal", symbol: "SAR" } };
 
-/** Typical spreads around interbank: banks buy remittances a touch below; open market sells cash above. */
-const BANK_BUY = -0.0025;
-const OPEN_MARKET_SELL = 0.008;
+const { bankBuy: BANK_BUY, openMarketSell: OPEN_MARKET_SELL } = FX_SPREADS;
 
 export const currencyConverter: ToolDefinition = {
   slug: "currency-converter",
@@ -19,7 +17,7 @@ export const currencyConverter: ToolDefinition = {
   description: "Convert dollars, dirhams, riyals, pounds and euros to Pakistani rupees at today's interbank rate, and see what a bank remittance or the open market would actually give you.",
   keywords: ["usd to pkr", "dollar to pkr", "dollar rate today", "aed to pkr", "dirham to pkr", "sar to pkr", "riyal to pkr", "gbp to pkr", "pound to pkr", "euro to pkr", "currency converter pakistan", "interbank rate today", "open market dollar rate", "remittance rate"],
   version: "1.0.0",
-  lastReviewed: "2026-09-15",
+  lastReviewed: REFERENCE_RATES.reviewedAt,
   featured: true,
   sources: [{ title: "State Bank of Pakistan: daily interbank closing rates", url: "https://www.sbp.org.pk/ecodata/rates/m2m/M2M-Current.asp", publisher: "State Bank of Pakistan" }, { title: "Exchange Companies Association of Pakistan: open market rates", publisher: "ECAP" }],
   fields: [

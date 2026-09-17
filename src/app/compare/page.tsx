@@ -2,7 +2,7 @@ import Link from "next/link";
 import { JsonLd, SectionHeader } from "@/components/ui";
 import { CARS, CARS_REVIEWED_AT } from "@/content/cars";
 import { INVERTERS, INVERTERS_REVIEWED_AT } from "@/content/inverters";
-import { formatDate, pkr } from "@/lib/format";
+import { formatDate, pkr, pkrCompact } from "@/lib/format";
 import { readLivingSet } from "@/lib/compare-data";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { HUB_COPY } from "@/lib/seo-copy";
@@ -13,7 +13,6 @@ export const metadata = buildMetadata({
   kicker: "Compare",
 });
 
-const lakh = (n: number) => (n >= 1e7 ? `Rs ${(n / 1e7).toFixed(1).replace(/\.0$/, "")} crore` : `Rs ${Math.round(n / 1e5)} lakh`);
 const carLow = Math.min(...CARS.map((c) => c.price[0]));
 const carHigh = Math.max(...CARS.map((c) => c.price[1]));
 const invLow = Math.min(...INVERTERS.map((i) => i.price[0]));
@@ -24,7 +23,7 @@ const PAGES = [
     href: "/compare/cars",
     title: "New cars",
     count: `${CARS.length} models`,
-    range: `${lakh(carLow)} to ${lakh(carHigh)}`,
+    range: `${pkrCompact(carLow)} to ${pkrCompact(carHigh)}`,
     facets: ["Body", "Fuel", "Budget"],
     specs: "Ex-factory price, engine, gearbox, city economy, airbags, seats",
     tools: "Car loan, token tax, fuel cost",
