@@ -52,7 +52,7 @@ async function PostsView({ status }: { status: "pending" | "published" }) {
           actions={
             <form action={moderatePost} className="flex flex-col items-end gap-1.5">
               <input type="hidden" name="id" value={p.id} />
-              {status === "pending" ? <input name="note" placeholder="Note to author (optional)" className="h-8 w-60 border border-line bg-surface px-2 text-[13px] outline-none focus:border-ink-500" /> : null}
+              {status === "pending" ? <input name="note" aria-label="Note to author" placeholder="Note to author (optional)" className="h-8 w-60 border border-line bg-surface px-2 text-[13px] outline-none focus:border-ink-500" /> : null}
               <div className="flex flex-wrap justify-end gap-1.5">
                 {status === "pending" ? (
                   <>

@@ -14,7 +14,10 @@ src/db/schema/
   data.ts        data_series · data_points
   newsletter.ts  newsletter_subscribers · newsletter_issues
   search.ts      search_documents · search_queries · search_synonyms
-  platform.ts    redirects · media · analytics_events · settings
+  platform.ts    redirects · media · analytics_events · settings · reports · messages · inbox_messages
+  professionals.ts  professionals · professional_leads · professional_reviews
+  community.ts   member_profiles · posts · bids · comments · reactions · saved_items
+  commerce.ts    orders · submissions
   relations.ts   Drizzle relations for the query API
 ```
 
@@ -63,11 +66,31 @@ src/db/schema/
 - `search_queries`, every search with `result_count` (zero-result queries = content backlog).
 - `search_synonyms`, term → synonyms (Phase 5 query expansion).
 
+## Professionals (ADR-26)
+- `professionals`, a person's profile: `profession_slug` (from `src/content/professions.ts`), city/area, headline, Markdown `bio`, services, experience, education, certifications, CV, socials, `status` (pending | active | hidden | rejected), `tier` (free | verified), `is_verified`, `owner_user_id`, rating aggregates. Unique `slug`.
+- `professional_leads`, enquiries from a profile page.
+- `professional_reviews`, with moderation `status` and owner reply.
+
+## Community (ADR-27)
+- `member_profiles`, one per user: `handle` (unique), display name, bio, avatar, socials, `is_verified`, `is_banned`, `post_count`.
+- `posts`, `kind` (job | listing | auction | question | discussion), Markdown `body`, `images[]`, kind-specific `meta{}` (pay, price, apply URL, end time…), `status` (pending | published | rejected | hidden | closed), `expires_at`, `highest_bid`. A member's edit to a live post goes back to pending.
+- `bids`, auction bids per post and user.
+- `comments`, on posts and articles (`target_type`, `target_id`), threaded by `parent_id`, moderated.
+- `reactions`, likes on posts, comments and articles; unique per user and target.
+- `saved_items`, bookmarks on articles, tools, data series, businesses, professionals and posts.
+
+## Commerce
+- `orders`, one row per invoice: `invoice_no` (SP-YYYY-NNNNNN, unique), `kind` (business_plan | sponsored_post | placement | professional_plan), `product_code` from `src/content/pricing.ts`, amount, `status` (pending | paid | active | expired | cancelled | refunded), `provider`, payment reference, payer details, `starts_at`/`ends_at`. Invoice pages are reached through a signed link (`orderPath()`), never by number alone.
+- `submissions`, pitches from `/write-for-us` (guest | sponsored | press_release) with `status`, links, the order they produced and the article they became.
+
 ## Platform
 - `redirects`, old path → new path (URL changes must add a row).
-- `media`, uploaded assets metadata.
-- `analytics_events`, first-party events (`page_view`, `search`, `tool_run`, `business_click`, `business_lead`, `newsletter_subscribe`).
-- `settings`, key/JSON site settings editable in admin.
+- `media`, uploaded assets metadata, with licence, credit and source for open-licence imports.
+- `analytics_events`, first-party events (`page_view`, `search`, `tool_run`, `business_click`, `business_lead`, `newsletter_subscribe`, `error`). Pruned after 90 days.
+- `settings`, key/JSON site settings editable in admin (brand kit, identity, front page, living comparisons, price lists, job locks).
+- `reports`, reader reports on businesses, reviews, articles, posts and comments, with a moderation `status`.
+- `messages`, contact-form messages (`status`: new | replied | archived).
+- `inbox_messages`, mail received through the Resend webhook, mirrored into `/admin/inbox` (ADR-28).
 
 ## Conventions
 - Never hand-edit files in `drizzle/`; generate them.

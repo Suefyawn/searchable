@@ -1,4 +1,4 @@
-# Gap audit: plan vs. built (updated 2026-09-15, evening)
+# Gap audit: plan vs. built (updated 2026-09-17)
 
 Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day plan + `docs/ROADMAP-1000-DAYS.md`. Money: see `docs/MONETIZATION.md`.
 
@@ -11,6 +11,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | CI | ✅ | GitHub Actions: typecheck, lint, build |
 | Env management | ✅ | `.env.example`; ads/Openverse/billing keys documented |
 | Error monitoring | ✅ | No vendor: `src/instrumentation.ts` records every uncaught server error as an `error` event, the error page reports browser crashes through the beacon, `/admin/system` groups the last 24 hours (docs/FREE-TIER.md) |
+| Hardening (audit of 2026-09-17, ADR-39) | ✅ | Member markdown escaped, script links refused, search snippets escaped, invoice links signed, security headers on every response, cron secret required in production, URL fields validated. Still in memory: the rate limiter (per instance) |
 
 ## Database
 | Entity | Status | Note |
@@ -27,7 +28,8 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 | search_documents, synonyms, queries | ✅ | |
 | redirects, reports, messages, settings, analytics_events | ✅ | |
 | **orders, submissions** | ✅ | Plans, invoices, guest/sponsored pitches (`src/db/schema/commerce.ts`) |
-| events, jobs, deals | ❌ | Phase 7 |
+| jobs | ✅ | Community posts with `kind=job` (JobPosting JSON-LD), plus the admin API for the task |
+| events, deals | ❌ | Phase 7 |
 
 ## Content engine (CMS)
 | Feature | Status |
@@ -72,7 +74,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 |---|---|
 | Capture, topics, frequency, double opt-in, unsubscribe, manage page | ✅ |
 | Issue builder (numbers, stories, guide, tool of the day, trending), preview, test, send, schedule, cron | ✅ |
-| Resend delivery + open/click tracking | 🟡 adapter ready; Resend at go-live |
+| Resend delivery + open/click tracking | ✅ live since go-live (2026-09-15); receiving feeds the admin inbox (ADR-28) |
 | Sponsor slot | 🟡 markdown block; no product/booking yet |
 
 ## Data · Compare · Trust

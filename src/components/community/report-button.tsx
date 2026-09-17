@@ -23,14 +23,14 @@ export function ReportButton({ targetType, targetId }: { targetType: "post" | "m
           }}
           className="flex flex-wrap items-center gap-2"
         >
-          <select name="reason" className="h-8 border border-line bg-surface px-2 text-[13px]">
+          <select name="reason" aria-label="Reason" className="h-8 border border-line bg-surface px-2 text-[13px]">
             <option value="scam">Scam or fraud</option>
             <option value="spam">Spam</option>
             <option value="abuse">Abuse</option>
             <option value="wrong">Wrong or misleading</option>
             <option value="other">Other</option>
           </select>
-          <input name="details" placeholder="Details (optional)" maxLength={600} className="h-8 w-48 border border-line bg-surface px-2 text-[13px]" />
+          <input name="details" aria-label="Details" placeholder="Details (optional)" maxLength={600} className="h-8 w-48 border border-line bg-surface px-2 text-[13px]" />
           <Button type="submit" size="sm" variant="outline">
             Send
           </Button>

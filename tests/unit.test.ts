@@ -104,8 +104,9 @@ test("income tax: exempt below the threshold, positive above it", () => {
 });
 
 test("no em dashes in site copy, tools, content or docs", () => {
-  const roots = ["src/content", "src/tools", "src/app", "src/components", "docs"];
+  const roots = ["src", "scripts", "docs"];
   const offenders: string[] = [];
+  for (const f of ["README.md", "CLAUDE.md", "SEARCHABLE_MASTER_SPEC.md"]) if (readFileSync(f, "utf8").includes("—")) offenders.push(f);
   const walk = (dir: string) => {
     for (const name of readdirSync(dir)) {
       const p = path.join(dir, name);

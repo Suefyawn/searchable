@@ -37,7 +37,7 @@ export default async function AdminClaims({ searchParams }: { searchParams: Prom
               c.status === "pending" ? (
                 <form action={decideClaim} className="flex flex-col items-end gap-1.5">
                   <input type="hidden" name="id" value={c.id} />
-                  <input name="note" placeholder="Note to claimant (optional)" className="h-8 w-64 border border-line bg-surface px-2 text-[13px] outline-none focus:border-ink-500" />
+                  <input name="note" aria-label="Note to claimant" placeholder="Note to claimant (optional)" className="h-8 w-64 border border-line bg-surface px-2 text-[13px] outline-none focus:border-ink-500" />
                   <div className="flex gap-1.5">
                     <Button size="sm" type="submit" name="decision" value="approve">
                       {c.method === "phone" ? "Code received, approve" : "Approve"}

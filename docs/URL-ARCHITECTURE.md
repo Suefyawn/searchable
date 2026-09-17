@@ -14,12 +14,15 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 ```
 /                                        Home = search + latest + tools + cities
 /search?q=                               Federated search (dynamic, noindex)
-/suggest?q=                              (API) autocomplete
+/api/suggest?q=                          (API) autocomplete
 
 /news                                    News hub
 /news/[category]                         pakistan · politics · business · economy · technology · ai · science
                                          sports · education · health · auto · property · lifestyle · world
 /news/[category]/[slug]                  Article
+/news/page/[n]  /news/[category]/page/[n]   Older pages (same for /guides)
+/tags/[slug]                             Articles carrying a tag (noindex)
+/authors/[slug]                          Author page (Person JSON-LD)
 
 /guides                                  Guides hub
 /guides/[category]                       taxes · banking · cars · property · government · utilities
@@ -60,8 +63,11 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 
 /e/[entity]                              Entity hub (FBR, NADRA, Toyota, USD, Lahore…)
 
-/data                                    Data hub (Phase 6)
+/data                                    Data hub
 /data/[series]                           e.g. /data/petrol-price · /data/usd-pkr · /data/gold-rate
+/data/solar-panel-price                  Solar panel per-watt page (its own layout)
+/electricity  /electricity/[disco]       Bill check by DISCO; /electricity/net-metering
+/pta                                     PTA mobile tax hub
 
 /today                                   Daily hub: prices, weather, prayer times, Islamic date
 /weather  /weather/[city]                MET Norway forecast per city (cities with coordinates), ISR 30 min
@@ -76,8 +82,10 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /prices/[category]                       mobiles · bikes · cars (noindex under 10 models)
 /prices/[category]/[slug]                A brand (vivo, honda) or a model (vivo-y29, honda-cd-70)
 
-/compare                                 (Phase 6)
-/compare/[slug]                          e.g. /compare/toyota-corolla-vs-honda-civic
+/compare                                 Compare hub
+/compare/cars  /compare/solar-inverters  Versioned content files (src/content)
+/compare/air-conditioners  /credit-cards  /mobile-packages  /national-savings
+                                         Living comparisons kept by the task (noindex under five items)
 
 /events /events/[city] /events/[slug]    (later)
 /deals  /deals/[city]  /deals/[slug]     (later)
@@ -85,8 +93,11 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /newsletter                              Subscribe + preferences
 /newsletter/confirm?token=               Double opt-in
 /newsletter/unsubscribe?token=
+/newsletter/manage?token=                Topics and frequency
 
-/about  /contact  /editorial-policy  /privacy  /terms  /advertise  /add-business
+/about  /contact  /editorial-policy  /privacy  /terms  /advertise  /add-business  /write-for-us  /brand
+/login                                   Sign in (?next=)
+/orders/[invoiceNo]?k=                   Invoice: signed link from the email, the buying account or an admin (noindex)
 
 /account                                 User home; /account/profile, /account/posts, /account/saved,
                                          /account/notifications
@@ -100,21 +111,28 @@ Locked from Day 1. Changing a public URL later requires a row in `redirects`.
 /api/community/liked  /api/community/saved   Signed-in reader state (private, no-store)
 /api/md/[...path]  /llms.txt  /llms-full.txt  Markdown and LLM renditions
 /api/newsletter/subscribe                POST
+/api/feed                                Live feed JSON for the home hero (ISR 5 min)
+/api/track                               POST, first-party analytics beacon
+/api/upload                              POST, images and PDFs (signed in)
 /api/tools/[slug]                        GET input schema · POST { inputs } runs the calculator (no key); /run logs a browser run
 /api/health                              Liveness
 /openapi.json                            OpenAPI 3.1 for the public read API
 /mcp                                     MCP server (Streamable HTTP, JSON-RPC, read-only tools)
 /.well-known/api-catalog                 RFC 9727 linkset · /.well-known/mcp/server-card.json · /.well-known/agent-skills/index.json
 /skills/searchable-pk/SKILL.md           The skill agents fetch through the index
-/api/cron/*                              scheduled jobs (Phase 6)
+/api/cron/ingest  /api/cron/publish      Vercel crons (Bearer CRON_SECRET; open locally, closed in production without it)
+/a2a  /auth.md  /.well-known/agent-card.json  /.well-known/ai-catalog.json   A2A agent, its card and the AI catalog
+/og                                      Social card renderer (cached a year)
+/ads.txt  /indexnow-key.txt  /manifest.webmanifest
 /api/webhooks/resend                     POST, signed; email.received feeds the admin inbox
 /api/admin/*                             Bearer ADMIN_API_KEY; context, reference, ideas, articles, data,
                                          businesses, backlog, queue, inbox, newsletter, media, jobs, report,
                                          compare, front, today, prices, match (docs/ADMIN-API.md)
 
-/sitemap.xml                             index → /sitemap/[type].xml
-/robots.txt
-/feed.xml                                RSS (news)
+/sitemap.xml                             One sitemap (src/app/sitemap.ts, hourly); category × city pages with five or more listings included
+/news-sitemap.xml                        Google News sitemap (last 48 hours)
+/robots.txt                              Route, with Content Signals (ADR-37)
+/feed.xml                                RSS (news and guides)
 ```
 
 ## Slug policy

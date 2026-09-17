@@ -91,7 +91,7 @@
   --ring: var(--border);
   --text: var(--color-ink-900);
   --text-2: var(--color-ink-600);
-  --text-3: var(--color-ink-500);
+  --text-3: var(--color-ink-550);
   --link: var(--color-brand-700);
   --glass: #ffffff;
   color-scheme: light;
@@ -117,6 +117,7 @@
   --color-ink-300: color-mix(in srgb, var(--brand-slate) 22%, white);
   --color-ink-400: color-mix(in srgb, var(--brand-slate) 40%, white);
   --color-ink-500: color-mix(in srgb, var(--brand-slate) 62%, white);
+  --color-ink-550: color-mix(in srgb, var(--brand-slate) 75%, white);
   --color-ink-600: color-mix(in srgb, var(--brand-slate) 82%, white);
   --color-ink-700: color-mix(in srgb, var(--brand-slate) 92%, white);
   --color-ink-800: var(--brand-slate);
@@ -125,7 +126,7 @@
   --rule: var(--brand-ink);
   --text: var(--color-ink-900);
   --text-2: var(--color-ink-600);
-  --text-3: var(--color-ink-500);
+  --text-3: var(--color-ink-550);
   --link: var(--color-brand-700);
   color: var(--text);
 }

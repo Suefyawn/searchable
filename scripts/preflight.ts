@@ -1,6 +1,8 @@
 import "dotenv/config";
+import { readFileSync } from "node:fs";
 import { sql } from "drizzle-orm";
 import { getDb, isPglite, rawQuery } from "../src/db";
+import { TOOLS } from "../src/tools/registry";
 
 /**
  * Go-live preflight: reads the environment the way the app does and says what is missing before a deploy.
@@ -38,8 +40,12 @@ async function main() {
       const db = await getDb();
       await rawQuery(db, sql`select 1`);
       checks.push({ name: "Database reachable", ok: true, required: true });
+      const expected = (JSON.parse(readFileSync("drizzle/meta/_journal.json", "utf8")).entries as unknown[]).length;
       const [m] = await rawQuery<{ n: number }>(db, sql`select count(*)::int as n from drizzle.__drizzle_migrations`).catch(() => [{ n: -1 }]);
-      checks.push({ name: "Migrations applied", ok: m?.n >= 13, note: m?.n >= 0 ? `${m.n} applied` : "migrations table missing: run npm run db:migrate", required: true });
+      checks.push({ name: `Migrations applied (${expected} in drizzle/)`, ok: m?.n >= expected, note: m?.n >= 0 ? `${m.n} applied` : "migrations table missing: run npm run db:migrate", required: true });
+      const toolRows = await rawQuery<{ slug: string }>(db, sql`select slug from tools`).catch(() => []);
+      const missingTools = TOOLS.filter((t) => !toolRows.some((r) => r.slug === t.slug)).map((t) => t.slug);
+      checks.push({ name: "tools table matches the registry", ok: missingTools.length === 0, note: missingTools.length ? `missing: ${missingTools.join(", ")}; run npm run db:seed` : `${TOOLS.length} tools` });
       const [ext] = await rawQuery<{ n: number }>(db, sql`select count(*)::int as n from pg_extension where extname = 'pg_trgm'`).catch(() => [{ n: 0 }]);
       checks.push({ name: "pg_trgm extension enabled", ok: (ext?.n ?? 0) > 0, note: "Supabase: Database > Extensions > pg_trgm", required: true });
       const [docs] = await rawQuery<{ n: number }>(db, sql`select count(*)::int as n from search_documents`).catch(() => [{ n: 0 }]);

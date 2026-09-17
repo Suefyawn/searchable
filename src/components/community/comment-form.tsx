@@ -116,14 +116,14 @@ export function CommentActions({ commentId, authorId, targetType, targetId, path
           }}
           className="mt-2 flex flex-wrap items-center gap-2"
         >
-          <select name="reason" className="h-8 border border-line bg-surface px-2 text-[13px]">
+          <select name="reason" aria-label="Reason" className="h-8 border border-line bg-surface px-2 text-[13px]">
             <option value="spam">Spam</option>
             <option value="scam">Scam or fraud</option>
             <option value="abuse">Abuse or harassment</option>
             <option value="wrong">Wrong or misleading</option>
             <option value="other">Other</option>
           </select>
-          <input name="details" placeholder="Anything to add (optional)" maxLength={600} className="h-8 w-56 border border-line bg-surface px-2 text-[13px]" />
+          <input name="details" aria-label="Details" placeholder="Anything to add (optional)" maxLength={600} className="h-8 w-56 border border-line bg-surface px-2 text-[13px]" />
           <Button type="submit" size="sm" variant="outline">
             Send
           </Button>
