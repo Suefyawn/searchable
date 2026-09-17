@@ -48,7 +48,7 @@ Legend: ✅ built · 🟡 partial · ❌ missing. "Plan" = the original 1000-day
 |---|---|
 | Section, category, article routes with pagination, RSS | ✅ |
 | Tools framework: fields, compute, methodology, sources, versions, JSON-LD, share URLs, live defaults from data | ✅ |
-| Tools built | 🟡 31 of 50; stamp duty calculator added 2026-09-16 on the Punjab Gazette ordinance |
+| Tools built | 🟡 39 of 50; 2026-09-18 added passport fee (DGIP charts), vehicle transfer fee (Punjab Excise), CGPA (new education category), gold converter, solar panel count, electricity units, battery backup, fuel average, all picked by Semrush pk volume and KD |
 | Embeddable widgets (`?embed=1` mode + copyable iframe snippet with attribution link) | ✅ |
 | Hubs: `/pta`, `/electricity` + 11 DISCOs, `/electricity/net-metering`, `/data/solar-panel-price`, `/compare/solar-inverters` | ✅ |
 

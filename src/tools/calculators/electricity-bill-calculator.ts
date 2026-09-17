@@ -1,26 +1,6 @@
-import { ELECTRICITY, type TariffSlab } from "../data/rates";
+import { ELECTRICITY, energyCharge } from "../data/rates";
 import { bool, num, str, type ToolDefinition } from "../types";
 import { pkr } from "@/lib/format";
-
-function energyCharge(units: number, slabs: TariffSlab[]) {
-  // Units up to 200 are billed telescopically (each slab for its own range). Above 200 units
-  // the slab benefit is withdrawn: the entire consumption is billed at the rate of the slab reached.
-  const lines: { label: string; units: number; rate: number; amount: number }[] = [];
-  if (units <= 200) {
-    let remaining = units;
-    for (const s of slabs) {
-      if (remaining <= 0) break;
-      const width = (s.to ?? Infinity) - s.from + 1;
-      const take = Math.min(remaining, width);
-      lines.push({ label: `${s.from}–${s.to ?? "∞"} units`, units: take, rate: s.rate, amount: take * s.rate });
-      remaining -= take;
-    }
-  } else {
-    const slab = slabs.find((s) => s.to === null || units <= s.to) ?? slabs[slabs.length - 1];
-    lines.push({ label: `All ${units} units @ ${slab.from}–${slab.to ?? "∞"} slab`, units, rate: slab.rate, amount: units * slab.rate });
-  }
-  return { lines, total: lines.reduce((a, l) => a + l.amount, 0) };
-}
 
 export const electricityBillCalculator: ToolDefinition = {
   slug: "electricity-bill-calculator",

@@ -9,6 +9,9 @@ export type LiveDefault = { key: string; value: number; label: string; seriesSlu
  */
 const MAP: Record<string, { key: string; series: string; label: string; transform?: (v: number) => number }[]> = {
   "fuel-cost-calculator": [{ key: "price", series: "petrol-price", label: "Petrol price" }],
+  "fuel-average-calculator": [{ key: "price", series: "petrol-price", label: "Petrol price" }],
+  "gold-converter": [{ key: "price", series: "gold-24k-tola", label: "Gold 24K per tola" }],
+  "solar-panel-calculator": [{ key: "perWatt", series: "solar-panel-per-watt", label: "Panel price per watt" }],
   "pta-mobile-tax-calculator": [{ key: "usdPkr", series: "usd-pkr", label: "USD/PKR interbank" }],
   "zakat-calculator": [
     { key: "goldPrice", series: "gold-24k-tola", label: "Gold 24k per gram", transform: (v) => Math.round(v / 11.664) },

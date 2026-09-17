@@ -1,5 +1,13 @@
 import { acRunningCostCalculator } from "./calculators/ac-running-cost-calculator";
 import { ageCalculator } from "./calculators/age-calculator";
+import { batteryBackupCalculator } from "./calculators/battery-backup-calculator";
+import { cgpaCalculator } from "./calculators/cgpa-calculator";
+import { electricityUnitsCalculator } from "./calculators/electricity-units-calculator";
+import { fuelAverageCalculator } from "./calculators/fuel-average-calculator";
+import { goldConverter } from "./calculators/gold-converter";
+import { passportFeeCalculator } from "./calculators/passport-fee-calculator";
+import { solarPanelCalculator } from "./calculators/solar-panel-calculator";
+import { vehicleTransferFeeCalculator } from "./calculators/vehicle-transfer-fee-calculator";
 import { capitalGainsTaxCalculator } from "./calculators/capital-gains-tax-calculator";
 import { carLoanCalculator } from "./calculators/car-loan-calculator";
 import { carRegistrationTaxCalculator } from "./calculators/car-registration-tax-calculator";
@@ -64,6 +72,14 @@ export const TOOLS: ToolDefinition[] = [
   gasBillCalculator,
   nationalSavingsCalculator,
   providentFundCalculator,
+  passportFeeCalculator,
+  cgpaCalculator,
+  goldConverter,
+  solarPanelCalculator,
+  electricityUnitsCalculator,
+  batteryBackupCalculator,
+  fuelAverageCalculator,
+  vehicleTransferFeeCalculator,
 ];
 
 const bySlug = new Map(TOOLS.map((t) => [t.slug, t]));

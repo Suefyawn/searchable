@@ -87,8 +87,10 @@ After ~4s on the page, one anonymous `tool_runs` row is written with the current
 ## First 50 tools (Phase 3 backlog)
 **Tax (10):** income tax ✅ · salary take-home ✅ · withholding on property purchase · withholding on vehicle registration · capital gains on property · rental income tax · advance tax on cash withdrawal · sales tax on services (provincial) · filer vs non-filer comparison · tax refund estimator
 **Finance (10):** zakat ✅ · car loan ✅ · home loan (KIBOR) · personal loan · savings/PLS returns · Naya Pakistan Certificate returns · remittance cost comparison · inflation adjuster · FD vs savings · credit card cost
-**Cars (10):** fuel cost · token tax by province · registration cost · import duty on used car · resale value · EMI compare (bank vs dealer) · CNG vs petrol · km per litre · insurance premium · transfer fee
+**Cars (10):** fuel cost ✅ · token tax by province ✅ · registration cost ✅ · import duty on used car (parked: rates unverifiable) · resale value · EMI compare (bank vs dealer) · CNG vs petrol · km per litre ✅ · insurance premium · transfer fee ✅ (Punjab)
 **Property (5):** stamp duty & CVT · rental yield · plot size converter (marla/kanal/sqft) · construction cost · property tax
-**Utilities (5):** electricity ✅ · gas bill (slab) · water charges · UPS/battery sizing · AC running cost
-**Government (5):** passport fee & timeline · CNIC fee · driving licence fee · NADRA FRC · birth certificate
-**Solar (5):** payback ✅ · system sizing by appliances · net-metering savings · battery backup hours · panel count for roof area
+**Utilities (5):** electricity ✅ · gas bill (slab) ✅ · water charges · UPS/battery sizing ✅ · AC running cost ✅ · electricity units by appliance ✅
+**Government (5):** passport fee & timeline ✅ · CNIC fee · driving licence fee · NADRA FRC · birth certificate (NADRA fees wait for the official schedule; nadra.gov.pk blocks fetches)
+**Solar (5):** payback ✅ · system sizing ✅ (panel count, inverter, roof area) · net-metering savings · battery backup hours ✅ · panel count for roof area ✅
+**Finance, added:** gold converter (tola, gram, masha, ratti, value by karat at the live rate) ✅
+**Education (new category):** CGPA / GPA on the HEC 4.0 scale ✅

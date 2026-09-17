@@ -3,7 +3,7 @@
  * The generic page at /tools/[category]/[slug] renders any ToolDefinition.
  */
 
-export type ToolCategory = "tax" | "finance" | "cars" | "property" | "utilities" | "government" | "solar" | "telecom";
+export type ToolCategory = "tax" | "finance" | "cars" | "property" | "utilities" | "government" | "solar" | "telecom" | "education";
 
 export const TOOL_CATEGORIES: Record<ToolCategory, { name: string; description: string }> = {
   tax: { name: "Tax", description: "Income tax, PTA tax, withholding, filer vs non-filer" },
@@ -14,6 +14,7 @@ export const TOOL_CATEGORIES: Record<ToolCategory, { name: string; description: 
   government: { name: "Government", description: "Fees, timelines, eligibility" },
   solar: { name: "Solar", description: "System sizing, payback, net metering" },
   telecom: { name: "Telecom", description: "Packages, PTA, mobile tax" },
+  education: { name: "Education", description: "GPA and CGPA, results, admissions" },
 };
 
 export type FieldOption = { value: string; label: string };

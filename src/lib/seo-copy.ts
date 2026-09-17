@@ -58,6 +58,7 @@ export const TOOL_CATEGORY_COPY: Record<string, SeoCopy> = {
   government: { title: "Government Fee Calculators Pakistan: Passport, NADRA, Licences", description: "Calculators for government fees in Pakistan: passport fees by validity and pages, NADRA charges, licence fees and processing timelines." },
   solar: { title: "Solar Calculators Pakistan: System Size, Payback, Net Metering", description: "Solar calculators for Pakistan: the system size your bill needs, panel and inverter cost, payback period and net-metering credit under the current rules." },
   telecom: { title: "Telecom Calculators Pakistan: PTA Tax, Packages, Mobile Cost", description: "Telecom calculators for Pakistan: PTA tax on any phone by value and passport or CNIC, mobile package cost per GB and per minute." },
+  education: { title: "Education Calculators Pakistan: CGPA, GPA, Percentage", description: "Calculators for students in Pakistan: semester GPA and cumulative CGPA on the HEC 4.0 scale, with what you need next semester to reach your target." },
 };
 
 export const HUB_COPY = {

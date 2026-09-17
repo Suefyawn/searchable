@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import { indexTools } from "@/lib/indexers";
 import { runIngestion } from "@/lib/ingest";
 import { cronAuthorized, pruneOldRows, runDueJobs } from "@/lib/jobs";
 
@@ -10,6 +11,9 @@ export const maxDuration = 60;
 export async function GET(req: Request) {
   if (!cronAuthorized(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const result = await runIngestion();
+  // Calculators live in code; the daily cron mirrors the registry into the tools table and search so a deploy
+  // that adds one needs no manual reindex.
+  await indexTools();
   const pruned = await pruneOldRows();
   const jobs = await runDueJobs({ force: true });
   const written = result.results.filter((r) => r.status === "written");

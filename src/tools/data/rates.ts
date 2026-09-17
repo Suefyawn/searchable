@@ -85,6 +85,28 @@ export const ZAKAT = {
 // ── Residential electricity tariff (NEPRA uniform tariff, DISCOs e.g. LESCO/IESCO/K-Electric) ──
 export type TariffSlab = { from: number; to: number | null; rate: number };
 
+/**
+ * Energy charge for a month's units. Up to 200 units are billed telescopically (each slab for its own range);
+ * above 200 the slab benefit is withdrawn and the whole consumption is billed at the rate of the slab reached.
+ */
+export function energyCharge(units: number, slabs: TariffSlab[]) {
+  const lines: { label: string; units: number; rate: number; amount: number }[] = [];
+  if (units <= 200) {
+    let remaining = units;
+    for (const s of slabs) {
+      if (remaining <= 0) break;
+      const width = (s.to ?? Infinity) - s.from + 1;
+      const take = Math.min(remaining, width);
+      lines.push({ label: `${s.from}–${s.to ?? "∞"} units`, units: take, rate: s.rate, amount: take * s.rate });
+      remaining -= take;
+    }
+  } else {
+    const slab = slabs.find((s) => s.to === null || units <= s.to) ?? slabs[slabs.length - 1];
+    lines.push({ label: `All ${units} units @ ${slab.from}–${slab.to ?? "∞"} slab`, units, rate: slab.rate, amount: units * slab.rate });
+  }
+  return { lines, total: lines.reduce((a, l) => a + l.amount, 0) };
+}
+
 export const ELECTRICITY = {
   reviewedAt: "2026-09-15",
   source: { title: "NEPRA: Schedule of Electricity Tariffs for residential consumers", url: "https://nepra.org.pk/", publisher: "NEPRA" },
