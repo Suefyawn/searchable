@@ -39,6 +39,7 @@ export async function SectionHub({ kind, page = 1 }: { kind: "news" | "guide"; p
   const rest = page === 1 ? items.filter((a) => a.id !== lead?.id) : items;
   return (
     <div className="container-x py-8 sm:py-12">
+      <JsonLd data={breadcrumbJsonLd([{ name: m.name, path: `/${m.section}` }])} />
       <SectionHeader as="h1" title={m.name} description={m.description} />
       <CategoryNav section={m.section} categories={categories} />
       {/* The lead with its photo; beside it the next four as compact rows with thumbnails, so the two columns

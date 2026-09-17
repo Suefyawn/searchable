@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { ToolCard } from "@/components/cards";
 import { DiscoFinder } from "@/components/disco-finder";
-import { SectionHeader } from "@/components/ui";
+import { JsonLd, SectionHeader } from "@/components/ui";
 import { DISCOS } from "@/content/discos";
-import { buildMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { HUB_COPY } from "@/lib/seo-copy";
 import { getTool } from "@/tools/registry";
 
@@ -17,6 +17,7 @@ export const metadata = buildMetadata({
 export default function ElectricityHub() {
   return (
     <div className="container-x py-8 sm:py-12">
+      <JsonLd data={breadcrumbJsonLd([{ name: "Electricity", path: "/electricity" }])} />
       <SectionHeader as="h1" eyebrow="Electricity" title="Electricity bill check online" description="Pick your distribution company to check a bill by reference number, see the per-unit tariff and use the bill calculator." />
       <div className="mb-8">
         <DiscoFinder discos={DISCOS.map(({ slug, short, name, region, cities, billUrl, billUrlLabel }) => ({ slug, short, name, region, cities, billUrl, billUrlLabel }))} />

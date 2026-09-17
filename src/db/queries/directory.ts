@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDb, schema } from "@/db";
@@ -10,7 +11,7 @@ export async function listBusinessCategories(opts: { topLevelOnly?: boolean } = 
   });
 }
 
-export async function getBusinessCategory(slug: string) {
+async function getBusinessCategoryRaw(slug: string) {
   const db = await getDb();
   return db.query.businessCategories.findFirst({ where: eq(schema.businessCategories.slug, slug), with: { children: true, parent: true } });
 }
@@ -151,7 +152,7 @@ export async function countBusinesses(opts: { categoryId?: string; cityId?: stri
   return row?.n ?? 0;
 }
 
-export async function getBusiness(slug: string) {
+async function getBusinessRaw(slug: string) {
   const db = await getDb();
   return db.query.businesses.findFirst({
     where: eq(schema.businesses.slug, slug),
@@ -172,3 +173,6 @@ export async function incrementBusinessViews(id: string) {
   const db = await getDb();
   await db.update(schema.businesses).set({ viewCount: sql`${schema.businesses.viewCount} + 1` }).where(eq(schema.businesses.id, id));
 }
+/** Memoised per request: generateMetadata and the page body ask for the same rows. */
+export const getBusinessCategory = cache(getBusinessCategoryRaw);
+export const getBusiness = cache(getBusinessRaw);

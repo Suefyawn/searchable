@@ -10,5 +10,5 @@ export async function GET(req: Request) {
   const type = url.searchParams.get("type");
   const limit = Math.min(50, Math.max(1, Number(url.searchParams.get("limit")) || 20));
   const result = await search(q, { types: type && type in TYPE_LABEL ? [type as SearchEntityType] : undefined, limit });
-  return NextResponse.json(result);
+  return NextResponse.json(result, { headers: { "cache-control": "public, s-maxage=120, stale-while-revalidate=600" } });
 }

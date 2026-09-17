@@ -15,6 +15,7 @@ import { breadcrumbJsonLd, buildMetadata, faqJsonLd, toolJsonLd } from "@/lib/se
 import { TOOLS, getTool, toolUrl } from "@/tools/registry";
 import { TOOL_CATEGORIES } from "@/tools/types";
 import { liveDefaults } from "@/tools/live-defaults";
+import { defaultInput } from "@/tools/types";
 
 type Props = { params: Promise<{ category: string; slug: string }> };
 
@@ -62,7 +63,7 @@ export default async function ToolPage({ params }: Props) {
 
       <div className="mt-8">
         <Suspense fallback={<div className="surface p-6 text-2">Loading calculator…</div>}>
-          <ToolRunner slug={tool.slug} live={live.input} />
+          <ToolRunner slug={tool.slug} fields={tool.fields} live={live.input} initial={tool.compute({ ...defaultInput(tool.fields), ...live.input })} />
         </Suspense>
         <Suspense fallback={null}>
           <EmbedMode toolName={tool.name} toolPath={toolUrl(tool)} />

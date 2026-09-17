@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { and, desc, eq, inArray, ne, sql } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 
@@ -107,7 +108,7 @@ export async function countArticles(kind?: ArticleKind, categorySlug?: string) {
   return row?.n ?? 0;
 }
 
-export async function getArticle(kind: ArticleKind, slug: string, opts: { includeDrafts?: boolean } = {}) {
+async function getArticleRaw(kind: ArticleKind, slug: string, opts: { includeDrafts?: boolean } = {}) {
   const db = await getDb();
   const conds = [eq(schema.articles.kind, kind), eq(schema.articles.slug, slug)];
   if (!opts.includeDrafts) conds.push(eq(schema.articles.status, "published"));
@@ -199,3 +200,5 @@ export async function listArticlesByAuthor(authorSlug: string, limit = 30) {
     .limit(limit);
   return { author, items: rows.map(shape) };
 }
+/** Memoised per request: generateMetadata and the page body ask for the same article. */
+export const getArticle = cache(getArticleRaw);

@@ -1,7 +1,7 @@
 "use server";
 
 import { and, eq, inArray, ne } from "drizzle-orm";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
@@ -170,7 +170,6 @@ export async function saveArticle(raw: ArticleFormInput): Promise<{ ok: boolean;
   // pattern-wide revalidatePath("/news/[category]/[slug]") would re-render every story on the next crawl.
   const cat = d.categoryId ? await db.query.categories.findFirst({ where: eq(schema.categories.id, d.categoryId), columns: { slug: true } }) : null;
   const catSlug = cat?.slug ?? "general";
-  revalidateTag("articles", "max");
   revalidatePath("/");
   revalidatePath(`/${section}`);
   revalidatePath(`/${section}/${catSlug}`);

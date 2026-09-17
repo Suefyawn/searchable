@@ -3,6 +3,8 @@ import { readSiteSettings } from "@/lib/site-settings";
 import { ContactForm } from "./contact-form";
 
 export const metadata = buildMetadata({ title: "Contact", description: "Report an error, suggest a guide or tool, or ask about a listing.", path: "/contact" });
+// Reads the contact address from site settings, so it follows /admin/settings within the hour instead of the next deploy.
+export const revalidate = 3600;
 
 export default async function ContactPage({ searchParams }: { searchParams: Promise<{ about?: string }> }) {
   const [{ about }, site] = await Promise.all([searchParams, readSiteSettings()]);

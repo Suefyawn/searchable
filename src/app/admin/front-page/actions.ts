@@ -9,9 +9,12 @@ import { readFrontPage, writeFrontPage, type FrontPageT } from "@/lib/front-page
 
 type Result = { ok: boolean; error?: string; front?: FrontPageT };
 
-/** The homepage, the news front and the layout (breaking bar) all read the front-page settings. */
-function revalidateFront() {
-  revalidatePath("/", "layout");
+/**
+ * The homepage and the news front read the lead and pins; only the breaking bar sits in every page's header,
+ * so only that change pays for a site-wide purge (ISR writes are the metered line, docs/FREE-TIER.md).
+ */
+function revalidateFront(opts: { layout?: boolean } = {}) {
+  if (opts.layout) revalidatePath("/", "layout");
   revalidatePath("/");
   revalidatePath("/news");
   revalidatePath("/admin/front-page");
@@ -48,14 +51,14 @@ export async function setBreaking(raw: { text: string; href?: string; hours?: nu
   await requireRole("editor");
   if (!raw) {
     const front = await writeFrontPage({ breaking: null });
-    revalidateFront();
+    revalidateFront({ layout: true });
     return { ok: true, front };
   }
   const parsed = z.object({ text: z.string().trim().min(3).max(160), href: z.string().trim().max(300).optional(), hours: z.number().min(0.5).max(72).default(6) }).safeParse(raw);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Check the text" };
   const d = parsed.data;
   const front = await writeFrontPage({ breaking: { text: d.text, href: d.href || "", until: new Date(Date.now() + d.hours * 3_600_000).toISOString() } });
-  revalidateFront();
+  revalidateFront({ layout: true });
   return { ok: true, front };
 }
 

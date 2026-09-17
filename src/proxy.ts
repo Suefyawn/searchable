@@ -8,7 +8,12 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 export function proxy(req: NextRequest) {
   const accept = req.headers.get("accept") ?? "";
-  if (!/text\/markdown/i.test(accept) || /text\/html/i.test(accept.split(",")[0] ?? "")) return NextResponse.next();
+  if (!/text\/markdown/i.test(accept) || /text\/html/i.test(accept.split(",")[0] ?? "")) {
+    // Both renditions live at one URL, so any shared cache in front must key on Accept for the HTML too.
+    const pass = NextResponse.next();
+    pass.headers.set("vary", "Accept");
+    return pass;
+  }
   const url = req.nextUrl.clone();
   url.pathname = url.pathname === "/" ? "/api/md/home" : `/api/md${url.pathname}`;
   const res = NextResponse.rewrite(url);

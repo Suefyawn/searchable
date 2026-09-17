@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ToolCard, toolExample } from "@/components/cards";
-import { SectionHeader } from "@/components/ui";
-import { buildMetadata } from "@/lib/seo";
+import { JsonLd, SectionHeader } from "@/components/ui";
+import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { HUB_COPY } from "@/lib/seo-copy";
 import { TOOLS } from "@/tools/registry";
 import { TOOL_CATEGORIES, type ToolCategory } from "@/tools/types";
@@ -15,6 +15,7 @@ export default function ToolsPage() {
   const cats = (Object.keys(TOOL_CATEGORIES) as ToolCategory[]).filter((c) => TOOLS.some((t) => t.category === c));
   return (
     <div className="container-x py-8 sm:py-12">
+      <JsonLd data={breadcrumbJsonLd([{ name: "Tools", path: "/tools" }])} />
       <SectionHeader as="h1" title="Calculators & tools" description="Every number shows its source and the date it was last reviewed. Calculations run in your browser: nothing you enter is stored." />
       <nav className="flex flex-wrap gap-2" aria-label="Tool categories">
         {cats.map((c) => (

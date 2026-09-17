@@ -204,7 +204,7 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<S
   const listPromise = rawQuery<Record<string, unknown> & { total: number }>(db, sql`
     with q as (${tsq}),
     matched as (
-      select d.entity_type, d.entity_id, d.url, d.title, d.summary, d.category, d.city, d.image_url, d.published_at, d.meta,
+      select d.entity_type, d.entity_id, d.url, d.title, d.summary, d.category, d.city, d.image_url, d.published_at, d.meta, left(d.body, 600) as body_head,
              (
                greatest(
                  ts_rank_cd(d.tsv, q.ws, 32),
@@ -216,18 +216,18 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<S
                * case when d.entity_type = 'news' and d.published_at is not null
                       then greatest(0.5, 1 - extract(epoch from (now() - d.published_at)) / (86400.0 * 180))
                       else 1 end
-             ) as rank,
-             ts_headline('english', replace(replace(replace(coalesce(d.summary, left(d.body, 600), ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;'), q.ws,
-                         'MaxWords=28, MinWords=14, StartSel=<mark>, StopSel=</mark>, MaxFragments=1') as headline
+             ) as rank
       from search_documents d, q
       where (d.tsv @@ q.ws or (q.pq is not null and d.tsv_simple @@ q.pq))
       ${typeFilter}
       ${cityFilter}
-    )
-    select *, count(*) over() as total
-    from matched
+    ),
+    page as (select *, count(*) over() as total from matched order by ${order} limit ${limit} offset ${offset})
+    select p.*,
+           ts_headline('english', replace(replace(replace(coalesce(p.summary, p.body_head, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;'), q.ws,
+                       'MaxWords=28, MinWords=14, StartSel=<mark>, StopSel=</mark>, MaxFragments=1') as headline
+    from page p, q
     order by ${order}
-    limit ${limit} offset ${offset}
   `);
   const [list, facetRows] = await Promise.all([listPromise, facetsPromise]);
   const facets: SearchResult["facets"] = {};
@@ -250,11 +250,12 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<S
   if (list.length >= 3 || offset > 0) return { hits, total: list.length ? Number(list[0].total) : 0, facets, intent };
 
   // Typo tolerance: too few full-text hits → trigram similarity on title/keywords ("electrcity bill" → electricity).
+  // The % operator (pg_trgm's default 0.3 threshold) is what the GIN trigram indexes serve; similarity() > x is a scan.
   const fuzzy = await rawQuery<Record<string, unknown>>(db, sql`
     select d.entity_type, d.entity_id, d.url, d.title, d.summary, d.category, d.city, d.image_url, d.published_at, d.meta,
            greatest(similarity(d.title, ${q}), similarity(coalesce(d.keywords, ''), ${q}) * 0.9) * d.boost * ${intentBoost} as rank
     from search_documents d
-    where (similarity(d.title, ${q}) > 0.25 or similarity(coalesce(d.keywords, ''), ${q}) > 0.2)
+    where (d.title % ${q} or coalesce(d.keywords, '') % ${q})
     ${typeFilter}
     ${cityFilter}
     order by rank desc
@@ -310,7 +311,7 @@ export async function suggest(query: string, limit = 8): Promise<Suggestion[]> {
       meta: schema.searchDocuments.meta,
     })
     .from(schema.searchDocuments)
-    .where(sql`lower(${schema.searchDocuments.title}) like ${"%" + q + "%"} or lower(coalesce(${schema.searchDocuments.keywords}, '')) like ${"%" + q + "%"} or similarity(${schema.searchDocuments.title}, ${q}) > 0.3`)
+    .where(sql`lower(${schema.searchDocuments.title}) like ${"%" + q + "%"} or lower(coalesce(${schema.searchDocuments.keywords}, '')) like ${"%" + q + "%"} or ${schema.searchDocuments.title} % ${q}`)
     .orderBy(sql`case when lower(${schema.searchDocuments.title}) like ${"%" + q + "%"} then 0 else 1 end`, desc(schema.searchDocuments.boost), desc(schema.searchDocuments.popularity))
     .limit(limit);
   return rows;

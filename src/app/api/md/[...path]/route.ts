@@ -3,6 +3,10 @@ import { llmsIndex } from "@/lib/llms";
 import { articleMarkdown, dataMarkdown, listingMarkdown, toolMarkdown } from "@/lib/markdown-export";
 
 export const revalidate = 3600;
+// A dynamic segment without this renders per request (docs/FREE-TIER.md, ISR gotcha); with it, paths are cached on first hit.
+export function generateStaticParams() {
+  return [];
+}
 
 /**
  * Markdown version of a page: /api/md/news/economy/slug, /api/md/guides/taxes/slug, /api/md/tools/tax/slug,

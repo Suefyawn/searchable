@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
@@ -32,7 +33,7 @@ const KEY = "front:page";
 /** A story marked featured leads automatically for this long, then the newest story takes over. */
 export const FEATURED_LEAD_HOURS = 48;
 
-export async function readFrontPage(): Promise<FrontPageT> {
+async function readFrontPageRaw(): Promise<FrontPageT> {
   const db = await getDb();
   const row = await db.query.settings.findFirst({ where: eq(schema.settings.key, KEY) });
   const parsed = FrontPage.safeParse(row?.value ?? {});
@@ -88,3 +89,5 @@ export function resolveFront(front: FrontPageT, latest: ArticleListItem[], byId:
   for (const a of latest) push(a);
   return { lead, ordered, leadSource };
 }
+/** Memoised per request: the header, the news front and the homepage all read it in one render. */
+export const readFrontPage = cache(readFrontPageRaw);

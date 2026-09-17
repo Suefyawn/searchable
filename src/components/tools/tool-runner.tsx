@@ -5,18 +5,8 @@ import { usePathname, useSearchParams } from "next/navigation";
 import * as React from "react";
 import { Field as FieldWrap, Input, Select } from "@/components/ui";
 import { cn } from "@/lib/utils";
-import { getTool } from "@/tools/registry";
-import type { Field, ToolInput, ToolResult } from "@/tools/types";
-
-function defaults(fields: Field[]): ToolInput {
-  const out: ToolInput = {};
-  for (const f of fields) {
-    if (f.type === "number") out[f.key] = f.default ?? 0;
-    else if (f.type === "select") out[f.key] = f.default ?? f.options[0]?.value ?? "";
-    else out[f.key] = f.default ?? false;
-  }
-  return out;
-}
+import { loadTool } from "@/tools/load";
+import { defaultInput as defaults, type Field, type ToolDefinition, type ToolInput, type ToolResult } from "@/tools/types";
 
 function fromParams(fields: Field[], params: URLSearchParams): ToolInput {
   const out: ToolInput = {};
@@ -35,36 +25,43 @@ function fromParams(fields: Field[], params: URLSearchParams): ToolInput {
 
 /**
  * Renders any ToolDefinition: form from `fields`, live `compute`, results, warnings.
- * Runs entirely in the browser, nothing personal is sent to the server.
+ * Runs entirely in the browser, nothing personal is sent to the server. The form and the server-computed
+ * `initial` result paint at once; the calculator's own module arrives right after and takes over compute.
  */
-export function ToolRunner({ slug, live = {} }: { slug: string; live?: ToolInput }) {
-  const tool = getTool(slug);
+export function ToolRunner({ slug, fields, live = {}, initial }: { slug: string; fields: Field[]; live?: ToolInput; initial: ToolResult }) {
+  const [tool, setTool] = React.useState<ToolDefinition | null>(null);
   const pathname = usePathname();
   const params = useSearchParams();
-  const [input, setInput] = React.useState<ToolInput>(() => ({ ...defaults(tool?.fields ?? []), ...live, ...fromParams(tool?.fields ?? [], params) }));
+  const [input, setInput] = React.useState<ToolInput>(() => ({ ...defaults(fields), ...live, ...fromParams(fields, params) }));
   const [copied, setCopied] = React.useState(false);
   const logged = React.useRef(false);
 
+  React.useEffect(() => {
+    let on = true;
+    void loadTool(slug).then((t) => on && t && setTool(t));
+    return () => {
+      on = false;
+    };
+  }, [slug]);
+
   const result: ToolResult | null = React.useMemo(() => {
-    if (!tool) return null;
+    if (!tool) return initial;
     try {
       return tool.compute(input);
     } catch {
       return null;
     }
-  }, [tool, input]);
+  }, [tool, input, initial]);
 
   // Log one anonymous run per page view, after the user changes something.
   React.useEffect(() => {
-    if (!tool || logged.current) return;
+    if (logged.current) return;
     const t = setTimeout(() => {
       logged.current = true;
-      void fetch(`/api/tools/${tool.slug}/run`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ inputs: input }) }).catch(() => {});
+      void fetch(`/api/tools/${slug}/run`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ inputs: input }) }).catch(() => {});
     }, 4000);
     return () => clearTimeout(t);
-  }, [tool, input]);
-
-  if (!tool) return null;
+  }, [slug, input]);
 
   function set(key: string, value: number | string | boolean) {
     setInput((cur) => ({ ...cur, [key]: value }));
@@ -72,7 +69,7 @@ export function ToolRunner({ slug, live = {} }: { slug: string; live?: ToolInput
 
   async function share() {
     const qs = new URLSearchParams();
-    for (const f of tool!.fields) qs.set(f.key, String(input[f.key]));
+    for (const f of fields) qs.set(f.key, String(input[f.key]));
     const url = `${window.location.origin}${pathname}?${qs.toString()}`;
     try {
       await navigator.clipboard.writeText(url);
@@ -87,11 +84,11 @@ export function ToolRunner({ slug, live = {} }: { slug: string; live?: ToolInput
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
       {/* Inputs */}
       <form className="space-y-5 border border-line p-5 sm:p-6" onSubmit={(e) => e.preventDefault()}>
-        {tool.fields.map((f) => (
+        {fields.map((f) => (
           <FieldInput key={f.key} field={f} value={input[f.key]} onChange={(v) => set(f.key, v)} />
         ))}
         <div className="flex items-center justify-between pt-1">
-          <button type="button" onClick={() => setInput({ ...defaults(tool.fields), ...live })} className="inline-flex items-center gap-1.5 text-sm text-2 hover:text-[var(--text)]">
+          <button type="button" onClick={() => setInput({ ...defaults(fields), ...live })} className="inline-flex items-center gap-1.5 text-sm text-2 hover:text-[var(--text)]">
             <RotateCcw className="size-3.5" /> Reset
           </button>
           <button type="button" onClick={share} className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 dark:text-brand-300">

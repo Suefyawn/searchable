@@ -36,18 +36,19 @@ export const metadata = buildMetadata({ ...HUB_COPY.home, path: "", absoluteTitl
 export default async function HomePage() {
   const [front, site, matches] = await Promise.all([readFrontPage(), readSiteSettings(), readMatches()]);
   const matchLead = tickerLine(matches);
-  const [pinned, latest, guides, cities, categories, series, feed, wider, community, pros] = await Promise.all([
+  const [pinned, guides, cities, categories, series, wider, community, pros] = await Promise.all([
     listArticlesByIds([...(front.leadId ? [front.leadId] : []), ...front.pins]),
-    listArticles({ kind: "news", limit: 12 }),
     listArticles({ kind: "guide", limit: 5 }),
     citiesWithCounts(8),
     categoryCounts(),
     listSeriesWithLatest(),
-    activityFeed(24),
     listArticles({ kind: "news", limit: 80 }),
     listPosts({ limit: 6 }),
     listProfessionals({ limit: 4 }),
   ]);
+  // The 80 newest stories serve the hero, the desks and the live feed; one query, sliced three ways.
+  const latest = wider.slice(0, 12);
+  const feed = await activityFeed(24, { news: wider, guides });
   // Lead, pins and the rest: an editor's choices from /admin/front-page first, then the newest stories.
   const { ordered } = resolveFront(front, latest, new Map(pinned.map((a) => [a.id, a])));
   const slides: Slide[] = ordered

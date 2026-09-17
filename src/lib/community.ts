@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { and, asc, desc, eq, inArray, lt, or, sql } from "drizzle-orm";
 import { getDb, rawQuery, schema } from "@/db";
 import type { SessionUser } from "./auth";
@@ -37,7 +38,7 @@ export async function listPosts(opts: { kind?: PostKindKey; citySlug?: string; t
   return { rows: rows as PostRow[], total };
 }
 
-export async function getPost(slug: string) {
+async function getPostRaw(slug: string) {
   const db = await getDb();
   const p = await db.query.posts.findFirst({ where: eq(schema.posts.slug, slug), with: { author: { columns: { id: true, name: true, image: true } }, city: { columns: { name: true, slug: true } }, bids: { orderBy: [desc(schema.bids.amount)], limit: 10, with: { user: { columns: { id: true, name: true } } } } } });
   return p ?? null;
@@ -189,3 +190,5 @@ export async function indexPost(id: string) {
   });
 }
 
+/** Memoised per request: generateMetadata and the page body ask for the same post. */
+export const getPost = cache(getPostRaw);

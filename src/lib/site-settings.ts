@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
@@ -69,7 +70,7 @@ const KEY = "site:settings";
 
 export const DEFAULT_SETTINGS: SiteSettingsT = SiteSettings.parse({});
 
-export async function readSiteSettings(): Promise<SiteSettingsT> {
+async function readSiteSettingsRaw(): Promise<SiteSettingsT> {
   const db = await getDb();
   const row = await db.query.settings.findFirst({ where: eq(schema.settings.key, KEY) });
   const parsed = SiteSettings.safeParse(row?.value ?? {});
@@ -89,3 +90,5 @@ export async function writeSiteSettings<K extends "brand" | "identity" | "front"
 export function brandCss(brand: BrandT): string {
   return `:root{--brand-ink:${brand.ink};--brand-slate:${brand.slate};--brand-accent:${brand.accent};--brand-link:${brand.link};--brand-primary:${brand.primary}}`;
 }
+/** Memoised per request: the layout, the footer and the homepage all read it in one render. */
+export const readSiteSettings = cache(readSiteSettingsRaw);

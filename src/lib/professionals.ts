@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { getDb, rawQuery, schema } from "@/db";
 import { getProfession, PROFESSIONS } from "@/content/professions";
@@ -51,7 +52,7 @@ export async function listProfessionals(opts: { profession?: string; citySlug?: 
   return { rows: rows as unknown as ProfessionalCard[], total };
 }
 
-export async function getProfessional(slug: string) {
+async function getProfessionalRaw(slug: string) {
   const db = await getDb();
   return db.query.professionals.findFirst({ where: eq(schema.professionals.slug, slug), with: { city: true, area: true, reviews: { where: eq(schema.professionalReviews.status, "published"), orderBy: [desc(schema.professionalReviews.createdAt)], limit: 30 } } });
 }
@@ -162,3 +163,5 @@ export async function indexProfessional(id: string) {
     meta: { verified: p.isVerified, rating: p.ratingAvg, ratingCount: p.ratingCount, phone: p.phone, whatsapp: p.whatsapp, profession: p.professionSlug },
   });
 }
+/** Memoised per request: generateMetadata and the page body ask for the same profile. */
+export const getProfessional = cache(getProfessionalRaw);

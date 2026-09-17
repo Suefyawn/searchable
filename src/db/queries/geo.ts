@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 
@@ -17,7 +18,7 @@ export async function listCities(opts: { provinceId?: string; limit?: number } =
   });
 }
 
-export async function getCity(slug: string) {
+async function getCityRaw(slug: string) {
   const db = await getDb();
   return db.query.locations.findFirst({
     where: and(eq(schema.locations.kind, "city"), eq(schema.locations.slug, slug)),
@@ -53,3 +54,5 @@ export async function citiesWithCounts(limit = 12) {
     .orderBy(desc(sql`count(${schema.businesses.id})`), desc(schema.locations.population))
     .limit(limit);
 }
+/** Memoised per request: generateMetadata and the page body ask for the same row. */
+export const getCity = cache(getCityRaw);

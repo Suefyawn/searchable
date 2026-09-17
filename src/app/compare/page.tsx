@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { SectionHeader } from "@/components/ui";
+import { JsonLd, SectionHeader } from "@/components/ui";
 import { CARS, CARS_REVIEWED_AT } from "@/content/cars";
 import { INVERTERS, INVERTERS_REVIEWED_AT } from "@/content/inverters";
 import { formatDate, pkr } from "@/lib/format";
 import { readLivingSet } from "@/lib/compare-data";
-import { buildMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { HUB_COPY } from "@/lib/seo-copy";
 
 export const metadata = buildMetadata({
@@ -54,6 +54,7 @@ export default async function CompareHub() {
   ];
   return (
     <div className="container-x py-8 sm:py-12">
+      <JsonLd data={breadcrumbJsonLd([{ name: "Compare", path: "/compare" }])} />
       <SectionHeader as="h1" eyebrow="Compare" title="Compare before you buy" description="Prices and specifications in one place, filters that match how people shop (budget, type, fuel), and a side-by-side for the final three that marks the best value in every row. Reviewed on a schedule; every page shows its date and source." />
       <div className="grid gap-6 md:grid-cols-2">
         {[...PAGES, ...living].map((p) => (

@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { PhotoTile } from "@/components/photo-tiles";
-import { SectionHeader } from "@/components/ui";
+import { JsonLd, SectionHeader } from "@/components/ui";
 import { categoryCounts } from "@/db/queries/directory";
 import { citiesWithCounts } from "@/db/queries/geo";
-import { buildMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { HUB_COPY } from "@/lib/seo-copy";
 
 export const revalidate = 3600;
@@ -16,6 +16,7 @@ export default async function BusinessesPage() {
   const [categories, cities] = await Promise.all([categoryCounts(), citiesWithCounts(20)]);
   return (
     <div className="container-x py-8 sm:py-12">
+      <JsonLd data={breadcrumbJsonLd([{ name: "Businesses", path: "/businesses" }])} />
       <SectionHeader as="h1" title="Business directory" description="Browse by what you need, then narrow to your city. Verified listings show a badge and a last-checked date." />
       <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
         <section>

@@ -1,6 +1,6 @@
 import { desc, eq, gt } from "drizzle-orm";
 import { getDb, schema } from "@/db";
-import { listArticles } from "@/db/queries/content";
+import { listArticles, type ArticleListItem } from "@/db/queries/content";
 import { articleUrl } from "@/components/cards";
 
 /**
@@ -17,14 +17,15 @@ export type FeedItem = {
   external?: boolean;
 };
 
-export async function activityFeed(limit = 24): Promise<FeedItem[]> {
+/** `have` lets a page that already holds the latest stories and guides skip those two queries. */
+export async function activityFeed(limit = 24, have?: { news: ArticleListItem[]; guides: ArticleListItem[] }): Promise<FeedItem[]> {
   const db = await getDb();
   const since = new Date(Date.now() - 3 * 86_400_000);
   // Our own things only: stories, guides, data readings. Press headlines feed the story-ideas desk, not
   // readers (the founder's call, 2026-09-16: a homepage should not be a list of links to other papers).
   const [news, guides, points] = await Promise.all([
-    listArticles({ kind: "news", limit: 14 }),
-    listArticles({ kind: "guide", limit: 5 }),
+    have ? have.news.slice(0, 14) : listArticles({ kind: "news", limit: 14 }),
+    have ? have.guides.slice(0, 5) : listArticles({ kind: "guide", limit: 5 }),
     db
       .select({ value: schema.dataPoints.value, date: schema.dataPoints.date, note: schema.dataPoints.note, createdAt: schema.dataPoints.createdAt, name: schema.dataSeries.name, slug: schema.dataSeries.slug, unit: schema.dataSeries.unit })
       .from(schema.dataPoints)

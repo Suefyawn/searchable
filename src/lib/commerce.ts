@@ -5,7 +5,9 @@ import { getProduct } from "@/content/pricing";
 import { hasRole, type SessionUser } from "./auth";
 import { sendEmail } from "./email";
 import { pkr } from "./format";
+import { indexBusiness } from "./indexers";
 import { escapeHtml } from "./markdown";
+import { indexProfessional } from "./professionals";
 import { SITE } from "./utils";
 
 /* ───────────── Invoice links ───────────── */
@@ -82,14 +84,18 @@ export async function markPaid(orderId: string, opts: { reference?: string; prov
     .set({ status: product?.periodDays ? "active" : "paid", paidAt: now, startsAt: now, endsAt, paymentReference: opts.reference ?? order.paymentReference, provider: opts.provider ?? order.provider })
     .where(eq(schema.orders.id, orderId));
 
+  // Search stores the verified flag and ranks it, so every tier change is followed by a reindex.
   if (order.kind === "business_plan" && order.businessId && product?.tier) {
     await db.update(schema.businesses).set({ tier: product.tier, tierExpiresAt: endsAt, isVerified: true, verifiedAt: now, lastVerifiedAt: now }).where(eq(schema.businesses.id, order.businessId));
+    await indexBusiness(order.businessId);
   }
   if (order.kind === "professional_plan" && order.professionalId) {
     await db.update(schema.professionals).set({ tier: "verified", tierExpiresAt: endsAt, isVerified: true, verifiedAt: now }).where(eq(schema.professionals.id, order.professionalId));
+    await indexProfessional(order.professionalId);
   }
   if (order.kind === "placement" && order.businessId) {
     await db.update(schema.businesses).set({ tier: "sponsored", tierExpiresAt: endsAt }).where(eq(schema.businesses.id, order.businessId));
+    await indexBusiness(order.businessId);
   }
   if (order.submissionId) {
     await db.update(schema.submissions).set({ orderId: order.id, status: "accepted" }).where(eq(schema.submissions.id, order.submissionId));
@@ -115,11 +121,17 @@ export async function expireLapsedPlans() {
     if (o.businessId) {
       // Only downgrade if no other active order keeps the tier.
       const other = await db.query.orders.findFirst({ where: and(eq(schema.orders.businessId, o.businessId), eq(schema.orders.status, "active")) });
-      if (!other) await db.update(schema.businesses).set({ tier: "free", tierExpiresAt: null }).where(eq(schema.businesses.id, o.businessId));
+      if (!other) {
+        await db.update(schema.businesses).set({ tier: "free", tierExpiresAt: null }).where(eq(schema.businesses.id, o.businessId));
+        await indexBusiness(o.businessId);
+      }
     }
     if (o.professionalId) {
       const other = await db.query.orders.findFirst({ where: and(eq(schema.orders.professionalId, o.professionalId), eq(schema.orders.status, "active")) });
-      if (!other) await db.update(schema.professionals).set({ tier: "free", tierExpiresAt: null, isVerified: false }).where(eq(schema.professionals.id, o.professionalId));
+      if (!other) {
+        await db.update(schema.professionals).set({ tier: "free", tierExpiresAt: null, isVerified: false }).where(eq(schema.professionals.id, o.professionalId));
+        await indexProfessional(o.professionalId);
+      }
     }
   }
   return lapsed.length;

@@ -72,6 +72,17 @@ export interface ToolDefinition {
   featured?: boolean;
 }
 
+/** The form's starting values: every field's default, or the empty value for its type. */
+export function defaultInput(fields: Field[]): ToolInput {
+  const out: ToolInput = {};
+  for (const f of fields) {
+    if (f.type === "number") out[f.key] = f.default ?? 0;
+    else if (f.type === "select") out[f.key] = f.default ?? f.options[0]?.value ?? "";
+    else out[f.key] = f.default ?? false;
+  }
+  return out;
+}
+
 /** Utility: read a numeric field with a default. */
 export function num(input: ToolInput, key: string, fallback = 0): number {
   const v = input[key];

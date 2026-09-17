@@ -5,9 +5,14 @@ import type { Result } from "@/components/admin/action-form";
 import { requireRole } from "@/lib/auth";
 import { Brand, BRAND_DEFAULTS, SiteSettings, writeSiteSettings } from "@/lib/site-settings";
 
-/** Every page carries the brand tokens and the header lines, so the whole layout is re-rendered. */
-function revalidateAll() {
-  revalidatePath("/", "layout");
+/**
+ * Brand tokens and identity lines are in every page's chrome, so those saves re-render the whole layout.
+ * The front-page settings (hero, ticker, home switches) only change the homepage and the footer capture,
+ * which is not worth a site-wide purge (docs/FREE-TIER.md).
+ */
+function revalidateAll(scope: "layout" | "home" = "layout") {
+  if (scope === "layout") revalidatePath("/", "layout");
+  else revalidatePath("/");
   revalidatePath("/admin/settings");
 }
 
@@ -53,7 +58,7 @@ export async function saveFront(_prev: Result, formData: FormData): Promise<Resu
   });
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Check the form" };
   await writeSiteSettings("front", parsed.data);
-  revalidateAll();
+  revalidateAll("home");
   return { ok: true, message: "Saved" };
 }
 
@@ -63,6 +68,6 @@ export async function saveFeatures(_prev: Result, formData: FormData): Promise<R
   const parsed = SiteSettings.shape.features.safeParse({ homeCommunity: on("homeCommunity"), homeProfessionals: on("homeProfessionals"), homeWorld: on("homeWorld"), newsletterCapture: on("newsletterCapture") });
   if (!parsed.success) return { ok: false, error: "Check the switches" };
   await writeSiteSettings("features", parsed.data);
-  revalidateAll();
+  revalidateAll("home");
   return { ok: true, message: "Saved" };
 }
