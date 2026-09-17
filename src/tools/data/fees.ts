@@ -47,3 +47,28 @@ export const VEHICLE_TRANSFER_PUNJAB = {
   /** Capital value tax on transfer of a motor vehicle, 1% of the assessed value (Punjab Finance Act 2022, from 1 July 2022). */
   cvtRate: 0.01,
 };
+
+export type NadraService = "new" | "modification" | "duplicate" | "renewal";
+export type NadraDocument = "cnic" | "smartNic" | "crc" | "frcOne" | "frcBoth" | "nicopA" | "nicopB" | "poc";
+type NadraDoc = { label: string; currency: "PKR" | "USD"; /** [normal, urgent, executive]; null where the category is not offered. */ services: Partial<Record<NadraService, [number | null, number | null, number | null]>>; days: [number | null, number | null, number | null] };
+
+/**
+ * NADRA fee structure (nadra.gov.pk/feeStructure, site last updated 17-09-2026, read 2026-09-18). PKR for
+ * inland documents; NICOP and POC in USD, paid in rupees at NADRA's conversion rate on the application date.
+ */
+export const NADRA_FEES = {
+  reviewedAt: "2026-09-18",
+  source: { title: "NADRA: Fee Structure, processing fee and timeline for CNIC, Smart CNIC, CRC, FRC, NICOP and POC", url: "https://www.nadra.gov.pk/feeStructure", publisher: "National Database & Registration Authority" },
+  /** Home delivery of a card within Pakistan. */
+  deliveryPk: 165,
+  documents: {
+    cnic: { label: "CNIC (paper)", currency: "PKR", services: { new: [0, 1_150, 2_150], modification: [400, 1_150, 2_150], duplicate: [400, 1_150, 2_150], renewal: [400, 1_150, 2_150] }, days: [15, 12, 6] },
+    smartNic: { label: "Smart NIC", currency: "PKR", services: { new: [750, 1_500, 2_500], modification: [750, 1_500, 2_500], duplicate: [750, 1_500, 2_500], renewal: [750, 1_500, 2_500] }, days: [31, 23, 9] },
+    crc: { label: "CRC / B-form (child registration)", currency: "PKR", services: { new: [50, null, 500] }, days: [7, null, 1] },
+    frcOne: { label: "FRC: one family type (alpha, beta or gamma)", currency: "PKR", services: { new: [null, null, 1_000] }, days: [null, null, 1] },
+    frcBoth: { label: "FRC: both family types", currency: "PKR", services: { new: [null, null, 2_000] }, days: [null, null, 1] },
+    nicopA: { label: "Smart NICOP, Zone A (USA, Europe)", currency: "USD", services: { new: [39, 57, 75], modification: [39, 57, 75], duplicate: [39, 57, 75], renewal: [39, 57, 75] }, days: [31, 23, 9] },
+    nicopB: { label: "Smart NICOP, Zone B (Middle East, Africa)", currency: "USD", services: { new: [20, 30, 40], modification: [20, 30, 40], duplicate: [20, 30, 140], renewal: [20, 30, 40] }, days: [31, 23, 9] },
+    poc: { label: "Smart POC (Pakistan Origin Card)", currency: "USD", services: { new: [150, 200, 250], modification: [200, 250, 300], duplicate: [200, 250, 300], renewal: [150, 200, 250] }, days: [31, 23, 9] },
+  } as Record<NadraDocument, NadraDoc>,
+};

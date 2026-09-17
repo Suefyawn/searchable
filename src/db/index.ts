@@ -1,4 +1,6 @@
 import "dotenv/config";
+import { mkdirSync } from "node:fs";
+import path from "node:path";
 import { Param, SQL } from "drizzle-orm";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import * as schema from "./schema";
@@ -20,6 +22,8 @@ async function create(): Promise<Database> {
     const { pg_trgm } = await import("@electric-sql/pglite/contrib/pg_trgm");
     const { drizzle } = await import("drizzle-orm/pglite");
     const dataDir = DATABASE_URL.replace("pglite://", "");
+    // PGlite creates the data directory itself but not its parent; a fresh checkout (CI) has no .data/ yet.
+    mkdirSync(path.dirname(dataDir), { recursive: true });
     // pg_trgm powers typo-tolerant search (migration 0005); Supabase has it built in.
     const client = await PGlite.create({ dataDir, extensions: { pg_trgm } });
     return drizzle(client, { schema }) as unknown as Database;

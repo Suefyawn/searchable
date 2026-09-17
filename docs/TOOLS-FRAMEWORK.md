@@ -90,7 +90,7 @@ After ~4s on the page, one anonymous `tool_runs` row is written with the current
 **Cars (10):** fuel cost ✅ · token tax by province ✅ · registration cost ✅ · import duty on used car (parked: rates unverifiable) · resale value · EMI compare (bank vs dealer) · CNG vs petrol · km per litre ✅ · insurance premium · transfer fee ✅ (Punjab)
 **Property (5):** stamp duty & CVT · rental yield · plot size converter (marla/kanal/sqft) · construction cost · property tax
 **Utilities (5):** electricity ✅ · gas bill (slab) ✅ · water charges · UPS/battery sizing ✅ · AC running cost ✅ · electricity units by appliance ✅
-**Government (5):** passport fee & timeline ✅ · CNIC fee · driving licence fee · NADRA FRC · birth certificate (NADRA fees wait for the official schedule; nadra.gov.pk blocks fetches)
+**Government (5):** passport fee & timeline ✅ · CNIC fee ✅ · driving licence fee · NADRA FRC ✅ · birth certificate (one NADRA fee calculator covers CNIC, Smart NIC, CRC, FRC, NICOP and POC from the official schedule)
 **Solar (5):** payback ✅ · system sizing ✅ (panel count, inverter, roof area) · net-metering savings · battery backup hours ✅ · panel count for roof area ✅
 **Finance, added:** gold converter (tola, gram, masha, ratti, value by karat at the live rate) ✅
 **Education (new category):** CGPA / GPA on the HEC 4.0 scale ✅

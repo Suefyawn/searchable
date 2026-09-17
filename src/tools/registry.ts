@@ -5,6 +5,7 @@ import { cgpaCalculator } from "./calculators/cgpa-calculator";
 import { electricityUnitsCalculator } from "./calculators/electricity-units-calculator";
 import { fuelAverageCalculator } from "./calculators/fuel-average-calculator";
 import { goldConverter } from "./calculators/gold-converter";
+import { nadraFeeCalculator } from "./calculators/nadra-fee-calculator";
 import { passportFeeCalculator } from "./calculators/passport-fee-calculator";
 import { solarPanelCalculator } from "./calculators/solar-panel-calculator";
 import { vehicleTransferFeeCalculator } from "./calculators/vehicle-transfer-fee-calculator";
@@ -73,6 +74,7 @@ export const TOOLS: ToolDefinition[] = [
   nationalSavingsCalculator,
   providentFundCalculator,
   passportFeeCalculator,
+  nadraFeeCalculator,
   cgpaCalculator,
   goldConverter,
   solarPanelCalculator,
