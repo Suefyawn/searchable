@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { getDb, rawQuery, schema } from "@/db";
 import { getProfession, PROFESSIONS } from "@/content/professions";
+import { hasRole, type SessionUser } from "./auth";
 import { removeSearchDocument, syncSearchDocument } from "./search";
 import type { ProfessionalFormInput } from "./professional-schema";
 
@@ -54,6 +55,15 @@ export async function getProfessional(slug: string) {
   const db = await getDb();
   return db.query.professionals.findFirst({ where: eq(schema.professionals.slug, slug), with: { city: true, area: true, reviews: { where: eq(schema.professionalReviews.status, "published"), orderBy: [desc(schema.professionalReviews.createdAt)], limit: 30 } } });
 }
+/** Editors can edit any profile; owners only their own. */
+export async function canEditProfessional(user: SessionUser | null, id: string): Promise<boolean> {
+  if (!user) return false;
+  if (hasRole(user, "editor")) return true;
+  const db = await getDb();
+  const p = await db.query.professionals.findFirst({ where: eq(schema.professionals.id, id), columns: { ownerUserId: true } });
+  return p?.ownerUserId === user.id;
+}
+
 export async function getProfessionalById(id: string) {
   const db = await getDb();
   return db.query.professionals.findFirst({ where: eq(schema.professionals.id, id), with: { city: true, area: true } });

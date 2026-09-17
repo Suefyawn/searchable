@@ -4,20 +4,12 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
-import { getSessionUser, hasRole, requireRole, type SessionUser } from "@/lib/auth";
+import { getSessionUser, hasRole, requireRole } from "@/lib/auth";
 import { notifyProfessionalLead } from "@/lib/notify";
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { slugify, uniqueSlug } from "@/lib/slug";
-import { indexProfessional } from "./professionals";
+import { canEditProfessional, indexProfessional } from "./professionals";
 import { ProfessionalInput, type ProfessionalFormInput } from "./professional-schema";
-
-export async function canEditProfessional(user: SessionUser | null, id: string): Promise<boolean> {
-  if (!user) return false;
-  if (hasRole(user, "editor")) return true;
-  const db = await getDb();
-  const p = await db.query.professionals.findFirst({ where: eq(schema.professionals.id, id), columns: { ownerUserId: true } });
-  return p?.ownerUserId === user.id;
-}
 
 /**
  * Create or update a profile. New profiles start pending and go live once an editor approves; edits to a

@@ -8,7 +8,10 @@ import { recordSearchClick } from "@/lib/search";
 const Event = z.object({
   name: z.enum(["business_click", "page_view", "share", "tool_share", "search_click", "error"]),
   path: z.string().max(300).optional(),
-  props: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
+  props: z
+    .record(z.string().max(40), z.union([z.string().max(500), z.number(), z.boolean()]))
+    .refine((p) => Object.keys(p).length <= 20, "Too many props")
+    .optional(),
 });
 
 /** First-party analytics beacon. Anonymous; nothing personal is stored. */

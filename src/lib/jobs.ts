@@ -1,9 +1,12 @@
-import { sql } from "drizzle-orm";
+import { timingSafeEqual } from "node:crypto";
+import { eq, sql } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { getDb, rawQuery, schema } from "@/db";
-import { publishDueArticles } from "@/app/admin/articles/actions";
 import { expireStaleClaims, sendClaimInvites } from "./claims";
 import { expireLapsedPlans } from "./commerce";
 import { closeExpiredPosts } from "./community";
+import { indexArticle } from "./indexers";
+import { pingIndexNow } from "./indexnow";
 import { syncInbox } from "./inbox";
 import { backfillArticlePhotos } from "./media-import";
 import { sendActivityDigests } from "./notify";
@@ -22,6 +25,39 @@ const JOB_INTERVAL_MS = 5 * 60_000;
 /** Photo backfill, mailbox mirror, invites and digests: every half hour is plenty, and it keeps function time low. */
 const HEAVY_INTERVAL_MS = 30 * 60_000;
 let lastLocalRun = 0;
+
+/** Cron routes: Bearer CRON_SECRET, compared in constant time. Without a secret they are open locally and closed in production. */
+export function cronAuthorized(req: Request): boolean {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) return process.env.NODE_ENV !== "production";
+  const given = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim() ?? "";
+  const a = Buffer.from(secret);
+  const b = Buffer.from(given);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+/** Publish everything whose scheduled time has passed. */
+export async function publishDueArticles(): Promise<number> {
+  const db = await getDb();
+  const due = await db.query.articles.findMany({ where: eq(schema.articles.status, "scheduled") });
+  const now = Date.now();
+  let n = 0;
+  for (const a of due) {
+    if (!a.scheduledFor || a.scheduledFor.getTime() > now) continue;
+    await db.update(schema.articles).set({ status: "published", publishedAt: a.publishedAt ?? new Date(), scheduledFor: null, lastReviewedAt: new Date() }).where(eq(schema.articles.id, a.id));
+    await db.insert(schema.articleRevisions).values({ articleId: a.id, title: a.title, body: a.body, note: "Published on schedule" });
+    await indexArticle(a.id);
+    void pingIndexNow([`/${a.kind === "news" ? "news" : "guides"}`]);
+    n++;
+  }
+  if (n) {
+    revalidatePath("/");
+    revalidatePath("/news");
+    revalidatePath("/guides");
+    revalidatePath("/feed.xml");
+  }
+  return n;
+}
 
 export type JobsResult = { ran: boolean; published?: number; newsletters?: unknown; lapsedPlans?: number; invites?: { sent: number; skipped: string }; digests?: { sent: number }; inbox?: { added: number; skipped?: string }; photos?: { tried: number; filled: number }; at?: string };
 

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { assetUrl, webUrl } from "./url-fields";
 
 export const POST_KINDS = [
   { key: "job", label: "Job", plural: "Jobs", blurb: "Hiring? Post the role, pay and how to apply." },
@@ -21,13 +22,13 @@ export const PostInput = z
     body: z.string().trim().min(20).max(12_000),
     topic: z.string().trim().max(40).optional(),
     cityId: z.string().optional(),
-    images: z.array(z.object({ url: z.string().min(1).max(500), alt: z.string().max(200).optional() })).max(8).default([]),
+    images: z.array(z.object({ url: assetUrl, alt: z.string().max(200).optional() })).max(8).default([]),
     // job
     company: z.string().trim().max(120).optional(),
     employmentType: z.enum(EMPLOYMENT_TYPES).optional(),
     salaryMin: money,
     salaryMax: money,
-    applyUrl: z.string().trim().max(300).optional(),
+    applyUrl: webUrl.optional(),
     deadline: z.string().trim().max(10).optional(),
     // listing
     price: money,
@@ -72,7 +73,7 @@ export const MemberInput = z.object({
     .regex(/^[a-z0-9][a-z0-9_.-]{2,29}$/, "3 to 30 characters: letters, numbers, dots, dashes, underscores"),
   displayName: z.string().trim().min(2).max(80),
   bio: z.string().trim().max(600).optional(),
-  avatarUrl: z.string().trim().max(500).optional(),
+  avatarUrl: assetUrl.optional(),
   cityId: z.string().optional(),
   website: handleField,
   linkedin: handleField,

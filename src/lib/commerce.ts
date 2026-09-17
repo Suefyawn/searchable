@@ -1,9 +1,30 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { and, desc, eq, lt } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import { getProduct } from "@/content/pricing";
+import { hasRole, type SessionUser } from "./auth";
 import { sendEmail } from "./email";
 import { pkr } from "./format";
+import { escapeHtml } from "./markdown";
 import { SITE } from "./utils";
+
+/* ───────────── Invoice links ───────────── */
+
+/** Invoice numbers are sequential, so the link carries a signature; without it the page is a 404. */
+function orderKey(invoiceNo: string): string {
+  return createHmac("sha256", process.env.BETTER_AUTH_SECRET ?? "dev-secret").update(`order:${invoiceNo}`).digest("base64url").slice(0, 20);
+}
+export function orderPath(invoiceNo: string): string {
+  return `/orders/${invoiceNo}?k=${orderKey(invoiceNo)}`;
+}
+/** The signed link, the order's own account, or an admin. */
+export function canViewOrder(order: { invoiceNo: string; userId: string | null }, user: SessionUser | null, key: string | undefined): boolean {
+  if (user && (hasRole(user, "admin") || (order.userId && order.userId === user.id))) return true;
+  if (!key) return false;
+  const a = Buffer.from(orderKey(order.invoiceNo));
+  const b = Buffer.from(key);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
 
 /** Invoice numbers people can read out on the phone: SP-2026-000123. */
 export async function nextInvoiceNo() {
@@ -41,8 +62,8 @@ export async function createOrder(input: { productCode: string; userId?: string 
   await sendEmail({
     to: input.payer.email,
     subject: `Invoice ${invoiceNo}: ${product.name} on ${SITE.name}`,
-    html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;padding:24px;line-height:1.6"><h1 style="font-size:20px">Invoice ${invoiceNo}</h1><p><strong>${product.name}</strong>, ${pkr(product.pricePkr)}${product.periodDays ? ` for ${product.periodDays} days` : ""}.</p><p>Pay by bank transfer, JazzCash or Easypaisa and reply with the transaction ID. Details and status: <a href="${SITE.url}/orders/${invoiceNo}">${SITE.url}/orders/${invoiceNo}</a></p></div>`,
-    text: `Invoice ${invoiceNo}: ${product.name} ${pkr(product.pricePkr)}. Details: ${SITE.url}/orders/${invoiceNo}`,
+    html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;padding:24px;line-height:1.6"><h1 style="font-size:20px">Invoice ${invoiceNo}</h1><p><strong>${product.name}</strong>, ${pkr(product.pricePkr)}${product.periodDays ? ` for ${product.periodDays} days` : ""}.</p><p>Pay by bank transfer, JazzCash or Easypaisa and reply with the transaction ID. Details and status: <a href="${SITE.url}${orderPath(invoiceNo)}">${SITE.url}/orders/${invoiceNo}</a></p></div>`,
+    text: `Invoice ${invoiceNo}: ${product.name} ${pkr(product.pricePkr)}. Details: ${SITE.url}${orderPath(invoiceNo)}`,
   });
   return order;
 }
@@ -77,7 +98,7 @@ export async function markPaid(orderId: string, opts: { reference?: string; prov
     await sendEmail({
       to: order.payerEmail,
       subject: `Payment received: ${order.invoiceNo}`,
-      html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;padding:24px;line-height:1.6"><p>Thanks, payment for <strong>${order.productName}</strong> (${order.invoiceNo}) is confirmed.${endsAt ? ` It runs until ${endsAt.toDateString()}.` : ""}</p></div>`,
+      html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;padding:24px;line-height:1.6"><p>Thanks, payment for <strong>${escapeHtml(order.productName)}</strong> (${order.invoiceNo}) is confirmed.${endsAt ? ` It runs until ${endsAt.toDateString()}.` : ""}</p></div>`,
       text: `Payment for ${order.productName} (${order.invoiceNo}) confirmed.`,
     });
   }

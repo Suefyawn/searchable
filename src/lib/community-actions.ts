@@ -10,7 +10,7 @@ import { sendEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
 import { slugify, uniqueSlug } from "@/lib/slug";
 import { SITE } from "@/lib/utils";
-import { getMemberByUser, indexPost, isTrustedAuthor } from "./community";
+import { ensureMemberProfile, getMemberByUser, indexPost, isTrustedAuthor } from "./community";
 import { notifyOutbid } from "./notify";
 
 type Result = { ok: boolean; error?: string; id?: string; slug?: string };
@@ -18,17 +18,6 @@ type Result = { ok: boolean; error?: string; id?: string; slug?: string };
 async function ensureNotBanned(user: SessionUser): Promise<string | null> {
   const m = await getMemberByUser(user.id);
   return m?.isBanned ? "This account cannot post or comment." : null;
-}
-
-/** Every member gets a handle on first write, derived from their name, so profiles and bylines always resolve. */
-export async function ensureMemberProfile(user: SessionUser) {
-  const db = await getDb();
-  const existing = await db.query.memberProfiles.findFirst({ where: eq(schema.memberProfiles.userId, user.id) });
-  if (existing) return existing;
-  const base = slugify(user.name || user.email.split("@")[0]).replace(/-/g, "_").slice(0, 24) || "member";
-  const handle = await uniqueSlug(base, async (h) => !!(await db.query.memberProfiles.findFirst({ where: eq(schema.memberProfiles.handle, h), columns: { id: true } })));
-  const [row] = await db.insert(schema.memberProfiles).values({ userId: user.id, handle, displayName: user.name || handle, avatarUrl: user.image ?? null }).returning();
-  return row;
 }
 
 /* ───────────── Member profile ───────────── */
@@ -89,7 +78,9 @@ export async function savePost(raw: PostFormInput): Promise<Result> {
     const before = await db.query.posts.findFirst({ where: eq(schema.posts.id, d.id) });
     if (!before) return { ok: false, error: "Post not found" };
     if (before.authorId !== user.id && !editor) return { ok: false, error: "Not your post" };
-    await db.update(schema.posts).set(values).where(eq(schema.posts.id, d.id));
+    // A member's edit to a live post goes back through the queue, so approval covers what is actually shown.
+    const requeue = !editor && before.status === "published";
+    await db.update(schema.posts).set({ ...values, ...(requeue ? { status: "pending" as const } : {}) }).where(eq(schema.posts.id, d.id));
     await indexPost(d.id);
     revalidatePath(`/community/post/${before.slug}`);
     return { ok: true, id: d.id, slug: before.slug };
@@ -202,6 +193,7 @@ export async function deleteOwnComment(commentId: string, path?: string): Promis
 export async function toggleLike(targetType: "post" | "comment" | "article", targetId: string, path?: string): Promise<{ ok: boolean; liked?: boolean; count?: number; error?: string }> {
   const user = await getSessionUser();
   if (!user) return { ok: false, error: "Sign in to like." };
+  if (!z.enum(["post", "comment", "article"]).safeParse(targetType).success) return { ok: false, error: "Bad target" };
   const db = await getDb();
   const existing = await db.query.reactions.findFirst({ where: and(eq(schema.reactions.userId, user.id), eq(schema.reactions.targetType, targetType), eq(schema.reactions.targetId, targetId)) });
   let liked: boolean;

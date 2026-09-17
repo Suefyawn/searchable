@@ -4,7 +4,7 @@ import * as React from "react";
 import { Alert, Button, Input, Select } from "@/components/ui";
 import { submitPaymentReferenceAction } from "@/lib/commerce-actions";
 
-export function PaymentReferenceForm({ invoiceNo, existing }: { invoiceNo: string; existing: string | null }) {
+export function PaymentReferenceForm({ invoiceNo, k, existing }: { invoiceNo: string; k?: string; existing: string | null }) {
   const [state, setState] = React.useState<"idle" | "saving" | "done">(existing ? "done" : "idle");
   const [error, setError] = React.useState("");
 
@@ -23,6 +23,7 @@ export function PaymentReferenceForm({ invoiceNo, existing }: { invoiceNo: strin
   return (
     <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-3 border border-line p-4">
       <input type="hidden" name="invoiceNo" value={invoiceNo} />
+      {k ? <input type="hidden" name="k" value={k} /> : null}
       {error ? <p className="w-full text-sm text-red-600">{error}</p> : null}
       <label className="text-xs text-3">
         Paid via

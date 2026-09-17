@@ -15,7 +15,7 @@ export function PitchForm({ initialKind = "guest", categories }: { initialKind?:
   const [kind, setKind] = React.useState(KINDS.some((k) => k.value === initialKind) ? initialKind : "guest");
   const [state, setState] = React.useState<"idle" | "saving" | "done">("idle");
   const [error, setError] = React.useState("");
-  const [result, setResult] = React.useState<{ invoiceNo?: string } | null>(null);
+  const [result, setResult] = React.useState<{ invoiceNo?: string; invoicePath?: string } | null>(null);
   const [words, setWords] = React.useState(0);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -25,7 +25,7 @@ export function PitchForm({ initialKind = "guest", categories }: { initialKind?:
     const raw = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
     const r = await submitPitchAction(raw);
     if (r.ok) {
-      setResult({ invoiceNo: r.invoiceNo });
+      setResult({ invoiceNo: r.invoiceNo, invoicePath: r.invoicePath });
       setState("done");
     } else {
       setError(r.error);
@@ -39,7 +39,7 @@ export function PitchForm({ initialKind = "guest", categories }: { initialKind?:
         {result?.invoiceNo ? (
           <>
             Your invoice is <strong>{result.invoiceNo}</strong>. Payment details and status are on{" "}
-            <Link href={`/orders/${result.invoiceNo}`} className="underline underline-offset-4">
+            <Link href={result.invoicePath ?? `/orders/${result.invoiceNo}`} className="underline underline-offset-4">
               your invoice page
             </Link>
             ; editing starts once payment is confirmed.

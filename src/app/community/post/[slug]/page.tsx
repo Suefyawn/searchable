@@ -12,7 +12,7 @@ import { Breadcrumbs, JsonLd } from "@/components/ui";
 import { getPost, kindLabel, listPosts, memberHandles } from "@/lib/community";
 import { srcSetFor } from "@/lib/images";
 import { formatDate, pkr, timeAgo } from "@/lib/format";
-import { renderMarkdown } from "@/lib/markdown";
+import { renderUserMarkdown } from "@/lib/markdown";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/utils";
 import { BidForm } from "./bid-form";
@@ -109,7 +109,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             </div>
           ) : null}
 
-          <div className="prose mt-6 max-w-[70ch] text-[16px] leading-relaxed" dangerouslySetInnerHTML={{ __html: renderMarkdown(p.body) }} />
+          <div className="prose mt-6 max-w-[70ch] text-[16px] leading-relaxed" dangerouslySetInnerHTML={{ __html: renderUserMarkdown(p.body) }} />
 
           <LikedProvider targets={[{ type: "post", id: p.id }]}>
             <div className="mt-6 flex flex-wrap items-center gap-5 border-y border-line py-3">

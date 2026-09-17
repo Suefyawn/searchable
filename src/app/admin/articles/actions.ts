@@ -194,25 +194,3 @@ export async function deleteArticle(id: string) {
   redirect("/admin/articles");
 }
 
-/** Publish everything whose scheduled time has passed. Called by /api/cron/publish. */
-export async function publishDueArticles(): Promise<number> {
-  const db = await getDb();
-  const due = await db.query.articles.findMany({ where: eq(schema.articles.status, "scheduled") });
-  const now = Date.now();
-  let n = 0;
-  for (const a of due) {
-    if (!a.scheduledFor || a.scheduledFor.getTime() > now) continue;
-    await db.update(schema.articles).set({ status: "published", publishedAt: a.publishedAt ?? new Date(), scheduledFor: null, lastReviewedAt: new Date() }).where(eq(schema.articles.id, a.id));
-    await db.insert(schema.articleRevisions).values({ articleId: a.id, title: a.title, body: a.body, note: "Published on schedule" });
-    await indexArticle(a.id);
-    void pingIndexNow([`/${a.kind === "news" ? "news" : "guides"}`]);
-    n++;
-  }
-  if (n) {
-    revalidatePath("/");
-    revalidatePath("/news");
-    revalidatePath("/guides");
-    revalidatePath("/feed.xml");
-  }
-  return n;
-}

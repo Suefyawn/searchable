@@ -1,6 +1,18 @@
 import { and, asc, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
+import { hasRole, type SessionUser } from "@/lib/auth";
 import type { BusinessFormInput } from "@/lib/business-schema";
+
+/** Editors/admins can edit any business; owners only their own. */
+export async function canEditBusiness(user: SessionUser | null, businessId: string): Promise<boolean> {
+  if (!user) return false;
+  if (hasRole(user, "editor")) return true;
+  const db = await getDb();
+  const b = await db.query.businesses.findFirst({ where: eq(schema.businesses.id, businessId), columns: { ownerUserId: true } });
+  if (b?.ownerUserId === user.id) return true;
+  const claim = await db.query.businessClaims.findFirst({ where: and(eq(schema.businessClaims.businessId, businessId), eq(schema.businessClaims.userId, user.id), eq(schema.businessClaims.status, "approved")), columns: { id: true } });
+  return !!claim;
+}
 
 /** Loads a business plus the option lists the editor needs. Shared by admin and owner pages. */
 export async function loadBusinessEditor(id: string) {

@@ -217,7 +217,7 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<S
                       then greatest(0.5, 1 - extract(epoch from (now() - d.published_at)) / (86400.0 * 180))
                       else 1 end
              ) as rank,
-             ts_headline('english', coalesce(d.summary, left(d.body, 600), ''), q.ws,
+             ts_headline('english', replace(replace(replace(coalesce(d.summary, left(d.body, 600), ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;'), q.ws,
                          'MaxWords=28, MinWords=14, StartSel=<mark>, StopSel=</mark>, MaxFragments=1') as headline
       from search_documents d, q
       where (d.tsv @@ q.ws or (q.pq is not null and d.tsv_simple @@ q.pq))

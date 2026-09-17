@@ -45,7 +45,7 @@ export async function storeImage(input: Buffer, opts: { variant: Variant; alt?: 
 
 /** Stores a document as is (CVs are PDFs). Same providers as images; served from an unguessable key. */
 export async function storeDocument(input: Buffer, opts: { mimeType: string; originalName?: string; folder?: string }): Promise<{ id: string; url: string; bytes: number }> {
-  if (!DOCUMENT_TYPES.has(opts.mimeType)) throw new Error("Only PDF documents are accepted");
+  if (!DOCUMENT_TYPES.has(opts.mimeType) || input.subarray(0, 5).toString("latin1") !== "%PDF-") throw new Error("Only PDF documents are accepted");
   const id = crypto.randomUUID();
   const key = `uploads/${opts.folder ?? "documents"}/${id}.pdf`;
   const url = await putObject(key, input, opts.mimeType);

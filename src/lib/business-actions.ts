@@ -3,20 +3,10 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb, schema } from "@/db";
-import { getSessionUser, hasRole, type SessionUser } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth";
+import { canEditBusiness } from "@/lib/business-editor-data";
 import { indexBusiness } from "@/lib/indexers";
 import { BusinessInput, type BusinessFormInput } from "@/lib/business-schema";
-
-/** Editors/admins can edit any business; owners only their own. */
-export async function canEditBusiness(user: SessionUser | null, businessId: string): Promise<boolean> {
-  if (!user) return false;
-  if (hasRole(user, "editor")) return true;
-  const db = await getDb();
-  const b = await db.query.businesses.findFirst({ where: eq(schema.businesses.id, businessId), columns: { ownerUserId: true } });
-  if (b?.ownerUserId === user.id) return true;
-  const claim = await db.query.businessClaims.findFirst({ where: and(eq(schema.businessClaims.businessId, businessId), eq(schema.businessClaims.userId, user.id), eq(schema.businessClaims.status, "approved")), columns: { id: true } });
-  return !!claim;
-}
 
 export async function saveBusiness(raw: BusinessFormInput): Promise<{ ok: boolean; error?: string }> {
   const user = await getSessionUser();

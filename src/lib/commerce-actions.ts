@@ -7,7 +7,8 @@ import { z } from "zod";
 import { getDb, schema } from "@/db";
 import { getProduct } from "@/content/pricing";
 import { getSessionUser, requireRole, requireUser } from "@/lib/auth";
-import { createOrder, markPaid } from "@/lib/commerce";
+import { canViewOrder, createOrder, markPaid, orderPath } from "@/lib/commerce";
+import { escapeHtml } from "@/lib/markdown";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { sendEmail } from "@/lib/email";
 import { SITE } from "@/lib/utils";
@@ -25,7 +26,7 @@ export async function buyPlanAction(formData: FormData) {
   const biz = await db.query.businesses.findFirst({ where: and(eq(schema.businesses.id, d.businessId), or(eq(schema.businesses.ownerUserId, user.id), ...(claims.length ? [eq(schema.businesses.id, claims[0].businessId)] : []))) });
   if (!biz) throw new Error("You do not manage this business");
   const order = await createOrder({ productCode: product.code, userId: user.id, businessId: biz.id, payer: { name: user.name ?? user.email, email: user.email, phone: d.phone }, notes: `${product.name} for ${biz.name}` });
-  redirect(`/orders/${order.invoiceNo}`);
+  redirect(orderPath(order.invoiceNo));
 }
 
 const BuyProPlan = z.object({ professionalId: z.string().min(1), productCode: z.string().min(1), phone: z.string().trim().max(20).optional() });
@@ -40,11 +41,11 @@ export async function buyProfessionalPlanAction(formData: FormData) {
   const pro = await db.query.professionals.findFirst({ where: and(eq(schema.professionals.id, d.professionalId), eq(schema.professionals.ownerUserId, user.id)) });
   if (!pro) throw new Error("You do not manage this profile");
   const order = await createOrder({ productCode: product.code, userId: user.id, professionalId: pro.id, payer: { name: user.name ?? user.email, email: user.email, phone: d.phone }, notes: `${product.name} for ${pro.name}` });
-  redirect(`/orders/${order.invoiceNo}`);
+  redirect(orderPath(order.invoiceNo));
 }
 
 /* ───────────── Payer: attach a payment reference ───────────── */
-const Reference = z.object({ invoiceNo: z.string().min(5), reference: z.string().trim().min(3).max(120), provider: z.enum(["manual", "jazzcash", "easypaisa"]).default("manual") });
+const Reference = z.object({ invoiceNo: z.string().min(5), k: z.string().max(40).optional(), reference: z.string().trim().min(3).max(120), provider: z.enum(["manual", "jazzcash", "easypaisa"]).default("manual") });
 
 export async function submitPaymentReferenceAction(formData: FormData) {
   const rl = await rateLimit("payment-ref", 10, 60 * 60_000);
@@ -54,10 +55,10 @@ export async function submitPaymentReferenceAction(formData: FormData) {
   const d = parsed.data;
   const db = await getDb();
   const order = await db.query.orders.findFirst({ where: eq(schema.orders.invoiceNo, d.invoiceNo) });
-  if (!order) return { error: "Invoice not found." };
+  if (!order || !canViewOrder(order, await getSessionUser(), d.k)) return { error: "Invoice not found." };
   if (order.status !== "pending") return { error: "This invoice is already settled." };
   await db.update(schema.orders).set({ paymentReference: d.reference, provider: d.provider }).where(eq(schema.orders.id, order.id));
-  await sendEmail({ to: process.env.BILLING_EMAIL ?? "billing@searchable.pk", subject: `Payment reference on ${order.invoiceNo}`, html: `<p>${order.payerName} says they paid ${order.productName} via ${d.provider}: <strong>${d.reference}</strong>. Confirm in <a href="${SITE.url}/admin/orders">admin</a>.</p>`, text: `${order.invoiceNo}: ${d.provider} ${d.reference}` });
+  await sendEmail({ to: process.env.BILLING_EMAIL ?? "billing@searchable.pk", subject: `Payment reference on ${order.invoiceNo}`, html: `<p>${escapeHtml(order.payerName ?? "")} says they paid ${escapeHtml(order.productName)} via ${d.provider}: <strong>${escapeHtml(d.reference)}</strong>. Confirm in <a href="${SITE.url}/admin/orders">admin</a>.</p>`, text: `${order.invoiceNo}: ${d.provider} ${d.reference}` });
   revalidatePath(`/orders/${d.invoiceNo}`);
   return { ok: true };
 }
@@ -96,7 +97,7 @@ const Submission = z.object({
   company_url: z.string().max(0).optional(),
 });
 
-export async function submitPitchAction(raw: Record<string, string>): Promise<{ ok: true; id: string; invoiceNo?: string } | { ok: false; error: string }> {
+export async function submitPitchAction(raw: Record<string, string>): Promise<{ ok: true; id: string; invoiceNo?: string; invoicePath?: string } | { ok: false; error: string }> {
   const rl = await rateLimit("pitch", 5, 60 * 60_000);
   if (!rl.ok) return { ok: false, error: "Too many submissions from this connection. Try again in an hour." };
   const parsed = Submission.safeParse(raw);
@@ -119,14 +120,16 @@ export async function submitPitchAction(raw: Record<string, string>): Promise<{ 
     const order = await createOrder({ productCode: d.kind === "sponsored" ? "sponsored-post" : "press-release", userId: user?.id ?? null, submissionId: row.id, payer: { name: d.name, email: d.email, phone: d.phone }, notes: d.title });
     invoiceNo = order.invoiceNo;
   }
-  await sendEmail({ to: process.env.EDITORIAL_EMAIL ?? "editorial@searchable.pk", subject: `[${d.kind}] ${d.title}`, html: `<p>${d.name} (${d.email}${d.company ? `, ${d.company}` : ""}) pitched: <strong>${d.title}</strong>. Review in <a href="${SITE.url}/admin/submissions">admin</a>.</p>`, text: `${d.name} pitched ${d.title}` });
+  const invoicePath = invoiceNo ? orderPath(invoiceNo) : undefined;
+  const e = { name: escapeHtml(d.name), title: escapeHtml(d.title), company: escapeHtml(d.company ?? ""), email: escapeHtml(d.email) };
+  await sendEmail({ to: process.env.EDITORIAL_EMAIL ?? "editorial@searchable.pk", subject: `[${d.kind}] ${d.title}`, html: `<p>${e.name} (${e.email}${e.company ? `, ${e.company}` : ""}) pitched: <strong>${e.title}</strong>. Review in <a href="${SITE.url}/admin/submissions">admin</a>.</p>`, text: `${d.name} pitched ${d.title}` });
   await sendEmail({
     to: d.email,
     subject: d.kind === "guest" ? `We got your pitch: ${SITE.name}` : `Your ${d.kind === "sponsored" ? "sponsored article" : "press release"}: next steps`,
-    html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;padding:24px;line-height:1.6"><p>Thanks, ${d.name}. We received “${d.title}”.</p>${invoiceNo ? `<p>Your invoice is <strong>${invoiceNo}</strong>. Payment details and status: <a href="${SITE.url}/orders/${invoiceNo}">${SITE.url}/orders/${invoiceNo}</a>. We start editing once payment is confirmed and publish within 5 working days.</p>` : `<p>An editor reads every pitch within 5 working days. If it fits, we reply with edits or a publication date; if not, we say so.</p>`}</div>`,
-    text: `Thanks, we received "${d.title}".${invoiceNo ? ` Invoice ${invoiceNo}: ${SITE.url}/orders/${invoiceNo}` : ""}`,
+    html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;padding:24px;line-height:1.6"><p>Thanks, ${e.name}. We received “${e.title}”.</p>${invoiceNo ? `<p>Your invoice is <strong>${invoiceNo}</strong>. Payment details and status: <a href="${SITE.url}${invoicePath}">${SITE.url}/orders/${invoiceNo}</a>. We start editing once payment is confirmed and publish within 5 working days.</p>` : `<p>An editor reads every pitch within 5 working days. If it fits, we reply with edits or a publication date; if not, we say so.</p>`}</div>`,
+    text: `Thanks, we received "${d.title}".${invoiceNo ? ` Invoice ${invoiceNo}: ${SITE.url}${invoicePath}` : ""}`,
   });
-  return { ok: true, id: row.id, invoiceNo };
+  return { ok: true, id: row.id, invoiceNo, invoicePath };
 }
 
 /* ───────────── Admin: submissions ───────────── */

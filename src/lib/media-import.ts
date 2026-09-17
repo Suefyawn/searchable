@@ -16,6 +16,7 @@ export async function importImageFromUrl(url: string, opts: { variant?: "article
   if (!/^https:\/\//.test(url)) throw new Error("Image URL must be https");
   const res = await fetch(url, { headers: { "user-agent": UA }, redirect: "follow", signal: AbortSignal.timeout(15_000) });
   if (!res.ok) throw new Error(`Image download failed: ${res.status}`);
+  if (!/^https:\/\//.test(res.url)) throw new Error("Image URL redirected off https");
   const type = res.headers.get("content-type") ?? "";
   if (!/^image\/(jpeg|png|webp|gif|avif)/.test(type)) throw new Error(`Not an image (${type || "unknown type"})`);
   const buf = Buffer.from(await res.arrayBuffer());

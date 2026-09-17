@@ -1,7 +1,9 @@
 import { and, asc, desc, eq, inArray, lt, or, sql } from "drizzle-orm";
 import { getDb, rawQuery, schema } from "@/db";
+import type { SessionUser } from "./auth";
 import { POST_KINDS, type PostKindKey } from "./community-schema";
 import { removeSearchDocument, syncSearchDocument } from "./search";
+import { slugify, uniqueSlug } from "./slug";
 
 /** Read side for the community: posts, comments, members, plus the search indexer. */
 
@@ -108,6 +110,17 @@ export async function getMemberByHandle(handle: string) {
 export async function getMemberByUser(userId: string) {
   const db = await getDb();
   return db.query.memberProfiles.findFirst({ where: eq(schema.memberProfiles.userId, userId), with: { city: { columns: { name: true, slug: true } } } });
+}
+
+/** Every member gets a handle on first write, derived from their name, so profiles and bylines always resolve. */
+export async function ensureMemberProfile(user: SessionUser) {
+  const db = await getDb();
+  const existing = await db.query.memberProfiles.findFirst({ where: eq(schema.memberProfiles.userId, user.id) });
+  if (existing) return existing;
+  const base = slugify(user.name || user.email.split("@")[0]).replace(/-/g, "_").slice(0, 24) || "member";
+  const handle = await uniqueSlug(base, async (h) => !!(await db.query.memberProfiles.findFirst({ where: eq(schema.memberProfiles.handle, h), columns: { id: true } })));
+  const [row] = await db.insert(schema.memberProfiles).values({ userId: user.id, handle, displayName: user.name || handle, avatarUrl: user.image ?? null }).returning();
+  return row;
 }
 
 /** A member's linked business listings and professional profiles, for the public profile. */

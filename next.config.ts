@@ -17,8 +17,22 @@ const nextConfig: NextConfig = {
   },
 };
 
+/**
+ * Security headers on every response. Framing is refused everywhere except calculator pages, which other sites
+ * embed through ?embed=1 (src/components/tools/embed.tsx). A full script CSP is not workable with AdSense; the
+ * page is protected by escaping instead (src/lib/markdown.ts). Vercel adds HSTS itself.
+ */
+const SECURITY_HEADERS = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+  { key: "Content-Security-Policy", value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'" },
+];
+
 /** RFC 8288 / RFC 9727 discovery links on the home page: where the API catalog, OpenAPI and docs live. */
 nextConfig.headers = async () => [
+  { source: "/:path*", headers: SECURITY_HEADERS },
+  { source: "/tools/:category/:slug", headers: [{ key: "Content-Security-Policy", value: "frame-ancestors *; object-src 'none'; base-uri 'self'" }] },
   {
     source: "/",
     headers: [

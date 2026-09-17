@@ -1,4 +1,9 @@
-import { marked, type Tokens } from "marked";
+import { Marked, type MarkedExtension, type Tokens } from "marked";
+
+/** Escape text for an HTML text node or attribute value. */
+export function escapeHtml(s: string): string {
+  return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+}
 
 function headingId(text: string): string {
   return text
@@ -8,7 +13,17 @@ function headingId(text: string): string {
     .replace(/^-|-$/g, "");
 }
 
-marked.use({
+/**
+ * Only web, mail and phone links survive; `javascript:` and every other scheme become "#". Control characters
+ * are ignored for the check because browsers drop them from URLs ("java\tscript:" runs).
+ */
+function safeHref(href: string): string {
+  const probe = href.replace(/[\u0000-\u0020\u007f]/g, "");
+  if (/^[a-z][a-z0-9+.-]*:/i.test(probe) && !/^(https?|mailto|tel):/i.test(probe)) return "#";
+  return escapeHtml(href);
+}
+
+const base: MarkedExtension = {
   gfm: true,
   breaks: false,
   renderer: {
@@ -28,14 +43,23 @@ marked.use({
       const text = this.parser.parseInline(tokens);
       const external = /^https?:\/\//.test(href);
       const attrs = external ? ' target="_blank" rel="noopener"' : "";
-      return `<a href="${href}"${title ? ` title="${title}"` : ""}${attrs}>${text}</a>`;
+      return `<a href="${safeHref(href)}"${title ? ` title="${escapeHtml(title)}"` : ""}${attrs}>${text}</a>`;
     },
   },
-});
+};
 
-/** Server-side Markdown → HTML for trusted (editor-authored) content. */
+const trusted = new Marked(base);
+/** Same Markdown, but raw HTML is shown as text instead of being inserted into the page. */
+const untrusted = new Marked(base, { renderer: { html: ({ text }: Tokens.HTML | Tokens.Tag) => escapeHtml(text) } });
+
+/** Server-side Markdown → HTML for trusted (editor-authored) content: articles, tool methodology, site pages. */
 export function renderMarkdown(md: string): string {
-  return marked.parse(md ?? "", { async: false }) as string;
+  return trusted.parse(md ?? "", { async: false }) as string;
+}
+
+/** Markdown written by members (posts, profile bios): no raw HTML, no script links. */
+export function renderUserMarkdown(md: string): string {
+  return untrusted.parse(md ?? "", { async: false }) as string;
 }
 
 export type TocItem = { id: string; text: string; level: number };

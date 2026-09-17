@@ -4,7 +4,7 @@ import { ProfessionalEditor } from "@/components/professionals/professional-edit
 import { Badge, SectionHeader } from "@/components/ui";
 import { getProfession } from "@/content/professions";
 import { requireUser } from "@/lib/auth";
-import { canEditProfessional } from "@/lib/professional-actions";
+import { canEditProfessional } from "@/lib/professionals";
 import { professionalEditorOptions } from "@/lib/professional-editor-data";
 import { getProfessionalById, toFormInput } from "@/lib/professionals";
 

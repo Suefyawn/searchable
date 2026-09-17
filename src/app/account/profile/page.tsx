@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { SectionHeader } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
-import { getMemberByUser } from "@/lib/community";
-import { ensureMemberProfile } from "@/lib/community-actions";
+import { ensureMemberProfile, getMemberByUser } from "@/lib/community";
 import { professionalEditorOptions } from "@/lib/professional-editor-data";
 import { ProfileForm } from "./profile-form";
 

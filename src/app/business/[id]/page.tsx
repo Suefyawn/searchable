@@ -6,7 +6,7 @@ import { ReviewResponseForm } from "@/components/directory/review-response-form"
 import { Badge } from "@/components/ui";
 import { getDb, schema } from "@/db";
 import { requireUser } from "@/lib/auth";
-import { canEditBusiness } from "@/lib/business-actions";
+import { canEditBusiness } from "@/lib/business-editor-data";
 import { loadBusinessEditor } from "@/lib/business-editor-data";
 import { formatDate } from "@/lib/format";
 

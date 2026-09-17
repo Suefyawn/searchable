@@ -19,7 +19,9 @@ const MODE = process.env.SEED_MODE === "reference" ? "reference" : "sample";
 
 async function seedAdmin() {
   const email = process.env.SEED_ADMIN_EMAIL ?? "admin@searchable.pk";
-  const password = process.env.SEED_ADMIN_PASSWORD ?? "searchable-admin-123";
+  const local = (process.env.DATABASE_URL ?? "pglite://").startsWith("pglite://");
+  const password = process.env.SEED_ADMIN_PASSWORD ?? (local ? "searchable-admin-123" : undefined);
+  if (!password) throw new Error("Set SEED_ADMIN_PASSWORD before seeding a database that is not local PGlite.");
   const db = await getDb();
   const existing = await db.query.users.findFirst({ where: eq(schema.users.email, email) });
   if (existing) {

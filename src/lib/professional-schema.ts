@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { PROFESSIONS } from "@/content/professions";
+import { assetUrl, webUrl } from "./url-fields";
 
 const Experience = z.object({ title: z.string().trim().min(1).max(120), org: z.string().trim().max(120).optional(), from: z.string().trim().max(10).optional(), to: z.string().trim().max(10).optional(), description: z.string().trim().max(400).optional() });
 const Education = z.object({ degree: z.string().trim().min(1).max(120), institution: z.string().trim().max(120).optional(), year: z.string().trim().max(10).optional() });
@@ -21,7 +22,7 @@ export const ProfessionalInput = z.object({
   whatsapp: z.string().trim().max(20).optional(),
   email: z.string().trim().max(120).optional(),
   showEmail: z.boolean().default(false),
-  website: z.string().trim().max(200).optional(),
+  website: webUrl.optional(),
   linkedin: handle,
   x: handle,
   instagram: handle,
@@ -41,8 +42,8 @@ export const ProfessionalInput = z.object({
   availability: z.string().trim().max(160).optional(),
   rateFrom: z.number().int().nonnegative().optional(),
   rateUnit: z.string().trim().max(30).optional(),
-  cvUrl: z.string().trim().max(500).optional(),
+  cvUrl: assetUrl.optional(),
   cvPublic: z.boolean().default(true),
-  photoUrl: z.string().trim().max(500).optional(),
+  photoUrl: assetUrl.optional(),
 });
 export type ProfessionalFormInput = z.infer<typeof ProfessionalInput>;

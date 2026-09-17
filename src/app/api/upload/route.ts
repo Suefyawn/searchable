@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionUser, hasRole } from "@/lib/auth";
-import { canEditBusiness } from "@/lib/business-actions";
+import { canEditBusiness } from "@/lib/business-editor-data";
 import { rateLimit } from "@/lib/rate-limit";
 import { ALLOWED_TYPES, DOCUMENT_TYPES, MAX_DOCUMENT_BYTES, MAX_UPLOAD_BYTES, storeDocument, storeImage } from "@/lib/storage";
 

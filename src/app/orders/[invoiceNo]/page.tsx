@@ -5,6 +5,8 @@ import { PaymentReferenceForm } from "@/components/payment-reference-form";
 import { Badge, Breadcrumbs } from "@/components/ui";
 import { getDb, schema } from "@/db";
 import { getProduct, PAYMENT_DETAILS_SET, PAYMENT_INSTRUCTIONS } from "@/content/pricing";
+import { getSessionUser } from "@/lib/auth";
+import { canViewOrder } from "@/lib/commerce";
 import { formatDate, pkr } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -12,12 +14,12 @@ export const metadata = { title: "Invoice", robots: { index: false, follow: fals
 
 const TONE: Record<string, "neutral" | "warning" | "success" | "danger"> = { pending: "warning", paid: "success", active: "success", expired: "neutral", cancelled: "danger", refunded: "neutral" };
 
-/** Invoice + payment instructions. The URL is the secret (unguessable enough for a Rs 5–35k invoice; no PII beyond the payer's own). */
-export default async function InvoicePage({ params }: { params: Promise<{ invoiceNo: string }> }) {
-  const { invoiceNo } = await params;
+/** Invoice + payment instructions. Reachable through the signed link in the email (`?k=`), by the account that placed the order, or by an admin. */
+export default async function InvoicePage({ params, searchParams }: { params: Promise<{ invoiceNo: string }>; searchParams: Promise<{ k?: string }> }) {
+  const [{ invoiceNo }, { k }] = await Promise.all([params, searchParams]);
   const db = await getDb();
   const order = await db.query.orders.findFirst({ where: eq(schema.orders.invoiceNo, invoiceNo) });
-  if (!order) notFound();
+  if (!order || !canViewOrder(order, await getSessionUser(), k)) notFound();
   const product = getProduct(order.productCode);
   const business = order.businessId ? await db.query.businesses.findFirst({ where: eq(schema.businesses.id, order.businessId), columns: { name: true, slug: true } }) : null;
 
@@ -102,7 +104,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ invoic
             </p>
           )}
           <div className="mt-6">
-            <PaymentReferenceForm invoiceNo={order.invoiceNo} existing={order.paymentReference} />
+            <PaymentReferenceForm invoiceNo={order.invoiceNo} k={k} existing={order.paymentReference} />
           </div>
         </section>
       ) : null}

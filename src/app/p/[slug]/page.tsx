@@ -9,7 +9,7 @@ import { getProfession } from "@/content/professions";
 import { followRedirect } from "@/lib/redirects";
 import { srcSetFor } from "@/lib/images";
 import { formatDate, pkr } from "@/lib/format";
-import { renderMarkdown } from "@/lib/markdown";
+import { renderUserMarkdown } from "@/lib/markdown";
 import { getProfessional, listProfessionals } from "@/lib/professionals";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/utils";
@@ -161,7 +161,7 @@ export default async function ProfessionalPage({ params }: { params: Promise<{ s
           {p.bio ? (
             <section>
               <h2 className="eyebrow mb-3">About</h2>
-              <div className="prose max-w-[70ch] text-[16px] leading-relaxed" dangerouslySetInnerHTML={{ __html: renderMarkdown(p.bio) }} />
+              <div className="prose max-w-[70ch] text-[16px] leading-relaxed" dangerouslySetInnerHTML={{ __html: renderUserMarkdown(p.bio) }} />
             </section>
           ) : null}
           {p.services.length ? (

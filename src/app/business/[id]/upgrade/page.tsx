@@ -5,7 +5,7 @@ import { Badge, Button, Input } from "@/components/ui";
 import { getDb, schema } from "@/db";
 import { PRODUCTS } from "@/content/pricing";
 import { requireUser } from "@/lib/auth";
-import { canEditBusiness } from "@/lib/business-actions";
+import { canEditBusiness } from "@/lib/business-editor-data";
 import { buyPlanAction } from "@/lib/commerce-actions";
 import { formatDate, pkr } from "@/lib/format";
 
