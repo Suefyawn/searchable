@@ -10,8 +10,12 @@ const nextConfig: NextConfig = {
   // Renditions are written at upload time (src/lib/storage.ts) and served as plain <img srcset>, so the
   // metered image optimiser is never used.
   images: { unoptimized: true },
-  // The social-card renderer reads Geist from public/fonts at request time; ship the files with that function.
-  outputFileTracingIncludes: { "/og": ["./public/fonts/*.ttf"] },
+  // Files read at request time that the tracer cannot see: the social card fonts, and the WebAssembly image
+  // codecs that src/lib/platform.ts resolves by name (uploads, imports and photo backfill run from many routes).
+  outputFileTracingIncludes: {
+    "/og": ["./public/fonts/*.ttf"],
+    "/**": ["./node_modules/@cf-wasm/photon/dist/lib/photon_rs_bg.wasm", "./node_modules/@jsquash/webp/codec/enc/*.wasm"],
+  },
   experimental: {
     serverActions: { bodySizeLimit: "4mb" },
     ...(usingPglite ? { cpus: 1, workerThreads: false } : {}),

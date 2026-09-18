@@ -12,9 +12,22 @@ export type Decoded = { img: PhotonImage; width: number; height: number };
 let photon: Promise<unknown> | undefined;
 let encoder: Promise<unknown> | undefined;
 
+/** Initialise once per process; a failed attempt is forgotten so the next call can retry. */
+function once(slot: "photon" | "encoder", start: () => Promise<unknown>): Promise<unknown> {
+  const current = slot === "photon" ? photon : encoder;
+  if (current) return current;
+  const p = start().catch((e) => {
+    if (slot === "photon") photon = undefined;
+    else encoder = undefined;
+    throw e;
+  });
+  if (slot === "photon") photon = p;
+  else encoder = p;
+  return p;
+}
+
 export async function decodeImage(bytes: Uint8Array): Promise<Decoded> {
-  photon ??= photonModule().then((m) => initPhoton({ module_or_path: m }));
-  await photon;
+  await once("photon", () => photonModule().then((m) => initPhoton({ module_or_path: m })));
   const img = PhotonImage.new_from_byteslice(bytes);
   return { img, width: img.get_width(), height: img.get_height() };
 }
@@ -30,8 +43,7 @@ export async function toWebp(src: Decoded, max: { width: number; height?: number
   const height = Math.max(1, Math.round(src.height * scale));
   const scaled = scale < 1 ? resize(src.img, width, height, SamplingFilter.Lanczos3) : src.img;
   try {
-    encoder ??= webpEncoderModule().then((m) => initWebp(m));
-    await encoder;
+    await once("encoder", () => webpEncoderModule().then((m) => initWebp(m)));
     const rgba = scaled.get_raw_pixels();
     const out = await encode({ data: new Uint8ClampedArray(rgba.buffer, rgba.byteOffset, rgba.byteLength), width, height, colorSpace: "srgb" } as ImageData, { quality, method: 4 });
     return { data: new Uint8Array(out), width, height };

@@ -67,12 +67,15 @@ export async function userForBearer(given: string | undefined): Promise<SessionU
   if (!row) return null;
   // last_used_at is a coarse signal for the admin page; one write every five minutes per key at most.
   if (!row.lastUsedAt || Date.now() - row.lastUsedAt.getTime() > 5 * 60_000) await db.update(schema.apiKeys).set({ lastUsedAt: new Date() }).where(eq(schema.apiKeys.id, row.id));
-  return actAs(db, row.createdBy, row.role);
+  // A key is only as strong as its maker still is: a demoted or deleted admin takes their keys down with them.
+  const maker = row.createdBy ? await db.query.users.findFirst({ where: eq(schema.users.id, row.createdBy) }) : null;
+  if (!maker || ROLE_RANK[maker.role] < ROLE_RANK[row.role]) return null;
+  return { id: maker.id, email: maker.email, name: maker.name, role: row.role, image: maker.image };
 }
 
-async function actAs(db: Database, userId: string | null, role: Role): Promise<SessionUser | null> {
-  const own = userId ? await db.query.users.findFirst({ where: eq(schema.users.id, userId) }) : null;
-  const user = own ?? (await db.query.users.findFirst({ where: eq(schema.users.role, "admin"), orderBy: [asc(schema.users.createdAt)] }));
+/** The environment key stands for the first admin account. */
+async function actAs(db: Database, _userId: null, role: Role): Promise<SessionUser | null> {
+  const user = await db.query.users.findFirst({ where: eq(schema.users.role, "admin"), orderBy: [asc(schema.users.createdAt)] });
   return user ? { id: user.id, email: user.email, name: user.name, role, image: user.image } : null;
 }
 
