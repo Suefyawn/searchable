@@ -17,6 +17,8 @@ const CONTENT_SIGNAL = "Content-Signal: search=yes, ai-input=yes, ai-train=yes";
 export const dynamic = "force-static";
 
 export function GET() {
+  // Staging (NOINDEX=1 in wrangler.jsonc) must never be indexed alongside the real site.
+  if (process.env.NOINDEX) return new Response(["User-Agent: *", "Disallow: /", ""].join("\n"), { headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" } });
   const lines: string[] = [
     "# Searchable.pk welcomes search engines and AI assistants. Cite us: every page has a markdown rendition",
     "# (Accept: text/markdown, or /api/md/<path>) and /llms.txt lists what is here.",

@@ -5,12 +5,13 @@ import type { NextConfig } from "next";
 const usingPglite = (process.env.DATABASE_URL ?? "pglite://./.data/pglite").startsWith("pglite://");
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["@electric-sql/pglite"],
+  // PGlite (local database) and the WebAssembly image codecs load their binaries relative to their own files.
+  serverExternalPackages: ["@electric-sql/pglite", "@cf-wasm/photon", "@jsquash/webp"],
   // Renditions are written at upload time (src/lib/storage.ts) and served as plain <img srcset>, so the
   // metered image optimiser is never used.
   images: { unoptimized: true },
-  // The social-card renderer reads its serif font from disk; make sure the file ships with that function.
-  outputFileTracingIncludes: { "/og": ["./src/app/og/*.ttf"] },
+  // The social-card renderer reads Geist from public/fonts at request time; ship the files with that function.
+  outputFileTracingIncludes: { "/og": ["./public/fonts/*.ttf"] },
   experimental: {
     serverActions: { bodySizeLimit: "4mb" },
     ...(usingPglite ? { cpus: 1, workerThreads: false } : {}),

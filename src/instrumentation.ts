@@ -8,7 +8,6 @@ import type { Instrumentation } from "next";
  * must never turn one error into two.
  */
 export const onRequestError: Instrumentation.onRequestError = async (err, request, context) => {
-  if (process.env.NEXT_RUNTIME !== "nodejs") return;
   try {
     const { getDb, schema } = await import("@/db");
     const e = err as Error & { digest?: string };

@@ -1,13 +1,15 @@
 import "dotenv/config";
-import { mkdirSync } from "node:fs";
-import path from "node:path";
 import { Param, SQL } from "drizzle-orm";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
+import { bindings } from "@/lib/platform";
 import * as schema from "./schema";
 
 export type Database = PgDatabase<PgQueryResultHKT, typeof schema>;
 
-const DATABASE_URL = process.env.DATABASE_URL ?? "pglite://./.data/pglite";
+// On Workers the Hyperdrive binding carries the connection string (pooled next to the database); elsewhere
+// DATABASE_URL does, defaulting to the local PGlite directory.
+const hyperdrive = bindings().HYPERDRIVE;
+const DATABASE_URL = hyperdrive?.connectionString ?? process.env.DATABASE_URL ?? "pglite://./.data/pglite";
 export const isPglite = DATABASE_URL.startsWith("pglite://");
 
 type Globals = typeof globalThis & {
@@ -23,6 +25,7 @@ async function create(): Promise<Database> {
     const { drizzle } = await import("drizzle-orm/pglite");
     const dataDir = DATABASE_URL.replace("pglite://", "");
     // PGlite creates the data directory itself but not its parent; a fresh checkout (CI) has no .data/ yet.
+    const [{ mkdirSync }, path] = await Promise.all([import("node:fs"), import("node:path")]);
     mkdirSync(path.dirname(dataDir), { recursive: true });
     // pg_trgm powers typo-tolerant search (migration 0005); Supabase has it built in.
     const client = await PGlite.create({ dataDir, extensions: { pg_trgm } });
@@ -37,7 +40,7 @@ async function create(): Promise<Database> {
   // is off there: queued queries go one at a time, a few hundred milliseconds on a cold render, nothing on ISR
   // hits. Pipelining off also disables postgres-js transactions, which the app never uses but the migrator
   // does; scripts run on the session pooler (5432), where pipelining stays on.
-  const serverless = !!process.env.VERCEL || !!process.env.CF_PAGES || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+  const serverless = !!hyperdrive || !!process.env.VERCEL || !!process.env.CF_PAGES || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
   const transactionPooler = /:6543\//.test(DATABASE_URL);
   // max_pipeline is a documented postgres-js option that its type definitions leave out.
   const options = { max: serverless ? 1 : 5, prepare: false, max_pipeline: transactionPooler ? 0 : 100, idle_timeout: 20, connect_timeout: 10 } as Parameters<typeof postgres>[1];

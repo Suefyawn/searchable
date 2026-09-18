@@ -19,6 +19,7 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
+      - run: npm test
       - name: Migrations apply cleanly to a fresh database
         run: npm run db:migrate
       - name: Reference seed

@@ -15,6 +15,7 @@ npm run db:reset       # wipe .data/pglite, migrate, seed
 npm run search:reindex # rebuild search_documents
 npm test              # pure-function checks, no database (calculators, slugs, markdown, webhook signatures, no em dashes)
 npm run typecheck && npm run lint && npm run build
+npm run build:vinext   # Cloudflare Workers build (dist/); npm run start:vinext runs it under wrangler dev
 ```
 
 ## Rules
@@ -28,4 +29,5 @@ npm run typecheck && npm run lint && npm run build
 8. **No client-side data fetching** on public pages (the one exception: the home live feed refreshes from `/api/feed` at the CDN interval). `"use client"` only for interactivity (search box, tool forms, editors). Member-written Markdown renders through `renderUserMarkdown()`, never `renderMarkdown()`.
 9. **Money & rates** live in versioned data files with sources, never inline constants in calculators.
 10. **No em dashes, anywhere.** Not in site copy, tool text, docs, commit messages or UI strings. Use a comma, colon, full stop, parentheses or a plain hyphen. (Founder rule: em dashes read as machine-written.) Ranges may use a hyphen or en dash (2026-27, Rs 1.5-3 lakh).
-11. Keep files small and named by domain. Match surrounding style. Do not add dependencies without an ADR in `docs/DECISIONS.md`.
+11. **Runtime differences** (Workers vs Node) go only in `src/lib/platform.ts` and `src/lib/platform.workerd.ts`; never import `cloudflare:workers`, `node:fs` writes or WebAssembly modules anywhere else.
+12. Keep files small and named by domain. Match surrounding style. Do not add dependencies without an ADR in `docs/DECISIONS.md`.

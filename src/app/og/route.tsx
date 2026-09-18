@@ -1,20 +1,14 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { ImageResponse } from "next/og";
+import { publicFont } from "@/lib/platform";
 import { SITE } from "@/lib/utils";
 
 import { MARK_HANDLE, MARK_RING } from "@/components/brand";
 
-export const runtime = "nodejs";
-
-/** Geist throughout (600 for the headline); read once per instance from the files beside this route. */
+/** Geist throughout (600 for the headline); read once per instance from public/fonts. */
 type Font = { name: string; data: ArrayBuffer; weight: 400 | 600; style: "normal" };
 let fonts: Promise<Font[]> | null = null;
 function loadFonts() {
-  const read = async (file: string, name: string, weight: 400 | 600): Promise<Font> => {
-    const b = await readFile(path.join(process.cwd(), "src/app/og", file));
-    return { name, data: b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer, weight, style: "normal" };
-  };
+  const read = async (file: string, name: string, weight: 400 | 600): Promise<Font> => ({ name, data: await publicFont(file), weight, style: "normal" });
   fonts ??= Promise.all([read("geist-400.ttf", "Geist", 400), read("geist-600.ttf", "Geist", 600)]);
   return fonts;
 }

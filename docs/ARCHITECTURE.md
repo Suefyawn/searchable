@@ -34,11 +34,16 @@ One Next.js 16 application serves everything: public site, admin, business dashb
 5. **Search index is write-through:** every content/directory mutation calls `syncSearchDocument()` (through the `index*()` helpers in `src/lib/indexers.ts`). `scripts/reindex.ts` rebuilds from scratch.
 6. **Per-request memoisation:** getters that both `generateMetadata` and the page body call (`getArticle`, `getBusiness`, `getCity`, `readSiteSettings`, …) are wrapped in React `cache()`, so a render runs each query once.
 
+## Runtime-specific code
+
+Everything that differs between Node (Vercel, `next dev`, scripts) and Cloudflare Workers sits in one module pair: `src/lib/platform.ts` and `src/lib/platform.workerd.ts` (bindings, the WebAssembly image codecs, fonts). The vinext build swaps one for the other (`vite.config.ts`, ADR-41); nothing else in `src/` asks where it runs. Images are decoded, scaled and encoded in WebAssembly (`src/lib/image-resize.ts`, ADR-42).
+
 ## Database client (`src/db/index.ts`)
 
 ```
 DATABASE_URL = pglite://./.data/pglite   → drizzle-orm/pglite  (dev, tests)
 DATABASE_URL = postgres://…              → drizzle-orm/postgres-js (Supabase, CI)
+HYPERDRIVE binding (Workers)             → drizzle-orm/postgres-js through Cloudflare Hyperdrive
 ```
 
 A `globalThis` singleton prevents duplicate PGlite instances across HMR. `@electric-sql/pglite` is marked as a server-external package in `next.config.ts`.

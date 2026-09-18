@@ -31,3 +31,5 @@ coverage/
 
 # graphify knowledge graph output (local tooling)
 graphify-out/
+.vinext/
+.wrangler/

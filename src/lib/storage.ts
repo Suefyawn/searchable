@@ -1,8 +1,7 @@
 import { createHash, createHmac } from "node:crypto";
-import { mkdirSync, writeFileSync } from "node:fs";
-import path from "node:path";
-import sharp from "sharp";
 import { getDb, schema } from "@/db";
+import { decodeImage, toWebp, type Decoded } from "@/lib/image-resize";
+import { bindings } from "@/lib/platform";
 import { RENDITION_WIDTHS } from "./images";
 
 export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
@@ -19,33 +18,38 @@ const VARIANT_MAX: Record<Variant, number> = { article: 1800, logo: 512, cover: 
  * Normalises an uploaded image (resize to a sane maximum, convert to WebP, strip metadata), writes it plus
  * 480 and 960 px renditions, and records it in the `media` table.
  *
- * Renditions are made here, once, with sharp, so the site never needs an image-optimisation service
- * (Vercel's is metered on the free plan). Pages use plain <img srcset> via `srcSetFor()`.
+ * Renditions are made here, once, in WebAssembly (src/lib/image-resize.ts), so the site never needs an
+ * image-optimisation service (metered everywhere). Pages use plain <img srcset> via `srcSetFor()`.
  *
  * STORAGE_PROVIDER=local (default) writes to public/uploads/YYYY/MM/. `r2` puts objects in a Cloudflare R2
- * bucket (free egress, served from R2_PUBLIC_URL). `supabase` uses Supabase Storage (metered egress; avoid).
+ * bucket (free egress, served from R2_PUBLIC_URL) through the MEDIA binding on Workers or a signed PUT
+ * elsewhere. `supabase` uses Supabase Storage (metered egress; avoid).
  */
-export async function storeImage(input: Buffer, opts: { variant: Variant; alt?: string; credit?: string; originalName?: string }): Promise<StoredImage> {
+export async function storeImage(input: Uint8Array, opts: { variant: Variant; alt?: string; credit?: string; originalName?: string }): Promise<StoredImage> {
   const max = VARIANT_MAX[opts.variant];
-  const base = sharp(input, { failOn: "error" }).rotate();
-  const out = await base.clone().resize({ width: max, height: max, fit: "inside", withoutEnlargement: true }).webp({ quality: 82, effort: 4 }).toBuffer({ resolveWithObject: true });
-  const id = crypto.randomUUID();
-  const now = new Date();
-  const dir = `uploads/${now.getUTCFullYear()}/${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
-  const key = `${dir}/${id}.webp`;
-  const url = await putObject(key, out.data, "image/webp");
-  await writeRenditions(base, out.info.width, `${dir}/${id}`);
-  const db = await getDb();
-  const [row] = await db
-    .insert(schema.media)
-    .values({ url, storageKey: key, mimeType: "image/webp", width: out.info.width, height: out.info.height, bytes: out.info.size, alt: opts.alt ?? opts.originalName?.replace(/\.[a-z0-9]+$/i, "") ?? null, credit: opts.credit ?? null })
-    .returning({ id: schema.media.id });
-  return { id: row.id, url, width: out.info.width, height: out.info.height, bytes: out.info.size, mimeType: "image/webp" };
+  const decoded = await decodeImage(input);
+  try {
+    const out = await toWebp(decoded, { width: max, height: max }, 82);
+    const id = crypto.randomUUID();
+    const now = new Date();
+    const dir = `uploads/${now.getUTCFullYear()}/${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
+    const key = `${dir}/${id}.webp`;
+    const url = await putObject(key, out.data, "image/webp");
+    await writeRenditions(decoded, out.width, `${dir}/${id}`);
+    const db = await getDb();
+    const [row] = await db
+      .insert(schema.media)
+      .values({ url, storageKey: key, mimeType: "image/webp", width: out.width, height: out.height, bytes: out.data.byteLength, alt: opts.alt ?? opts.originalName?.replace(/\.[a-z0-9]+$/i, "") ?? null, credit: opts.credit ?? null })
+      .returning({ id: schema.media.id });
+    return { id: row.id, url, width: out.width, height: out.height, bytes: out.data.byteLength, mimeType: "image/webp" };
+  } finally {
+    decoded.img.free();
+  }
 }
 
 /** Stores a document as is (CVs are PDFs). Same providers as images; served from an unguessable key. */
-export async function storeDocument(input: Buffer, opts: { mimeType: string; originalName?: string; folder?: string }): Promise<{ id: string; url: string; bytes: number }> {
-  if (!DOCUMENT_TYPES.has(opts.mimeType) || input.subarray(0, 5).toString("latin1") !== "%PDF-") throw new Error("Only PDF documents are accepted");
+export async function storeDocument(input: Uint8Array, opts: { mimeType: string; originalName?: string; folder?: string }): Promise<{ id: string; url: string; bytes: number }> {
+  if (!DOCUMENT_TYPES.has(opts.mimeType) || new TextDecoder("latin1").decode(input.subarray(0, 5)) !== "%PDF-") throw new Error("Only PDF documents are accepted");
   const id = crypto.randomUUID();
   const key = `uploads/${opts.folder ?? "documents"}/${id}.pdf`;
   const url = await putObject(key, input, opts.mimeType);
@@ -59,10 +63,10 @@ export async function storeDocument(input: Buffer, opts: { mimeType: string; ori
  * the rendition is written as is under that name (never enlarged), because pages build the srcset from the
  * URL alone and a missing rendition is a broken image, not a fallback.
  */
-export async function writeRenditions(image: sharp.Sharp, masterWidth: number, stem: string) {
+export async function writeRenditions(image: Decoded, masterWidth: number, stem: string) {
   for (const w of RENDITION_WIDTHS) {
-    const r = await image.clone().resize({ width: Math.min(w, masterWidth || w), withoutEnlargement: true }).webp({ quality: 78, effort: 4 }).toBuffer();
-    await putObject(`${stem}-${w}.webp`, r, "image/webp");
+    const r = await toWebp(image, { width: Math.min(w, masterWidth || w) }, 78);
+    await putObject(`${stem}-${w}.webp`, r.data, "image/webp");
   }
 }
 
@@ -89,7 +93,7 @@ export async function backfillRenditions(limit = 40): Promise<{ checked: number;
       if (!missing.length) continue;
       const res = await fetch(m.url, { cache: "no-store" });
       if (!res.ok) throw new Error(`${res.status}`);
-      const buf = Buffer.from(await res.arrayBuffer());
+      const buf = new Uint8Array(await res.arrayBuffer());
       for (const w of missing) {
         await putObject(`${stem}-${w}.webp`, buf, "image/webp");
         written += 1;
@@ -101,7 +105,7 @@ export async function backfillRenditions(limit = 40): Promise<{ checked: number;
   return { checked: rows.length, written, failed };
 }
 
-export async function putObject(key: string, data: Buffer, contentType: string): Promise<string> {
+export async function putObject(key: string, data: Uint8Array, contentType: string): Promise<string> {
   const provider = process.env.STORAGE_PROVIDER ?? "local";
   if (provider === "r2") return putR2(key, data, contentType);
   if (provider === "supabase") {
@@ -117,6 +121,8 @@ export async function putObject(key: string, data: Buffer, contentType: string):
     if (!res.ok) throw new Error(`Supabase Storage upload failed: ${res.status} ${await res.text()}`);
     return `${base}/storage/v1/object/public/${bucket}/${key}`;
   }
+  // Local disk, development only; loaded on demand so the Workers bundle never carries a filesystem write.
+  const [{ mkdirSync, writeFileSync }, path] = await Promise.all([import("node:fs"), import("node:path")]);
   const abs = path.join(process.cwd(), "public", key);
   mkdirSync(path.dirname(abs), { recursive: true });
   writeFileSync(abs, data);
@@ -124,11 +130,18 @@ export async function putObject(key: string, data: Buffer, contentType: string):
 }
 
 /**
- * Cloudflare R2 via the S3 API, signed with AWS SigV4 in ~30 lines so we carry no SDK.
- * Needs R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET and R2_PUBLIC_URL
- * (the bucket's custom domain, e.g. https://img.searchable.pk, which Cloudflare caches at the edge).
+ * Cloudflare R2. On Workers the MEDIA bucket binding writes directly (no keys at all). Elsewhere the S3 API
+ * is signed with AWS SigV4 in ~30 lines so we carry no SDK; that path needs R2_ACCOUNT_ID, R2_ACCESS_KEY_ID,
+ * R2_SECRET_ACCESS_KEY and R2_BUCKET. Both need R2_PUBLIC_URL (the bucket's custom domain, e.g.
+ * https://img.searchable.pk, which Cloudflare caches at the edge).
  */
-async function putR2(key: string, data: Buffer, contentType: string): Promise<string> {
+async function putR2(key: string, data: Uint8Array, contentType: string): Promise<string> {
+  const media = bindings().MEDIA;
+  const publicHost = process.env.R2_PUBLIC_URL;
+  if (media && publicHost) {
+    await media.put(key, data, { httpMetadata: { contentType, cacheControl: "public, max-age=31536000, immutable" } });
+    return `${publicHost.replace(/\/$/, "")}/${key}`;
+  }
   const { R2_ACCOUNT_ID: account, R2_ACCESS_KEY_ID: accessKey, R2_SECRET_ACCESS_KEY: secret, R2_BUCKET: bucket, R2_PUBLIC_URL: publicUrl } = process.env;
   if (!account || !accessKey || !secret || !bucket || !publicUrl) throw new Error("R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET and R2_PUBLIC_URL are required for STORAGE_PROVIDER=r2");
   const host = `${account}.r2.cloudflarestorage.com`;
@@ -159,7 +172,7 @@ async function putR2(key: string, data: Buffer, contentType: string): Promise<st
   return `${publicUrl.replace(/\/$/, "")}/${key}`;
 }
 
-function sha256(input: Buffer | string): string {
+function sha256(input: Uint8Array | string): string {
   return createHash("sha256").update(input).digest("hex");
 }
 function hmac(key: Buffer | string, data: string): Buffer {
