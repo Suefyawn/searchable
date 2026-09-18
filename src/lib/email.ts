@@ -1,5 +1,3 @@
-import { mkdirSync, writeFileSync } from "node:fs";
-import path from "node:path";
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 
@@ -60,7 +58,8 @@ export async function emailAllowance(kind: EmailKind = "bulk"): Promise<{ today:
 
 /**
  * Email adapter. `EMAIL_PROVIDER=local` writes an .eml file to .data/outbox so you can inspect sends
- * without any account. `resend` uses the Resend API in production. Every send counts against the budget.
+ * without any account (on a runtime without a writable disk it only logs). `resend` uses the Resend API in
+ * production. `none` (staging) counts the send and drops it. Every send counts against the budget.
  */
 export async function sendEmail(email: Email, kind: EmailKind = "transactional"): Promise<{ id: string }> {
   const provider = process.env.EMAIL_PROVIDER ?? "local";
@@ -78,16 +77,24 @@ export async function sendEmail(email: Email, kind: EmailKind = "transactional")
     const { data, error } = await resend.emails.send({ from, to: email.to, subject: email.subject, html: email.html, text: email.text, replyTo: email.replyTo, headers: email.headers });
     if (error) throw new Error(error.message);
     id = data?.id ?? "";
+  } else if (provider === "none") {
+    id = `dropped-${Date.now()}`;
+    console.info(`[email:none] ${email.subject} -> ${email.to}`);
   } else {
-    const dir = path.join(process.cwd(), ".data", "outbox");
-    mkdirSync(dir, { recursive: true });
     id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    const file = path.join(dir, `${id}.eml`);
     const extra = Object.entries(email.headers ?? {})
       .map(([k, v]) => `${k}: ${v}\n`)
       .join("");
-    writeFileSync(file, `From: ${from}\nTo: ${email.to}\nSubject: ${email.subject}\nDate: ${new Date().toUTCString()}\n${extra}Content-Type: text/html; charset=utf-8\n\n${email.html}`);
-    console.info(`[email:local] ${email.subject} -> ${email.to}  (${file})`);
+    const eml = `From: ${from}\nTo: ${email.to}\nSubject: ${email.subject}\nDate: ${new Date().toUTCString()}\n${extra}Content-Type: text/html; charset=utf-8\n\n${email.html}`;
+    try {
+      const [{ mkdirSync, writeFileSync }, path] = await Promise.all([import("node:fs"), import("node:path")]);
+      const dir = path.join(process.cwd(), ".data", "outbox");
+      mkdirSync(dir, { recursive: true });
+      writeFileSync(path.join(dir, `${id}.eml`), eml);
+      console.info(`[email:local] ${email.subject} -> ${email.to}  (.data/outbox/${id}.eml)`);
+    } catch {
+      console.info(`[email:local] ${email.subject} -> ${email.to}  (no writable disk here)`);
+    }
   }
   budget.dayCount += 1;
   budget.monthCount += 1;

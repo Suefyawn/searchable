@@ -62,6 +62,9 @@ export async function publishDueArticles(): Promise<number> {
 export type JobsResult = { ran: boolean; published?: number; newsletters?: unknown; lapsedPlans?: number; invites?: { sent: number; skipped: string }; digests?: { sent: number }; inbox?: { added: number; skipped?: string }; photos?: { tried: number; filled: number }; at?: string };
 
 export async function runDueJobs(opts: { force?: boolean } = {}): Promise<JobsResult> {
+  // A staging deployment that shares the production database (migration Phase 1) must never publish, send or
+  // expire anything: JOBS_DISABLED=1 in its environment makes every scheduler entry point a no-op.
+  if (process.env.JOBS_DISABLED) return { ran: false };
   const now = Date.now();
   if (!opts.force && now - lastLocalRun < JOB_INTERVAL_MS) return { ran: false };
   const db = await getDb();

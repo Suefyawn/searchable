@@ -6,11 +6,11 @@ import * as schema from "./schema";
 
 export type Database = PgDatabase<PgQueryResultHKT, typeof schema>;
 
-// On Workers the Hyperdrive binding carries the connection string (pooled next to the database); elsewhere
-// DATABASE_URL does, defaulting to the local PGlite directory.
-const hyperdrive = bindings().HYPERDRIVE;
-const DATABASE_URL = hyperdrive?.connectionString ?? process.env.DATABASE_URL ?? "pglite://./.data/pglite";
-export const isPglite = DATABASE_URL.startsWith("pglite://");
+// Scripts and local development read DATABASE_URL, defaulting to the PGlite directory. On Workers the Hyperdrive
+// binding carries the connection string instead; it is read inside create(), never at module scope, because a
+// Worker may not touch bindings while its modules load.
+const ENV_URL = process.env.DATABASE_URL ?? "pglite://./.data/pglite";
+export const isPglite = ENV_URL.startsWith("pglite://");
 
 type Globals = typeof globalThis & {
   __searchableDb?: Database;
@@ -19,7 +19,9 @@ type Globals = typeof globalThis & {
 const g = globalThis as Globals;
 
 async function create(): Promise<Database> {
-  if (isPglite) {
+  const hyperdrive = bindings().HYPERDRIVE;
+  const DATABASE_URL = hyperdrive?.connectionString ?? ENV_URL;
+  if (!hyperdrive && isPglite) {
     const { PGlite } = await import("@electric-sql/pglite");
     const { pg_trgm } = await import("@electric-sql/pglite/contrib/pg_trgm");
     const { drizzle } = await import("drizzle-orm/pglite");
@@ -43,7 +45,9 @@ async function create(): Promise<Database> {
   const serverless = !!hyperdrive || !!process.env.VERCEL || !!process.env.CF_PAGES || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
   const transactionPooler = /:6543\//.test(DATABASE_URL);
   // max_pipeline is a documented postgres-js option that its type definitions leave out.
-  const options = { max: serverless ? 1 : 5, prepare: false, max_pipeline: transactionPooler ? 0 : 100, idle_timeout: 20, connect_timeout: 10 } as Parameters<typeof postgres>[1];
+  // Through Hyperdrive the client lives for one call, so it must not hold its socket open afterwards, and the
+  // type lookup postgres-js does on connect is skipped (Cloudflare's guidance; the schema uses no array types).
+  const options = { max: serverless ? 1 : 5, prepare: false, max_pipeline: transactionPooler ? 0 : 100, idle_timeout: hyperdrive ? 2 : 20, connect_timeout: 10, ...(hyperdrive ? { fetch_types: false } : {}) } as Parameters<typeof postgres>[1];
   const client = postgres(DATABASE_URL, options);
   return drizzle(client, { schema }) as unknown as Database;
 }
@@ -51,8 +55,15 @@ async function create(): Promise<Database> {
 /**
  * Returns the Drizzle database. A globalThis singleton survives Next.js HMR so PGlite
  * never opens the same data directory twice.
+ *
+ * On Workers there is no singleton: a socket belongs to the request that opened it, and reusing it from the
+ * next request hangs that request for good (seen on staging, 2026-09-19). Hyperdrive pools connections a few
+ * milliseconds away, so a fresh client per call is cheap.
  */
+// ponytail: one client per getDb() call on Workers (a page makes 5 to 15); share one per request through
+// AsyncLocalStorage if Hyperdrive connection counts ever matter. Phase 2 (D1) removes the question.
 export async function getDb(): Promise<Database> {
+  if (bindings().HYPERDRIVE) return create();
   if (g.__searchableDb) return g.__searchableDb;
   if (!g.__searchableDbPromise) {
     g.__searchableDbPromise = create().then((db) => {

@@ -15,10 +15,11 @@ export const heavyComputeAllowed = false;
 export const photonModule = async (): Promise<WebAssembly.Module> => PHOTON;
 export const webpEncoderModule = async (): Promise<WebAssembly.Module> => WEBP_ENC;
 
-export async function publicFont(file: string): Promise<ArrayBuffer> {
+export async function publicFile(relPath: string): Promise<ArrayBuffer> {
   const assets = (env as Bindings).ASSETS;
   if (!assets) throw new Error("ASSETS binding missing");
-  const res = await assets.fetch(new Request(`https://assets.local/fonts/${file}`));
-  if (!res.ok) throw new Error(`font ${file}: ${res.status}`);
+  const res = await assets.fetch(new Request(`https://assets.local/${relPath}`));
+  if (!res.ok) throw new Error(`${relPath}: ${res.status}`);
   return res.arrayBuffer();
 }
+export const publicFont = (file: string) => publicFile(`fonts/${file}`);

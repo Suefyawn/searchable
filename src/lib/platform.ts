@@ -31,8 +31,9 @@ const compile = async (specifier: string) => WebAssembly.compile(await readFile(
 export const photonModule = () => compile("@cf-wasm/photon/photon.wasm");
 export const webpEncoderModule = () => compile("@jsquash/webp/codec/enc/webp_enc_simd.wasm");
 
-/** A font from public/fonts, read from disk here and from the static assets binding on Workers. */
-export async function publicFont(file: string): Promise<ArrayBuffer> {
-  const b = await readFile(path.join(process.cwd(), "public", "fonts", file));
+/** A file under public/, read from disk here and from the static assets binding on Workers. */
+export async function publicFile(relPath: string): Promise<ArrayBuffer> {
+  const b = await readFile(path.join(process.cwd(), "public", relPath));
   return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer;
 }
+export const publicFont = (file: string) => publicFile(`fonts/${file}`);

@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { heavyComputeAllowed, publicFont } from "@/lib/platform";
+import { heavyComputeAllowed, publicFile, publicFont } from "@/lib/platform";
 import { SITE } from "@/lib/utils";
 
 import { MARK_HANDLE, MARK_RING } from "@/components/brand";
@@ -16,7 +16,7 @@ function loadFonts() {
 /** Social card: /og?title=…&kicker=…  Rendered on demand and cached. */
 export async function GET(req: Request) {
   // Cards shared before a runtime change keep resolving: answer with the static card instead of rendering one.
-  if (!heavyComputeAllowed) return fetch(new URL("/og-card.png", req.url));
+  if (!heavyComputeAllowed) return new Response(await publicFile("og-card.png"), { headers: { "content-type": "image/png", "cache-control": "public, max-age=86400, s-maxage=31536000, immutable" } });
   const url = new URL(req.url);
   const title = (url.searchParams.get("title") ?? SITE.tagline).slice(0, 140);
   const kicker = (url.searchParams.get("kicker") ?? "").slice(0, 40);
