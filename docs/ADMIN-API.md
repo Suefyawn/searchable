@@ -1,5 +1,7 @@
 # Admin API
 
+> **Contract frozen 2026-09-19** for the Cloudflare migration (docs/INVENTORY.md). Every route below keeps its path, method, auth, request fields and the response keys listed under "Response shapes" until the migration's contract suite (`tests/contract/admin-api.test.ts`) is green in production. Additions are allowed; changes and removals are not.
+
 JSON API for automation: the scheduled content task, scripts, anything that should do what an editor does without a browser. Every route runs as the first admin account and calls the same server actions as the dashboard, so validation, search indexing, cache revalidation, IndexNow pings and email budgets all apply. Write calls are logged as `admin_api` analytics events.
 
 ## Auth
@@ -81,28 +83,64 @@ Same pipeline as the CSV importer: category by slug or alias (restaurant, dentis
 ### Newsletter
 `POST /newsletter`: `{ "create": true, "frequency": "daily", "subject"?, "preheader"?, "body"?, "scheduledFor"? }` (omit subject and body to use the automatic assembly of this week's stories); `{ "id", "scheduledFor" }`; `{ "id", "sendNow": true }`; `{ "id", "sendTestTo": "you@..." }`.
 
-### Media
+### Data corrections
 `DELETE /data` `{ series, dates[] }` removes readings that were verified wrong (seed placeholders, parser slips); the series is re-indexed and re-rendered.
 
+### Front page
 `GET /front` and `POST /front` `{ leadId?, leadHours?, pins?, breaking?, featured? }`: the homepage hero and news-front controls, the same as `/admin/front-page`. `leadId` pins a story as lead for `leadHours` (null hands back to automatic), `pins` is the ordered list of stories after the lead (max 6), `breaking` `{ text, href?, hours? }` puts a black bar across every page until it expires (null clears), `featured` `{ id, on }` sets the featured flag on one story (the newest featured story leads automatically for 48 hours; only one carries the flag).
 
+### Prices
 `GET /prices?category=mobiles|bikes|cars[&brand=vivo]` returns the living price list for that category (item shape in `src/lib/prices-shared.ts`); `POST /prices` `{ category, items, mode?: "upsert" | "replace", remove?: [slugs], reviewedAt? }` adds or updates models (a changed price is appended to that model's history), drops discontinued ones, and revalidates `/prices/*`. Mobiles need `specs.ram`, `specs.storage` and `specs.battery`; bikes and cars need `specs.engine`; every item needs a `source` URL.
 
+### Posts
 `GET /posts?kind=job` lists published posts of a kind (so a vacancy is never posted twice); `POST /posts` with `kind: "job"` publishes a vacancy as the desk (title, body markdown, company, city slug, topic, employmentType, salary range, applyUrl (required, the official notice), deadline) and `{ id, intent: "close" }` closes one. Job posts expire 45 days after publishing and are pruned by the daily job.
 
+### Match
 `GET /match` returns the fixtures on file grouped into today, live, upcoming and recent; `POST /match` `{ matches: [...] }` replaces the list (shape in `src/lib/match-today.ts`) and revalidates `/cricket-today`, `/today` and the home ticker, which shows the live score or today's first fixture as its first cell.
 
+### Today
 `GET /today` returns the Islamic date the site shows for Pakistan, the Umm al-Qura table date and the sighting offset in force; `POST /today` `{ "days": -1|0|1, "note"?, "sourceUrl"? }` sets the offset after a Ruet-e-Hilal Committee announcement (1 when Pakistan began the month a day before the table, -1 a day after, 0 when they agree) and revalidates /islamic-date, /today and the prayer pages.
 
+### Compare
 `GET /compare?slug=air-conditioners|credit-cards|mobile-packages|national-savings` and `POST /compare` `{ slug, items: [{ id, brand, model, price, priceNote?, url?, specs: {...}, note? }], reviewedAt: "YYYY-MM-DD", source: { title, url?, publisher? } }`: the living comparisons (`/compare/air-conditioners`, `/compare/credit-cards`). POST replaces the whole set, so send every item each time. Air conditioners need `specs.tonnage` (1, 1.5, 2) and `specs.inverter` (true/false); useful extras: `heatCool`, `t3`, `eer`, `wifi`, `warranty` (years). Credit cards: `price` is the annual fee, `specs.bank`, `specs.network` (Visa, Mastercard, UnionPay), `apr` (percent a year), `minIncome` (rupees a month), `cashback`, `lounge`, `fuel`, `freeFirstYear`, `islamic`. Mobile packages: `price` is the package price, `specs.network` (Jazz, Zong, Telenor, Ufone), `validity` ("Monthly", "Weekly", "Daily"), `data` (GB as a number), `onnetMinutes`, `offnetMinutes`, `sms`, `code` (the subscription code as printed). National Savings: `price` is the profit rate in percent a year, `model` the scheme name, `specs.payout` (Monthly, Half-yearly, At maturity), `term`, `min`, `max`, `who`, `withholding`, `islamic`; source is the CDNS profit-rate sheet. Every price and rate must come from the brand's own price list or the bank's schedule of charges, with that page as `url`.
 
+### Media
 `POST /media`: `{ "search": "Karachi skyline", "entities"? }` lists candidates (Wikipedia photo of each entity, then Openverse, then Commons), each with `alreadyUsed: true` when that source photo is already on the site (automatic imports skip those on their own); `{ "query": "...", "alt"? }` imports the first usable one; `{ "url", "alt"?, "credit"?, "sourceUrl"?, "license"? }` imports a known openly licensed image. Returns the stored URL and credit.
 
 ### Reports
 `POST /report` `{ "slot", "report" (markdown), "published"?, "updated"?, "errors"? }` files a run report; it shows on `/admin/automation`. `GET /report` lists the last twenty.
 
 ### Jobs
-`POST /jobs` `{ "job": "due" | "reindex" | "prune" | "revalidate", "paths"? }`.
+`POST /jobs` `{ "job": "due" | "reindex" | "prune" | "revalidate" | "remove-sample" | "renditions", "paths"? }`. `due` runs the five-minute scheduler now, `reindex` rebuilds the search index, `prune` deletes aged analytics and search logs, `revalidate` purges the given paths (default: the hubs), `remove-sample` deletes the seeded sample content, `renditions` writes any missing 480 and 960 px image files.
+
+## Response shapes
+
+Top-level keys the contract suite asserts. Errors are always `{ "error": string, "issues"?: [] }` with 400 (validation), 401 (key missing or wrong), 403 (account not allowed), 404 (unknown id), 503 (`ADMIN_API_KEY` not configured).
+
+| Route | Success keys |
+|---|---|
+| `GET /context` | `site, now, nowKarachi, recentArticles, drafts, scheduled, queues, directory, newsDesks, data, topSearches, searchesWithNoResults, email, lastJobsRun, lastIngestion, weekSince` |
+| `GET /reference` | `articleKinds, newsCategories, guideCategories, businessCategories, cities, areas, entities, dataSeries, professions, tools, authors, articleStatuses` |
+| `GET /ideas` | `headlines` |
+| `GET /backlog` / `POST /backlog` | `items` / `ok` |
+| `GET /queue` / `POST /queue` | `businesses, claims, professionals, posts, comments, businessReviews, professionalReviews, reports, messages, submissions` / `ok, results` |
+| `GET /articles` / `POST /articles` | `articles` / `ok, id, status, url, image` |
+| `GET /articles/{id}` / `PATCH` / `DELETE` | `article` / `ok, id, status, url, image` / `ok, deleted` |
+| `GET /businesses` / `POST /businesses` | `businesses` / `ok, created, skipped` |
+| `GET /data` / `POST /data` / `DELETE /data` | `series` / `ok, recorded` or `ok, results` (ingest) / `ok, series, removed, missing` |
+| `GET /front` / `POST /front` | `front` / `ok, front` |
+| `GET /prices` / `POST /prices` | `category, reviewedAt, count, items` / `ok, category, live, added, updated, removed` |
+| `GET /compare` / `POST /compare` | `slug, items, reviewedAt, source` / `ok, slug, items, reviewedAt` |
+| `GET /match` / `POST /match` | `updatedAt, matches` / `ok, matches` |
+| `GET /today` / `POST /today` | `date, pakistan, umalqura, offset` / `ok, offset, pakistan` |
+| `GET /posts` / `POST /posts` | `kind, posts` / `ok, id, status, url` |
+| `POST /media` | `candidates` (search) or `ok, image` (import) |
+| `GET /inbox` / `POST /inbox` | `messages` or `message` / `ok` |
+| `GET /newsletter` / `POST /newsletter` | `issues, suggestedDraft` / `ok` plus `issue`, `sent, remaining`, `sentTestTo` or `id, scheduledFor` by action |
+| `GET /report` / `POST /report` | `reports` / `ok, id, at` |
+| `POST /jobs` | `ok` plus the job's own counters |
+
+Every non-GET call is logged as an `admin_api` analytics event with method, status and duration; `/admin/automation` and `/admin/system` read those rows.
 
 ## Rules the automation must follow
 1. Read `/context` first. Never publish a story whose subject is already in `recentArticles`; update that article instead (`PATCH` or `POST` with its `id`).
