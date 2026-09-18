@@ -19,6 +19,9 @@ A scheduled Claude task keeps the site alive between human sessions: six runs a 
 
 On the 1st and 16th of the month (petrol price reviews), the Afternoon and Night runs check OGRA and update `petrol-price` and `diesel-price` the moment the notification is out, and publish the "what a full tank costs now" story.
 
+## Photos on a server that cannot resize
+When `POST /media` or an article image answers `400 This server does not resize images`, do the resizing yourself: `POST /media { search }` for candidates, download the chosen file, make the master and the 960 and 480 px WebP renditions (quality 82 and 78), `POST /media` as multipart with `master`, `r960`, `r480`, `alt`, `credit`, `sourceUrl`, `license`, then pass the returned `url` as `image.url`. Stories still without a photo are yours to fill on the Dawn and Midday runs; the photo backfill job does nothing on such a server.
+
 ## What a run does
 1. `GET /context` and `GET /reference`. Note Karachi time, the last 40 stories, drafts, queue counts, latest data, searches with no results, email budget.
 2. `GET /ideas` for the slot's topics. Pick stories that matter to readers in Pakistan (money, prices, rules, jobs, sport they follow). Skip anything already covered; update the existing story instead.

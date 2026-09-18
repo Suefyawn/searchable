@@ -19,6 +19,13 @@ export function bindings(): Bindings {
   return {};
 }
 
+/**
+ * Whether this runtime may spend real CPU on one request: decoding and resizing an image, rendering a social
+ * card. True on Node. False on the Workers free plan (10 ms per request), where that work is done by the
+ * browser or the automation before upload and the server only validates and stores.
+ */
+export const heavyComputeAllowed = true;
+
 /** The WebAssembly image codecs (photon, libwebp), compiled once per process. */
 const compile = async (specifier: string) => WebAssembly.compile(await readFile(createRequire(import.meta.url).resolve(specifier)));
 export const photonModule = () => compile("@cf-wasm/photon/photon.wasm");

@@ -1,6 +1,7 @@
 import { eq, inArray } from "drizzle-orm";
 import { getDb, schema } from "@/db";
-import { storeImage } from "./storage";
+import { heavyComputeAllowed } from "./platform";
+import { NoServerResize, storeImage } from "./storage";
 
 /**
  * Openly licensed photos via the Openverse API (openverse.org, aggregates Flickr, Wikimedia Commons, museums…).
@@ -260,6 +261,7 @@ export async function usedSources(candidates: OpenImage[]): Promise<Set<string>>
 }
 
 export async function importOpenImage(img: OpenImage, variant: "article" | "cover" | "photo" = "article", alt?: string) {
+  if (!heavyComputeAllowed) throw new NoServerResize();
   const res = await fetch(img.url, { headers: { "user-agent": UA, referer: img.sourceUrl }, signal: AbortSignal.timeout(12_000) });
   if (!res.ok) throw new Error(`Image download failed: ${res.status}`);
   const buf = Buffer.from(await res.arrayBuffer());

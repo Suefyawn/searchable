@@ -2,7 +2,8 @@ import { desc, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb, schema } from "@/db";
 import { entitiesIn, findAndImport } from "./open-images";
-import { storeImage } from "./storage";
+import { heavyComputeAllowed } from "./platform";
+import { NoServerResize, storeImage } from "./storage";
 
 const MAX_BYTES = 25 * 1024 * 1024;
 const UA = "Searchable.pk image importer (+https://searchable.pk)";
@@ -13,6 +14,7 @@ const UA = "Searchable.pk image importer (+https://searchable.pk)";
  * kit, a government release). Licence and source are recorded on the media row for the credits page.
  */
 export async function importImageFromUrl(url: string, opts: { variant?: "article" | "cover" | "photo" | "logo"; alt?: string; credit?: string; sourceUrl?: string; license?: string }) {
+  if (!heavyComputeAllowed) throw new NoServerResize();
   if (!/^https:\/\//.test(url)) throw new Error("Image URL must be https");
   const res = await fetch(url, { headers: { "user-agent": UA }, redirect: "follow", signal: AbortSignal.timeout(15_000) });
   if (!res.ok) throw new Error(`Image download failed: ${res.status}`);
@@ -34,7 +36,9 @@ export async function importImageFromUrl(url: string, opts: { variant?: "article
  * the job runner calls this every few minutes and handles two at a time so it never eats the request budget.
  * Only stories from the last two weeks are retried, so a hopeless query does not run forever.
  */
-export async function backfillArticlePhotos(limit = 2): Promise<{ tried: number; filled: number }> {
+export async function backfillArticlePhotos(limit = 2): Promise<{ tried: number; filled: number; skipped?: string }> {
+  // Without server-side resizing the automation fills photos itself (its Dawn and Midday steps).
+  if (!heavyComputeAllowed) return { tried: 0, filled: 0, skipped: "no server-side image processing here" };
   const db = await getDb();
   const rows = await db.query.articles.findMany({
     where: sql`${schema.articles.featuredImageUrl} is null and ${schema.articles.status} in ('published', 'scheduled') and ${schema.articles.updatedAt} > now() - interval '14 days'`,

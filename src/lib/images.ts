@@ -1,6 +1,26 @@
 /** Widths of the smaller renditions written next to every stored image (see storage.ts). */
 export const RENDITION_WIDTHS = [480, 960] as const;
 
+/** Longest side of the stored master per variant. Shared by the browser (which now does the resizing) and the server. */
+export type StoreVariant = "article" | "logo" | "cover" | "photo";
+export const VARIANT_MAX: Record<StoreVariant, number> = { article: 1800, logo: 512, cover: 2000, photo: 1600 };
+/** WebP quality: the master keeps more detail than the renditions cards use. */
+export const MASTER_QUALITY = 82;
+export const RENDITION_QUALITY = 78;
+
+/** Upload variants the forms use, mapped onto the four stored kinds. */
+export type UploadVariant = StoreVariant | "evidence" | "avatar" | "post" | "cv";
+export function storeVariantFor(v: Exclude<UploadVariant, "cv">): StoreVariant {
+  if (v === "evidence" || v === "post") return "photo";
+  if (v === "avatar") return "logo";
+  return v;
+}
+
+/** The width each rendition file must have for a master of `masterWidth`: never enlarged, always present. */
+export function renditionWidth(w: (typeof RENDITION_WIDTHS)[number], masterWidth: number): number {
+  return Math.min(w, masterWidth || w);
+}
+
 /**
  * srcset for an image we stored (…/uploads/YYYY/MM/<uuid>.webp): the 480 and 960 px renditions plus the
  * master. Anything else (a remote photo, an old file) gets no srcset and loads as is.

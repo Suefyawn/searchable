@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { heavyComputeAllowed } from "./platform";
 import { SITE } from "./utils";
 
 type MetaInput = {
@@ -18,7 +19,13 @@ type MetaInput = {
   markdownPath?: string;
 };
 
+/**
+ * Social card for pages without a photo of their own. Rendered per title where the server may spend the CPU;
+ * on the Workers free plan (10 ms a request) every such page shares the static card in public/ instead
+ * (ADR-43). Articles pass their featured photo and never come here.
+ */
 export function ogImageUrl(title: string, kicker?: string) {
+  if (!heavyComputeAllowed) return `${SITE.url}/og-card.png`;
   const p = new URLSearchParams({ title });
   if (kicker) p.set("kicker", kicker);
   return `${SITE.url}/og?${p.toString()}`;

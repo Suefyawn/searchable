@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { getDb, schema } from "@/db";
 import { adminApiConfigured, getSessionUser, hasRole, type SessionUser } from "./auth";
+import { NoServerResize } from "./storage";
 
 /**
  * Admin API plumbing (docs/ADMIN-API.md). Every route is `withAdminApi(async (req, ctx) => ...)`: the bearer
@@ -33,7 +34,7 @@ export function withAdminApi<P = Record<string, string>>(handler: Handler<P>) {
         throw new ApiError(401, "Bearer key missing or wrong");
       }
       const params = ctx ? await ctx.params : ({} as P);
-      const body = req.method === "GET" || req.method === "HEAD" ? undefined : await readJson(req);
+      const body = req.method === "GET" || req.method === "HEAD" ? undefined : await readBody(req);
       const data = await handler(req, { user, params, body });
       return NextResponse.json(data ?? { ok: true }, { status });
     } catch (e) {
@@ -46,7 +47,9 @@ export function withAdminApi<P = Record<string, string>>(handler: Handler<P>) {
   };
 }
 
-async function readJson(req: Request): Promise<unknown> {
+/** JSON everywhere except uploads, which arrive as multipart/form-data and are handed over as FormData. */
+async function readBody(req: Request): Promise<unknown> {
+  if ((req.headers.get("content-type") ?? "").startsWith("multipart/form-data")) return req.formData();
   const text = await req.text();
   if (!text.trim()) return {};
   try {
@@ -59,6 +62,8 @@ async function readJson(req: Request): Promise<unknown> {
 function toError(e: unknown): { status: number; message: string; issues?: string[] } {
   if (e instanceof ApiError) return { status: e.status, message: e.message };
   if (e instanceof ZodError) return { status: 400, message: "Invalid input", issues: e.issues.map((i) => `${i.path.join(".") || "body"}: ${i.message}`) };
+  // Asked a CPU-capped server to resize: the caller must prepare the renditions (POST /media multipart, ADR-43).
+  if (e instanceof NoServerResize) return { status: 400, message: e.message };
   const msg = (e as Error)?.message ?? "Unknown error";
   // Server actions redirect on auth failure; in an API that is a permission error, not a page change.
   if (/NEXT_REDIRECT/.test(msg)) return { status: 403, message: "Not allowed for this account" };

@@ -10,6 +10,7 @@ import { businessSlug } from "../src/lib/import";
 import { inviteToken, readInviteToken } from "../src/lib/claims";
 import { formatPhone, formatReading, pkr } from "../src/lib/format";
 import { srcSetFor } from "../src/lib/images";
+import { webpDimensions } from "../src/lib/webp";
 import { entitiesIn, isRelevant } from "../src/lib/open-images";
 import { parseAddress, verifyResendWebhook } from "../src/lib/inbox";
 import { renderMarkdown, renderUserMarkdown } from "../src/lib/markdown";
@@ -355,4 +356,21 @@ test("admin API keys: 256-bit hex with a recognisable prefix, hashed determinist
   assert.notEqual(await hashApiKey(key), await hashApiKey(key + "x"));
   assert.equal(apiKeyPrefix(key), key.slice(0, 12));
   assert.ok(!(await hashApiKey(key)).includes(key.slice(4, 20)));
+});
+
+test("webp header parser reads the size of every stored rendition without decoding, and rejects non-WebP bytes", () => {
+  const dir = "public/uploads/2026/09";
+  const files = readdirSync(dir).filter((f) => f.endsWith(".webp")).slice(0, 12);
+  assert.ok(files.length >= 3, "sample uploads present");
+  for (const f of files) {
+    const dims = webpDimensions(new Uint8Array(readFileSync(path.join(dir, f))));
+    assert.ok(dims && dims.width > 0 && dims.height > 0, f);
+    const m = f.match(/-(480|960).webp$/);
+    if (m) assert.equal(dims!.width, Number(m[1]), f);
+  }
+  assert.equal(webpDimensions(new Uint8Array(readFileSync("public/og-card.png"))), null);
+  assert.equal(webpDimensions(new Uint8Array(8)), null);
+  // Lossless (VP8L) header, 1 x 1: signature 2f then 14-bit width-1 and height-1 packed little-endian.
+  const vp8l = new Uint8Array([...Buffer.from("RIFF"), 0x1a, 0, 0, 0, ...Buffer.from("WEBPVP8L"), 0x0e, 0, 0, 0, 0x2f, 0x00, 0x00, 0x00, 0x00, 0x10, 0x07, 0x10, 0x11, 0x11, 0x88, 0x88, 0xfe, 0x07, 0x00]);
+  assert.deepEqual(webpDimensions(vp8l), { width: 1, height: 1 });
 });

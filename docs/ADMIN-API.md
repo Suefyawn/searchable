@@ -107,6 +107,8 @@ Same pipeline as the CSV importer: category by slug or alias (restaurant, dentis
 ### Media
 `POST /media`: `{ "search": "Karachi skyline", "entities"? }` lists candidates (Wikipedia photo of each entity, then Openverse, then Commons), each with `alreadyUsed: true` when that source photo is already on the site (automatic imports skip those on their own); `{ "query": "...", "alt"? }` imports the first usable one; `{ "url", "alt"?, "credit"?, "sourceUrl"?, "license"? }` imports a known openly licensed image. Returns the stored URL and credit.
 
+**Prepared upload (works on every server, required where the server cannot resize).** `POST /media` as `multipart/form-data` with three WebP files, `master` (longest side at most 1800 px for `article`, 2000 for `cover`, 1600 for `photo`, 512 for `logo`), `r960` and `r480` (exactly 960 and 480 px wide, or the master's width when it is narrower), plus text fields `alt`, `credit`, `sourceUrl`, `license`, `variant`. The server reads the WebP headers, checks the sizes, stores the three files and answers `{ ok, image: { url, width, height, ... } }`. Pass that `url` as `image.url` to `POST /articles` or `PATCH /articles/{id}`; a URL on our own image host is linked, never re-imported. When a server answers `400` with "This server does not resize images", the `{ query }` and `{ url }` forms are unavailable there and this is the way (ADR-43).
+
 ### Reports
 `POST /report` `{ "slot", "report" (markdown), "published"?, "updated"?, "errors"? }` files a run report; it shows on `/admin/automation`. `GET /report` lists the last twenty.
 

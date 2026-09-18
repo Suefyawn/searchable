@@ -1,8 +1,9 @@
 import { createHash, createHmac } from "node:crypto";
 import { getDb, schema } from "@/db";
 import { decodeImage, toWebp, type Decoded } from "@/lib/image-resize";
-import { bindings } from "@/lib/platform";
-import { RENDITION_WIDTHS } from "./images";
+import { bindings, heavyComputeAllowed } from "@/lib/platform";
+import { webpDimensions } from "@/lib/webp";
+import { MASTER_QUALITY, RENDITION_QUALITY, RENDITION_WIDTHS, VARIANT_MAX, renditionWidth, type StoreVariant } from "./images";
 
 export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 export const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]);
@@ -11,8 +12,48 @@ export const DOCUMENT_TYPES = new Set(["application/pdf"]);
 
 export type StoredImage = { id: string; url: string; width: number; height: number; bytes: number; mimeType: string };
 
-type Variant = "article" | "logo" | "cover" | "photo";
-const VARIANT_MAX: Record<Variant, number> = { article: 1800, logo: 512, cover: 2000, photo: 1600 };
+type Variant = StoreVariant;
+
+/** Thrown when a caller asks this server to resize but the runtime may not spend the CPU (Workers free plan). */
+export class NoServerResize extends Error {
+  constructor() {
+    super("This server does not resize images. Send the master and the 960 and 480 px WebP renditions, prepared by the browser or the automation.");
+  }
+}
+
+/** The three files a client prepares: master plus one file per rendition width, all WebP. */
+export type PreparedImage = { master: Uint8Array; renditions: Record<(typeof RENDITION_WIDTHS)[number], Uint8Array> };
+
+/**
+ * Stores files the client already resized and encoded (src/components/upload/upload-client.ts in the browser,
+ * the automation for imports). The server reads the WebP headers (no decoding), checks every size against the
+ * variant and the rendition rule, writes the three objects and the media row. Zero image CPU.
+ */
+export async function storePreparedImage(files: PreparedImage, opts: { variant: Variant; alt?: string; credit?: string; originalName?: string }): Promise<StoredImage> {
+  const master = webpDimensions(files.master);
+  if (!master) throw new Error("The master file is not a WebP image");
+  const max = VARIANT_MAX[opts.variant];
+  if (master.width > max || master.height > max) throw new Error(`The master must fit inside ${max} px for a ${opts.variant} image`);
+  if (files.master.byteLength > MAX_UPLOAD_BYTES) throw new Error("The master is too large");
+  for (const w of RENDITION_WIDTHS) {
+    const dims = webpDimensions(files.renditions[w]);
+    if (!dims) throw new Error(`The ${w} px rendition is not a WebP image`);
+    if (dims.width !== renditionWidth(w, master.width)) throw new Error(`The ${w} px rendition must be ${renditionWidth(w, master.width)} px wide`);
+    if (files.renditions[w].byteLength > files.master.byteLength * 2) throw new Error(`The ${w} px rendition is larger than expected`);
+  }
+  const id = crypto.randomUUID();
+  const now = new Date();
+  const dir = `uploads/${now.getUTCFullYear()}/${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
+  const key = `${dir}/${id}.webp`;
+  const url = await putObject(key, files.master, "image/webp");
+  for (const w of RENDITION_WIDTHS) await putObject(`${dir}/${id}-${w}.webp`, files.renditions[w], "image/webp");
+  const db = await getDb();
+  const [row] = await db
+    .insert(schema.media)
+    .values({ url, storageKey: key, mimeType: "image/webp", width: master.width, height: master.height, bytes: files.master.byteLength, alt: opts.alt ?? opts.originalName?.replace(/\.[a-z0-9]+$/i, "") ?? null, credit: opts.credit ?? null })
+    .returning({ id: schema.media.id });
+  return { id: row.id, url, width: master.width, height: master.height, bytes: files.master.byteLength, mimeType: "image/webp" };
+}
 
 /**
  * Normalises an uploaded image (resize to a sane maximum, convert to WebP, strip metadata), writes it plus
@@ -26,10 +67,11 @@ const VARIANT_MAX: Record<Variant, number> = { article: 1800, logo: 512, cover: 
  * elsewhere. `supabase` uses Supabase Storage (metered egress; avoid).
  */
 export async function storeImage(input: Uint8Array, opts: { variant: Variant; alt?: string; credit?: string; originalName?: string }): Promise<StoredImage> {
+  if (!heavyComputeAllowed) throw new NoServerResize();
   const max = VARIANT_MAX[opts.variant];
   const decoded = await decodeImage(input);
   try {
-    const out = await toWebp(decoded, { width: max, height: max }, 82);
+    const out = await toWebp(decoded, { width: max, height: max }, MASTER_QUALITY);
     const id = crypto.randomUUID();
     const now = new Date();
     const dir = `uploads/${now.getUTCFullYear()}/${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
@@ -65,7 +107,7 @@ export async function storeDocument(input: Uint8Array, opts: { mimeType: string;
  */
 export async function writeRenditions(image: Decoded, masterWidth: number, stem: string) {
   for (const w of RENDITION_WIDTHS) {
-    const r = await toWebp(image, { width: Math.min(w, masterWidth || w) }, 78);
+    const r = await toWebp(image, { width: renditionWidth(w, masterWidth) }, RENDITION_QUALITY);
     await putObject(`${stem}-${w}.webp`, r.data, "image/webp");
   }
 }

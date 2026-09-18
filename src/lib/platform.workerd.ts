@@ -10,6 +10,8 @@ export function bindings(): Bindings {
   return env as Bindings;
 }
 
+export const heavyComputeAllowed = false;
+
 export const photonModule = async (): Promise<WebAssembly.Module> => PHOTON;
 export const webpEncoderModule = async (): Promise<WebAssembly.Module> => WEBP_ENC;
 

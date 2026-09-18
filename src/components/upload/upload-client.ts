@@ -1,11 +1,16 @@
 "use client";
 
+import { MASTER_QUALITY, RENDITION_QUALITY, RENDITION_WIDTHS, VARIANT_MAX, renditionWidth, storeVariantFor, type UploadVariant } from "@/lib/images";
+
 /**
- * Browser side of uploads: validation with plain messages, a canvas downscale so a 12 MB phone photo goes up
- * as a 1 MB one, and XHR so we can show real progress and cancel. Server rules live in /api/upload.
+ * Browser side of uploads: validation with plain messages, the resize itself (the master plus the 480 and
+ * 960 px WebP renditions are made here, so the server never spends CPU on an image: ADR-43), and XHR so we
+ * can show real progress and cancel. Server rules live in /api/upload.
  */
-export type UploadVariant = "article" | "logo" | "cover" | "photo" | "evidence" | "avatar" | "post" | "cv";
+export type { UploadVariant };
 export type Uploaded = { url: string; width?: number; height?: number; bytes?: number };
+/** What the browser sends for one image: the resized master and one file per rendition width. */
+export type PreparedUpload = { master: Blob; renditions: Record<(typeof RENDITION_WIDTHS)[number], Blob>; width: number; height: number };
 
 export const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
 export const IMAGE_ACCEPT = IMAGE_TYPES.join(",");
@@ -91,10 +96,58 @@ export async function downscaleImage(file: File): Promise<File> {
   }
 }
 
-export function uploadFile(file: File, opts: { variant: UploadVariant; businessId?: string; alt?: string; onProgress?: (fraction: number) => void; signal?: AbortSignal }): Promise<Uploaded> {
+/**
+ * Decodes once, then draws the master and each rendition through a canvas and encodes WebP. Returns null when
+ * the browser cannot encode WebP (old Safari) or the file is a GIF, so the caller can fall back to a raw upload.
+ */
+export async function prepareImage(file: File, variant: Exclude<UploadVariant, "cv">): Promise<PreparedUpload | null> {
+  if (file.type === "image/gif" || typeof createImageBitmap !== "function") return null;
+  let bmp: ImageBitmap;
+  try {
+    bmp = await createImageBitmap(file);
+  } catch {
+    return null;
+  }
+  try {
+    const max = VARIANT_MAX[storeVariantFor(variant)];
+    const scale = Math.min(1, max / bmp.width, max / bmp.height);
+    const width = Math.max(1, Math.round(bmp.width * scale));
+    const height = Math.max(1, Math.round(bmp.height * scale));
+    const master = await encodeWebp(bmp, width, height, MASTER_QUALITY / 100);
+    if (!master) return null;
+    const renditions = {} as PreparedUpload["renditions"];
+    for (const w of RENDITION_WIDTHS) {
+      const rw = renditionWidth(w, width);
+      const blob = await encodeWebp(bmp, rw, Math.max(1, Math.round((height * rw) / width)), RENDITION_QUALITY / 100);
+      if (!blob) return null;
+      renditions[w] = blob;
+    }
+    return { master, renditions, width, height };
+  } finally {
+    bmp.close();
+  }
+}
+
+async function encodeWebp(bmp: ImageBitmap, w: number, h: number, quality: number): Promise<Blob | null> {
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+  ctx.drawImage(bmp, 0, 0, w, h);
+  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", quality));
+  // A browser without a WebP encoder answers with a PNG; that is a signal to fall back, not a file to send.
+  return blob && blob.type === "image/webp" ? blob : null;
+}
+
+export function uploadFile(file: File | PreparedUpload, opts: { variant: UploadVariant; businessId?: string; alt?: string; onProgress?: (fraction: number) => void; signal?: AbortSignal }): Promise<Uploaded> {
   return new Promise((resolve, reject) => {
     const fd = new FormData();
-    fd.set("file", file);
+    if (file instanceof File) fd.set("file", file);
+    else {
+      fd.set("master", file.master, "master.webp");
+      for (const w of RENDITION_WIDTHS) fd.set(`r${w}`, file.renditions[w], `r${w}.webp`);
+    }
     fd.set("variant", opts.variant);
     if (opts.businessId) fd.set("businessId", opts.businessId);
     if (opts.alt) fd.set("alt", opts.alt);
@@ -120,11 +173,17 @@ export function uploadFile(file: File, opts: { variant: UploadVariant; businessI
   });
 }
 
-/** Full pipeline for one image: validate, downscale, upload with progress. */
-export async function uploadImage(file: File, opts: { variant: UploadVariant; businessId?: string; alt?: string; onProgress?: (fraction: number) => void; signal?: AbortSignal }): Promise<Uploaded> {
+/** Full pipeline for one image: validate, resize and encode here, upload with progress. */
+export async function uploadImage(file: File, opts: { variant: Exclude<UploadVariant, "cv">; businessId?: string; alt?: string; onProgress?: (fraction: number) => void; signal?: AbortSignal }): Promise<Uploaded> {
   const problem = validateFile(file, "image");
   if (problem) throw new ValidationError(problem);
-  const prepared = await downscaleImage(file);
-  if (prepared.size > MAX_IMAGE_BYTES) throw new ValidationError(`That image is ${humanSize(prepared.size)} even after shrinking; the limit is 8 MB.`);
-  return uploadFile(prepared, opts);
+  const ready = await prepareImage(file, opts.variant);
+  if (ready) {
+    if (ready.master.size > MAX_IMAGE_BYTES) throw new ValidationError(`That image is ${humanSize(ready.master.size)} even after shrinking; the limit is 8 MB.`);
+    return uploadFile(ready, opts);
+  }
+  // No WebP encoder in this browser: send the (downscaled) original and let a server that can resize do it.
+  const fallback = await downscaleImage(file);
+  if (fallback.size > MAX_IMAGE_BYTES) throw new ValidationError(`That image is ${humanSize(fallback.size)} even after shrinking; the limit is 8 MB.`);
+  return uploadFile(fallback, opts);
 }
