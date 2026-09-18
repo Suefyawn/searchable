@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { getDb, schema } from "@/db";
-import { getSessionUser, hasRole, type SessionUser } from "./auth";
+import { adminApiConfigured, getSessionUser, hasRole, type SessionUser } from "./auth";
 
 /**
  * Admin API plumbing (docs/ADMIN-API.md). Every route is `withAdminApi(async (req, ctx) => ...)`: the bearer
@@ -27,9 +27,11 @@ export function withAdminApi<P = Record<string, string>>(handler: Handler<P>) {
     const started = Date.now();
     let status = 200;
     try {
-      if (!process.env.ADMIN_API_KEY) throw new ApiError(503, "ADMIN_API_KEY is not configured");
       const user = await getSessionUser();
-      if (!user || !hasRole(user, "editor")) throw new ApiError(401, "Bearer key missing or wrong");
+      if (!user || !hasRole(user, "editor")) {
+        if (!(await adminApiConfigured())) throw new ApiError(503, "No admin API key is configured");
+        throw new ApiError(401, "Bearer key missing or wrong");
+      }
       const params = ctx ? await ctx.params : ({} as P);
       const body = req.method === "GET" || req.method === "HEAD" ? undefined : await readJson(req);
       const data = await handler(req, { user, params, body });

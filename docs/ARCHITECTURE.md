@@ -75,7 +75,7 @@ A `globalThis` singleton prevents duplicate PGlite instances across HMR. `@elect
 
 - Every response carries `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` and a CSP of `frame-ancestors 'none'; object-src 'none'; base-uri 'self'` (`next.config.ts`); calculator pages allow framing for `?embed=1`. A script CSP is not workable with AdSense, so the page is protected by escaping instead.
 - Editor markdown (`renderMarkdown`) keeps raw HTML; member markdown (`renderUserMarkdown`: posts, bios) shows it as text. Both refuse every href scheme except http(s), mailto and tel. Search snippets are escaped before `ts_headline`.
-- Invoice pages need the signed link from the email (`orderPath()`), the buying account or an admin. Cron routes compare `CRON_SECRET` in constant time and are closed in production without it. The admin API key is compared in constant time.
+- Invoice pages need the signed link from the email (`orderPath()`), the buying account or an admin. Cron routes compare `CRON_SECRET` in constant time and are closed in production without it. The admin API accepts the `ADMIN_API_KEY` environment variable (constant-time compare) or a key made at `/admin/api-keys`, looked up by its SHA-256 (`src/lib/api-keys.ts`); keys carry a role and are revoked by a timestamp, never deleted.
 - Rate limiting is in memory per instance (`src/lib/rate-limit.ts`); a shared store is the next step if abuse shows up (ADR-39).
 
 ## Observability

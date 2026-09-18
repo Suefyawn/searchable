@@ -3,6 +3,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { test } from "node:test";
 import { createHmac } from "node:crypto";
+import { apiKeyPrefix, generateApiKey, hashApiKey } from "../src/lib/api-keys";
 import { backlogScore } from "../src/lib/backlog";
 import { normalizePhone } from "../src/lib/dedupe";
 import { businessSlug } from "../src/lib/import";
@@ -343,4 +344,15 @@ test("registry integrity: unique slugs, known categories, https sources", () => 
     for (const s of t.sources) assert.ok(!s.url || s.url.startsWith("https://"), `${t.slug}: source "${s.title}" is not https`);
     for (const r of t.related?.tools ?? []) assert.ok(TOOLS.some((o) => o.slug === r), `${t.slug}: related tool ${r} does not exist`);
   }
+});
+
+test("admin API keys: 256-bit hex with a recognisable prefix, hashed deterministically, shown by prefix only", async () => {
+  const key = generateApiKey();
+  assert.match(key, /^spk_[0-9a-f]{64}$/);
+  assert.notEqual(key, generateApiKey());
+  assert.equal(await hashApiKey(key), await hashApiKey(key));
+  assert.match(await hashApiKey(key), /^[0-9a-f]{64}$/);
+  assert.notEqual(await hashApiKey(key), await hashApiKey(key + "x"));
+  assert.equal(apiKeyPrefix(key), key.slice(0, 12));
+  assert.ok(!(await hashApiKey(key)).includes(key.slice(4, 20)));
 });

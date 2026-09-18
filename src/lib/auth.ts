@@ -1,10 +1,11 @@
 import { timingSafeEqual } from "node:crypto";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq, isNull } from "drizzle-orm";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getDb, schema, type Database } from "@/db";
+import { hashApiKey } from "@/lib/api-keys";
 import { SITE } from "@/lib/utils";
 
 export type Role = (typeof schema.userRole.enumValues)[number];
@@ -43,20 +44,43 @@ export function getAuth(): Promise<Auth> {
 export type SessionUser = { id: string; email: string; name: string; role: Role; image?: string | null };
 
 /**
- * Admin API: a request carrying `Authorization: Bearer $ADMIN_API_KEY` acts as the first admin account, so every
- * server action and query guard works unchanged for automation (the scheduled content task, scripts). The key
- * never creates a browser session; it is only honoured on this header, compared in constant time.
+ * Admin API: a request carrying `Authorization: Bearer <key>` acts as an admin account, so every server action and
+ * query guard works unchanged for automation (the scheduled content task, scripts, external tools). Two kinds of key
+ * are honoured: the `ADMIN_API_KEY` environment variable (acts as the first admin) and keys made from
+ * /admin/api-keys (act as the admin who made them, with the key's role). A key never creates a browser session.
  */
 async function apiKeyUser(h: Headers): Promise<SessionUser | null> {
-  const key = process.env.ADMIN_API_KEY?.trim();
-  const given = h.get("authorization")?.replace(/^Bearer\s+/i, "").trim();
-  if (!key || !given || key.length < 32) return null;
-  const a = Buffer.from(key);
-  const b = Buffer.from(given);
-  if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+  return userForBearer(h.get("authorization")?.replace(/^Bearer\s+/i, "").trim());
+}
+
+/** The account a bearer key stands for, or null. Exported so the key path can be exercised without a request. */
+export async function userForBearer(given: string | undefined): Promise<SessionUser | null> {
+  if (!given || given.length < 32) return null;
   const db = await getDb();
-  const admin = await db.query.users.findFirst({ where: eq(schema.users.role, "admin"), orderBy: [asc(schema.users.createdAt)] });
-  return admin ? { id: admin.id, email: admin.email, name: admin.name, role: "admin", image: admin.image } : null;
+  const envKey = process.env.ADMIN_API_KEY?.trim();
+  if (envKey && envKey.length >= 32) {
+    const a = Buffer.from(envKey);
+    const b = Buffer.from(given);
+    if (a.length === b.length && timingSafeEqual(a, b)) return actAs(db, null, "admin");
+  }
+  const row = await db.query.apiKeys.findFirst({ where: and(eq(schema.apiKeys.keyHash, await hashApiKey(given)), isNull(schema.apiKeys.revokedAt)) });
+  if (!row) return null;
+  // last_used_at is a coarse signal for the admin page; one write every five minutes per key at most.
+  if (!row.lastUsedAt || Date.now() - row.lastUsedAt.getTime() > 5 * 60_000) await db.update(schema.apiKeys).set({ lastUsedAt: new Date() }).where(eq(schema.apiKeys.id, row.id));
+  return actAs(db, row.createdBy, row.role);
+}
+
+async function actAs(db: Database, userId: string | null, role: Role): Promise<SessionUser | null> {
+  const own = userId ? await db.query.users.findFirst({ where: eq(schema.users.id, userId) }) : null;
+  const user = own ?? (await db.query.users.findFirst({ where: eq(schema.users.role, "admin"), orderBy: [asc(schema.users.createdAt)] }));
+  return user ? { id: user.id, email: user.email, name: user.name, role, image: user.image } : null;
+}
+
+/** True when some key can authenticate the admin API at all (env key or an unrevoked row). */
+export async function adminApiConfigured(): Promise<boolean> {
+  if (process.env.ADMIN_API_KEY) return true;
+  const db = await getDb();
+  return !!(await db.query.apiKeys.findFirst({ where: isNull(schema.apiKeys.revokedAt), columns: { id: true } }));
 }
 
 export async function getSessionUser(): Promise<SessionUser | null> {

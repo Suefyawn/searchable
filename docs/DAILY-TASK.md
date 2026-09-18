@@ -3,7 +3,7 @@
 A scheduled Claude task keeps the site alive between human sessions: six runs a day, each one reads the site's state through the admin API, then publishes, updates and moderates. Everything it does goes through `docs/ADMIN-API.md`, so the same rules (search index, cache, IndexNow, budgets, no em dashes) apply as for a human editor.
 
 ## Setup (once)
-1. Generate a key: `openssl rand -hex 32`. Set it as `ADMIN_API_KEY` in Vercel (Production) and redeploy.
+1. Make a key at `/admin/api-keys` (name it after the task, role admin) and copy it when it is shown. Revoke it there if it ever leaks. (`ADMIN_API_KEY` in the host's environment still works as a bootstrap key.)
 2. In Claude, create a scheduled task (or six, one per slot) with the prompt below. Give the task the key as a secret or paste it into the prompt; it is the only credential it needs. Base URL: `https://searchable.pk/api/admin`.
 3. First run: ask it to do only a "state" pass (read `/context`, `/reference`, `/queue`; report, publish nothing) and check the report reads sensibly.
 

@@ -6,10 +6,10 @@ JSON API for automation: the scheduled content task, scripts, anything that shou
 
 ## Auth
 ```
-Authorization: Bearer $ADMIN_API_KEY
+Authorization: Bearer <key>
 Content-Type: application/json
 ```
-`ADMIN_API_KEY` is 64 hex characters (`openssl rand -hex 32`), set in Vercel. It only works on this header; it never creates a browser session. Wrong or missing key: `401 {"error": "..."}`. Validation problems: `400` with `issues[]`. Unknown ids: `404`.
+Keys are made at `/admin/api-keys` (admin only): one per tool, named, `spk_` plus 64 hex characters, shown once, revocable one by one. A key acts as the admin who made it, with the role chosen for the key (`admin`: everything the API exposes; `editor`: the desk, no accounts or settings). The `ADMIN_API_KEY` environment variable still works as a bootstrap key and acts as the first admin. A key only works on this header; it never creates a browser session. Wrong, missing or revoked key: `401 {"error": "..."}`. No key configured anywhere: `503`. Validation problems: `400` with `issues[]`. Unknown ids: `404`.
 
 Base URL: `https://searchable.pk/api/admin`. All slugs (categories, cities, series, entities) come from `GET /reference`.
 

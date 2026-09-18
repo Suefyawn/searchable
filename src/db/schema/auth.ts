@@ -74,3 +74,24 @@ export const verifications = pgTable(
   },
   (t) => [index("verifications_identifier_idx").on(t.identifier)],
 );
+
+/**
+ * Admin API keys made from /admin/api-keys. Only the SHA-256 of the key is stored; `prefix` is the first characters
+ * shown in admin so a key can be recognised. A request with `Authorization: Bearer <key>` acts as the admin who
+ * made the key, with the key's role. Revoking sets `revoked_at`; the row stays for the audit trail.
+ */
+export const apiKeys = pgTable(
+  "api_keys",
+  {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    name: text("name").notNull(),
+    prefix: text("prefix").notNull(),
+    keyHash: text("key_hash").notNull().unique(),
+    role: userRole("role").default("admin").notNull(),
+    createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("api_keys_created_by_idx").on(t.createdBy)],
+);

@@ -4,7 +4,7 @@ Postgres, managed by Drizzle. Schema lives in `src/db/schema/*.ts`; generated SQ
 
 ```
 src/db/schema/
-  auth.ts        users · sessions · accounts · verifications        (better-auth)
+  auth.ts        users · sessions · accounts · verifications · api_keys  (better-auth + admin API keys)
   geo.ts         locations                                          (country → province → city → area)
   content.ts     categories · authors · articles · tags · article_tags · article_revisions
   tools.ts       tools · tool_runs
@@ -26,6 +26,7 @@ src/db/schema/
 |---|---|
 | `users` | better-auth user + `role` enum (`user`, `business_owner`, `editor`, `admin`) |
 | `sessions`, `accounts`, `verifications` | better-auth internals (sessions in DB, password hash in `accounts.password`) |
+| `api_keys` | admin API keys made at `/admin/api-keys`: name, shown prefix, SHA-256 of the key, role, maker, last use, revocation (ADR-40) |
 
 ## Geography
 `locations(id, parent_id, kind, slug, name, name_urdu, city_id, province_id, lat, lng, population)`, one tree. `city_id`/`province_id` are denormalised for fast filtering. Unique on `(kind, slug)`.
