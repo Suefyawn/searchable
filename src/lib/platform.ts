@@ -13,6 +13,7 @@ export type Bindings = {
   DB?: D1Database;
   MEDIA?: { put: R2Put };
   ASSETS?: { fetch: (input: Request | string) => Promise<Response> };
+  ANALYTICS?: { writeDataPoint: (point: { indexes?: string[]; blobs?: string[]; doubles?: number[] }) => void };
 };
 
 export function bindings(): Bindings {

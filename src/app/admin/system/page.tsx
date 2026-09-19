@@ -34,7 +34,8 @@ export default async function AdminSystem() {
     db.query.settings.findFirst({ where: eq(schema.settings.key, "ingest:last") }),
     db.query.settings.findFirst({ where: eq(schema.settings.key, "email:budget") }),
     emailAllowance("transactional"),
-    rawQuery<{ bytes: number }>(db, sql`select page_count * page_size as bytes from pragma_page_count(), pragma_page_size()`).catch(() => [{ bytes: NaN }]),
+    // D1 reports the database size on every statement's meta; pragma table-valued functions are not allowed there.
+    db.run(sql`select 1`).then((r) => [{ bytes: Number((r as { meta?: { size_after?: number } }).meta?.size_after ?? NaN) }]).catch(() => [{ bytes: NaN }]),
     rawQuery<Record<string, number>>(
       db,
       sql`select
@@ -57,13 +58,12 @@ export default async function AdminSystem() {
         from analytics_events where name = 'admin_api'`,
     ).then((r) => r[0]),
     rawQuery<{ path: string; method: string; status: number; ms: number; at: number }>(db, sql`select path, json_extract(props, '$.method') as method, json_extract(props, '$.status') as status, json_extract(props, '$.ms') as ms, created_at as at from analytics_events where name = 'admin_api' order by created_at desc limit 12`),
-    rawQuery<{ path: string; message: string; digest: string | null; route: string | null; source: string; n: number; last_at: number }>(
+    rawQuery<{ fp: string; route: string; name: string; message: string; top_frame: string | null; source: string; n: number; first_at: number; last_at: number }>(
       db,
-      sql`select path, json_extract(props, '$.message') as message, json_extract(props, '$.digest') as digest, json_extract(props, '$.routePath') as route, coalesce(json_extract(props, '$.source'), 'server') as source, count(*) as n, max(created_at) as last_at
-        from analytics_events where name = 'error' and created_at > ${Date.now() - 86_400_000}
-        group by path, json_extract(props, '$.message'), json_extract(props, '$.digest'), json_extract(props, '$.routePath'), coalesce(json_extract(props, '$.source'), 'server') order by max(created_at) desc limit 20`,
+      sql`select fp, route, name, message, top_frame, source, count as n, first_seen as first_at, last_seen as last_at
+        from error_fingerprints where last_seen > ${Date.now() - 7 * 86_400_000} order by last_seen desc limit 30`,
     ),
-    rawQuery<{ today: number; week: number }>(db, sql`select sum(case when created_at > ${Date.now() - 86_400_000} then 1 else 0 end) as today, sum(case when created_at > ${Date.now() - 7 * 86_400_000} then 1 else 0 end) as week from analytics_events where name = 'error'`).then((r) => r[0]),
+    rawQuery<{ today: number; week: number; open: number }>(db, sql`select count(case when last_seen > ${Date.now() - 86_400_000} then 1 end) as today, count(*) as week, count(case when first_seen > ${Date.now() - 48 * 3_600_000} then 1 end) as open from error_fingerprints where last_seen > ${Date.now() - 7 * 86_400_000}`).then((r) => r[0]),
   ]);
   const sample = sampleRow?.value as SampleSeed | undefined;
   const sampleLive = sample
@@ -166,11 +166,12 @@ export default async function AdminSystem() {
             </ul>
           ) : null}
         </Section>
-        <Section title="Errors" description="Uncaught errors from pages, route handlers and server actions (src/instrumentation.ts) and crashes reported by the error page. Grouped by message, last 24 hours; pruned with the other events after 90 days.">
+        <Section title="Errors" description="Distinct errors (ADR-48): uncaught server errors from pages, route handlers and server actions, and crashes the browser reported. One row per route and error type, counted; the first occurrence was mailed to the editorial address. Last 7 days.">
           <Details
             items={[
-              { label: "Last 24 hours", value: (errCounts?.today ?? 0).toLocaleString() },
-              { label: "Last 7 days", value: (errCounts?.week ?? 0).toLocaleString() },
+              { label: "Distinct, seen today", value: (errCounts?.today ?? 0).toLocaleString() },
+              { label: "Distinct, last 7 days", value: (errCounts?.week ?? 0).toLocaleString() },
+              { label: "New in 48 hours", value: (errCounts?.open ?? 0).toLocaleString() },
             ]}
           />
           {errs.length ? (
@@ -178,21 +179,21 @@ export default async function AdminSystem() {
               {errs.map((e, i) => (
                 <li key={i} className="py-2">
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span className="min-w-0 flex-1 truncate font-mono text-[12.5px]">{e.path}</span>
+                    <span className="min-w-0 flex-1 truncate font-mono text-[12.5px]">{e.route}</span>
                     <span className="text-3">{e.source}</span>
                     <span className="tabular font-semibold">{e.n}×</span>
-                    <span className="text-3">{timeAgo(new Date(e.last_at))}</span>
+                    <span className="text-3">first {timeAgo(new Date(e.first_at))}, last {timeAgo(new Date(e.last_at))}</span>
                   </div>
                   <p className="mt-0.5 text-2">
-                    {e.message}
-                    {e.digest ? <span className="ml-2 font-mono text-[11.5px] text-3">{e.digest}</span> : null}
-                    {e.route && e.route !== e.path ? <span className="ml-2 font-mono text-[11.5px] text-3">{e.route}</span> : null}
+                    <span className="font-medium">{e.name}:</span> {e.message}
+                    <span className="ml-2 font-mono text-[11.5px] text-3">{e.fp}</span>
                   </p>
+                  {e.top_frame ? <p className="mt-0.5 truncate font-mono text-[11.5px] text-3">{e.top_frame}</p> : null}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-3 text-[14px] text-2">None in the last day.</p>
+            <p className="mt-3 text-[14px] text-2">None in the last week.</p>
           )}
         </Section>
         {sample ? (

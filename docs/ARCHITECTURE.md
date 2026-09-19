@@ -84,8 +84,10 @@ There is no connection to pool or close. `rawQuery()` returns rows and turns `Da
 
 ## Observability
 
-- `analytics_events` table (first-party): page_view (sampled), search, tool_run, business_click, newsletter_subscribe, error (uncaught server errors from `src/instrumentation.ts` and browser crashes from the error page); `/admin/system` groups the last 24 hours.
-- Microsoft Clarity on the client when `NEXT_PUBLIC_CLARITY_ID` is set. No PostHog, no Sentry (docs/FREE-TIER.md).
+- Errors (ADR-48): uncaught server errors (`src/instrumentation.ts`) and browser crashes (`POST /api/client-errors` from the error page) are fingerprinted by `packages/errors` (route + error type + top frame) and counted in `error_fingerprints` by `src/lib/errors.ts`; the first occurrence of a fingerprint is mailed to `EDITORIAL_EMAIL`, repeats are counted only. `/admin/system` lists the last week; `GET /api/health?boom=1` with the `CRON_SECRET` throws on purpose to test the chain.
+- Product events (ADR-48): `track()` in `src/lib/track.ts` writes `search_performed`, `calculator_used`, `directory_view`, `newsletter_subscribe` and `community_post` to Workers Analytics Engine (binding `ANALYTICS`); `/admin/metrics` reads them through the SQL API (`CF_ANALYTICS_TOKEN`, `CF_ACCOUNT_ID`), cached ten minutes, next to `ingest_runs` freshness.
+- `analytics_events` table (first-party): business_click, page_view (business pages, bumps `view_count`), share, search_click, admin_api.
+- Microsoft Clarity on the client when `NEXT_PUBLIC_CLARITY_ID` is set; Cloudflare Web Analytics by automatic injection on the zone once the site is proxied (dashboard toggle, no code). No PostHog, no Sentry (docs/FREE-TIER.md).
 
 ## Background jobs
 

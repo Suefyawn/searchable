@@ -12,7 +12,7 @@ import { Img } from "@/components/img";
 import { SaveButton } from "@/components/saved/save-button";
 import { LeadForm } from "./lead-form";
 import { MapEmbed } from "@/components/directory/map-embed";
-import { TrackedLink } from "@/components/directory/tracked-link";
+import { TrackedLink, ViewPing } from "@/components/directory/tracked-link";
 import { ReportForm } from "@/components/report-form";
 import { ReviewForm } from "@/components/directory/review-form";
 
@@ -61,6 +61,7 @@ export default async function BusinessPage({ params }: Props) {
 
   return (
     <div className="container-x py-8 sm:py-12">
+      <ViewPing businessId={b.id} category={b.primaryCategory?.slug} city={b.city?.slug} />
       <JsonLd
         data={[
           localBusinessJsonLd({ name: b.name, description: b.description, path, phone: b.phone, address: b.address, city: b.city?.name, lat: b.lat, lng: b.lng, image: b.coverUrl ?? b.logoUrl, ratingAvg: b.ratingAvg, ratingCount: b.ratingCount, priceRange: b.priceRange }),

@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
+import { track } from "@/lib/track";
 import { getTool } from "@/tools/registry";
 
 /** Anonymous usage log + run counter. Inputs are kept only in aggregate form for product decisions. */
@@ -19,5 +20,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
   const db = await getDb();
   await db.insert(schema.toolRuns).values({ toolSlug: slug, inputs: body.data.inputs });
   await db.update(schema.tools).set({ runCount: sql`${schema.tools.runCount} + 1` }).where(eq(schema.tools.slug, slug));
+  track("calculator_used", { blobs: [slug, tool.category] });
   return NextResponse.json({ ok: true });
 }

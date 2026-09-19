@@ -1,6 +1,6 @@
 # Local to production
 
-Everything runs on Cloudflare: the Worker (vinext build of the Next.js app), D1 (database), R2 (images, page cache), Cron Triggers and Workflows (Phase 4), Turnstile (ADR-47), Analytics Engine (Phase 7). Resend sends and receives email. The application code is the same everywhere; only bindings and secrets differ between `wrangler.dev.jsonc` (development), the default environment in `wrangler.jsonc` (staging) and its `production` environment. Cost and allowances: `docs/FREE-TIER.md`; decisions: ADR-41 to ADR-47.
+Everything runs on Cloudflare: the Worker (vinext build of the Next.js app), D1 (database), R2 (images, page cache), Cron Triggers and Workflows (Phase 4), Turnstile (ADR-47), Analytics Engine (Phase 7). Resend sends and receives email. The application code is the same everywhere; only bindings and secrets differ between `wrangler.dev.jsonc` (development), the default environment in `wrangler.jsonc` (staging) and its `production` environment. Cost and allowances: `docs/FREE-TIER.md`; decisions: ADR-41 to ADR-48.
 
 ## 1. Local development
 
@@ -22,9 +22,9 @@ A copy of production content is the better development database: `.data/export.s
 
 ## 3. Bindings and configuration
 
-`wrangler.jsonc` holds every binding and public variable per environment: `DB` (D1), `MEDIA` (R2 images), `CACHE_BODIES` and `CACHE_METADATA` (Response Store), `ASSETS`, and the vars `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_SITE_NAME`, `BETTER_AUTH_URL`, `STORAGE_PROVIDER=r2`, `R2_PUBLIC_URL=https://img.searchable.pk`, `EMAIL_PROVIDER`, `EMAIL_FROM`, `HEAVY_COMPUTE=1`, `TURNSTILE_SITE_KEY` (one Turnstile widget per environment; the matching `TURNSTILE_SECRET` is a secret). Staging adds `NOINDEX=1` and `JOBS_DISABLED=1`.
+`wrangler.jsonc` holds every binding and public variable per environment: `DB` (D1), `MEDIA` (R2 images), `CACHE_BODIES` and `CACHE_METADATA` (Response Store), `ASSETS`, and the vars `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_SITE_NAME`, `BETTER_AUTH_URL`, `STORAGE_PROVIDER=r2`, `R2_PUBLIC_URL=https://img.searchable.pk`, `EMAIL_PROVIDER`, `EMAIL_FROM`, `HEAVY_COMPUTE=1`, `TURNSTILE_SITE_KEY` (one Turnstile widget per environment; the matching `TURNSTILE_SECRET` is a secret), `CF_ACCOUNT_ID` and `ANALYTICS_DATASET` (Analytics Engine, binding `ANALYTICS`). Staging adds `NOINDEX=1` and `JOBS_DISABLED=1`.
 
-Secrets are set with `wrangler secret put <NAME>` (add `--env production` for production) and never written down: `BETTER_AUTH_SECRET`, `ADMIN_API_KEY` (the same value the scheduled editorial task uses; keys made at `/admin/api-keys` work as well), `CRON_SECRET`, `RESEND_API_KEY` (full access, receiving needs it), `RESEND_WEBHOOK_SECRET`, `INDEXNOW_KEY` (32 hex), `BILLING_EMAIL`, `EDITORIAL_EMAIL`, `CLAIM_WHATSAPP_NUMBER`, `GOOGLE_SITE_VERIFICATION`, `TURNSTILE_SECRET`, `CF_ANALYTICS_TOKEN` (Phase 7).
+Secrets are set with `wrangler secret put <NAME>` (add `--env production` for production) and never written down: `BETTER_AUTH_SECRET`, `ADMIN_API_KEY` (the same value the scheduled editorial task uses; keys made at `/admin/api-keys` work as well), `CRON_SECRET`, `RESEND_API_KEY` (full access, receiving needs it), `RESEND_WEBHOOK_SECRET`, `INDEXNOW_KEY` (32 hex), `BILLING_EMAIL`, `EDITORIAL_EMAIL`, `CLAIM_WHATSAPP_NUMBER`, `GOOGLE_SITE_VERIFICATION`, `TURNSTILE_SECRET`, `CF_ANALYTICS_TOKEN` (an API token with Account Analytics Read, for `/admin/metrics`; ADR-48).
 
 ## 4. Database
 

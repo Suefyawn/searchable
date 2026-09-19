@@ -21,3 +21,19 @@ export function TrackedLink({ businessId, kind, href, className, children, targe
     </a>
   );
 }
+
+/**
+ * One page_view beacon per business page load. The page itself is served from the edge cache, so the server
+ * render cannot count views; this reaches /api/track, which bumps view_count and emits directory_view.
+ */
+export function ViewPing({ businessId, category, city }: { businessId: string; category?: string | null; city?: string | null }) {
+  React.useEffect(() => {
+    try {
+      const body = JSON.stringify({ name: "page_view", path: location.pathname, props: { businessId, category: category ?? "", city: city ?? "" } });
+      if (!navigator.sendBeacon?.("/api/track", new Blob([body], { type: "application/json" }))) void fetch("/api/track", { method: "POST", headers: { "content-type": "application/json" }, body, keepalive: true });
+    } catch {
+      /* ignore */
+    }
+  }, [businessId, category, city]);
+  return null;
+}

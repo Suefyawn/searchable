@@ -4,12 +4,12 @@ import * as React from "react";
 import { Button } from "@/components/ui";
 
 export default function ErrorPage({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  // A crash in the browser is reported once so /admin/system sees it; server errors are recorded by
+  // A crash in the browser is reported once so /admin/system sees it (ADR-48); server errors are recorded by
   // src/instrumentation.ts and carry the same digest.
   React.useEffect(() => {
-    const body = JSON.stringify({ name: "error", path: location.pathname.slice(0, 300), props: { message: String(error?.message ?? error).slice(0, 500), digest: error?.digest ?? "", source: "client" } });
+    const body = JSON.stringify({ name: error?.name, message: String(error?.message ?? error).slice(0, 500), stack: String(error?.stack ?? "").slice(0, 4000), path: location.pathname.slice(0, 300), digest: error?.digest ?? "" });
     try {
-      if (!navigator.sendBeacon?.("/api/track", new Blob([body], { type: "application/json" }))) fetch("/api/track", { method: "POST", body, headers: { "content-type": "application/json" }, keepalive: true }).catch(() => {});
+      if (!navigator.sendBeacon?.("/api/client-errors", new Blob([body], { type: "application/json" }))) fetch("/api/client-errors", { method: "POST", body, headers: { "content-type": "application/json" }, keepalive: true }).catch(() => {});
     } catch {
       // nothing to do: reporting must never throw inside the error page
     }

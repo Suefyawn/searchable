@@ -4,9 +4,10 @@ import { z } from "zod";
 import { getDb, schema } from "@/db";
 import { rateLimit } from "@/lib/rate-limit";
 import { recordSearchClick } from "@/lib/search";
+import { track } from "@/lib/track";
 
 const Event = z.object({
-  name: z.enum(["business_click", "page_view", "share", "tool_share", "search_click", "error"]),
+  name: z.enum(["business_click", "page_view", "share", "tool_share", "search_click"]),
   path: z.string().max(300).optional(),
   props: z
     .record(z.string().max(40), z.union([z.string().max(500), z.number(), z.boolean()]))
@@ -25,6 +26,10 @@ export async function POST(req: Request) {
   await db.insert(schema.analyticsEvents).values({ name: e.name, path: e.path, props: e.props ?? {} });
   if (e.name === "search_click" && typeof e.props?.q === "string" && typeof e.props?.url === "string") {
     await recordSearchClick(e.props.q, e.props.url);
+  }
+  if (e.name === "page_view" && typeof e.props?.businessId === "string") {
+    await db.update(schema.businesses).set({ viewCount: sql`${schema.businesses.viewCount} + 1` }).where(eq(schema.businesses.id, e.props.businessId));
+    track("directory_view", { blobs: [e.props.businessId, String(e.props.category ?? ""), String(e.props.city ?? "")] });
   }
   if (e.name === "business_click" && typeof e.props?.businessId === "string") {
     await db.update(schema.businesses).set({ clickCount: sql`${schema.businesses.clickCount} + 1` }).where(eq(schema.businesses.id, e.props.businessId));

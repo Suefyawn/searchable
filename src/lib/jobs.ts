@@ -104,6 +104,7 @@ export async function pruneOldRows(): Promise<Record<string, number>> {
   const out: Record<string, number> = {};
   const now = Date.now();
   out.analyticsEvents = await rawRun(db, sql`delete from analytics_events where created_at < ${now - 90 * 86_400_000}`);
+  out.errorFingerprints = await rawRun(db, sql`delete from error_fingerprints where last_seen < ${now - 90 * 86_400_000}`);
   out.searchQueries = await rawRun(db, sql`delete from search_queries where created_at < ${now - 180 * 86_400_000}`);
   out.verifications = await rawRun(db, sql`delete from ${schema.verifications} where expires_at < ${now - 7 * 86_400_000}`);
   out.expiredClaims = await expireStaleClaims();

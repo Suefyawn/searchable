@@ -137,3 +137,25 @@ export const automationReports = sqliteTable(
   },
   (t) => [index("automation_reports_at_idx").on(t.at)],
 );
+
+/**
+ * Error tracker (ADR-48): one row per distinct error (a fingerprint of route + name + top stack frame), counted
+ * on every occurrence. The first occurrence sends one email; nothing else does. /admin/system lists them.
+ */
+export const errorSource = textEnum("error_source", ["server", "client"]);
+export const errorFingerprints = sqliteTable(
+  "error_fingerprints",
+  {
+    fp: text("fp").primaryKey(),
+    source: enumColumn("source", errorSource).notNull(),
+    route: text("route").notNull(),
+    name: text("name").notNull(),
+    message: text("message").notNull(),
+    topFrame: text("top_frame"),
+    sample: json("sample").$type<Record<string, unknown>>().notNull(),
+    count: integer("count").default(1).notNull(),
+    firstSeen: timestampMs("first_seen").notNull(),
+    lastSeen: timestampMs("last_seen").notNull(),
+  },
+  (t) => [index("error_fingerprints_last_seen_idx").on(t.lastSeen), check("error_fingerprints_source_check", enumCheckSql("source", errorSource))],
+);

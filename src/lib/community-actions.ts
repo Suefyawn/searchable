@@ -12,6 +12,7 @@ import { slugify, uniqueSlug } from "@/lib/slug";
 import { SITE } from "@/lib/utils";
 import { ensureMemberProfile, getMemberByUser, indexPost, isTrustedAuthor } from "./community";
 import { notifyOutbid } from "./notify";
+import { track } from "./track";
 
 type Result = { ok: boolean; error?: string; id?: string; slug?: string };
 
@@ -97,6 +98,7 @@ export async function savePost(raw: PostFormInput): Promise<Result> {
     .values({ ...values, slug, authorId: user.id, status: editor ? "published" : "pending", isVerified: trusted, publishedAt: editor ? new Date() : null, expiresAt: days ? new Date(Date.now() + days * 86400_000) : null })
     .returning({ id: schema.posts.id });
   await db.update(schema.memberProfiles).set({ postCount: sql`${schema.memberProfiles.postCount} + 1` }).where(eq(schema.memberProfiles.userId, user.id));
+  track("community_post", { blobs: [d.kind, d.topic || "", d.cityId || ""] });
   if (editor) await indexPost(row.id);
   revalidatePath("/community");
   revalidatePath("/admin/community");

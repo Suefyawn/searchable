@@ -17,6 +17,7 @@ const PUBLIC_ROUTES = new Set([
   "src/app/api/tools/[slug]/route.ts",
   "src/app/api/tools/[slug]/run/route.ts",
   "src/app/api/track/route.ts",
+  "src/app/api/client-errors/route.ts", // browser crash reports, rate limited (ADR-48)
   "src/app/api/newsletter/subscribe/route.ts",
   "src/app/api/webhooks/resend/route.ts", // HMAC signature instead of a session
   "src/app/api/cron/ingest/route.ts", // CRON_SECRET (cronAuthorized)

@@ -3,6 +3,7 @@ import { getDb, schema } from "@/db";
 import { NEWSLETTER_TOPICS, type NewsletterTopic } from "@/db/schema/newsletter";
 import { sendEmail } from "./email";
 import { SITE } from "./utils";
+import { track } from "@/lib/track";
 
 function token() {
   return crypto.randomUUID().replace(/-/g, "");
@@ -10,6 +11,7 @@ function token() {
 
 export async function subscribe(input: { email: string; name?: string; topics?: string[]; frequency?: "daily" | "weekly"; source?: string }) {
   const db = await getDb();
+  track("newsletter_subscribe", { blobs: [input.source ?? "", input.frequency ?? "daily", (input.topics ?? []).join(",")] });
   const email = input.email.trim().toLowerCase();
   const topics = (input.topics ?? []).filter((t): t is NewsletterTopic => (NEWSLETTER_TOPICS as readonly string[]).includes(t));
   const existing = await db.query.newsletterSubscribers.findFirst({ where: eq(schema.newsletterSubscribers.email, email) });

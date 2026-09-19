@@ -1,35 +1,22 @@
 import type { Instrumentation } from "next";
 
 /**
- * Error monitoring without a vendor (docs/FREE-TIER.md): every uncaught server error, whether from a page,
- * a route handler, a server action or the proxy, is written to analytics_events as an "error" event with
- * its message, digest, route and the first lines of the stack. /admin/system lists the last day of them;
- * pruneOldRows() clears them with the rest of the events after 90 days. Fire-and-forget: a failing write
- * must never turn one error into two.
+ * Error monitoring without a vendor (ADR-48): every uncaught server error, whether from a page, a route handler,
+ * a server action or the proxy, is fingerprinted and counted in error_fingerprints by recordError(), which
+ * mails the first occurrence. /admin/system lists them. Fire-and-forget by construction.
  */
 export const onRequestError: Instrumentation.onRequestError = async (err, request, context) => {
   // Next compiles this file for its edge runtime too; that copy must not pull the database driver in (the
   // constant is inlined at build time, so everything below is dropped from the edge bundle). Node and Workers run it.
   if (process.env.NEXT_RUNTIME === "edge") return;
-  try {
-    const { getDb, schema } = await import("@/db");
-    const e = err as Error & { digest?: string };
-    const db = await getDb();
-    await db.insert(schema.analyticsEvents).values({
-      name: "error",
-      path: request.path.slice(0, 300),
-      props: {
-        message: String(e?.message ?? err).slice(0, 500),
-        digest: e?.digest ?? null,
-        stack: String(e?.stack ?? "").split("\n").slice(1, 5).join("\n").slice(0, 800),
-        method: request.method,
-        routerKind: context.routerKind,
-        routePath: context.routePath,
-        routeType: context.routeType,
-        renderSource: context.renderSource ?? null,
-      },
-    });
-  } catch {
-    // the database is the thing that failed, most likely; the platform log still has the original error
-  }
+  const { recordError } = await import("@/lib/errors");
+  const e = err as Error & { digest?: string };
+  await recordError("server", context.routePath || request.path, err, {
+    path: request.path.slice(0, 300),
+    method: request.method,
+    digest: e?.digest ?? null,
+    routerKind: context.routerKind,
+    routeType: context.routeType,
+    renderSource: context.renderSource ?? null,
+  });
 };

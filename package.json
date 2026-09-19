@@ -48,7 +48,8 @@
     "tailwind-merge": "^3.3.1",
     "vinext": "^1.0.0-beta.10",
     "zod": "^4.6.5",
-    "@jet/authz": "*"
+    "@jet/authz": "*",
+    "@jet/errors": "*"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.56.0",

@@ -1,0 +1,9 @@
+{
+  "name": "@jet/errors",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Error fingerprints for JetNine sites: turn an error and its route into a stable id, so a store can count occurrences and alert once.",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "test": "node --experimental-strip-types --test src/*.test.ts" }
+}

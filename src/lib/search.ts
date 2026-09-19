@@ -1,6 +1,7 @@
 import { and, desc, eq, sql } from "drizzle-orm";
 import { getDb, rawQuery, rawRun, schema } from "@/db";
 import { contentWords, toFtsQuery } from "@/lib/fts-query";
+import { track } from "@/lib/track";
 import { shareWord, trigramMatch, trigramSimilarity, wordSimilarity } from "@/lib/fuzzy";
 
 export type SearchEntityType = (typeof schema.searchEntityType.enumValues)[number];
@@ -192,6 +193,12 @@ const BM25 = sql`bm25(search_fts, 10, 10, 4, 4, 4, 1)`;
  * toFtsQuery; every plain word is prefix-matched so "electri" still finds electricity.
  */
 export async function search(query: string, opts: SearchOptions = {}): Promise<SearchResult> {
+  const result = await runSearch(query, opts);
+  if (result.hits.length || result.total || normalizeQuery(query)) track("search_performed", { blobs: [normalizeQuery(query), result.intent, opts.types?.join(",") ?? "", opts.city ?? ""], doubles: [result.total, opts.offset ?? 0] });
+  return result;
+}
+
+async function runSearch(query: string, opts: SearchOptions): Promise<SearchResult> {
   const q = normalizeQuery(query);
   if (!q) return { hits: [], total: 0, facets: {}, intent: "general" };
   const db = await getDb();
