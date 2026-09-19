@@ -358,19 +358,15 @@ test("admin API keys: 256-bit hex with a recognisable prefix, hashed determinist
   assert.ok(!(await hashApiKey(key)).includes(key.slice(4, 20)));
 });
 
-test("webp header parser reads the size of every stored rendition without decoding, and rejects non-WebP bytes", () => {
-  const dir = "public/uploads/2026/09";
-  const files = readdirSync(dir).filter((f) => f.endsWith(".webp")).slice(0, 12);
-  assert.ok(files.length >= 3, "sample uploads present");
-  for (const f of files) {
-    const dims = webpDimensions(new Uint8Array(readFileSync(path.join(dir, f))));
-    assert.ok(dims && dims.width > 0 && dims.height > 0, f);
-    const m = f.match(/-(480|960).webp$/);
-    if (m) assert.equal(dims!.width, Number(m[1]), f);
-  }
+test("webp header parser reads lossy, lossless and extended headers without decoding, and rejects other bytes", () => {
+  const riff = (chunk: string, payload: number[]) => new Uint8Array([...Buffer.from("RIFF"), 0, 0, 0, 0, ...Buffer.from("WEBP"), ...Buffer.from(chunk), payload.length, 0, 0, 0, ...payload, 0, 0, 0, 0, 0, 0]);
+  // VP8 (lossy): 3-byte frame tag, start code 9d 01 2a, then 14-bit width 1800 and height 1081.
+  assert.deepEqual(webpDimensions(riff("VP8 ", [0x30, 0x01, 0x00, 0x9d, 0x01, 0x2a, 1800 & 0xff, 1800 >> 8, 1081 & 0xff, 1081 >> 8])), { width: 1800, height: 1081 });
+  // VP8L (lossless): signature 2f, then 14-bit width minus one and height minus one, packed.
+  assert.deepEqual(webpDimensions(riff("VP8L", [0x2f, 0x00, 0x00, 0x00, 0x00, 0x10])), { width: 1, height: 1 });
+  // VP8X (extended): flags, reserved, 24-bit canvas width minus one and height minus one.
+  assert.deepEqual(webpDimensions(riff("VP8X", [0x10, 0, 0, 0, 0xbf, 0x03, 0x00, 0x40, 0x02, 0x00])), { width: 960, height: 577 });
   assert.equal(webpDimensions(new Uint8Array(readFileSync("public/og-card.png"))), null);
   assert.equal(webpDimensions(new Uint8Array(8)), null);
-  // Lossless (VP8L) header, 1 x 1: signature 2f then 14-bit width-1 and height-1 packed little-endian.
-  const vp8l = new Uint8Array([...Buffer.from("RIFF"), 0x1a, 0, 0, 0, ...Buffer.from("WEBPVP8L"), 0x0e, 0, 0, 0, 0x2f, 0x00, 0x00, 0x00, 0x00, 0x10, 0x07, 0x10, 0x11, 0x11, 0x88, 0x88, 0xfe, 0x07, 0x00]);
-  assert.deepEqual(webpDimensions(vp8l), { width: 1, height: 1 });
+  assert.equal(webpDimensions(riff("VP8 ", [0, 0, 0, 1, 2, 3, 0, 0, 0, 0])), null, "wrong start code");
 });
