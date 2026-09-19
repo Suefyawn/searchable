@@ -18,7 +18,7 @@ const FAQS = [
 ];
 
 export const metadata = buildMetadata({
-  title: "Car Prices in Pakistan 2026: Compare Alto, Swift, City, Corolla, Sportage",
+  title: "Car Prices in Pakistan 2026: Alto, Swift, City, Corolla",
   description: "Every new car on sale in Pakistan with ex-factory prices, engine, gearbox, fuel economy, airbags and seats. Filter by body, fuel and budget, compare three side by side, and jump to the car loan and token tax calculators.",
   path: "/compare/cars",
   kicker: "Compare",

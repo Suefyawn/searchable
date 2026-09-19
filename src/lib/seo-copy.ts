@@ -62,7 +62,7 @@ export const TOOL_CATEGORY_COPY: Record<string, SeoCopy> = {
 };
 
 export const HUB_COPY = {
-  home: { title: "Searchable.pk: Pakistan News Today, Prices, Guides, Calculators", description: "Pakistan news today with the numbers explained, petrol and gold prices, dollar rate, weather and prayer times, step-by-step guides, calculators and a business directory." },
+  home: { title: "Searchable.pk: Pakistan News Today, Prices, Guides, Calculators", description: "Pakistan news explained with the numbers, step-by-step guides, calculators with verified rates, a business directory and today's prices." },
   news: { title: "Pakistan News Today, Explained With the Numbers", description: "Latest news from Pakistan and the world for readers here: economy, prices, government decisions, cricket and technology, updated six times a day." },
   guides: { title: "Guides Pakistan: How to Do Things Step by Step", description: "Step-by-step guides for life in Pakistan: taxes, bills, NADRA, passports, cars, property, banking and telecom, with fees, timelines and the mistakes to avoid." },
   tools: { title: "Calculators for Pakistan: Tax, Zakat, Bills, Loans", description: "Free calculators for Pakistan with sourced 2026 rates: income tax and take-home salary, zakat, electricity bill, PTA tax, car finance and stamp duty." },

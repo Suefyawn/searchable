@@ -19,7 +19,7 @@ const FAQS = [
 ];
 
 export const metadata = buildMetadata({
-  title: "Net Metering in Pakistan 2026: Approved Inverters List, New NEPRA Rules, How to Apply (LESCO, IESCO, MEPCO, K-Electric)",
+  title: "Net Metering in Pakistan 2026: NEPRA Rules, Inverters, How to Apply",
   description: "Net metering became net billing in February 2026. See the new NEPRA export rate, eligibility, step-by-step application with legal timelines, costs, the list of inverters approved for net metering, and how to apply at each DISCO, LESCO, IESCO, MEPCO, GEPCO, FESCO, PESCO, HESCO, SEPCO, QESCO and K-Electric.",
   path: "/electricity/net-metering",
   kicker: "Electricity",

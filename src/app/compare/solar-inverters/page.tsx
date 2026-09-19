@@ -21,8 +21,8 @@ const FAQS = [
 const TYPE_ORDER: InverterType[] = ["hybrid", "on-grid", "off-grid"];
 
 export const metadata = buildMetadata({
-  title: "Solar Inverter Price in Pakistan 2026: Compare Hybrid, On-Grid & Off-Grid Inverters (3kW, 5kW, 10kW)",
-  description: "Compare solar inverter prices in Pakistan for Inverex, Ziewnic, Solis, Deye, Growatt, Sungrow, Huawei and more. Hybrid, on-grid and off-grid inverters from 3 kW to 12 kW with warranty, MPPT, battery voltage and dealer prices, updated monthly.",
+  title: "Solar Inverter Price in Pakistan 2026: Hybrid, On-Grid, Off-Grid",
+  description: "Solar inverter prices in Pakistan for Inverex, Ziewnic, Solis, Deye, Growatt, Sungrow and Huawei: hybrid, on-grid and off-grid, 3 kW to 12 kW, with dealer prices.",
   path: "/compare/solar-inverters",
   kicker: "Compare",
 });

@@ -31,8 +31,8 @@ export async function generateMetadata({ params }: Props) {
   const d = getDisco(disco);
   if (!d) return {};
   return buildMetadata({
-    title: `${d.short} Bill Check Online: Check ${d.short} Bill by Reference Number, Calculate & Pay`,
-    description: `Check your ${d.short} electricity bill online in seconds using the reference number, see the current per-unit price, calculate your bill from units, and find the ${d.short} helpline. Covers ${d.cities.slice(0, 4).join(", ")}.`,
+    title: `${d.short} Bill Check Online by Reference Number`,
+    description: `Check your ${d.short} electricity bill online by reference number, see the per-unit price, calculate a bill from units and find the helpline. Covers ${d.cities.slice(0, 3).join(", ")}.`,
     path: `/electricity/${d.slug}`,
     kicker: "Electricity",
   });

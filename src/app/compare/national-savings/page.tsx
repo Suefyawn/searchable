@@ -8,7 +8,7 @@ const DEF: LivingPageDef = {
   name: "National Savings schemes",
   title: "National Savings profit rates: every scheme compared",
   seoTitle: "National Savings Profit Rates 2026: Behbood, Regular Income, Defence, Special Savings Compared",
-  description: "Every National Savings (CDNS) scheme on one page: profit rate, how often profit is paid, term, minimum and maximum, who can buy, and the withholding tax, from the official rate sheet. Sort by rate, compare three, and see the monthly profit on your amount.",
+  description: "Every National Savings (CDNS) scheme on one page: profit rate, payout, term, minimum and maximum, who can buy and withholding tax, from the official rate sheet.",
   intro: "Rates from the Central Directorate of National Savings' published sheet, with the withholding rules that decide what you actually receive.",
   priceWord: "profit rate",
   tools: ["national-savings-calculator", "zakat-calculator"],
