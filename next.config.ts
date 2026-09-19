@@ -48,8 +48,10 @@ nextConfig.headers = async () => [
 
 /** Same-origin path for the image CDN, used only as a fallback when a visitor cannot reach the CDN host. */
 const imageHost = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
-if (imageHost) {
-  nextConfig.rewrites = async () => [{ source: "/media/:path*", destination: `${imageHost}/:path*` }];
-}
+nextConfig.rewrites = async () => [
+  // vinext's router skips dot-directories, so the agent surface lives in src/app/well-known and answers at /.well-known/ (ADR-38).
+  { source: "/.well-known/:path*", destination: "/well-known/:path*" },
+  ...(imageHost ? [{ source: "/media/:path*", destination: `${imageHost}/:path*` }] : []),
+];
 
 export default nextConfig;
