@@ -167,7 +167,7 @@ export async function indexStaticPages() {
       url: `/electricity/${d.slug}`,
       title: `${d.short} bill check online`,
       summary: `Check your ${d.short} electricity bill by reference number, see the per-unit price and calculate a bill. ${d.cities.slice(0, 4).join(", ")}.`,
-      keywords: [`${d.short.toLowerCase()} bill`, `${d.short.toLowerCase()} bill check`, `${d.short.toLowerCase()} online bill`, `${d.short.toLowerCase()} duplicate bill`, "electricity bill check online", "bijli bill", d.name, ...d.cities].join(", "),
+      keywords: [`${d.short.toLowerCase()} bill`, `${d.short.toLowerCase()} bill check`, `${d.short.toLowerCase()} online bill`, `${d.short.toLowerCase()} duplicate bill`, "electricity bill check online", "bijli bill", d.name, ...(d.aliases ?? []).map((a) => `${a.toLowerCase()} bill`), ...d.cities].join(", "),
       category: "Electricity",
       categorySlug: "utilities",
       boost: 1.3,

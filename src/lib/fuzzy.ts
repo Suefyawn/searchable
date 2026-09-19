@@ -22,6 +22,20 @@ export function trigramSimilarity(a: string, b: string): number {
   return shared / (ta.size + tb.size - shared);
 }
 
+/**
+ * Word-level similarity for typo tolerance: for each query word the best trigram match among the text's words,
+ * averaged. Whole-string similarity punishes long titles ("petrl price" scores 0.29 against "Petrol price in
+ * Pakistan today"); word by word it is 0.72, because "price" is exact and "petrl" is close to "petrol".
+ */
+export function wordSimilarity(text: string, q: string): number {
+  const words = text.toLowerCase().split(/[^a-z0-9؀-ۿ]+/).filter(Boolean);
+  const qs = q.toLowerCase().split(/[^a-z0-9؀-ۿ]+/).filter(Boolean);
+  if (!words.length || !qs.length) return 0;
+  let sum = 0;
+  for (const w of qs) sum += Math.max(0, ...words.map((x) => trigramSimilarity(x, w)));
+  return sum / qs.length;
+}
+
 /** The FTS5 MATCH string that finds anything sharing a trigram with `q`, for a trigram-tokenised table. */
 export function trigramMatch(q: string): string | null {
   const parts = [...trigrams(q)].map((t) => t.trim()).filter((t) => t.length === 3 && /^[a-z0-9؀-ۿ]+$/.test(t));

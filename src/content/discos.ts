@@ -14,6 +14,8 @@ export type Disco = {
   helpline: string;
   website?: string;
   notes?: string;
+  /** Old or colloquial names people still search for (KESC for K-Electric). Indexed as keywords. */
+  aliases?: string[];
 };
 
 export const DISCOS: Disco[] = [
@@ -27,7 +29,7 @@ export const DISCOS: Disco[] = [
   { slug: "sepco", short: "SEPCO", name: "Sukkur Electric Power Company", region: "Upper Sindh", cities: ["Sukkur", "Larkana", "Khairpur", "Jacobabad", "Shikarpur", "Ghotki", "Dadu"], billUrl: "https://bill.pitc.com.pk/sepcobill", billUrlLabel: "bill.pitc.com.pk/sepcobill", helpline: "118", website: "https://www.sepco.com.pk" },
   { slug: "qesco", short: "QESCO", name: "Quetta Electric Supply Company", region: "Balochistan", cities: ["Quetta", "Khuzdar", "Loralai", "Sibi", "Gwadar", "Turbat"], billUrl: "https://bill.pitc.com.pk/qescobill", billUrlLabel: "bill.pitc.com.pk/qescobill", helpline: "118", website: "https://www.qesco.com.pk" },
   { slug: "tesco", short: "TESCO", name: "Tribal Electric Supply Company", region: "Merged tribal districts, KP", cities: ["Khyber", "Kurram", "Bajaur", "Mohmand", "Orakzai", "North Waziristan", "South Waziristan"], billUrl: "https://bill.pitc.com.pk/tescobill", billUrlLabel: "bill.pitc.com.pk/tescobill", helpline: "118" },
-  { slug: "k-electric", short: "K-Electric", name: "K-Electric Limited", region: "Karachi and surroundings", cities: ["Karachi", "Dhabeji", "Gharo", "Hub (Balochistan)"], billUrl: "https://www.ke.com.pk/customer-services/", billUrlLabel: "ke.com.pk (KE Live app)", helpline: "118", website: "https://www.ke.com.pk", notes: "K-Electric is the only privately owned, vertically integrated utility; its tariff is set separately by NEPRA but tracks the national uniform tariff." },
+  { slug: "k-electric", short: "K-Electric", name: "K-Electric Limited", aliases: ["KESC", "KE"], region: "Karachi and surroundings", cities: ["Karachi", "Dhabeji", "Gharo", "Hub (Balochistan)"], billUrl: "https://www.ke.com.pk/customer-services/", billUrlLabel: "ke.com.pk (KE Live app)", helpline: "118", website: "https://www.ke.com.pk", notes: "K-Electric is the only privately owned, vertically integrated utility; its tariff is set separately by NEPRA but tracks the national uniform tariff." },
 ];
 
 export function getDisco(slug: string) {

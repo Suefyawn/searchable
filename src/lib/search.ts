@@ -1,7 +1,7 @@
 import { and, desc, eq, sql } from "drizzle-orm";
 import { getDb, rawQuery, rawRun, schema } from "@/db";
-import { toFtsQuery } from "@/lib/fts-query";
-import { shareWord, trigramMatch, trigramSimilarity } from "@/lib/fuzzy";
+import { contentWords, toFtsQuery } from "@/lib/fts-query";
+import { shareWord, trigramMatch, trigramSimilarity, wordSimilarity } from "@/lib/fuzzy";
 
 export type SearchEntityType = (typeof schema.searchEntityType.enumValues)[number];
 
@@ -209,11 +209,11 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<S
   const rank = sql`(-m.score) * d.boost * ${intentBoost} * (1 + min(d.popularity, 1000) / 2000.0)
       * case when d.entity_type = 'news' and d.published_at is not null then max(0.5, 1 - (${now} - d.published_at) / (86400000.0 * 180)) else 1 end`;
 
-  const fts = toFtsQuery(await expandQuery(q));
+  const expanded = await expandQuery(q);
   let hits: SearchHit[] = [];
   let total = 0;
   const facets: SearchResult["facets"] = {};
-  if (fts) {
+  const run = async (fts: string, any = false) => {
     const facetsPromise =
       !opts.types?.length && offset === 0
         ? rawQuery<{ entity_type: SearchEntityType; n: number }>(db, sql`
@@ -227,7 +227,7 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<S
         select rowid, ${BM25} as score, snippet(search_fts, -1, ${MARK_OPEN}, ${MARK_CLOSE}, '…', 28) as headline
         from search_fts where search_fts match ${fts}
       )
-      select d.entity_type, d.entity_id, d.url, d.title, d.summary, d.category, d.city, d.image_url, d.published_at, d.meta,
+      select d.entity_type, d.entity_id, d.url, d.title, d.keywords, d.summary, d.category, d.city, d.image_url, d.published_at, d.meta,
              m.headline, ${rank} as rank, count(*) over () as total
       from m join search_documents d on d.seq = m.rowid
       where 1 = 1 ${typeFilter} ${cityFilter}
@@ -235,13 +235,31 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<S
       limit ${limit} offset ${offset}`);
     const [list, facetRows] = await Promise.all([listPromise, facetsPromise]);
     for (const f of facetRows) facets[f.entity_type] = Number(f.n);
+    if (any) {
+      // bm25 over an OR does not prefer a document holding two of three words over one holding one word many
+      // times, so order this page by how many of the query's words appear in title, keywords or summary first.
+      const words = contentWords(q);
+      const matched = (r: Row) => {
+        const tokens = `${r.title} ${r.keywords ?? ""} ${r.summary ?? ""}`.toLowerCase().split(/[^a-z0-9؀-ۿ]+/);
+        return words.filter((w) => tokens.some((t) => t.startsWith(w))).length;
+      };
+      list.sort((a, b) => matched(b) - matched(a) || Number(b.rank) - Number(a.rank));
+    }
     hits = list.map((r) => toHit(r));
     total = list.length ? Number(list[0].total) : 0;
+  };
+  const fts = toFtsQuery(expanded);
+  if (fts) await run(fts);
+  // Nothing has every word ("kesc duplicate bill" spans the utility entity and the bill guide): take anything with
+  // any of them, still ranked by bm25 so documents matching more words come first.
+  if (!hits.length && offset === 0) {
+    const any = toFtsQuery(expanded, { any: true });
+    if (any) await run(any, true);
   }
   if (hits.length >= 3 || offset > 0) return { hits, total, facets, intent };
 
   // Typo tolerance: too few full-text hits, so ask the trigram index for anything sharing trigrams with the query and
-  // keep what pg_trgm would have kept (similarity 0.3 or more on title or keywords).
+  // keep candidates whose words are close to the query's words (wordSimilarity 0.5 or more on title or keywords).
   const match = trigramMatch(q);
   if (!match) return { hits, total, facets, intent };
   const candidates = await rawQuery<Row>(db, sql`
@@ -252,8 +270,8 @@ export async function search(query: string, opts: SearchOptions = {}): Promise<S
     order by bm25(search_trgm) limit 40`);
   const seen = new Set(hits.map((h) => h.entityId));
   const fuzzy = candidates
-    .map((r) => ({ r, sim: Math.max(trigramSimilarity(String(r.title), q), trigramSimilarity(String(r.keywords ?? ""), q) * 0.9) }))
-    .filter(({ r, sim }) => sim >= 0.3 && !seen.has(r.entity_id as string))
+    .map((r) => ({ r, sim: Math.max(wordSimilarity(String(r.title), q), wordSimilarity(String(r.keywords ?? ""), q) * 0.9) }))
+    .filter(({ r, sim }) => sim >= 0.5 && !seen.has(r.entity_id as string))
     .sort((a, b) => b.sim * Number(b.r.rank) - a.sim * Number(a.r.rank))
     .slice(0, limit);
   for (const { r, sim } of fuzzy) {
