@@ -15,6 +15,7 @@ Founder's rule (2026-09-15): the site must not run out of allowance on any servi
 | Cron Triggers | Included | | Five triggers per account; four are used (ADR-46) |
 | Workers Logs | 20M events a month, 7 days | USD 0.60 per million | `head_sampling_rate: 1`; lower it if events climb |
 | Analytics Engine | 10M points written, 10k SQL reads a month | USD 0.25 per million points | `/admin/metrics` is cached ten minutes so reads stay in the hundreds |
+| Cloudflare Images (resizing, ADR-50) | 5,000 unique transformations a month | USD 0.50 per 1,000 | Re-importing the whole photo library; each import is three transformations |
 | Turnstile | Free | | |
 | Web Analytics, DNS, CDN, Redirect Rules | Free | | |
 | Resend Free | 100 emails a day, 3,000 a month, one custom domain | USD 20 a month for 50k | A newsletter to 200 people, or a confirmation mail blocked because a newsletter used the day |
@@ -27,7 +28,7 @@ Expected bill at today's traffic (about 33k requests a day, 1M a month): USD 5 f
 ### Requests and compute
 - vinext's Response Store (ADR-44) keeps every rendered page in R2 (`searchable-page-cache`, APAC) with a SQLite Durable Object as the index: one render per revalidation window for the whole world, not one per data centre. Warm hits answer in 15 to 60 ms of wall time and about 5 ms of CPU; a miss renders at 100 to 280 ms of CPU. Publishing calls `revalidatePath` for the pages it touches, so ISR windows are the fallback, not the mechanism.
 - Smart Placement runs the Worker near D1 (APAC), so a render is a few short round trips instead of many long ones.
-- `HEAVY_COMPUTE=1` lets a request spend CPU on image resizing (photon, libwebp in WebAssembly, 200 to 500 ms) and the dynamic social card; the browser still prepares a master, 480 and 960 WebP before uploading (ADR-43), so the server usually only validates and stores.
+- Image resizing runs on Cloudflare Images through the `IMAGES` binding (ADR-50), so the Worker never decodes a photo; `HEAVY_COMPUTE=1` still allows the dynamic social card. The browser still prepares a master, 480 and 960 WebP before uploading (ADR-43), so an upload is usually a store, not a transformation.
 - The header's mega menu is built once per 10 minutes (`unstable_cache`), not per request. `/api/feed` is cached for 5 minutes; the live panel polls every 5 minutes and stops when the tab is hidden. Search suggestions come from `/suggest-index.json`, matched in the browser. Social cards are cached immutable for a year per title.
 - Anonymous visitors never call `/api/auth/get-session`: the header and review form check a readable `sp_auth` hint cookie first. Signed-in sessions are served from a signed cookie cache for 5 minutes (`cookieCache`).
 - First-party beacons only record clicks that matter (business contact clicks, business page views, search result clicks, shares). Product events go to Analytics Engine (ADR-48); page views go to Cloudflare Web Analytics and Clarity.

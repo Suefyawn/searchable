@@ -1,7 +1,7 @@
 import { createHash, createHmac } from "node:crypto";
 import { getDb, schema } from "@/db";
 import { decodeImage, toWebp, type Decoded } from "@/lib/image-resize";
-import { bindings, heavyComputeAllowed } from "@/lib/platform";
+import { bindings, heavyComputeAllowed, type ImagesBinding } from "@/lib/platform";
 import { webpDimensions } from "@/lib/webp";
 import { MASTER_QUALITY, RENDITION_QUALITY, RENDITION_WIDTHS, VARIANT_MAX, renditionWidth, type StoreVariant } from "./images";
 
@@ -67,6 +67,8 @@ export async function storePreparedImage(files: PreparedImage, opts: { variant: 
  * elsewhere. `supabase` uses Supabase Storage (metered egress; avoid).
  */
 export async function storeImage(input: Uint8Array, opts: { variant: Variant; alt?: string; credit?: string; originalName?: string }): Promise<StoredImage> {
+  const images = bindings().IMAGES;
+  if (images) return storeViaImages(images, input, opts);
   if (!heavyComputeAllowed) throw new NoServerResize();
   const max = VARIANT_MAX[opts.variant];
   const decoded = await decodeImage(input);
@@ -87,6 +89,39 @@ export async function storeImage(input: Uint8Array, opts: { variant: Variant; al
   } finally {
     decoded.img.free();
   }
+}
+
+/**
+ * Cloudflare Images does the decoding and scaling (ADR-50): a 15 MB camera original exhausted the 128 MB the
+ * Worker has when photon decoded it in WebAssembly, and even a 300 KB JPEG tipped a warm isolate over. The
+ * binding streams the source to Cloudflare's resizer and back; the Worker only stores bytes. Same files as the
+ * photon path: a WebP master inside the variant's box plus the 480 and 960 renditions.
+ */
+async function storeViaImages(images: ImagesBinding, input: Uint8Array, opts: { variant: Variant; alt?: string; credit?: string; originalName?: string }): Promise<StoredImage> {
+  const max = VARIANT_MAX[opts.variant];
+  const stream = () => new Response(new Uint8Array(input) as unknown as BodyInit).body!;
+  const info = await images.info(stream());
+  if (!info.width || !info.height) throw new Error(`Not a raster image (${info.format})`);
+  const scale = Math.min(1, max / info.width, max / info.height);
+  const width = Math.max(1, Math.round(info.width * scale));
+  const height = Math.max(1, Math.round(info.height * scale));
+  const render = async (w: number, h: number | undefined, quality: number) => {
+    const out = await images.input(stream()).transform({ width: w, height: h, fit: "scale-down" }).output({ format: "image/webp", quality });
+    return new Uint8Array(await new Response(out.image()).arrayBuffer());
+  };
+  const master = await render(max, max, MASTER_QUALITY);
+  const id = crypto.randomUUID();
+  const now = new Date();
+  const dir = `uploads/${now.getUTCFullYear()}/${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
+  const key = `${dir}/${id}.webp`;
+  const url = await putObject(key, master, "image/webp");
+  for (const w of RENDITION_WIDTHS) await putObject(`${dir}/${id}-${w}.webp`, await render(renditionWidth(w, width), undefined, RENDITION_QUALITY), "image/webp");
+  const db = await getDb();
+  const [row] = await db
+    .insert(schema.media)
+    .values({ url, storageKey: key, mimeType: "image/webp", width, height, bytes: master.byteLength, alt: opts.alt ?? opts.originalName?.replace(/\.[a-z0-9]+$/i, "") ?? null, credit: opts.credit ?? null })
+    .returning({ id: schema.media.id });
+  return { id: row.id, url, width, height, bytes: master.byteLength, mimeType: "image/webp" };
 }
 
 /** Stores a document as is (CVs are PDFs). Same providers as images; served from an unguessable key. */

@@ -8,5 +8,6 @@
   "main": "vinext/server/fetch-handler",
   "assets": { "directory": "dist/client", "not_found_handling": "none", "binding": "ASSETS" },
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "searchable-images" }],
+  "images": { "binding": "IMAGES" },
   "d1_databases": [{ "binding": "DB", "database_name": "searchable-staging", "database_id": "7185c5fd-a1f9-45e1-8f91-71eae5544637", "migrations_dir": "migrations" }]
 }

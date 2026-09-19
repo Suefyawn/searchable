@@ -14,6 +14,17 @@ export type Bindings = {
   MEDIA?: { put: R2Put };
   ASSETS?: { fetch: (input: Request | string) => Promise<Response> };
   ANALYTICS?: { writeDataPoint: (point: { indexes?: string[]; blobs?: string[]; doubles?: number[] }) => void };
+  IMAGES?: ImagesBinding;
+};
+
+/** The slice of Cloudflare's Images binding the storage layer calls (ADR-50). */
+export type ImagesBinding = {
+  info(stream: ReadableStream): Promise<{ format: string; fileSize?: number; width?: number; height?: number }>;
+  input(stream: ReadableStream): {
+    transform(options: { width?: number; height?: number; fit?: "scale-down" | "contain" | "cover" | "crop" | "pad" }): {
+      output(options: { format: "image/webp" | "image/jpeg" | "image/png" | "image/avif"; quality?: number }): Promise<{ image(): ReadableStream; contentType(): string }>;
+    };
+  };
 };
 
 export function bindings(): Bindings {

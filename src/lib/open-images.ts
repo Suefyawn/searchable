@@ -260,23 +260,12 @@ export async function usedSources(candidates: OpenImage[]): Promise<Set<string>>
   return new Set(rows.map((r) => r.sourceUrl!).filter(Boolean));
 }
 
-/**
- * Decoding happens in WebAssembly inside a 128 MB Worker; a 15 MB camera original (6000 px wide) needs more than
- * that as pixels and kills the request with error 1102. Commons serves any width on demand, so originals there
- * are fetched as a 1600 px rendition; anything else over the byte ceiling is refused with a clear message.
- */
-const MAX_SOURCE_BYTES = 6 * 1024 * 1024;
-export function downloadUrl(url: string): string {
-  const m = url.match(/^https:\/\/upload\.wikimedia\.org\/wikipedia\/(commons|[a-z]{2,3})\/([0-9a-f])\/([0-9a-f]{2})\/([^/]+)$/);
-  return m ? `https://upload.wikimedia.org/wikipedia/${m[1]}/thumb/${m[2]}/${m[3]}/${m[4]}/1600px-${m[4]}${/\.svg$/i.test(m[4]) ? ".png" : ""}` : url;
-}
-
 export async function importOpenImage(img: OpenImage, variant: "article" | "cover" | "photo" = "article", alt?: string) {
   if (!heavyComputeAllowed) throw new NoServerResize();
-  const res = await fetch(downloadUrl(img.url), { headers: { "user-agent": UA, referer: img.sourceUrl }, signal: AbortSignal.timeout(12_000) });
+  const res = await fetch(img.url, { headers: { "user-agent": UA, referer: img.sourceUrl }, signal: AbortSignal.timeout(12_000) });
   if (!res.ok) throw new Error(`Image download failed: ${res.status}`);
   const buf = Buffer.from(await res.arrayBuffer());
-  if (buf.byteLength > MAX_SOURCE_BYTES) throw new Error(`Image too large to resize here (${(buf.byteLength / 1_048_576).toFixed(1)} MB; the limit is 6 MB). Send a smaller rendition, or the prepared upload.`);
+  if (buf.byteLength > 25 * 1024 * 1024) throw new Error("Image too large");
   const credit = creditLine(img);
   const stored = await storeImage(buf, { variant, alt: alt ?? img.title, credit });
   const db = await getDb();
