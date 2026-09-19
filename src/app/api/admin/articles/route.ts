@@ -55,7 +55,10 @@ const Body = z.object({
    */
   image: z
     .union([
-      z.object({ url: z.string().url(), alt: z.string().max(300).optional(), credit: z.string().max(200).optional(), sourceUrl: z.string().url().optional(), license: z.string().max(40).optional() }),
+      z
+        .object({ url: z.string().url(), alt: z.string().max(300).optional(), credit: z.string().max(200).optional(), sourceUrl: z.string().url().optional(), license: z.string().max(40).optional() })
+        // An outside photo must say where it came from and who to credit (ADR-51); our own host needs neither.
+        .refine((i) => i.url.startsWith(process.env.R2_PUBLIC_URL ?? "https://img.searchable.pk") || (!!i.credit && !!i.sourceUrl), { message: "image.url from another host needs credit and sourceUrl (the page the photo was taken from)" }),
       z.object({
         query: z.string().min(2).max(120),
         alt: z.string().max(300).optional(),
