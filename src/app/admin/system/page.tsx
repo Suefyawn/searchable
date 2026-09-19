@@ -76,8 +76,8 @@ export default async function AdminSystem() {
   const ing = ingest?.value as { at?: string; errors?: string[]; results?: { slug: string; status: string; value?: number; message?: string }[] } | undefined;
   const b = budget?.value as { day?: string; dayCount?: number; month?: string; monthCount?: number } | undefined;
   const env = {
-    host: process.env.VERCEL ? "Vercel" : process.env.CF_PAGES ? "Cloudflare" : "local",
-    database: (process.env.DATABASE_URL ?? "pglite://").startsWith("pglite://") ? "PGlite (local file)" : "Postgres (Supabase)",
+    host: process.env.CF_ACCOUNT_ID ? "Cloudflare Workers" : "local",
+    database: "Cloudflare D1",
     storage: process.env.STORAGE_PROVIDER ?? "local",
     email: process.env.EMAIL_PROVIDER ?? "local",
     cron: process.env.CRON_SECRET ? "secret set" : "open (local)",
