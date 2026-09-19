@@ -7,7 +7,7 @@ const DEF: LivingPageDef = {
   slug: "credit-cards",
   name: "Credit cards",
   title: "Credit cards in Pakistan compared: fees, mark-up, minimum income",
-  seoTitle: "Credit Cards in Pakistan 2026: Compare Annual Fees, Mark-up and Rewards",
+  seoTitle: "Credit Cards in Pakistan 2026: Fees, Mark-up, Rewards",
   description: "Credit cards from HBL, UBL, MCB, Meezan, Bank Alfalah, Standard Chartered, Faysal and others compared on annual fee, mark-up rate, minimum income, cashback, lounge access and fuel discounts, from the banks' published schedules of charges.",
   intro: "Annual fees and mark-up from each bank's published schedule of charges, the income it asks for, and what the card gives back.",
   priceWord: "annual fee and mark-up rate",

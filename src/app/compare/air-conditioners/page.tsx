@@ -7,7 +7,7 @@ const DEF: LivingPageDef = {
   slug: "air-conditioners",
   name: "Air conditioners",
   title: "AC prices in Pakistan: inverter air conditioners compared",
-  seoTitle: "AC Prices in Pakistan 2026: Compare 1, 1.5 and 2 Ton Inverter ACs",
+  seoTitle: "AC Prices in Pakistan 2026: 1, 1.5 and 2 Ton Inverters",
   description: "Inverter and non-inverter air conditioners from Haier, Gree, Dawlance, Orient, Kenwood and others with brand-list prices, tonnage, EER, T3 rating and warranty. Filter by tonnage and brand, compare three, and see the monthly running cost on your tariff.",
   intro: "Brand list prices, the efficiency figures the brands publish, and a link to what each one costs to run on your tariff.",
   priceWord: "brand list price",

@@ -7,7 +7,7 @@ const DEF: LivingPageDef = {
   slug: "mobile-packages",
   name: "Mobile packages",
   title: "Mobile packages compared: Jazz, Zong, Telenor and Ufone",
-  seoTitle: "Mobile Packages Pakistan 2026: Jazz, Zong, Telenor, Ufone Data and Call Bundles Compared",
+  seoTitle: "Mobile Packages Pakistan 2026: Jazz, Zong, Telenor, Ufone",
   description: "Monthly, weekly and daily bundles from Jazz, Zong, Telenor and Ufone compared on price, data, on-net and off-net minutes, SMS and validity, with the rupees-per-GB figure worked out, from the operators' own package pages.",
   intro: "Price, data, minutes and validity from each operator's own package page, with the rupees-per-GB figure the operators never print.",
   priceWord: "price and allowance",

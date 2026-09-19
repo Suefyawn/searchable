@@ -7,7 +7,7 @@ const DEF: LivingPageDef = {
   slug: "national-savings",
   name: "National Savings schemes",
   title: "National Savings profit rates: every scheme compared",
-  seoTitle: "National Savings Profit Rates 2026: Behbood, Regular Income, Defence, Special Savings Compared",
+  seoTitle: "National Savings Profit Rates 2026: Every Scheme Compared",
   description: "Every National Savings (CDNS) scheme on one page: profit rate, payout, term, minimum and maximum, who can buy and withholding tax, from the official rate sheet.",
   intro: "Rates from the Central Directorate of National Savings' published sheet, with the withholding rules that decide what you actually receive.",
   priceWord: "profit rate",
