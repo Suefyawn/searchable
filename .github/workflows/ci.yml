@@ -19,6 +19,8 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
+      - name: Every action and API route authorises
+        run: npx tsx scripts/check-authz.ts
       - name: Migrations apply cleanly to a fresh local D1
         run: npm run db:migrate
       - run: npm run build

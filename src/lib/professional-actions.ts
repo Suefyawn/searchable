@@ -7,6 +7,7 @@ import { getDb, schema } from "@/db";
 import { getSessionUser, hasRole, requireRole } from "@/lib/auth";
 import { notifyProfessionalLead } from "@/lib/notify";
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
+import { TURNSTILE_ERROR, verifyTurnstile } from "@/lib/turnstile";
 import { slugify, uniqueSlug } from "@/lib/slug";
 import { canEditProfessional, indexProfessional } from "./professionals";
 import { ProfessionalInput, type ProfessionalFormInput } from "./professional-schema";
@@ -87,12 +88,13 @@ export async function saveProfessional(raw: ProfessionalFormInput): Promise<{ ok
   return { ok: true, id: row.id, slug };
 }
 
-const Lead = z.object({ professionalId: z.string().min(1), name: z.string().trim().min(2).max(80), phone: z.string().trim().min(7).max(20), email: z.string().trim().email().max(120).optional().or(z.literal("")), message: z.string().trim().max(1000).optional(), website: z.string().max(0).optional() });
+const Lead = z.object({ professionalId: z.string().min(1), name: z.string().trim().min(2).max(80), phone: z.string().trim().min(7).max(20), email: z.string().trim().email().max(120).optional().or(z.literal("")), message: z.string().trim().max(1000).optional(), website: z.string().max(0).optional(), turnstile: z.string().optional() });
 
 /** Enquiry from a profile page. `website` is a honeypot. */
 export async function sendProfessionalLead(input: z.input<typeof Lead>): Promise<{ ok: boolean; error?: string }> {
   const parsed = Lead.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Check your name and phone number." };
+  if (!(await verifyTurnstile(parsed.data.turnstile))) return { ok: false, error: TURNSTILE_ERROR };
   if (parsed.data.website) return { ok: true };
   const rl = await rateLimit("lead", LIMITS.lead.limit, LIMITS.lead.windowMs);
   if (!rl.ok) return { ok: false, error: "Too many enquiries. Try again in a few minutes." };

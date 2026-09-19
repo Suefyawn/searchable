@@ -14,13 +14,13 @@ npm run db:seed        # reference + sample data through the admin API of the ru
 npm run search:reindex # rebuild the search index through the admin API of the running instance (BASE_URL)
 npm run db:export      # Supabase -> .data/export.sql for the content migration (DATABASE_URL); -- --verify <db> compares
 npm test              # pure-function checks, no database (calculators, slugs, markdown, webhook signatures, WebP headers, no em dashes)
-npm run typecheck && npm run lint && npm run build
-npm run deploy         # staging Worker; npm run deploy:production for the production environment
+npm run typecheck && npm run lint && npm run check:authz && npm run build
+NEXT_PUBLIC_SITE_URL=https://staging.searchable.pk npm run build && npm run deploy   # staging Worker (production: the apex URL and deploy:production)
 ```
 
 ## Rules
 1. **Schema changes:** edit `src/db/schema/*.ts` (sqlite-core; enums via `textEnum`/`enumColumn` plus a CHECK, JSON via `json()`, timestamps via `timestampMs()`, see `docs/schema-notes.md`) → `npm run db:generate` → commit the SQL in `migrations/` → `npm run db:migrate`. Never hand-edit generated SQL. Raw SQL is SQLite: no casts, epoch-millisecond timestamps, `json_extract` for JSON.
-2. **Data access** only through `src/db` + `src/lib/*` query functions (public pages; an admin page may run its own Drizzle query for a one-off listing). Server Components read; Server Actions write; Zod-validate every action input; guard with `requireRole()`. Export only actions from a `"use server"` file: every export there is a public endpoint.
+2. **Data access** only through `src/db` + `src/lib/*` query functions (public pages; an admin page may run its own Drizzle query for a one-off listing). Server Components read; Server Actions write; Zod-validate every action input; guard with `requireRole()` or `allowed(user, op, resource)` (the matrix in `packages/authz`, ADR-47; a new resource or operation is added there first, with its test). Public forms carry a `<Turnstile/>` and verify the token. Export only actions from a `"use server"` file: every export there is a public endpoint.
 3. **Search:** any create/update/delete of an article, tool, business, location, or entity must call `syncSearchDocument()` / `removeSearchDocument()` from `src/lib/search.ts`.
 4. **New tool:** add `src/tools/calculators/<slug>.ts` implementing `ToolDefinition`, register it in `src/tools/registry.ts`, add rate data under `src/tools/data/` with `effectiveFrom` and `source`. Run `npm run db:seed` to mirror metadata into the `tools` table.
 5. **URLs** follow `docs/URL-ARCHITECTURE.md` exactly. A changed public URL needs a `redirects` row.

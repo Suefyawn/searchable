@@ -5,6 +5,7 @@ import * as React from "react";
 import { Button, Field, Input } from "@/components/ui";
 import { signIn, signUp } from "@/lib/auth-client";
 import { setAuthHint } from "@/lib/auth-hint";
+import { Turnstile, turnstileToken } from "@/components/turnstile";
 
 export function AuthForm({ next, initialMode }: { next: string; initialMode: "login" | "register" }) {
   const router = useRouter();
@@ -20,10 +21,11 @@ export function AuthForm({ next, initialMode }: { next: string; initialMode: "lo
     const email = String(fd.get("email") ?? "");
     const password = String(fd.get("password") ?? "");
     const name = String(fd.get("name") ?? "");
+    const fetchOptions = { headers: { "x-captcha-response": turnstileToken(fd) ?? "" } };
     const res =
       mode === "register"
-        ? await signUp.email({ email, password, name, callbackURL: next })
-        : await signIn.email({ email, password, callbackURL: next });
+        ? await signUp.email({ email, password, name, callbackURL: next, fetchOptions })
+        : await signIn.email({ email, password, callbackURL: next, fetchOptions });
     setLoading(false);
     if (res.error) {
       setError(res.error.message ?? "Something went wrong");
@@ -48,6 +50,7 @@ export function AuthForm({ next, initialMode }: { next: string; initialMode: "lo
         <Input id="password" name="password" type="password" required minLength={8} autoComplete={mode === "register" ? "new-password" : "current-password"} />
       </Field>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      <Turnstile />
       <Button type="submit" disabled={loading} className="w-full">
         {loading ? "Please wait…" : mode === "register" ? "Create account" : "Sign in"}
       </Button>

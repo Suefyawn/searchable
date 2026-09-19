@@ -5,6 +5,7 @@ import { z } from "zod";
 import { getDb, schema } from "@/db";
 import { getSessionUser } from "@/lib/auth";
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
+import { TURNSTILE_ERROR, verifyTurnstile } from "@/lib/turnstile";
 import { findDuplicates } from "@/lib/dedupe";
 import { slugify, uniqueSlug } from "@/lib/slug";
 
@@ -19,6 +20,7 @@ const Input = z.object({
   description: z.string().trim().min(20).max(2000),
   contactName: z.string().trim().min(2).max(80),
   contactEmail: z.email(),
+  turnstile: z.string().optional()
 });
 
 export async function submitBusiness(input: z.infer<typeof Input>): Promise<{ ok: boolean; error?: string; slug?: string }> {
@@ -26,6 +28,7 @@ export async function submitBusiness(input: z.infer<typeof Input>): Promise<{ ok
   if (!rl.ok) return { ok: false, error: "You have submitted several businesses recently. Please try again in an hour." };
   const parsed = Input.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Please check the highlighted fields, name, category, city, address, phone and a short description are required." };
+  if (!(await verifyTurnstile(parsed.data.turnstile))) return { ok: false, error: TURNSTILE_ERROR };
   const d = parsed.data;
   const db = await getDb();
   const [city, user] = await Promise.all([db.query.locations.findFirst({ where: eq(schema.locations.id, d.cityId) }), getSessionUser()]);

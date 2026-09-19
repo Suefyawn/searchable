@@ -48,9 +48,10 @@ There is no connection to pool or close. `rawQuery()` returns rows and turns `Da
 
 ## Auth (better-auth)
 
-- Email + password; sessions in Postgres; `users.role` ∈ `user | editor | admin | business_owner`.
+- Email + password; sessions in D1; `users.role` ∈ `user | editor | admin | business_owner`.
 - `src/lib/auth.ts` (server), `src/lib/auth-client.ts` (client), route at `/api/auth/[...all]`.
-- `requireUser()` / `requireRole('admin')` helpers for server components and actions.
+- `requireUser()` / `requireRole('admin')` helpers for server components and actions; `allowed(user, op, resource, {own})` asks the policy matrix in `packages/authz` (ADR-47). `npm run check:authz` fails CI when an action file or API route authorises nothing.
+- Cloudflare Turnstile on sign-up, sign-in and the public forms: `<Turnstile/>` from `src/components/turnstile.tsx` inside the form, `verifyTurnstile()` in the action. Off when `TURNSTILE_SECRET` is unset.
 - Business owners are `users` linked to `businesses` through `business_claims` (status=approved).
 
 ## Caching

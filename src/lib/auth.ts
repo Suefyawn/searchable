@@ -2,24 +2,30 @@ import { timingSafeEqual } from "node:crypto";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { captcha } from "better-auth/plugins";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getDb, schema, type Database } from "@/db";
+import { atLeast, can, type Context, type Operation, type Resource } from "@jet/authz";
 import { hashApiKey } from "@/lib/api-keys";
 import { SITE } from "@/lib/utils";
 
 export type Role = (typeof schema.userRole.enumValues)[number];
-const ROLE_RANK: Record<Role, number> = { user: 0, business_owner: 1, editor: 2, admin: 3 };
 
 function buildAuth(db: Database) {
   return betterAuth({
     baseURL: process.env.BETTER_AUTH_URL?.trim() || SITE.url,
     secret: process.env.BETTER_AUTH_SECRET,
+    // The Worker answers on its workers.dev host as well as the custom domain; better-auth rejects any origin
+    // that is not baseURL or listed here ("Invalid origin"). localhost is for vinext dev.
+    trustedOrigins: ["https://*.sooviaan.workers.dev", "http://localhost:3000"],
     database: drizzleAdapter(db, {
-      provider: "pg",
+      provider: "sqlite",
       schema: { user: schema.users, session: schema.sessions, account: schema.accounts, verification: schema.verifications },
     }),
     emailAndPassword: { enabled: true, minPasswordLength: 8 },
+    // Turnstile on sign-up and sign-in (ADR-47): the client sends the widget token as x-captcha-response.
+    plugins: process.env.TURNSTILE_SECRET?.trim() ? [captcha({ provider: "cloudflare-turnstile", secretKey: process.env.TURNSTILE_SECRET.trim() })] : [],
     user: {
       additionalFields: {
         role: { type: "string", defaultValue: "user", input: false },
@@ -69,7 +75,7 @@ export async function userForBearer(given: string | undefined): Promise<SessionU
   if (!row.lastUsedAt || Date.now() - row.lastUsedAt.getTime() > 5 * 60_000) await db.update(schema.apiKeys).set({ lastUsedAt: new Date() }).where(eq(schema.apiKeys.id, row.id));
   // A key is only as strong as its maker still is: a demoted or deleted admin takes their keys down with them.
   const maker = row.createdBy ? await db.query.users.findFirst({ where: eq(schema.users.id, row.createdBy) }) : null;
-  if (!maker || ROLE_RANK[maker.role] < ROLE_RANK[row.role]) return null;
+  if (!maker || !atLeast(maker.role, row.role)) return null;
   return { id: maker.id, email: maker.email, name: maker.name, role: row.role, image: maker.image };
 }
 
@@ -103,8 +109,17 @@ export async function requireUser(next = "/account"): Promise<SessionUser> {
   return user;
 }
 
+/** The role ladder (user, business_owner, editor, admin), answered by the policy package so it has one home. */
 export function hasRole(user: SessionUser | null, role: Role): boolean {
-  return !!user && ROLE_RANK[user.role] >= ROLE_RANK[role];
+  return !!user && atLeast(user.role, role);
+}
+
+/**
+ * The policy question for one action (packages/authz, ADR-47): may this session do `op` on `resource`? Pass
+ * `own: true` when the caller has established that the thing belongs to the user.
+ */
+export function allowed(user: SessionUser | null, op: Operation, resource: Resource, ctx?: Context): boolean {
+  return can(user?.role ?? "anonymous", op, resource, ctx);
 }
 
 export async function requireRole(role: Role, next = "/admin"): Promise<SessionUser> {

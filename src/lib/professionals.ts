@@ -2,7 +2,7 @@ import { cache } from "react";
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { getDb, rawQuery, schema } from "@/db";
 import { getProfession, PROFESSIONS } from "@/content/professions";
-import { hasRole, type SessionUser } from "./auth";
+import { allowed, type SessionUser } from "./auth";
 import { removeSearchDocument, syncSearchDocument } from "./search";
 import type { ProfessionalFormInput } from "./professional-schema";
 
@@ -59,10 +59,10 @@ async function getProfessionalRaw(slug: string) {
 /** Editors can edit any profile; owners only their own. */
 export async function canEditProfessional(user: SessionUser | null, id: string): Promise<boolean> {
   if (!user) return false;
-  if (hasRole(user, "editor")) return true;
+  if (allowed(user, "update", "professional")) return true;
   const db = await getDb();
   const p = await db.query.professionals.findFirst({ where: eq(schema.professionals.id, id), columns: { ownerUserId: true } });
-  return p?.ownerUserId === user.id;
+  return allowed(user, "update", "professional", { own: p?.ownerUserId === user.id });
 }
 
 export async function getProfessionalById(id: string) {

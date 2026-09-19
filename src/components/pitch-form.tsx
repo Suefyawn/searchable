@@ -4,6 +4,7 @@ import Link from "next/link";
 import * as React from "react";
 import { Alert, Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { submitPitchAction } from "@/lib/commerce-actions";
+import { Turnstile } from "@/components/turnstile";
 
 const KINDS = [
   { value: "guest", label: "Guest article (free, editorial)" },
@@ -111,6 +112,7 @@ export function PitchForm({ initialKind = "guest", categories }: { initialKind?:
       <p className="text-sm text-2">
         By submitting you confirm the text is your own, not published elsewhere, and that you accept our <Link href="/editorial-policy" className="underline underline-offset-4">editorial policy</Link>. Paid submissions are invoiced immediately and refunded in full if we decline the topic.
       </p>
+      <Turnstile />
       <Button type="submit" disabled={state === "saving"}>
         {state === "saving" ? "Sending…" : kind === "guest" ? "Send pitch" : "Submit and get invoice"}
       </Button>

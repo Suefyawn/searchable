@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Button, Field, Input, Textarea } from "@/components/ui";
 import { sendContact } from "./actions";
+import { Turnstile, turnstileToken } from "@/components/turnstile";
 
 export function ContactForm({ about }: { about?: string }) {
   const [state, setState] = React.useState<"idle" | "loading" | "done" | "error">("idle");
@@ -18,6 +19,7 @@ export function ContactForm({ about }: { about?: string }) {
       subject: String(fd.get("subject") ?? ""),
       message: String(fd.get("message") ?? ""),
       about,
+      turnstile: turnstileToken(fd),
     });
     if (res.ok) setState("done");
     else {
@@ -45,6 +47,7 @@ export function ContactForm({ about }: { about?: string }) {
       <Field label="Message" htmlFor="c-message">
         <Textarea id="c-message" name="message" required minLength={10} maxLength={4000} />
       </Field>
+      <Turnstile />
       <Button type="submit" disabled={state === "loading"}>
         {state === "loading" ? "Sending…" : "Send message"}
       </Button>

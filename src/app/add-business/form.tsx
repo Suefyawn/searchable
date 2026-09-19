@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { submitBusiness } from "./actions";
+import { Turnstile, turnstileToken } from "@/components/turnstile";
 
 type Opt = { id: string; name: string };
 
@@ -26,6 +27,7 @@ export function AddBusinessForm({ categories, cities }: { categories: Opt[]; cit
       description: get("description"),
       contactName: get("contactName"),
       contactEmail: get("contactEmail"),
+      turnstile: turnstileToken(fd),
     });
     if (res.ok) setState("done");
     else {
@@ -99,6 +101,7 @@ export function AddBusinessForm({ categories, cities }: { categories: Opt[]; cit
           <Input id="b-cemail" name="contactEmail" type="email" required />
         </Field>
       </div>
+      <Turnstile />
       <Button type="submit" size="lg" disabled={state === "loading"}>
         {state === "loading" ? "Submitting…" : "Submit for review"}
       </Button>

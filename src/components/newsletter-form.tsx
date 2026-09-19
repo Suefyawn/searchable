@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Button, Input } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { Turnstile, turnstileToken } from "@/components/turnstile";
 
 const TOPICS = [
   { value: "pakistan", label: "Pakistan" },
@@ -23,15 +24,16 @@ export function NewsletterForm({ compact = false, source = "page", className }: 
   const [state, setState] = React.useState<"idle" | "loading" | "pending" | "already_active" | "error">("idle");
   const [error, setError] = React.useState("");
 
-  async function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const turnstile = turnstileToken(new FormData(e.currentTarget));
     setState("loading");
     setError("");
     try {
       const res = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email, name: name || undefined, topics, frequency, source }),
+        body: JSON.stringify({ email, name: name || undefined, topics, frequency, source, turnstile }),
       });
       const data = (await res.json()) as { status?: string; error?: string };
       if (!res.ok) throw new Error(data.error ?? "Something went wrong");
@@ -70,6 +72,7 @@ export function NewsletterForm({ compact = false, source = "page", className }: 
           {state === "loading" ? "Sending…" : "Subscribe"}
         </Button>
       </div>
+      <Turnstile />
       {!compact ? (
         <>
           <div className="flex flex-wrap gap-2">

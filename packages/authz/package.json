@@ -1,0 +1,9 @@
+{
+  "name": "@jet/authz",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Policy matrix and can() for JetNine sites: who may do what to which resource, as data with a test per cell.",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "test": "node --experimental-strip-types --test src/*.test.ts" }
+}

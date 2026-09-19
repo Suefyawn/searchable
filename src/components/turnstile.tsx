@@ -1,0 +1,57 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
+const SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+
+declare global {
+  interface Window {
+    turnstile?: { render: (el: HTMLElement, opts: Record<string, unknown>) => string; remove: (id: string) => void };
+  }
+}
+
+/**
+ * Cloudflare Turnstile widget (ADR-47). Place it inside a <form>: the widget adds a hidden input named
+ * `cf-turnstile-response` there, so `turnstileToken(new FormData(form))` is the token to pass to the action.
+ * The site key is a runtime var (TURNSTILE_SITE_KEY, written by the root layout into a meta tag) rather than a
+ * build-time NEXT_PUBLIC value, so one build serves staging and production. Without a key nothing renders and
+ * the server skips verification.
+ */
+export function Turnstile({ className }: { className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const siteKey = document.querySelector<HTMLMetaElement>('meta[name="turnstile-site-key"]')?.content;
+    if (!siteKey) return;
+    if (!document.querySelector(`script[src^="${SCRIPT}"]`)) {
+      const s = document.createElement("script");
+      s.src = `${SCRIPT}?render=explicit`;
+      s.async = true;
+      document.head.appendChild(s);
+    }
+    let id: string | undefined;
+    let timer: ReturnType<typeof setInterval> | undefined;
+    const mount = () => {
+      if (ref.current && window.turnstile && id === undefined) id = window.turnstile.render(ref.current, { sitekey: siteKey, theme: "auto", size: "flexible" });
+    };
+    if (window.turnstile) mount();
+    else
+      timer = setInterval(() => {
+        if (window.turnstile) {
+          clearInterval(timer);
+          mount();
+        }
+      }, 200);
+    return () => {
+      if (timer) clearInterval(timer);
+      if (id) window.turnstile?.remove(id);
+    };
+  }, []);
+  // Always an (empty) div, so server and client markup agree whether or not a key is configured.
+  return <div ref={ref} className={className} />;
+}
+
+/** The token the widget wrote into the form, or undefined when the widget is off. */
+export function turnstileToken(fd: FormData): string | undefined {
+  const t = fd.get("cf-turnstile-response");
+  return typeof t === "string" && t ? t : undefined;
+}

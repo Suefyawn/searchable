@@ -4,12 +4,14 @@ import { z } from "zod";
 import { getDb, schema } from "@/db";
 import { notifyBusinessLead } from "@/lib/notify";
 import { LIMITS, rateLimit } from "@/lib/rate-limit";
+import { TURNSTILE_ERROR, verifyTurnstile } from "@/lib/turnstile";
 
 const Lead = z.object({
   businessId: z.string().min(1),
   name: z.string().trim().min(2).max(80),
   phone: z.string().trim().min(7).max(20),
   message: z.string().trim().min(5).max(1000),
+  turnstile: z.string().optional()
 });
 
 export async function sendLead(input: z.infer<typeof Lead>): Promise<{ ok: boolean; error?: string }> {
@@ -17,6 +19,7 @@ export async function sendLead(input: z.infer<typeof Lead>): Promise<{ ok: boole
   if (!rl.ok) return { ok: false, error: "Too many enquiries sent. Please try again later." };
   const parsed = Lead.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Please fill in your name, phone and message." };
+  if (!(await verifyTurnstile(parsed.data.turnstile))) return { ok: false, error: TURNSTILE_ERROR };
   const db = await getDb();
   await db.insert(schema.businessLeads).values({ ...parsed.data, source: "profile" });
   await db.insert(schema.analyticsEvents).values({ name: "business_lead", props: { businessId: parsed.data.businessId } });

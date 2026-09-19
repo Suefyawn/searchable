@@ -2,7 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { and, desc, eq, lt } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import { getProduct } from "@/content/pricing";
-import { hasRole, type SessionUser } from "./auth";
+import { allowed, type SessionUser } from "./auth";
 import { sendEmail } from "./email";
 import { pkr } from "./format";
 import { indexBusiness } from "./indexers";
@@ -21,7 +21,7 @@ export function orderPath(invoiceNo: string): string {
 }
 /** The signed link, the order's own account, or an admin. */
 export function canViewOrder(order: { invoiceNo: string; userId: string | null }, user: SessionUser | null, key: string | undefined): boolean {
-  if (user && (hasRole(user, "admin") || (order.userId && order.userId === user.id))) return true;
+  if (user && allowed(user, "read", "order", { own: !!order.userId && order.userId === user.id })) return true;
   if (!key) return false;
   const a = Buffer.from(orderKey(order.invoiceNo));
   const b = Buffer.from(key);

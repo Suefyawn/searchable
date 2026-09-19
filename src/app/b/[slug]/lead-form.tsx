@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Button, Input, Textarea } from "@/components/ui";
 import { sendLead } from "./actions";
+import { Turnstile, turnstileToken } from "@/components/turnstile";
 
 export function LeadForm({ businessId }: { businessId: string }) {
   const [state, setState] = React.useState<"idle" | "loading" | "done" | "error">("idle");
@@ -12,7 +13,7 @@ export function LeadForm({ businessId }: { businessId: string }) {
     e.preventDefault();
     setState("loading");
     const fd = new FormData(e.currentTarget);
-    const res = await sendLead({ businessId, name: String(fd.get("name") ?? ""), phone: String(fd.get("phone") ?? ""), message: String(fd.get("message") ?? "") });
+    const res = await sendLead({ businessId, name: String(fd.get("name") ?? ""), phone: String(fd.get("phone") ?? ""), message: String(fd.get("message") ?? ""), turnstile: turnstileToken(fd) });
     if (res.ok) setState("done");
     else {
       setError(res.error ?? "Could not send");
@@ -27,6 +28,7 @@ export function LeadForm({ businessId }: { businessId: string }) {
       <Input name="name" placeholder="Your name" required maxLength={80} />
       <Input name="phone" placeholder="Phone or WhatsApp" required maxLength={20} inputMode="tel" />
       <Textarea name="message" placeholder="What do you need?" required maxLength={1000} className="min-h-24" />
+      <Turnstile />
       <Button type="submit" disabled={state === "loading"} className="w-full">
         {state === "loading" ? "Sending…" : "Send enquiry"}
       </Button>

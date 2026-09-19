@@ -38,6 +38,7 @@
   // HEAVY_COMPUTE=1: this plan may spend CPU inside a request (image resizing, social cards); unset on the free plan.
   "vars": {
     "NEXT_PUBLIC_SITE_URL": "https://staging.searchable.pk",
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAE8eaoAcHkRopZwk",
     "NEXT_PUBLIC_SITE_NAME": "Searchable",
     "BETTER_AUTH_URL": "https://staging.searchable.pk",
     "STORAGE_PROVIDER": "r2",
@@ -59,6 +60,7 @@
       "d1_databases": [{ "binding": "DB", "database_name": "searchable", "database_id": "1a91bc6d-7826-499d-b677-e5ad6bd1e18b", "migrations_dir": "migrations" }],
       "vars": {
         "NEXT_PUBLIC_SITE_URL": "https://searchable.pk",
+        "TURNSTILE_SITE_KEY": "0x4AAAAAAE8ebJNuDtougfh2",
         "NEXT_PUBLIC_SITE_NAME": "Searchable",
         "BETTER_AUTH_URL": "https://searchable.pk",
         "STORAGE_PROVIDER": "r2",

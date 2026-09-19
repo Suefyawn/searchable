@@ -10,6 +10,7 @@ import { getSessionUser, requireRole, requireUser } from "@/lib/auth";
 import { canViewOrder, createOrder, markPaid, orderPath } from "@/lib/commerce";
 import { escapeHtml } from "@/lib/markdown";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { TURNSTILE_ERROR, TURNSTILE_FIELD, verifyTurnstile } from "@/lib/turnstile";
 import { sendEmail } from "@/lib/email";
 import { SITE } from "@/lib/utils";
 
@@ -100,6 +101,7 @@ const Submission = z.object({
 export async function submitPitchAction(raw: Record<string, string>): Promise<{ ok: true; id: string; invoiceNo?: string; invoicePath?: string } | { ok: false; error: string }> {
   const rl = await rateLimit("pitch", 5, 60 * 60_000);
   if (!rl.ok) return { ok: false, error: "Too many submissions from this connection. Try again in an hour." };
+  if (!(await verifyTurnstile(raw[TURNSTILE_FIELD]))) return { ok: false, error: TURNSTILE_ERROR };
   const parsed = Submission.safeParse(raw);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Check the form." };
   const d = parsed.data;

@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { getDb, schema } from "@/db";
-import { adminApiConfigured, getSessionUser, hasRole, type SessionUser } from "./auth";
+import { adminApiConfigured, allowed, getSessionUser, type SessionUser } from "./auth";
 import { NoServerResize } from "./storage";
 
 /**
@@ -29,7 +29,8 @@ export function withAdminApi<P = Record<string, string>>(handler: Handler<P>) {
     let status = 200;
     try {
       const user = await getSessionUser();
-      if (!user || !hasRole(user, "editor")) {
+      // The admin API is the desk's: every route needs the editor role the matrix grants "jobs.update" to.
+      if (!user || !allowed(user, "update", "jobs")) {
         if (!(await adminApiConfigured())) throw new ApiError(503, "No admin API key is configured");
         throw new ApiError(401, "Bearer key missing or wrong");
       }
