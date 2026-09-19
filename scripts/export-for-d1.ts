@@ -126,7 +126,8 @@ async function exportSql() {
 }
 
 function d1<T>(db: string, query: string): T[] {
-  const raw = execFileSync("npx", ["wrangler", "d1", "execute", db, "--remote", "--json", "--command", query], { encoding: "utf8", shell: true, stdio: ["ignore", "pipe", "ignore"] });
+  // wrangler is run through its own entry file, without a shell, so the query text is passed intact on Windows too.
+  const raw = execFileSync(process.execPath, ["node_modules/wrangler/bin/wrangler.js", "d1", "execute", db, "--remote", "--json", "--command", query], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 64 * 1024 * 1024 });
   const m = raw.match(/\[[\s\S]*\]/);
   return m ? (JSON.parse(m[0])[0].results as T[]) : [];
 }

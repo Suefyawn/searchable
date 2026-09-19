@@ -21,7 +21,8 @@
     "deploy:production": "vinext-cloudflare deploy --env production --config dist/server/wrangler.json",
     "db:migrate:staging": "wrangler d1 migrations apply searchable-staging --remote",
     "db:migrate:production": "wrangler d1 migrations apply searchable --remote --env production",
-    "db:export": "tsx scripts/export-for-d1.ts"
+    "db:export": "tsx scripts/export-for-d1.ts",
+    "contract": "node --import tsx --test tests/contract/*.test.ts"
   },
   "dependencies": {
     "@cf-wasm/photon": "^0.4.0",
