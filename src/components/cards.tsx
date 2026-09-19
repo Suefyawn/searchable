@@ -47,7 +47,7 @@ export function ArticleCard({ article, variant = "default", className, thumb = f
     return (
       <article className={cn("flex flex-col", className)}>
         {article.featuredImageUrl ? (
-          <Link href={href} className="mb-5 block">
+          <Link href={href} className="mb-5 block" tabIndex={-1} aria-hidden>
             {/* The lead photo of a section front is its largest paint: fetched at once, at high priority. */}
             <Img src={article.featuredImageUrl} alt="" aspect="16/9" sizes="(min-width: 1024px) 760px, 100vw" priority />
           </Link>
@@ -69,7 +69,7 @@ export function ArticleCard({ article, variant = "default", className, thumb = f
   return (
     <article className={cn("flex flex-col py-4", className)}>
       {article.featuredImageUrl ? (
-        <Link href={href} className="mb-3 block">
+        <Link href={href} className="mb-3 block" tabIndex={-1} aria-hidden>
           <Img src={article.featuredImageUrl} alt="" aspect="3/2" sizes="(min-width: 1024px) 400px, 100vw" />
         </Link>
       ) : null}
