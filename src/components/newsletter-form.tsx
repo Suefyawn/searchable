@@ -73,7 +73,7 @@ export function NewsletterForm({ compact = false, source = "page", className }: 
           {state === "loading" ? "Sending…" : "Subscribe"}
         </Button>
       </div>
-      <Turnstile size={compact ? "compact" : "flexible"} />
+      <Turnstile quiet={compact} className={compact ? "max-w-full overflow-hidden" : undefined} />
       {!compact ? (
         <>
           <div className="flex flex-wrap gap-2">

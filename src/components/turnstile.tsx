@@ -23,8 +23,12 @@ declare global {
  * build-time NEXT_PUBLIC value, so one build serves staging and production. Without a key nothing renders and
  * the server skips verification.
  */
-/** `size`: "flexible" fills the form (min 300 px wide); "compact" is the 150 px square for narrow columns such as the footer. */
-export function Turnstile({ className, size = "flexible" }: { className?: string; size?: "flexible" | "compact" | "normal" }) {
+/**
+ * `size`: "flexible" fills the form (min 300 px wide), "compact" is the 150 px square. `quiet`: the widget stays
+ * invisible and only appears when Turnstile needs the visitor to do something (the footer form, where a checkbox
+ * box would dominate a narrow column).
+ */
+export function Turnstile({ className, size = "flexible", quiet = false }: { className?: string; size?: "flexible" | "compact" | "normal"; quiet?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const siteKey = document.querySelector<HTMLMetaElement>('meta[name="turnstile-site-key"]')?.content;
@@ -39,7 +43,7 @@ export function Turnstile({ className, size = "flexible" }: { className?: string
     let timer: ReturnType<typeof setInterval> | undefined;
     const mount = () => {
       if (ref.current && window.turnstile && id === undefined) {
-        id = window.turnstile.render(ref.current, { sitekey: siteKey, theme: "auto", size });
+        id = window.turnstile.render(ref.current, { sitekey: siteKey, theme: "auto", size, appearance: quiet ? "interaction-only" : "always" });
         mounted.add(id);
       }
     };
@@ -58,7 +62,7 @@ export function Turnstile({ className, size = "flexible" }: { className?: string
         window.turnstile?.remove(id);
       }
     };
-  }, [size]);
+  }, [size, quiet]);
   // Always an (empty) div, so server and client markup agree whether or not a key is configured.
   return <div ref={ref} className={className} />;
 }
