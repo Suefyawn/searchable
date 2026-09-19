@@ -97,7 +97,7 @@ There is no connection to pool or close. `rawQuery()` returns rows and turns `Da
 
 ## Background jobs
 
-`scripts/*.ts` run with `tsx` (seed, reindex, migrate, preflight). `runDueJobs()` in `src/lib/jobs.ts` does the every-few-minutes work (scheduled publishing, newsletter sends, plan expiry, claim invites, digests, inbox sync) and is called from the two Vercel crons (`/api/cron/ingest` daily, `/api/cron/publish`), from admin page loads and from the live-feed regeneration, guarded to once per five minutes across instances by a settings row. An external pinger on `/api/cron/publish` makes it exact.
+`scripts/*.ts` run with `tsx` (seed and reindex through the admin API, the Supabase export). `runDueJobs()` in `src/lib/jobs.ts` does the every-few-minutes work (scheduled publishing, newsletter sends, plan expiry, claim invites, digests, inbox sync) and is called from `/api/cron/publish`, from admin page loads and from the live-feed regeneration, guarded to once per five minutes across instances by a settings row. The scheduler Worker (`workers/scheduler`, ADR-46) fires `/api/cron/publish` every five minutes, the market ingest hourly, the full ingest daily and the fuel-price Workflow on the 1st and 16th, over a service binding with `CRON_SECRET`.
 
 ## Directory layout
 
