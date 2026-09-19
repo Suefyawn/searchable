@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { Param, SQL } from "drizzle-orm";
+import { cache } from "react";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { bindings } from "@/lib/platform";
 import * as schema from "./schema";
@@ -60,10 +61,11 @@ async function create(): Promise<Database> {
  * next request hangs that request for good (seen on staging, 2026-09-19). Hyperdrive pools connections a few
  * milliseconds away, so a fresh client per call is cheap.
  */
-// ponytail: one client per getDb() call on Workers (a page makes 5 to 15); share one per request through
-// AsyncLocalStorage if Hyperdrive connection counts ever matter. Phase 2 (D1) removes the question.
+// Inside a page render React's cache() hands every caller the same client, so a page opens one connection instead
+// of one per query; route handlers render outside React and get a client per call (they make one or two queries).
+const createForRender = cache(create);
 export async function getDb(): Promise<Database> {
-  if (bindings().HYPERDRIVE) return create();
+  if (bindings().HYPERDRIVE) return createForRender();
   if (g.__searchableDb) return g.__searchableDb;
   if (!g.__searchableDbPromise) {
     g.__searchableDbPromise = create().then((db) => {

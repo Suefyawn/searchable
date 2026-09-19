@@ -10,7 +10,8 @@ export function bindings(): Bindings {
   return env as Bindings;
 }
 
-export const heavyComputeAllowed = false;
+/** Workers Paid may spend CPU in a request (HEAVY_COMPUTE=1 in wrangler.jsonc); the free plan leaves it unset. */
+export const heavyComputeAllowed = (env as { HEAVY_COMPUTE?: string }).HEAVY_COMPUTE === "1";
 
 export const photonModule = async (): Promise<WebAssembly.Module> => PHOTON;
 export const webpEncoderModule = async (): Promise<WebAssembly.Module> => WEBP_ENC;

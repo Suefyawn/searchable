@@ -1,8 +1,8 @@
 import { defineConfig, type Plugin } from "vite";
 import vinext from "vinext";
 import { cloudflare } from "@cloudflare/vite-plugin";
-import { cdnAdapter } from "@vinext/cloudflare/cache/cdn-adapter";
 import path from "node:path";
+import { responseStoreAdapter } from "@vinext/cloudflare/cache/response-store-adapter";
 
 const lib = (file: string) => path.resolve(import.meta.dirname, "src/lib", file);
 
@@ -26,7 +26,7 @@ export default defineConfig({
   plugins: [
     workersOnly,
     vinext({
-      cache: { cdn: cdnAdapter() },
+      cache: responseStoreAdapter({ mode: "self-contained" }),
     }),
     cloudflare({
       viteEnvironment: {

@@ -11,19 +11,31 @@
   },
   "cache": { "enabled": true },
   "version_metadata": { "binding": "CF_VERSION_METADATA" },
-  // Free-plan logging (200k events a day, 3 days); sampled so a busy day stays inside it.
+  // Workers Paid: 20M log events a month included, so keep every event for now.
   "observability": {
-    "logs": { "enabled": true, "head_sampling_rate": 0.2 },
+    "logs": { "enabled": true, "head_sampling_rate": 1 },
     "traces": { "enabled": true }
   },
   // The database is remote (Supabase in Tokyo through Hyperdrive until Phase 2), so run the Worker near it.
   "placement": { "mode": "smart" },
-  // Images: the existing bucket behind img.searchable.pk. Written through this binding (src/lib/storage.ts).
-  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "searchable-images" }],
+  // Images: the existing bucket behind img.searchable.pk, written through this binding (src/lib/storage.ts).
+  // Page cache: vinext's Response Store keeps rendered pages in R2 with a SQLite Durable Object as the index, one
+  // copy worldwide, so a page renders once per revalidation window instead of once per data centre.
+  "r2_buckets": [
+    { "binding": "MEDIA", "bucket_name": "searchable-images" },
+    { "binding": "CACHE_BODIES", "bucket_name": "searchable-page-cache" }
+  ],
+  "durable_objects": { "bindings": [{ "name": "CACHE_METADATA", "class_name": "CacheMetadata" }] },
+  "exports": {
+    "default": { "type": "worker", "cache": { "enabled": false } },
+    "ResponseStoreBinding": { "type": "worker", "cache": { "enabled": true } },
+    "CacheMetadata": { "type": "durable-object", "storage": "sqlite" }
+  },
   // Phase 1: the existing Supabase database through Hyperdrive (pooled next to it, query cache off).
   "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "d6577f9e3cc9465cb479327ccabe3682" }],
   // Public configuration. Secrets (BETTER_AUTH_SECRET, ADMIN_API_KEY, CRON_SECRET, RESEND_API_KEY,
   // RESEND_WEBHOOK_SECRET, INDEXNOW_KEY, ...) are set with `wrangler secret put`, never here.
+  // HEAVY_COMPUTE=1: this plan may spend CPU inside a request (image resizing, social cards); unset on the free plan.
   "vars": {
     "NEXT_PUBLIC_SITE_URL": "https://staging.searchable.pk",
     "NEXT_PUBLIC_SITE_NAME": "Searchable",
@@ -32,13 +44,18 @@
     "R2_PUBLIC_URL": "https://img.searchable.pk",
     "EMAIL_PROVIDER": "none",
     "EMAIL_FROM": "Searchable <daily@searchable.pk>",
+    "HEAVY_COMPUTE": "1",
     "NOINDEX": "1",
     "JOBS_DISABLED": "1"
   },
   "env": {
     "production": {
       "name": "searchable-production",
-      "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "searchable-images" }],
+      "r2_buckets": [
+        { "binding": "MEDIA", "bucket_name": "searchable-images" },
+        { "binding": "CACHE_BODIES", "bucket_name": "searchable-production-page-cache" }
+      ],
+      "durable_objects": { "bindings": [{ "name": "CACHE_METADATA", "class_name": "CacheMetadata" }] },
       "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "d6577f9e3cc9465cb479327ccabe3682" }],
       "vars": {
         "NEXT_PUBLIC_SITE_URL": "https://searchable.pk",
@@ -47,7 +64,8 @@
         "STORAGE_PROVIDER": "r2",
         "R2_PUBLIC_URL": "https://img.searchable.pk",
         "EMAIL_PROVIDER": "resend",
-        "EMAIL_FROM": "Searchable <daily@searchable.pk>"
+        "EMAIL_FROM": "Searchable <daily@searchable.pk>",
+        "HEAVY_COMPUTE": "1"
       }
     }
   }
