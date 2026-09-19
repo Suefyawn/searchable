@@ -16,7 +16,9 @@ export function ClarityScript() {
   if (/^\/(admin|account|business|professional)(\/|$)/.test(pathname)) return null;
   return (
     <Script id="clarity" strategy="afterInteractive">
-      {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script",${JSON.stringify(PROJECT)});`}
+      {/* Idempotent: the snippet can run more than once under the Vite runtime (hydration, client navigation), and a
+          second tag load made Clarity call its own API object as a function ("a[c] is not a function"). */}
+      {`(function(c,l,a,r,i,t,y){if(c[a])return;c[a]=function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script",${JSON.stringify(PROJECT)});`}
     </Script>
   );
 }

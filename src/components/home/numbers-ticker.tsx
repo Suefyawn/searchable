@@ -36,7 +36,7 @@ export function NumbersTicker({ items, leads = [] }: { items: TickerItem[]; lead
   }, [items.length]);
 
   const cell = (s: TickerItem, k: string, hidden: boolean) => (
-    <Link key={k} href={`/data/${s.slug}`} className="flex shrink-0 items-baseline gap-2 border-r border-line px-4 py-2.5 text-[13px] hover:bg-surface-2" aria-hidden={hidden} tabIndex={hidden ? -1 : 0}>
+    <Link key={k} href={`/data/${s.slug}`} prefetch={false} className="flex shrink-0 items-baseline gap-2 border-r border-line px-4 py-2.5 text-[13px] hover:bg-surface-2" aria-hidden={hidden} tabIndex={hidden ? -1 : 0}>
       <span className="text-3">{s.name}</span>
       <span className="font-medium tabular">{formatReading(s.value, s.unit)}</span>
       <Change latest={s.value} previous={s.previous} unit={s.unit} />
@@ -44,7 +44,7 @@ export function NumbersTicker({ items, leads = [] }: { items: TickerItem[]; lead
   );
 
   const leadCell = (l: TickerLead, k: string, hidden: boolean) => (
-    <Link key={k} href={l.href} className="flex shrink-0 items-baseline gap-2 border-r border-line bg-surface-2 px-4 py-2.5 text-[13px] hover:bg-surface-3" aria-hidden={hidden} tabIndex={hidden ? -1 : 0}>
+    <Link key={k} href={l.href} prefetch={false} className="flex shrink-0 items-baseline gap-2 border-r border-line bg-surface-2 px-4 py-2.5 text-[13px] hover:bg-surface-3" aria-hidden={hidden} tabIndex={hidden ? -1 : 0}>
       <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-700">{l.name}</span>
       <span className="font-medium">{l.text}</span>
     </Link>
