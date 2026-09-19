@@ -74,13 +74,12 @@
         "R2_PUBLIC_URL": "https://img.searchable.pk",
         "EMAIL_FROM": "Searchable <daily@searchable.pk>",
         "HEAVY_COMPUTE": "1",
-        // Dark until cutover (docs/CUTOVER.md step 5): the Worker answers on its workers.dev host for checks, runs no
-        // jobs and sends no mail, because Vercel and Supabase are still the live system. At cutover: EMAIL_PROVIDER
-        // becomes "resend", JOBS_DISABLED and workers_dev go, the custom domain route is added.
-        "EMAIL_PROVIDER": "none",
-        "JOBS_DISABLED": "1"
+        "EMAIL_PROVIDER": "resend"
       },
-      "workers_dev": true
+      // The live site (cutover 2026-09-19, docs/CUTOVER.md). The custom domain is the apex; www is a 301 Redirect
+      // Rule on the zone. No workers.dev host in production, so there is one canonical origin.
+      "workers_dev": false,
+      "routes": [{ "pattern": "searchable.pk", "custom_domain": true }]
     }
   }
 }
