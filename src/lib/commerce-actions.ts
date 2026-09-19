@@ -101,9 +101,10 @@ const Submission = z.object({
 export async function submitPitchAction(raw: Record<string, string>): Promise<{ ok: true; id: string; invoiceNo?: string; invoicePath?: string } | { ok: false; error: string }> {
   const rl = await rateLimit("pitch", 5, 60 * 60_000);
   if (!rl.ok) return { ok: false, error: "Too many submissions from this connection. Try again in an hour." };
-  if (!(await verifyTurnstile(raw[TURNSTILE_FIELD]))) return { ok: false, error: TURNSTILE_ERROR };
   const parsed = Submission.safeParse(raw);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Check the form." };
+  // After validation: a Turnstile token verifies once, so a form error must not spend it.
+  if (!(await verifyTurnstile(raw[TURNSTILE_FIELD]))) return { ok: false, error: TURNSTILE_ERROR };
   const d = parsed.data;
   const user = await getSessionUser();
   const db = await getDb();

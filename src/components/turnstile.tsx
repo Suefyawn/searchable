@@ -3,10 +3,16 @@
 import { useEffect, useRef } from "react";
 
 const SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+const mounted = new Set<string>();
+
+/** A token verifies once. Call this when the server rejected a submission, so the next attempt carries a fresh one. */
+export function resetTurnstile(): void {
+  for (const id of mounted) window.turnstile?.reset(id);
+}
 
 declare global {
   interface Window {
-    turnstile?: { render: (el: HTMLElement, opts: Record<string, unknown>) => string; remove: (id: string) => void };
+    turnstile?: { render: (el: HTMLElement, opts: Record<string, unknown>) => string; remove: (id: string) => void; reset: (id?: string) => void };
   }
 }
 
@@ -31,7 +37,10 @@ export function Turnstile({ className }: { className?: string }) {
     let id: string | undefined;
     let timer: ReturnType<typeof setInterval> | undefined;
     const mount = () => {
-      if (ref.current && window.turnstile && id === undefined) id = window.turnstile.render(ref.current, { sitekey: siteKey, theme: "auto", size: "flexible" });
+      if (ref.current && window.turnstile && id === undefined) {
+        id = window.turnstile.render(ref.current, { sitekey: siteKey, theme: "auto", size: "flexible" });
+        mounted.add(id);
+      }
     };
     if (window.turnstile) mount();
     else
@@ -43,7 +52,10 @@ export function Turnstile({ className }: { className?: string }) {
       }, 200);
     return () => {
       if (timer) clearInterval(timer);
-      if (id) window.turnstile?.remove(id);
+      if (id) {
+        mounted.delete(id);
+        window.turnstile?.remove(id);
+      }
     };
   }, []);
   // Always an (empty) div, so server and client markup agree whether or not a key is configured.

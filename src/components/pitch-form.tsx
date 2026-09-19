@@ -4,7 +4,7 @@ import Link from "next/link";
 import * as React from "react";
 import { Alert, Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { submitPitchAction } from "@/lib/commerce-actions";
-import { Turnstile } from "@/components/turnstile";
+import { Turnstile, resetTurnstile } from "@/components/turnstile";
 
 const KINDS = [
   { value: "guest", label: "Guest article (free, editorial)" },
@@ -30,6 +30,7 @@ export function PitchForm({ initialKind = "guest", categories }: { initialKind?:
       setState("done");
     } else {
       setError(r.error);
+      resetTurnstile();
       setState("idle");
     }
   }

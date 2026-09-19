@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Button, Input, Textarea } from "@/components/ui";
 import { sendLead } from "./actions";
-import { Turnstile, turnstileToken } from "@/components/turnstile";
+import { Turnstile, turnstileToken, resetTurnstile } from "@/components/turnstile";
 
 export function LeadForm({ businessId }: { businessId: string }) {
   const [state, setState] = React.useState<"idle" | "loading" | "done" | "error">("idle");
@@ -17,6 +17,7 @@ export function LeadForm({ businessId }: { businessId: string }) {
     if (res.ok) setState("done");
     else {
       setError(res.error ?? "Could not send");
+      resetTurnstile();
       setState("error");
     }
   }

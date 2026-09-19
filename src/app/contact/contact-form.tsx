@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Button, Field, Input, Textarea } from "@/components/ui";
 import { sendContact } from "./actions";
-import { Turnstile, turnstileToken } from "@/components/turnstile";
+import { Turnstile, turnstileToken, resetTurnstile } from "@/components/turnstile";
 
 export function ContactForm({ about }: { about?: string }) {
   const [state, setState] = React.useState<"idle" | "loading" | "done" | "error">("idle");
@@ -24,6 +24,7 @@ export function ContactForm({ about }: { about?: string }) {
     if (res.ok) setState("done");
     else {
       setError(res.error ?? "Could not send");
+      resetTurnstile();
       setState("error");
     }
   }

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Button, Input, Textarea } from "@/components/ui";
 import { sendProfessionalLead } from "@/lib/professional-actions";
-import { Turnstile, turnstileToken } from "@/components/turnstile";
+import { Turnstile, turnstileToken, resetTurnstile } from "@/components/turnstile";
 
 export function ProLeadForm({ professionalId, name }: { professionalId: string; name: string }) {
   const [state, setState] = React.useState<"idle" | "loading" | "done" | "error">("idle");
@@ -17,6 +17,7 @@ export function ProLeadForm({ professionalId, name }: { professionalId: string; 
     if (res.ok) setState("done");
     else {
       setError(res.error ?? "Could not send");
+      resetTurnstile();
       setState("error");
     }
   }

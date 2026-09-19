@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Button, Input } from "@/components/ui";
 import { cn } from "@/lib/utils";
-import { Turnstile, turnstileToken } from "@/components/turnstile";
+import { Turnstile, turnstileToken, resetTurnstile } from "@/components/turnstile";
 
 const TOPICS = [
   { value: "pakistan", label: "Pakistan" },
@@ -40,6 +40,7 @@ export function NewsletterForm({ compact = false, source = "page", className }: 
       setState(data.status === "already_active" ? "already_active" : "pending");
     } catch (err) {
       setState("error");
+      resetTurnstile();
       setError(err instanceof Error ? err.message : "Something went wrong");
     }
   }

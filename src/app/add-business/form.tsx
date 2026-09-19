@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { submitBusiness } from "./actions";
-import { Turnstile, turnstileToken } from "@/components/turnstile";
+import { Turnstile, turnstileToken, resetTurnstile } from "@/components/turnstile";
 
 type Opt = { id: string; name: string };
 
@@ -32,6 +32,7 @@ export function AddBusinessForm({ categories, cities }: { categories: Opt[]; cit
     if (res.ok) setState("done");
     else {
       setError(res.error ?? "Could not submit");
+      resetTurnstile();
       setState("error");
     }
   }

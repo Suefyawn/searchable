@@ -5,7 +5,7 @@ import * as React from "react";
 import { Button, Field, Input } from "@/components/ui";
 import { signIn, signUp } from "@/lib/auth-client";
 import { setAuthHint } from "@/lib/auth-hint";
-import { Turnstile, turnstileToken } from "@/components/turnstile";
+import { Turnstile, turnstileToken, resetTurnstile } from "@/components/turnstile";
 
 export function AuthForm({ next, initialMode }: { next: string; initialMode: "login" | "register" }) {
   const router = useRouter();
@@ -29,6 +29,7 @@ export function AuthForm({ next, initialMode }: { next: string; initialMode: "lo
     setLoading(false);
     if (res.error) {
       setError(res.error.message ?? "Something went wrong");
+      resetTurnstile();
       return;
     }
     setAuthHint((res.data as { user?: { id?: string } } | null)?.user?.id);
