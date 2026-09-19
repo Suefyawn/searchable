@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/brand";
+import { BreakingBar } from "@/components/layout/breaking-bar";
 import { activeBreaking, readFrontPage } from "@/lib/front-page";
 import { getMegaNav } from "@/lib/mega-nav";
 import { AuthLinks } from "./auth-links";
@@ -27,20 +28,7 @@ export async function Header({ showSearch = true }: { showSearch?: boolean }) {
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-[var(--bg)]">
       {/* Breaking bar: set from /admin/front-page or the admin API, gone when it expires. Black on every page. */}
-      {breaking ? (
-        <div className="bg-ink-900 text-white">
-          <div className="container-x flex items-center gap-3 py-1.5 text-[13.5px]">
-            <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.12em]">Breaking</span>
-            {breaking.href ? (
-              <Link href={breaking.href} className="min-w-0 truncate underline-offset-4 hover:underline">
-                {breaking.text}
-              </Link>
-            ) : (
-              <span className="min-w-0 truncate">{breaking.text}</span>
-            )}
-          </div>
-        </div>
-      ) : null}
+      {breaking ? <BreakingBar text={breaking.text} href={breaking.href || null} /> : null}
       <div className="container-x">
         {/* One line: wordmark, sections, search, account. The mega panel is positioned against this container. */}
         <div className="relative flex h-14 items-center gap-4 sm:h-[60px]">

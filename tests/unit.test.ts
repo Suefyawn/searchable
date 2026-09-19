@@ -370,3 +370,11 @@ test("webp header parser reads lossy, lossless and extended headers without deco
   assert.equal(webpDimensions(new Uint8Array(8)), null);
   assert.equal(webpDimensions(riff("VP8 ", [0, 0, 0, 1, 2, 3, 0, 0, 0, 0])), null, "wrong start code");
 });
+
+test("Commons originals are downloaded as a 1600 px rendition; other hosts untouched", async () => {
+  const { downloadUrl } = await import("../src/lib/open-images");
+  assert.equal(downloadUrl("https://upload.wikimedia.org/wikipedia/commons/e/e5/Karachi_Port_%28KPT%29.jpg"), "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Karachi_Port_%28KPT%29.jpg/1600px-Karachi_Port_%28KPT%29.jpg");
+  assert.equal(downloadUrl("https://upload.wikimedia.org/wikipedia/commons/a/ab/Map.svg"), "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Map.svg/1600px-Map.svg.png");
+  assert.equal(downloadUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/X.jpg/800px-X.jpg"), "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/X.jpg/800px-X.jpg");
+  assert.equal(downloadUrl("https://live.staticflickr.com/1/2_o.jpg"), "https://live.staticflickr.com/1/2_o.jpg");
+});

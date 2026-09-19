@@ -35,6 +35,6 @@ export const POST = withAdminApi(async (_req, { body }) => {
     if (!(await removeBacklog(d.keyword))) throw new ApiError(404, "No such backlog item");
     return { ok: true };
   }
-  if (!(await setBacklogStatus(d.keyword, { status: d.status, url: d.url, note: d.note }))) throw new ApiError(404, "No such backlog item");
+  if (!(await setBacklogStatus(d.keyword, { status: d.status, url: d.url, note: d.note }))) throw new ApiError(404, `No backlog item "${d.keyword}". To add one, send { items: [{ keyword, volume, kd, type, target, brief? }] }.`);
   return { ok: true };
 });
