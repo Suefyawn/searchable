@@ -1,6 +1,6 @@
 # Local to production
 
-Everything runs on Cloudflare: the Worker (vinext build of the Next.js app), D1 (database), R2 (images, page cache), Cron Triggers and Workflows (Phase 4), Turnstile (ADR-47), Analytics Engine (Phase 7). Resend sends and receives email. The application code is the same everywhere; only bindings and secrets differ between `wrangler.dev.jsonc` (development), the default environment in `wrangler.jsonc` (staging) and its `production` environment. Cost and allowances: `docs/FREE-TIER.md`; decisions: ADR-41 to ADR-48.
+Everything runs on Cloudflare: the Worker (vinext build of the Next.js app), D1 (database), R2 (images, page cache), Cron Triggers and Workflows (Phase 4), Turnstile (ADR-47), Analytics Engine (Phase 7). Resend sends and receives email. The application code is the same everywhere; only bindings and secrets differ between `wrangler.dev.jsonc` (development), the default environment in `wrangler.jsonc` (staging) and its `production` environment. Cost and allowances: `docs/FREE-TIER.md`; decisions: ADR-41 to ADR-49.
 
 ## 1. Local development
 
@@ -17,7 +17,7 @@ A copy of production content is the better development database: `.data/export.s
 
 1. **GitHub**: `Suefyawn/searchable`. `main` is the Vercel line until cutover; `d1` is the Workers line (ADR-45). Hotfixes are cherry-picked between them until `d1` becomes `main`.
 2. **Cloudflare** (one account, Workers Paid, ADR-44): the `searchable.pk` zone; Workers `searchable` (staging) and `searchable-production`; D1 `searchable-staging` and `searchable`; R2 `searchable-images` (public at img.searchable.pk), `searchable-page-cache`, `searchable-production-page-cache`. `wrangler login` once per machine.
-3. **Resend**: `searchable.pk` verified, sending and receiving. Webhook for `email.received` (plus `email.bounced`, `email.complained` from Phase 8) at `https://searchable.pk/api/webhooks/resend`; its signing secret is `RESEND_WEBHOOK_SECRET`.
+3. **Resend**: `searchable.pk` verified, sending and receiving. Webhook for `email.received`, `email.bounced` and `email.complained` at `https://searchable.pk/api/webhooks/resend` (a second webhook points at the staging host with its own secret); its signing secret is `RESEND_WEBHOOK_SECRET`.
 4. Later: Google Search Console, Bing, Google News Publisher Center, AdSense (unchanged from before).
 
 ## 3. Bindings and configuration

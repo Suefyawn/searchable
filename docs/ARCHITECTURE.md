@@ -89,6 +89,12 @@ There is no connection to pool or close. `rawQuery()` returns rows and turns `Da
 - `analytics_events` table (first-party): business_click, page_view (business pages, bumps `view_count`), share, search_click, admin_api.
 - Microsoft Clarity on the client when `NEXT_PUBLIC_CLARITY_ID` is set; Cloudflare Web Analytics by automatic injection on the zone once the site is proxied (dashboard toggle, no code). No PostHog, no Sentry (docs/FREE-TIER.md).
 
+## Email
+
+- `sendEmail(email, kind)` in `src/lib/email.ts` owns the budget (`settings` row `email:budget`, daily and monthly caps, a reserve for transactional mail) and hands the message to a provider from `packages/email` (`@jet/email`, ADR-49): `resendProvider` (Resend's REST API, `EMAIL_PROVIDER=resend` with `RESEND_API_KEY`), or `consoleProvider` (`local` in development, `none` on staging: counted, logged, dropped). No SDK.
+- Inbound: Resend webhook at `/api/webhooks/resend` (`RESEND_WEBHOOK_SECRET`, svix signature): `email.received` mirrors mail into the admin inbox; `email.bounced` and `email.complained` mark the newsletter subscriber `bounced`, and `sendIssue()` only mails `active` subscribers. Staging has its own webhook and secret.
+- Newsletter subscribers, double opt-in, topics and the resumable issue sender stay in D1 (`src/lib/newsletter*.ts`); Resend Audiences are not used.
+
 ## Background jobs
 
 `scripts/*.ts` run with `tsx` (seed, reindex, migrate, preflight). `runDueJobs()` in `src/lib/jobs.ts` does the every-few-minutes work (scheduled publishing, newsletter sends, plan expiry, claim invites, digests, inbox sync) and is called from the two Vercel crons (`/api/cron/ingest` daily, `/api/cron/publish`), from admin page loads and from the live-feed regeneration, guarded to once per five minutes across instances by a settings row. An external pinger on `/api/cron/publish` makes it exact.

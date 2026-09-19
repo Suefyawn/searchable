@@ -1,0 +1,9 @@
+{
+  "name": "@jet/email",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Email providers for JetNine sites: one Message shape, a Resend provider over its REST API, a console provider for development.",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "test": "node --experimental-strip-types --test src/*.test.ts" }
+}

@@ -1,3 +1,4 @@
+import { consoleProvider, resendProvider, type Provider } from "@jet/email";
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 
@@ -57,12 +58,16 @@ export async function emailAllowance(kind: EmailKind = "bulk"): Promise<{ today:
 }
 
 /**
- * Email adapter. `EMAIL_PROVIDER=local` writes an .eml file to .data/outbox so you can inspect sends
- * without any account (on a runtime without a writable disk it only logs). `resend` uses the Resend API in
- * production. `none` (staging) counts the send and drops it. Every send counts against the budget.
+ * The provider for this runtime (ADR-49, packages/email). `resend` is production; `none` (staging) counts the
+ * send and drops it; `local` (development) logs the envelope. Every send counts against the budget above.
  */
+function provider(): Provider {
+  const name = process.env.EMAIL_PROVIDER ?? "local";
+  if (name === "resend" && process.env.RESEND_API_KEY) return resendProvider(process.env.RESEND_API_KEY);
+  return consoleProvider(name === "resend" ? "local" : name);
+}
+
 export async function sendEmail(email: Email, kind: EmailKind = "transactional"): Promise<{ id: string }> {
-  const provider = process.env.EMAIL_PROVIDER ?? "local";
   const from = email.from ?? process.env.EMAIL_FROM ?? "Searchable <daily@searchable.pk>";
 
   const budget = await readBudget();
@@ -70,32 +75,7 @@ export async function sendEmail(email: Email, kind: EmailKind = "transactional")
   if (budget.monthCount + reserve >= MONTHLY_CAP) throw new EmailBudgetExceeded("month");
   if (budget.dayCount + reserve >= DAILY_CAP) throw new EmailBudgetExceeded("day");
 
-  let id: string;
-  if (provider === "resend" && process.env.RESEND_API_KEY) {
-    const { Resend } = await import("resend");
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    const { data, error } = await resend.emails.send({ from, to: email.to, subject: email.subject, html: email.html, text: email.text, replyTo: email.replyTo, headers: email.headers });
-    if (error) throw new Error(error.message);
-    id = data?.id ?? "";
-  } else if (provider === "none") {
-    id = `dropped-${Date.now()}`;
-    console.info(`[email:none] ${email.subject} -> ${email.to}`);
-  } else {
-    id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    const extra = Object.entries(email.headers ?? {})
-      .map(([k, v]) => `${k}: ${v}\n`)
-      .join("");
-    const eml = `From: ${from}\nTo: ${email.to}\nSubject: ${email.subject}\nDate: ${new Date().toUTCString()}\n${extra}Content-Type: text/html; charset=utf-8\n\n${email.html}`;
-    try {
-      const [{ mkdirSync, writeFileSync }, path] = await Promise.all([import("node:fs"), import("node:path")]);
-      const dir = path.join(process.cwd(), ".data", "outbox");
-      mkdirSync(dir, { recursive: true });
-      writeFileSync(path.join(dir, `${id}.eml`), eml);
-      console.info(`[email:local] ${email.subject} -> ${email.to}  (.data/outbox/${id}.eml)`);
-    } catch {
-      console.info(`[email:local] ${email.subject} -> ${email.to}  (no writable disk here)`);
-    }
-  }
+  const { id } = await provider().send({ from, to: email.to, subject: email.subject, html: email.html, text: email.text, replyTo: email.replyTo, headers: email.headers });
   budget.dayCount += 1;
   budget.monthCount += 1;
   await writeBudget(budget);

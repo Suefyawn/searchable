@@ -43,12 +43,12 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-server-dom-webpack": "^19.3.0",
-    "resend": "^6.28.0",
     "slugify": "^1.6.6",
     "tailwind-merge": "^3.3.1",
     "vinext": "^1.0.0-beta.10",
     "zod": "^4.6.5",
     "@jet/authz": "*",
+    "@jet/email": "*",
     "@jet/errors": "*"
   },
   "devDependencies": {

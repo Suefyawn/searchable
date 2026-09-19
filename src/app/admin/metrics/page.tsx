@@ -14,7 +14,7 @@ export default async function AdminMetrics() {
   await requireRole("admin");
   const db = await getDb();
   const runs = await db.select().from(schema.ingestRuns);
-  const now = Date.now();
+  const now = new Date().getTime();
   const metrics = metricsConfigured() ? await readMetrics().catch((e: Error) => ({ error: e.message })) : null;
   const days = metrics && !("error" in metrics) ? [...new Set(metrics.daily.map((d) => d.day.slice(0, 10)))].sort() : [];
   const cell = (rows: DailyCount[], event: string, day: string) => rows.filter((r) => r.event === event && r.day.startsWith(day)).reduce((a, r) => a + r.n, 0);
