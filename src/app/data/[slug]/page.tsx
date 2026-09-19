@@ -99,7 +99,10 @@ export default async function SeriesPage({ params }: Props) {
             "@context": "https://schema.org",
             "@type": "Dataset",
             name: `${series.name} (Pakistan)`,
-            description: series.description ?? `${series.name}, recorded ${series.frequency} from ${series.sourceName}.`,
+            // Google requires 50 to 5,000 characters; a short series blurb is padded with what the page is.
+            description: [series.description, `${series.name} in Pakistan, recorded ${series.frequency} from ${series.sourceName ?? "the official source"}, with the full history, the latest reading and the change since the previous one.`].filter(Boolean).join(" ").slice(0, 5000),
+            license: "https://creativecommons.org/licenses/by/4.0/",
+            isAccessibleForFree: true,
             url: `${SITE.url}/data/${slug}`,
             creator: { "@type": "Organization", name: SITE.name },
             dateModified: latest?.date,

@@ -343,6 +343,14 @@
   visibility: hidden;
   pointer-events: none;
 }
+/* The hero's horizontal track: one long ease, a touch under the timer, so the slide reads as a page turn. */
+@utility slide-track {
+  transition: transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
 @utility panel-enter {
   animation: panel-enter 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
   @media (prefers-reduced-motion: reduce) {

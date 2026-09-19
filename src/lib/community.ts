@@ -8,7 +8,7 @@ import { slugify, uniqueSlug } from "./slug";
 
 /** Read side for the community: posts, comments, members, plus the search indexer. */
 
-export type PostRow = typeof schema.posts.$inferSelect & { author: { id: string; name: string; image: string | null }; city: { name: string; slug: string } | null };
+export type PostRow = typeof schema.posts.$inferSelect & { author: { id: string; name: string; image: string | null }; city: { name: string; slug: string; parent?: { name: string } | null } | null };
 
 export function kindLabel(kind: PostKindKey, plural = false) {
   const k = POST_KINDS.find((x) => x.key === kind);
@@ -40,7 +40,7 @@ export async function listPosts(opts: { kind?: PostKindKey; citySlug?: string; t
 
 async function getPostRaw(slug: string) {
   const db = await getDb();
-  const p = await db.query.posts.findFirst({ where: eq(schema.posts.slug, slug), with: { author: { columns: { id: true, name: true, image: true } }, city: { columns: { name: true, slug: true } }, bids: { orderBy: [desc(schema.bids.amount)], limit: 10, with: { user: { columns: { id: true, name: true } } } } } });
+  const p = await db.query.posts.findFirst({ where: eq(schema.posts.slug, slug), with: { author: { columns: { id: true, name: true, image: true } }, city: { columns: { name: true, slug: true }, with: { parent: { columns: { name: true } } } }, bids: { orderBy: [desc(schema.bids.amount)], limit: 10, with: { user: { columns: { id: true, name: true } } } } } });
   return p ?? null;
 }
 

@@ -1,6 +1,8 @@
 import { SITE } from "@/lib/utils";
 
-const PRIVATE = ["/admin", "/account", "/business", "/api/", "/media/", "/search", "/login", "/orders/", "/newsletter/confirm", "/newsletter/unsubscribe", "/newsletter/manage"];
+// Disallow lines are prefixes: "/business" would also block /businesses and every directory page under it (Search Console
+// showed exactly that on 2026-09-19). The owner dashboard is matched as a path ("/business/") and as the bare page ("/business$").
+const PRIVATE = ["/admin", "/account", "/business/", "/business$", "/api/", "/media/", "/search", "/login", "/orders/", "/newsletter/confirm", "/newsletter/unsubscribe", "/newsletter/manage"];
 
 /**
  * Everyone is welcome, including AI crawlers: being cited by assistants is a goal, not a threat (docs/SEO-AI.md).

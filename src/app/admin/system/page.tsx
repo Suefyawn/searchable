@@ -2,7 +2,7 @@ import { eq, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { AdminPage, Details, Section } from "@/components/admin";
 import { Button } from "@/components/ui";
-import { getDb, rawQuery, schema } from "@/db";
+import { getDb, rawQuery, rawRun, schema } from "@/db";
 import { requireRole } from "@/lib/auth";
 import { emailAllowance } from "@/lib/email";
 import { formatDate, timeAgo } from "@/lib/format";
@@ -15,6 +15,15 @@ async function runJobsNow() {
   "use server";
   await requireRole("admin");
   await runDueJobs({ force: true });
+  revalidatePath("/admin/system");
+}
+
+/** Dismiss one error: the row goes; if the error happens again it is a new fingerprint and shows again (ADR-48). */
+async function dismissError(formData: FormData) {
+  "use server";
+  await requireRole("admin");
+  const fp = String(formData.get("fp") ?? "");
+  if (/^[0-9a-f]{16}$/.test(fp)) await rawRun(await getDb(), sql`delete from error_fingerprints where fp = ${fp}`);
   revalidatePath("/admin/system");
 }
 
@@ -166,7 +175,7 @@ export default async function AdminSystem() {
             </ul>
           ) : null}
         </Section>
-        <Section title="Errors" description="Distinct errors (ADR-48): uncaught server errors from pages, route handlers and server actions, and crashes the browser reported. One row per route and error type, counted; the first occurrence was mailed to the editorial address. Last 7 days.">
+        <Section title="Errors" description="Distinct errors (ADR-48): uncaught server errors from pages, route handlers and server actions, and crashes the browser reported. One row per route and error type, counted. New ones in the last 48 hours show as the badge on Status. Dismiss removes the row; a recurrence comes back as new. Last 7 days.">
           <Details
             items={[
               { label: "Distinct, seen today", value: (errCounts?.today ?? 0).toLocaleString() },
@@ -180,6 +189,12 @@ export default async function AdminSystem() {
                 <li key={i} className="py-2">
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                     <span className="min-w-0 flex-1 truncate font-mono text-[12.5px]">{e.route}</span>
+                    <form action={dismissError}>
+                      <input type="hidden" name="fp" value={e.fp} />
+                      <button type="submit" className="text-[12px] text-3 underline-offset-4 hover:underline">
+                        Dismiss
+                      </button>
+                    </form>
                     <span className="text-3">{e.source}</span>
                     <span className="tabular font-semibold">{e.n}×</span>
                     <span className="text-3">first {timeAgo(new Date(e.first_at))}, last {timeAgo(new Date(e.last_at))}</span>

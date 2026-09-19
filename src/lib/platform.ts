@@ -15,6 +15,8 @@ export type Bindings = {
   ASSETS?: { fetch: (input: Request | string) => Promise<Response> };
   ANALYTICS?: { writeDataPoint: (point: { indexes?: string[]; blobs?: string[]; doubles?: number[] }) => void };
   IMAGES?: ImagesBinding;
+  /** Browser Run quick actions (ADR-55): a real browser renders a page and hands back its HTML or markdown. */
+  BROWSER?: { quickAction: (action: "content" | "markdown" | "links" | "scrape", options: Record<string, unknown>) => Promise<Response> };
 };
 
 /** The slice of Cloudflare's Images binding the storage layer calls (ADR-50). */

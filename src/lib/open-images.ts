@@ -129,7 +129,10 @@ export const STRICT_MIN_SCORE = 2;
  * Stock subjects that pass a loose query but say nothing about a news event: a flag, banknotes, a skyline, a
  * map. A hard-news story gets no photo rather than one of these (ADR-51), unless the query asked for them.
  */
-const STOCK_SUBJECTS = /(flag|flags|banknote|banknotes|currency|coins?|rupee notes|skyline|aerial|map|maps|logo|emblem|stock photo|illustration|render|rendering|clipart|silhouette|sunset|sunrise)/i;
+const STOCK_SUBJECTS = /(flag|flags|banknote|banknotes|currency|coins?|rupee notes|skyline|aerial|map|maps|logo|emblem|stock photo|illustration|render|rendering|clipart|silhouette|sunset|sunrise|mosque|masjid|minar|fort|monument|highway|motorway|bridge|tower|landmark|panorama|cityscape)/i;
+
+/** A province or big city named as an entity says where, not what: it earns half an entity, never a photo on its own. */
+const PLACES = new Set(["pakistan", "punjab", "sindh", "balochistan", "khyber pakhtunkhwa", "kpk", "gilgit-baltistan", "azad kashmir", "islamabad", "karachi", "lahore", "rawalpindi", "faisalabad", "multan", "peshawar", "quetta", "hyderabad", "gujranwala", "sialkot", "bahawalpur", "sargodha", "sukkur", "larkana", "sheikhupura", "mardan", "gujrat", "abbottabad", "mirpur", "kohat", "dera ghazi khan", "muzaffarabad"]);
 
 /**
  * How well a candidate's own text (title, tags, description) describes the story. Named entities count most
@@ -152,8 +155,11 @@ export function relevanceScore(text: string, about: { query: string; entities?: 
     if (!el) continue;
     // Whole words only: "Chery Q" must not match "Chery QQ" (a different car), "Pearl" must not match "Pearls".
     if (word(el).test(h)) {
-      score += 2;
-      entityHit = true;
+      if (PLACES.has(el)) score += 0.5;
+      else {
+        score += 2;
+        entityHit = true;
+      }
     } else {
       const last = el.split(/\s+/).pop()!;
       if (last.length >= 4 && !GENERIC_WORDS.has(last) && word(last).test(h)) {

@@ -25,7 +25,8 @@ async function queueCounts() {
       (select count(*) from messages where status = 'new') as messages,
       (select count(*) from inbox_messages where status = 'new' and read_at is null) as inbox,
       (select count(*) from reports where status = 'open') as reports,
-      (select count(*) from articles where status = 'draft') as drafts`,
+      (select count(*) from articles where status = 'draft') as drafts,
+      (select count(*) from error_fingerprints where first_seen > ${Date.now() - 48 * 3_600_000}) as errors`,
   );
   return r ?? {};
 }
@@ -41,7 +42,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { title: "Money", items: [{ href: "/admin/orders", label: "Orders", count: c.orders }, { href: "/admin/submissions", label: "Pitches", count: c.submissions }] },
     { title: "Community", items: [{ href: "/admin/community", label: "Moderation", count: (c.posts ?? 0) + (c.community_reports ?? 0) }] },
     { title: "Audience", items: [{ href: "/admin/newsletter", label: "Newsletter" }, { href: "/admin/subscribers", label: "Subscribers" }, { href: "/admin/search-log", label: "Search log" }, { href: "/admin/metrics", label: "Metrics" }, { href: "/admin/inbox", label: "Inbox", count: c.inbox }, { href: "/admin/messages", label: "Messages", count: c.messages }, { href: "/admin/reports", label: "Reports", count: c.reports }] },
-    { title: "System", items: [{ href: "/admin/settings", label: "Settings" }, { href: "/admin/users", label: "Users" }, { href: "/admin/api-keys", label: "API keys" }, { href: "/admin/redirects", label: "Redirects" }, { href: "/admin/system", label: "Status" }] },
+    { title: "System", items: [{ href: "/admin/settings", label: "Settings" }, { href: "/admin/users", label: "Users" }, { href: "/admin/api-keys", label: "API keys" }, { href: "/admin/redirects", label: "Redirects" }, { href: "/admin/system", label: "Status", count: c.errors }] },
   ];
   return (
     <div className="container-x py-8">

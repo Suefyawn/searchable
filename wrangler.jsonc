@@ -38,6 +38,8 @@
   "analytics_engine_datasets": [{ "binding": "ANALYTICS", "dataset": "searchable_events_staging" }],
   // Image resizing off the isolate (ADR-50): 5,000 unique transformations a month included, then USD 0.50 per 1,000.
   "images": { "binding": "IMAGES" },
+  // Browser Run (ADR-55): POST /api/admin/fetch renders JavaScript-only pages (maker price lists) for the automation.
+  "browser": { "binding": "BROWSER" },
   // Public configuration. Secrets (BETTER_AUTH_SECRET, ADMIN_API_KEY, CRON_SECRET, RESEND_API_KEY,
   // RESEND_WEBHOOK_SECRET, INDEXNOW_KEY, ...) are set with `wrangler secret put`, never here.
   // HEAVY_COMPUTE=1: this plan may spend CPU inside a request (image resizing, social cards); unset on the free plan.
@@ -68,6 +70,7 @@
       "d1_databases": [{ "binding": "DB", "database_name": "searchable", "database_id": "1a91bc6d-7826-499d-b677-e5ad6bd1e18b", "migrations_dir": "migrations" }],
       "analytics_engine_datasets": [{ "binding": "ANALYTICS", "dataset": "searchable_events" }],
       "images": { "binding": "IMAGES" },
+      "browser": { "binding": "BROWSER" },
       "vars": {
         "NEXT_PUBLIC_SITE_URL": "https://searchable.pk",
         "TURNSTILE_SITE_KEY": "0x4AAAAAAE8ebJNuDtougfh2",

@@ -57,21 +57,24 @@ export function HeroCarousel({ slides, intervalMs = INTERVAL }: { slides: Slide[
         if (e.key === "ArrowLeft") go(i - 1);
       }}
     >
-      {/* Every slide's photo is in the document, stacked in one grid cell, only the current one visible: each
-          file is fetched and decoded once (the first at high priority, the rest right after), so a rotation
-          is a visibility flip and never shows an empty frame while an image arrives. */}
-      <Link href={s.href} className="grid lg:col-span-12" aria-hidden tabIndex={-1}>
-        {slides.map((x, k) => (
-          <div key={x.id} className={cn("[grid-area:1/1] layer-fade", k === i ? "layer-fade-in" : "layer-fade-out")}>
-            {x.imageUrl ? <Img src={x.imageUrl} alt="" aspect="16/9" priority={k === 0} eager sizes={SIZES} /> : <div className="bg-surface-2" style={{ aspectRatio: "16/9" }} />}
-          </div>
-        ))}
+      {/* Every slide's photo is in the document on one horizontal track that slides to the current one (ADR-53):
+          each file is fetched and decoded once (the first at high priority, the rest right after), so a rotation
+          never shows an empty frame while an image arrives. */}
+      <Link href={s.href} className="block overflow-hidden lg:col-span-12" aria-hidden tabIndex={-1}>
+        <div className="slide-track flex" style={{ transform: `translateX(-${i * 100}%)` }}>
+          {slides.map((x, k) => (
+            <div key={x.id} className="w-full shrink-0">
+              {x.imageUrl ? <Img src={x.imageUrl} alt="" aspect="16/9" priority={k === 0} eager sizes={SIZES} /> : <div className="bg-surface-2" style={{ aspectRatio: "16/9" }} />}
+            </div>
+          ))}
+        </div>
       </Link>
-      {/* Every slide's text is laid out in the same grid cell, hidden ones invisible, so the block keeps the
-          height of the tallest slide and the page below never jumps when the headline length changes. */}
-      <div className="grid lg:col-span-7" aria-live="polite">
+      {/* The headlines ride the same track, so the block keeps the height of the tallest slide and the page
+          below never jumps when the headline length changes. */}
+      <div className="overflow-hidden lg:col-span-7" aria-live="polite">
+        <div className="slide-track flex" style={{ transform: `translateX(-${i * 100}%)` }}>
         {slides.map((x, k) => (
-          <div key={x.id} className={cn("[grid-area:1/1] layer-fade", k === i ? "layer-fade-in" : "layer-fade-out")} aria-hidden={k !== i}>
+          <div key={x.id} className={cn("w-full shrink-0", k !== i && "pointer-events-none")} aria-hidden={k !== i}>
             <p className="eyebrow">
               {x.label}
               <span className="ml-2 font-sans text-[11px] font-normal normal-case tracking-normal text-3">{x.meta}</span>
@@ -83,17 +86,20 @@ export function HeroCarousel({ slides, intervalMs = INTERVAL }: { slides: Slide[
             </h2>
           </div>
         ))}
+        </div>
       </div>
       <div className="flex flex-col lg:col-span-5">
-        <div className="grid">
+        <div className="overflow-hidden">
+          <div className="slide-track flex" style={{ transform: `translateX(-${i * 100}%)` }}>
           {slides.map((x, k) => (
-            <div key={x.id} className={cn("[grid-area:1/1] layer-fade", k === i ? "layer-fade-in" : "layer-fade-out")} aria-hidden={k !== i}>
+            <div key={x.id} className={cn("w-full shrink-0", k !== i && "pointer-events-none")} aria-hidden={k !== i}>
               {x.dek ? <p className="font-display text-[1.05rem] leading-relaxed text-2 lg:pt-6">{x.dek}</p> : null}
               <Link href={x.href} className="mt-3 inline-block text-sm font-medium underline underline-offset-4" tabIndex={k === i ? 0 : -1}>
                 Read the story →
               </Link>
             </div>
           ))}
+          </div>
         </div>
         {n > 1 ? (
           <div className="mt-auto pt-5">

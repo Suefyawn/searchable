@@ -43,3 +43,12 @@ test("the first live day: a stranger's cancelled passport and the wrong Chery st
   const pkPassport = relevanceScore("Cover of a Pakistani passport, green, 2024 series", { query: "Pakistani passport cover", entities: ["Pakistan"] });
   assert.ok(pkPassport >= STRICT_MIN_SCORE, `scored ${pkPassport}`);
 });
+
+test("a landmark in the right city is still not the story: Badshahi Mosque for snake bites, a highway for a PTA order", () => {
+  const mosque = relevanceScore("Badshahi Mosque, Lahore, Punjab, at dusk", { query: "snake bite Rescue 1122 Punjab", entities: ["Rescue 1122", "Punjab"], headline: "1,060 snake bites in Punjab this year, 6 deaths: what Rescue 1122 logged" });
+  assert.ok(mosque < STRICT_MIN_SCORE, `scored ${mosque}`);
+  const highway = relevanceScore("Islamabad Highway aerial view, Islamabad, Pakistan", { query: "mobile signal Islamabad Rawalpindi", entities: ["PTA", "Islamabad", "Rawalpindi"], headline: "PTA gives mobile operators to October to fix Islamabad and Rawalpindi signals" });
+  assert.ok(highway < STRICT_MIN_SCORE, `scored ${highway}`);
+  const station = relevanceScore("Rescue 1122 ambulance station, Lahore, Punjab", { query: "Rescue 1122 station Punjab", entities: ["Rescue 1122", "Punjab"] });
+  assert.ok(station >= STRICT_MIN_SCORE, `scored ${station}`);
+});
