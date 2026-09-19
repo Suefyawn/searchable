@@ -75,7 +75,7 @@ export function MegaMenu({ sections }: { sections: MegaSection[] }) {
       </nav>
 
       {active ? (
-        <div data-panel={active.key} className="absolute inset-x-0 top-full z-40 hidden border-b border-line bg-[var(--bg)] shadow-[0_12px_24px_-16px_rgba(0,0,0,0.25)] lg:block" onMouseEnter={() => show(active.key)} onMouseLeave={hide}>
+        <div data-panel={active.key} className="panel-enter absolute inset-x-0 top-full z-40 hidden border-b border-line bg-[var(--bg)] shadow-[0_12px_24px_-16px_rgba(0,0,0,0.25)] lg:block" onMouseEnter={() => show(active.key)} onMouseLeave={hide}>
           <div className="container-x">
             <div className="grid gap-x-8 gap-y-6 py-6" style={{ gridTemplateColumns: `repeat(${Math.min(active.columns.length, 5)}, minmax(0, 1fr))` }}>
               {active.columns.slice(0, 5).map((col, i) => (

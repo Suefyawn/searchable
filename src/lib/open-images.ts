@@ -123,6 +123,8 @@ export function isRelevant(hay: string, query: string): boolean {
 /** Words so common in captions that they never identify a subject by themselves. */
 const GENERIC_WORDS = new Set(["pakistan", "pakistani", "national", "city", "people", "photo", "image", "view", "street", "road", "building", "office", "online", "check", "guide", "2024", "2025", "2026"]);
 
+export const STRICT_MIN_SCORE = 2;
+
 /**
  * Stock subjects that pass a loose query but say nothing about a news event: a flag, banknotes, a skyline, a
  * map. A hard-news story gets no photo rather than one of these (ADR-51), unless the query asked for them.
@@ -135,21 +137,33 @@ const STOCK_SUBJECTS = /(flag|flags|banknote|banknotes|currency|coins?|rupee no
  * Returns 0 when no specific query word matches at all. A news photo needs 2 or more (strict mode): an entity
  * plus a subject word, or every query word plus something from the headline.
  */
+const escapeRe = (w: string) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const word = (w: string) => new RegExp(`(^|[^a-z0-9])${escapeRe(w)}([^a-z0-9]|$)`, "i");
+
 export function relevanceScore(text: string, about: { query: string; entities?: string[]; headline?: string }): number {
   const h = text.toLowerCase();
   const specific = queryWords(about.query).filter((w) => !GENERIC_WORDS.has(w));
   const matched = specific.filter((w) => h.includes(w));
   if (specific.length && !matched.length) return 0;
   let score = specific.length ? (2 * matched.length) / specific.length : 0;
+  let entityHit = false;
   for (const e of about.entities ?? []) {
     const el = e.toLowerCase().trim();
     if (!el) continue;
-    if (h.includes(el)) score += 2;
-    else {
+    // Whole words only: "Chery Q" must not match "Chery QQ" (a different car), "Pearl" must not match "Pearls".
+    if (word(el).test(h)) {
+      score += 2;
+      entityHit = true;
+    } else {
       const last = el.split(/\s+/).pop()!;
-      if (last.length >= 4 && !GENERIC_WORDS.has(last) && h.includes(last)) score += 1;
+      if (last.length >= 4 && !GENERIC_WORDS.has(last) && word(last).test(h)) {
+        score += 1;
+        entityHit = true;
+      }
     }
   }
+  // A single query word on its own ("passport") is not a story: without an entity, two specific words must match.
+  if (!entityHit && matched.length < 2) score = Math.min(score, STRICT_MIN_SCORE - 0.5);
   if (about.headline) {
     const hw = queryWords(about.headline).filter((w) => !GENERIC_WORDS.has(w) && w.length >= 4 && !specific.includes(w));
     score += Math.min(1, 0.25 * hw.filter((w) => h.includes(w)).length);
@@ -158,7 +172,6 @@ export function relevanceScore(text: string, about: { query: string; entities?: 
   return Math.round(score * 100) / 100;
 }
 
-export const STRICT_MIN_SCORE = 2;
 
 /** Files that are never a news photo: paintings, maps, diagrams, logos, scans, documents. */
 const NOT_A_PHOTO = /\b(painting|paintings|engraving|lithograph|drawing|drawings|map of|maps of|diagram|chart|logo|logos|coat of arms|emblem|seal of|scan|scanned|manuscript|document|poster|stamp|postage|screenshot|icon)\b/i;

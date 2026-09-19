@@ -71,7 +71,7 @@ export function LiveFeed({ initial, limit = 12, className }: { initial: FeedItem
       </div>
       <ol className="divide-y divide-[var(--border)]">
         {items.slice(0, limit).map((it) => (
-          <li key={`${it.kind}:${it.url}`} className="grid grid-cols-[3.2rem_1fr] gap-3 px-4 py-2.5 text-[14px] leading-snug">
+          <li key={`${it.kind}:${it.url}`} className="panel-enter grid grid-cols-[3.2rem_1fr] gap-3 px-4 py-2.5 text-[14px] leading-snug transition-colors hover:bg-surface-2">
             <span className="pt-0.5 font-mono text-[11px] text-3">
               {clock(it.at)}
               {day(it.at) ? <span className="block">{day(it.at)}</span> : null}

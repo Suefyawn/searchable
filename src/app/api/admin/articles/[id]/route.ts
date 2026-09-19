@@ -27,9 +27,10 @@ const Patch = z.object({
   scheduledFor: z.string().optional(),
   /** Move the story to a new address; the old one redirects. */
   slug: z.string().trim().min(3).max(120).optional(),
-  /** Replace the photo only: a URL (ours or an openly licensed remote file with its credit) or a search, as on POST. */
+  /** Replace the photo only: a URL (ours or an openly licensed remote file with its credit) or a search, as on POST; `null` removes it. */
   image: z
     .union([
+      z.null(),
       z
         .object({ url: z.string().url(), alt: z.string().max(300).optional(), credit: z.string().max(200).optional(), sourceUrl: z.string().url().optional(), license: z.string().max(40).optional() })
         // An outside photo must say where it came from and who to credit (ADR-51); our own host needs neither.
@@ -49,11 +50,14 @@ export const maxDuration = 60;
  */
 export const PATCH = withAdminApi<{ id: string }>(async (_req, { params, body }) => {
   const d = Patch.parse(body);
-  if (!d.intent && !d.image && !d.slug) throw new ApiError(400, "Give an intent, an image or a slug");
+  if (!d.intent && d.image === undefined && !d.slug) throw new ApiError(400, "Give an intent, an image (or null to remove it) or a slug");
   const a = await load(params.id);
   let image = { featuredImageUrl: a.featuredImageUrl ?? undefined, featuredImageAlt: a.featuredImageAlt ?? undefined, featuredImageCredit: a.featuredImageCredit ?? undefined, featuredImageSourceUrl: a.featuredImageSourceUrl ?? undefined };
   let imageNote: string | undefined;
-  if (d.image && "query" in d.image) {
+  if (d.image === null) {
+    // A wrong or inappropriate photo comes off at once; the story stands without one (ADR-51).
+    image = { featuredImageUrl: undefined, featuredImageAlt: undefined, featuredImageCredit: undefined, featuredImageSourceUrl: undefined };
+  } else if (d.image && "query" in d.image) {
     const img = await findAndImport(d.image.query, "article", d.image.alt ?? a.title, { fallbackQuery: d.image.fallbackQuery, budgetMs: 25_000, entities: d.image.entities ?? entitiesIn(a.title), headline: a.title, strict: a.kind === "news" });
     if (img) image = { featuredImageUrl: img.url, featuredImageAlt: d.image.alt ?? a.title, featuredImageCredit: img.credit, featuredImageSourceUrl: img.sourceUrl };
     else imageNote = `No openly licensed photo describes "${d.image.query}" well enough (ADR-51); the photo is unchanged`;

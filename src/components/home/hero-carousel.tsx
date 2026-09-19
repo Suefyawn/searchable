@@ -62,7 +62,7 @@ export function HeroCarousel({ slides, intervalMs = INTERVAL }: { slides: Slide[
           is a visibility flip and never shows an empty frame while an image arrives. */}
       <Link href={s.href} className="grid lg:col-span-12" aria-hidden tabIndex={-1}>
         {slides.map((x, k) => (
-          <div key={x.id} className={cn("[grid-area:1/1]", k !== i && "invisible")}>
+          <div key={x.id} className={cn("[grid-area:1/1] layer-fade", k === i ? "layer-fade-in" : "layer-fade-out")}>
             {x.imageUrl ? <Img src={x.imageUrl} alt="" aspect="16/9" priority={k === 0} eager sizes={SIZES} /> : <div className="bg-surface-2" style={{ aspectRatio: "16/9" }} />}
           </div>
         ))}
@@ -71,7 +71,7 @@ export function HeroCarousel({ slides, intervalMs = INTERVAL }: { slides: Slide[
           height of the tallest slide and the page below never jumps when the headline length changes. */}
       <div className="grid lg:col-span-7" aria-live="polite">
         {slides.map((x, k) => (
-          <div key={x.id} className={cn("[grid-area:1/1]", k !== i && "invisible")} aria-hidden={k !== i}>
+          <div key={x.id} className={cn("[grid-area:1/1] layer-fade", k === i ? "layer-fade-in" : "layer-fade-out")} aria-hidden={k !== i}>
             <p className="eyebrow">
               {x.label}
               <span className="ml-2 font-sans text-[11px] font-normal normal-case tracking-normal text-3">{x.meta}</span>
@@ -87,7 +87,7 @@ export function HeroCarousel({ slides, intervalMs = INTERVAL }: { slides: Slide[
       <div className="flex flex-col lg:col-span-5">
         <div className="grid">
           {slides.map((x, k) => (
-            <div key={x.id} className={cn("[grid-area:1/1]", k !== i && "invisible")} aria-hidden={k !== i}>
+            <div key={x.id} className={cn("[grid-area:1/1] layer-fade", k === i ? "layer-fade-in" : "layer-fade-out")} aria-hidden={k !== i}>
               {x.dek ? <p className="font-display text-[1.05rem] leading-relaxed text-2 lg:pt-6">{x.dek}</p> : null}
               <Link href={x.href} className="mt-3 inline-block text-sm font-medium underline underline-offset-4" tabIndex={k === i ? 0 : -1}>
                 Read the story →

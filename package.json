@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "@cf-wasm/photon": "^0.4.0",
-    "@electric-sql/pglite": "^0.5.8",
     "@jsquash/webp": "^1.5.0",
     "@tailwindcss/typography": "^0.5.20",
     "@vinext/cloudflare": "^1.0.0-beta.8",

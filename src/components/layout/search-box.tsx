@@ -301,7 +301,7 @@ export function SearchBox({
       </form>
 
       {showList ? (
-        <div id="search-suggestions" role="listbox" className={cn("absolute z-40 mt-1 border border-line bg-surface shadow-pop", big ? "w-full" : "right-0 w-[26rem] max-w-[calc(100vw-2rem)]")}>
+        <div id="search-suggestions" role="listbox" className={cn("panel-enter absolute z-40 mt-1 border border-line bg-surface shadow-pop", big ? "w-full" : "right-0 w-[26rem] max-w-[calc(100vw-2rem)]")}>
           {idle ? (
             <ul className="py-1.5">
               {idleList.map((it, i) => (

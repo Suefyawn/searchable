@@ -3,6 +3,7 @@
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
+import { cn } from "@/lib/utils";
 import { SearchBox } from "./search-box";
 
 type Section = { key: string; label: string; href: string; links: { href: string; label: string }[] };
@@ -21,8 +22,8 @@ export function MobileNav({ nav, sections = [] }: { nav: { href: string; label: 
       <button type="button" onClick={() => setOpen(true)} aria-label="Open menu" className="grid size-10 place-items-center text-[var(--text)]">
         <Menu className="size-5" />
       </button>
-      {open ? (
-        <div className="fixed inset-0 z-50 bg-[var(--bg)]">
+      {/* Always mounted so it can fade and settle in (ADR-53); hidden state is invisible and untabbable. */}
+      <div className={cn("sheet fixed inset-0 z-50 overflow-y-auto bg-[var(--bg)]", open ? "visible translate-y-0 opacity-100" : "invisible -translate-y-2 opacity-0 pointer-events-none")} aria-hidden={!open}>
           <div className="container-x flex h-14 items-center justify-between border-b border-line">
             <span className="font-display text-xl">Menu</span>
             <button type="button" onClick={() => setOpen(false)} aria-label="Close menu" className="grid size-10 place-items-center">
@@ -69,8 +70,7 @@ export function MobileNav({ nav, sections = [] }: { nav: { href: string; label: 
               </Link>
             </nav>
           </div>
-        </div>
-      ) : null}
+      </div>
     </div>
   );
 }

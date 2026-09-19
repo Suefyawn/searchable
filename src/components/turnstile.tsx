@@ -23,7 +23,8 @@ declare global {
  * build-time NEXT_PUBLIC value, so one build serves staging and production. Without a key nothing renders and
  * the server skips verification.
  */
-export function Turnstile({ className }: { className?: string }) {
+/** `size`: "flexible" fills the form (min 300 px wide); "compact" is the 150 px square for narrow columns such as the footer. */
+export function Turnstile({ className, size = "flexible" }: { className?: string; size?: "flexible" | "compact" | "normal" }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const siteKey = document.querySelector<HTMLMetaElement>('meta[name="turnstile-site-key"]')?.content;
@@ -38,7 +39,7 @@ export function Turnstile({ className }: { className?: string }) {
     let timer: ReturnType<typeof setInterval> | undefined;
     const mount = () => {
       if (ref.current && window.turnstile && id === undefined) {
-        id = window.turnstile.render(ref.current, { sitekey: siteKey, theme: "auto", size: "flexible" });
+        id = window.turnstile.render(ref.current, { sitekey: siteKey, theme: "auto", size });
         mounted.add(id);
       }
     };
@@ -57,7 +58,7 @@ export function Turnstile({ className }: { className?: string }) {
         window.turnstile?.remove(id);
       }
     };
-  }, []);
+  }, [size]);
   // Always an (empty) div, so server and client markup agree whether or not a key is configured.
   return <div ref={ref} className={className} />;
 }

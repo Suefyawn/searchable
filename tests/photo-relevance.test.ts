@@ -32,3 +32,14 @@ test("stock subjects are pushed under the bar for hard news unless asked for", (
 test("no specific query word matched means zero, whatever else lines up", () => {
   assert.equal(relevanceScore("Karachi Port Trust head office", { query: "Kohat attack", entities: ["Karachi Port Trust"] }), 0);
 });
+
+test("the first live day: a stranger's cancelled passport and the wrong Chery stay under the bar", () => {
+  const passport = relevanceScore("Cancelled United States passport of Daniel Pearl", { query: "Pakistani passport", entities: ["Pakistan"], headline: "Pakistan's visa exemption list: 16 countries, and the passport type decides" });
+  assert.ok(passport < STRICT_MIN_SCORE, `scored ${passport}`);
+  const qq = relevanceScore("Chery QQ 2002 hatchback, Beijing", { query: "Chery Q electric car", entities: ["Chery Q"], headline: "Chery Q electric car launched in Pakistan at Rs 5,554,000" });
+  assert.ok(qq < STRICT_MIN_SCORE, `scored ${qq}`);
+  const right = relevanceScore("Chery Q electric SUV at the 2026 launch", { query: "Chery Q electric car", entities: ["Chery Q"] });
+  assert.ok(right >= STRICT_MIN_SCORE, `scored ${right}`);
+  const pkPassport = relevanceScore("Cover of a Pakistani passport, green, 2024 series", { query: "Pakistani passport cover", entities: ["Pakistan"] });
+  assert.ok(pkPassport >= STRICT_MIN_SCORE, `scored ${pkPassport}`);
+});

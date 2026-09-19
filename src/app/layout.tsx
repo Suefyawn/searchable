@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { AdSenseScript } from "@/components/ads";
 import { ClarityScript } from "@/components/clarity";
+import { ScrollToTop } from "@/components/layout/scroll-to-top";
 import { JsonLd } from "@/components/ui";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 import { brandCss, readSiteSettings } from "@/lib/site-settings";
@@ -61,6 +62,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
         <AdSenseScript />
         <ClarityScript />
+        <ScrollToTop />
         {/* WebMCP: when a browser exposes navigator.modelContext, register the site's three actions as tools. */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){var mc=navigator.modelContext;if(!mc||!mc.registerTool)return;var j=function(r){return r.json()};mc.registerTool({name:"search",description:"Search Searchable.pk: Pakistan news, guides, calculators, prices, businesses",inputSchema:{type:"object",properties:{query:{type:"string"}},required:["query"]},execute:function(a){return fetch("/api/search?q="+encodeURIComponent(a.query)).then(j)}});mc.registerTool({name:"get_data_series",description:"Latest readings of a Pakistan price or rate series (petrol-price, usd-pkr, gold-24k-tola, sbp-policy-rate)",inputSchema:{type:"object",properties:{slug:{type:"string"}},required:["slug"]},execute:function(a){return fetch("/api/data/"+encodeURIComponent(a.slug)).then(j)}});mc.registerTool({name:"run_calculator",description:"Run a Searchable calculator by slug with inputs; GET /api/tools/{slug} gives the input schema",inputSchema:{type:"object",properties:{slug:{type:"string"},inputs:{type:"object"}},required:["slug"]},execute:function(a){return fetch("/api/tools/"+encodeURIComponent(a.slug),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({inputs:a.inputs||{}})}).then(j)}});})();` }} />
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:bg-ink-900 focus:px-3 focus:py-2 focus:text-white">
