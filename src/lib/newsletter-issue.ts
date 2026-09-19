@@ -8,6 +8,7 @@ import { escapeHtml, renderMarkdown } from "./markdown";
 import { trendingSearches } from "./search";
 import { SITE } from "./utils";
 import { TOOLS, toolUrl } from "@/tools/registry";
+import { emailShell } from "@/lib/email-layout";
 
 type Frequency = "daily" | "weekly";
 
@@ -69,31 +70,21 @@ export async function createIssue(frequency: Frequency = "daily") {
   return row;
 }
 
-/** Newspaper-plain HTML email. Inline styles only; no images required. */
-export function renderIssueHtml(issue: { subject: string; preheader: string | null; body: string }, opts: { unsubscribeUrl: string; manageUrl: string; webUrl?: string }) {
-  const content = renderMarkdown(issue.body)
-    .replace(/<h2(?: [^>]*)?>/g, `<h2 style="font-family:Georgia,'Times New Roman',serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#6b6b6b;margin:28px 0 8px;padding-top:12px;border-top:1px solid #d9d9d9">`)
-    .replace(/<h3(?: [^>]*)?>/g, `<h3 style="font-family:Georgia,'Times New Roman',serif;font-size:20px;line-height:1.3;margin:14px 0 4px;font-weight:600">`)
-    .replace(/<p(?: [^>]*)?>/g, `<p style="margin:0 0 10px;font-size:16px;line-height:1.55;color:#222">`)
-    .replace(/<ul(?: [^>]*)?>/g, `<ul style="padding-left:18px;margin:0 0 10px;font-size:16px;line-height:1.6;color:#222">`)
-    .replace(/<a /g, `<a style="color:#111;text-decoration:underline;text-underline-offset:3px" `);
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapeHtml(issue.subject)}</title></head>
-<body style="margin:0;background:#f4f4f2;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#111">
-<span style="display:none;max-height:0;overflow:hidden;color:#f4f4f2">${escapeHtml(issue.preheader ?? "")}</span>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px 12px">
-<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border:1px solid #e2e2e0">
-<tr><td style="padding:22px 28px 14px;border-bottom:2px solid #111">
-  <div style="font-size:12px;color:#6b6b6b;letter-spacing:.06em;text-transform:uppercase">${formatDate(new Date())}</div>
-  <div style="font-family:Georgia,'Times New Roman',serif;font-size:30px;font-weight:700;margin-top:4px">${escapeHtml(SITE.name)}<span style="color:#166534">.pk</span> <span style="font-size:18px;font-weight:400;color:#6b6b6b">Daily</span></div>
-  <div style="font-size:14px;color:#6b6b6b;margin-top:2px;font-style:italic">${escapeHtml(SITE.tagline)}</div>
-</td></tr>
-<tr><td style="padding:8px 28px 24px">${content}</td></tr>
-<tr><td style="padding:16px 28px;border-top:1px solid #d9d9d9;font-size:12px;color:#6b6b6b;line-height:1.6">
-  You are receiving this because you subscribed at ${escapeHtml(SITE.url.replace(/^https?:\/\//, ""))}.
-  <a href="${opts.manageUrl}" style="color:#6b6b6b">Change topics or frequency</a> · <a href="${opts.unsubscribeUrl}" style="color:#6b6b6b">Unsubscribe</a>${opts.webUrl ? ` · <a href="${opts.webUrl}" style="color:#6b6b6b">View on the web</a>` : ""}
-  <br>${escapeHtml(SITE.name)} · Lahore, Pakistan
-</td></tr>
-</table></td></tr></table></body></html>`;
+/** The issue in the site's email shell (ADR-52): masthead with the date, the markdown body, manage and unsubscribe links. */
+export function renderIssueHtml(issue: { subject: string; preheader: string | null; body: string }, opts: { unsubscribeUrl: string; manageUrl: string; webUrl?: string; frequency?: string }) {
+  const dateLine = `<p style="margin:0 0 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6b7280">${escapeHtml(formatDate(new Date()))}</p>`;
+  return emailShell({
+    title: issue.subject,
+    preheader: issue.preheader ?? undefined,
+    kicker: opts.frequency === "weekly" ? "Weekly" : "Daily",
+    body: dateLine + renderMarkdown(issue.body),
+    footerNote: `You are receiving this because you subscribed at ${SITE.url.replace(/^https?:\/\//, "")}.`,
+    footerLinks: [
+      { label: "Change topics or frequency", href: opts.manageUrl },
+      { label: "Unsubscribe", href: opts.unsubscribeUrl },
+      ...(opts.webUrl ? [{ label: "View on the web", href: opts.webUrl }] : []),
+    ],
+  });
 }
 
 function plainTextOf(body: string) {
@@ -139,7 +130,7 @@ export async function sendIssue(issueId: string) {
     await Promise.all(
       recipients.slice(i, Math.min(i + 10, end)).map(async (r) => {
         try {
-          const html = renderIssueHtml(issue, { unsubscribeUrl: `${SITE.url}/newsletter/unsubscribe?token=${r.unsubscribeToken}`, manageUrl: `${SITE.url}/newsletter/manage?token=${r.unsubscribeToken}` });
+          const html = renderIssueHtml(issue, { unsubscribeUrl: `${SITE.url}/newsletter/unsubscribe?token=${r.unsubscribeToken}`, manageUrl: `${SITE.url}/newsletter/manage?token=${r.unsubscribeToken}`, frequency: issue.frequency });
           await sendEmail({ to: r.email, subject: issue.subject, html, text }, "bulk");
           sent += 1;
         } catch (e) {

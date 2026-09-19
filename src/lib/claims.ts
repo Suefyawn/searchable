@@ -316,11 +316,7 @@ export async function optOut(token: string): Promise<boolean> {
 
 /* ───────────── Email chrome ───────────── */
 
+/** Content for the branded shell that sendEmail() adds (ADR-52): a heading and the body, nothing else. */
 export function layout(title: string, body: string) {
-  return `<div style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;max-width:560px;margin:auto;padding:24px;line-height:1.6;color:#111">
-  <p style="font-family:Georgia,serif;font-size:20px;margin:0 0 18px;padding-bottom:10px;border-bottom:2px solid #111">${SITE.name}<span style="color:#888">.pk</span></p>
-  <h1 style="font-family:Georgia,serif;font-size:24px;line-height:1.25;margin:0 0 12px">${title}</h1>
-  ${body}
-  <p style="color:#888;font-size:12px;margin-top:28px;padding-top:10px;border-top:1px solid #ddd">${SITE.name}, ${SITE.url.replace(/^https?:\/\//, "")}</p>
-</div>`;
+  return `<h1>${title}</h1>${body}`;
 }

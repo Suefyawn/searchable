@@ -1,12 +1,20 @@
 import { consoleProvider, resendProvider, type Provider } from "@jet/email";
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
+import { emailShell, isFullDocument } from "@/lib/email-layout";
 
 export type Email = {
   to: string;
   subject: string;
+  /** The content. Anything that is not already a full document is wrapped in the branded shell (ADR-52). */
   html: string;
   text?: string;
+  /** Inbox preview line; defaults to the first 140 characters of the text. */
+  preheader?: string;
+  /** Small label beside the wordmark ("Your account", "Invoice"). */
+  kicker?: string;
+  /** One primary action, rendered as a button under the content. */
+  cta?: { label: string; href: string };
   /** Override the sender (must be on the verified domain), e.g. a reply from editorial@searchable.pk. */
   from?: string;
   replyTo?: string;
@@ -75,7 +83,8 @@ export async function sendEmail(email: Email, kind: EmailKind = "transactional")
   if (budget.monthCount + reserve >= MONTHLY_CAP) throw new EmailBudgetExceeded("month");
   if (budget.dayCount + reserve >= DAILY_CAP) throw new EmailBudgetExceeded("day");
 
-  const { id } = await provider().send({ from, to: email.to, subject: email.subject, html: email.html, text: email.text, replyTo: email.replyTo, headers: email.headers });
+  const html = isFullDocument(email.html) ? email.html : emailShell({ title: /<h1[\s>]/i.test(email.html) ? undefined : email.subject, preheader: email.preheader ?? email.text?.replace(/\s+/g, " ").trim().slice(0, 140), kicker: email.kicker, body: email.html, cta: email.cta });
+  const { id } = await provider().send({ from, to: email.to, subject: email.subject, html, text: email.text, replyTo: email.replyTo, headers: email.headers });
   budget.dayCount += 1;
   budget.monthCount += 1;
   await writeBudget(budget);
