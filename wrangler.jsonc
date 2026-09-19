@@ -55,6 +55,7 @@
   "env": {
     "production": {
       "name": "searchable-production",
+      "version_metadata": { "binding": "CF_VERSION_METADATA" },
       "r2_buckets": [
         { "binding": "MEDIA", "bucket_name": "searchable-images" },
         { "binding": "CACHE_BODIES", "bucket_name": "searchable-production-page-cache" }
@@ -71,10 +72,15 @@
         "BETTER_AUTH_URL": "https://searchable.pk",
         "STORAGE_PROVIDER": "r2",
         "R2_PUBLIC_URL": "https://img.searchable.pk",
-        "EMAIL_PROVIDER": "resend",
         "EMAIL_FROM": "Searchable <daily@searchable.pk>",
-        "HEAVY_COMPUTE": "1"
-      }
+        "HEAVY_COMPUTE": "1",
+        // Dark until cutover (docs/CUTOVER.md step 5): the Worker answers on its workers.dev host for checks, runs no
+        // jobs and sends no mail, because Vercel and Supabase are still the live system. At cutover: EMAIL_PROVIDER
+        // becomes "resend", JOBS_DISABLED and workers_dev go, the custom domain route is added.
+        "EMAIL_PROVIDER": "none",
+        "JOBS_DISABLED": "1"
+      },
+      "workers_dev": true
     }
   }
 }

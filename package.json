@@ -18,7 +18,7 @@
     "dev:next": "next dev",
     "build:next": "next build",
     "deploy": "vinext-cloudflare deploy --config dist/server/wrangler.json",
-    "deploy:production": "vinext-cloudflare deploy --env production --config dist/server/wrangler.json",
+    "deploy:production": "vinext-cloudflare deploy --env production --name searchable-production --config dist/server/wrangler.json",
     "db:migrate:staging": "wrangler d1 migrations apply searchable-staging --remote",
     "db:migrate:production": "wrangler d1 migrations apply searchable --remote --env production",
     "db:export": "tsx scripts/export-for-d1.ts",
