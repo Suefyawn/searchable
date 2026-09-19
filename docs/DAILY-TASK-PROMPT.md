@@ -18,7 +18,7 @@ Focus by slot:
 - Dawn: overnight world, US markets close, crypto, cricket results. Cricket fixtures for today (step 8d). Run data ingest. Create and schedule today's newsletter for 07:30 PKT.
 - Morning: Pakistan morning news from the press feeds, every story worth having (step 3). Semrush demand check. Jobs (step 8e). Queue and inbox pass. One backlog item.
 - Midday: PSX and rupee, one backlog guide, inbox replies. Run data ingest. Directory: add real businesses for one city and category.
-- Afternoon: business, tech, government notifications (OGRA, SBP, FBR, NEPRA, PTA); record notified numbers by hand with sources; KIBOR and policy rate check. Price lists (step 8c). Calculator rate review (see step 9). Queue pass.
+- Afternoon: business, tech, government notifications (OGRA, SBP, FBR, NEPRA, PTA); record notified numbers by hand with sources; GET /ingest/status, then the manual read for anything stale or failed (KIBOR and the policy rate always, SBP blocks the fetcher). Price lists (step 8c). Calculator rate review (see step 9). Queue pass.
 - Evening: sport (cricket, MMA, snooker) and entertainment; cricket fixtures and scores (step 8d); update the living sport pages from the backlog; one evergreen guide refresh.
 - Night: update stories that moved during the day, check one guide's numbers against its sources, jobs (step 8e), one backlog item, run the due jobs, report.
 On the 1st and 16th of each month (fuel price reviews), and any day OGRA moves the price, the Afternoon and Night runs record petrol-price and diesel-price the moment the notification is public and publish or update the "what a full tank costs now" story.
@@ -79,7 +79,8 @@ GET /reference → { newsCategories[{slug,name}], guideCategories[{slug,name}], 
 GET /ideas?topic=&region=pk|world&limit= → { headlines[{title,source,url,publishedAt,topic,region}] }
 
 GET /backlog?status=open|in_progress|done|all → { items[{keyword,volume,kd,score,type,target,brief,status,url}] }   (Semrush demand, Pakistan; highest score first)
-POST /backlog {"keyword","status": "in_progress" | "done" | "open" | "dropped", "url"?, "note"?}
+POST /backlog {"keyword","status": "in_progress" | "done" | "open" | "dropped", "url"?, "note"?}   (status of an existing item; 404 when the keyword is not in the backlog)
+POST /backlog {"items": [{"keyword","volume","kd","type": "guide"|"news"|"data"|"compare"|"tool","target": "/proposed/url","brief"?}]}   (add new items or replace their numbers; this is how a Semrush find enters the backlog)
 
 GET /articles?status=published|draft|scheduled|all&kind=news|guide&q=&limit=   GET /articles/{id} (full article: body markdown, sources, faqs, entities, tags, image)
 POST /articles
@@ -108,7 +109,8 @@ GET /compare?slug=air-conditioners|credit-cards|mobile-packages|national-savings
 GET /data → { series[] }
 DELETE /data {"series": "kibor-1y", "dates": ["2026-09-12"]} → { ok, removed[] }   (a reading you have verified is wrong)
 POST /data {"readings": [{"series": "petrol-price", "value": 272.61, "date": "2026-09-16", "note": "OGRA notification", "sourceUrl": "https://..."}]}
-POST /data {"ingest": true, "force": false}   (force accepts readings that jump more than 30%)
+POST /data {"ingest": true, "force": false}   (force accepts readings that jump more than 30%; the market series also refresh hourly and everything daily on the site's own schedule, so this is for a number you need now)
+GET /ingest/status → { at, sources[{source,lastRunAt,lastSuccessAt,lastValue,lastStatus,lastError,staleHours}] }   (freshness per automatically ingested series; a source with staleHours over 30 or lastStatus "error" needs the manual read)
 
 POST /businesses {"businesses": [{"name","category","city","area"?,"address"?,"phone"?,"whatsapp"?,"website"?,"email"?,"description"?,"tagline"?,"opens"?,"closes"?,"closedDays"?,"services"?: [],"priceRange"?: 1-4}], "publish": true}
 → { created[{slug,name,url}], skipped[{name,status,problems,duplicates}] }
