@@ -17,7 +17,7 @@ A scheduled Claude task keeps the site alive between human sessions: six runs a 
 | Evening | 18:30 | Sport (cricket, MMA, snooker), entertainment, one evergreen guide refresh. |
 | Night | 22:30 | Day wrap: update stories that moved, weekly guide audit (one guide per night gets its numbers checked), housekeeping `POST /jobs {job:"due"}`, report. |
 
-On the 1st and 16th of the month (petrol price reviews), the Afternoon and Night runs check OGRA and update `petrol-price` and `diesel-price` the moment the notification is out, and publish the "what a full tank costs now" story.
+On the 1st and 16th of the month (petrol price reviews) the fuel-price Workflow records `petrol-price` and `diesel-price` itself as soon as PSO publishes the notified prices (it retries through the afternoon) and leaves a draft story; the Afternoon and Night runs check `GET /ingest/status`, verify the numbers against the OGRA notification, and publish the "what a full tank costs now" story from the draft.
 
 ## Photos on a server that cannot resize
 When `POST /media` or an article image answers `400 This server does not resize images`, do the resizing yourself: `POST /media { search }` for candidates, download the chosen file, make the master and the 960 and 480 px WebP renditions (quality 82 and 78), `POST /media` as multipart with `master`, `r960`, `r480`, `alt`, `credit`, `sourceUrl`, `license`, then pass the returned `url` as `image.url`. Stories still without a photo are yours to fill on the Dawn and Midday runs; the photo backfill job does nothing on such a server.
@@ -27,7 +27,7 @@ When `POST /media` or an article image answers `400 This server does not resize 
 2. `GET /ideas` for the slot's topics. Pick stories that matter to readers in Pakistan (money, prices, rules, jobs, sport they follow). Skip anything already covered; update the existing story instead.
 3. For each story: write 350 to 700 words of original reporting in markdown with a clear structure (what happened, numbers, what it means for you, what to do), link at least one calculator, guide or data page, add sources with URLs, an FAQ pair when useful, tags, entities, city when local. `POST /articles` with `image: { query }` chosen for the subject. Publish, or schedule spaced 30 to 40 minutes apart when there are several.
 4. Guides: when `searchesWithNoResults` shows a repeated question, write the guide (kind `guide`, a guide category), 800 to 1,500 words, step by step, with fees, timelines and the mistakes people make.
-5. Data: run `ingest` on the Dawn and Midday runs; record notified prices by hand with `sourceUrl` on the others.
+5. Data: the scheduler ingests market series every hour and everything daily; check `GET /ingest/status` and only record notified prices by hand (NEPRA tariffs, SBP rates while sbp.org.pk blocks automated reads) with `sourceUrl`.
 6. Queue: `GET /queue`, then `POST /queue` with clear approvals and rejections; leave doubtful items alone and mention them in the report.
 7. Inbox: `GET /inbox?status=new`; reply to genuine questions from the right mailbox (editorial for corrections, billing for payments, hello for the rest); archive spam.
 8. Newsletter: Dawn run only. `GET /newsletter`, take `suggestedDraft`, improve the subject, `POST /newsletter { create: true, subject, body, scheduledFor }` for 07:30 PKT.

@@ -1,5 +1,5 @@
 import { index, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
-import { createdAt, id, json, updatedAt } from "./_shared";
+import { createdAt, id, json, timestampMs, updatedAt } from "./_shared";
 
 /** A named time series: petrol-price, usd-pkr, gold-24k-tola, sbp-policy-rate… */
 export const dataSeries = sqliteTable("data_series", {
@@ -32,3 +32,17 @@ export const dataPoints = sqliteTable(
   },
   (t) => [uniqueIndex("data_points_series_date_idx").on(t.seriesId, t.date), index("data_points_series_idx").on(t.seriesId)],
 );
+
+/**
+ * One row per automatically ingested series (and per source that failed), so the automation can check data
+ * freshness before writing about it (GET /api/admin/ingest/status, migration Phase 4).
+ */
+export const ingestRuns = sqliteTable("ingest_runs", {
+  /** Series slug (usd-pkr, petrol-price) or, for a source that produced nothing, its name (SBP, PSO). */
+  source: text("source").primaryKey(),
+  lastRunAt: timestampMs("last_run_at").notNull(),
+  lastSuccessAt: timestampMs("last_success_at"),
+  lastValue: real("last_value"),
+  lastStatus: text("last_status").notNull(),
+  lastError: text("last_error"),
+});

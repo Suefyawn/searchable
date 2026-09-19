@@ -9,7 +9,7 @@ Next.js 16 (App Router, RSC, Server Actions) on Cloudflare Workers via vinext ·
 ```
 npm run dev            # vinext dev server with a local D1, http://localhost:3000 (needs .dev.vars, see docs/LOCAL-TO-PRODUCTION.md)
 npm run db:migrate     # apply migrations/ to the local D1 (db:migrate:staging, db:migrate:production for the remote ones)
-npm run db:generate    # generate a migration after editing src/db/schema (hand-written SQL such as FTS goes in its own numbered file)
+npm run db:generate    # generate a migration after editing src/db/schema (hand-written SQL such as FTS: `npx drizzle-kit generate --custom --name <x>` reserves the numbered file, then fill it)
 npm run db:seed        # reference + sample data through the admin API of the running dev server (SEED_MODE, SEED_ADMIN_*)
 npm run search:reindex # rebuild the search index through the admin API of the running instance (BASE_URL)
 npm run db:export      # Supabase -> .data/export.sql for the content migration (DATABASE_URL); -- --verify <db> compares

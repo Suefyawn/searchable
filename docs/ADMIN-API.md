@@ -25,6 +25,7 @@ Base URL: `https://searchable.pk/api/admin`. All slugs (categories, cities, seri
 | `GET /articles?status=&kind=&q=&limit=` | article list; `GET /articles/{id}` full article with markdown, sources, faqs, entities, tags |
 | `GET /businesses?status=&q=&limit=` | business list |
 | `GET /data` | every series with latest and previous reading |
+| `GET /ingest/status` | freshness of every automatically ingested series: last run, last success, last value, last error and hours since the last success (sources that failed appear by name, SBP or PSO). Check it before writing about a number; mention anything stale in the report |
 | `GET /newsletter` | recent issues and a suggested draft assembled from this week's content |
 
 ## Write
@@ -124,6 +125,7 @@ Top-level keys the contract suite asserts. Errors are always `{ "error": string,
 | `GET /context` | `site, now, nowKarachi, recentArticles, drafts, scheduled, queues, directory, newsDesks, data, topSearches, searchesWithNoResults, email, lastJobsRun, lastIngestion, weekSince` |
 | `GET /reference` | `articleKinds, newsCategories, guideCategories, businessCategories, cities, areas, entities, dataSeries, professions, tools, authors, articleStatuses` |
 | `GET /ideas` | `headlines` |
+| `GET /ingest/status` | `at, sources` (each: `source, lastRunAt, lastSuccessAt, lastValue, lastStatus, lastError, staleHours`) |
 | `GET /backlog` / `POST /backlog` | `items` / `ok` |
 | `GET /queue` / `POST /queue` | `businesses, claims, professionals, posts, comments, businessReviews, professionalReviews, reports, messages, submissions` / `ok, results` |
 | `GET /articles` / `POST /articles` | `articles` / `ok, id, status, url, image` |

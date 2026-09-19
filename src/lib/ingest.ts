@@ -140,13 +140,25 @@ async function spot(symbol: "XAU" | "XAG"): Promise<number> {
 }
 
 /** Collect readings from every source; a failing source only loses its own series. */
-export async function collectReadings(): Promise<{ readings: Reading[]; errors: string[] }> {
+/** Which series each source fills, so a run for two series fetches one site instead of six (and stays inside rate limits). */
+const SOURCE_SERIES = {
+  sbp: ["usd-pkr", "kibor-1y", "sbp-policy-rate"],
+  fx: ["aed-pkr", "sar-pkr", "gbp-pkr", "eur-pkr", "usd-pkr"],
+  pso: ["petrol-price", "diesel-price"],
+  gold: ["gold-24k-tola", "gold-22k-tola", "gold-21k-tola", "silver-tola"],
+  psx: ["kse-100"],
+  crypto: ["btc-usd", "eth-usd"],
+} as const;
+
+export async function collectReadings(only?: string[]): Promise<{ readings: Reading[]; errors: string[] }> {
   const readings: Reading[] = [];
   const errors: string[] = [];
   const date = today();
   let usdPkr: number | null = null;
+  const wanted = (source: keyof typeof SOURCE_SERIES) => !only?.length || SOURCE_SERIES[source].some((slug) => only.includes(slug));
 
-  try {
+  // Gold and the cross rates need USD/PKR, so SBP is read whenever any of them is asked for.
+  if (wanted("sbp") || wanted("fx") || wanted("gold")) try {
     const s = await sbp();
     usdPkr = s.usd;
     const note = `SBP snapshot${s.asOf ? `, as on ${s.asOf}` : ""} (auto)`;
@@ -158,7 +170,7 @@ export async function collectReadings(): Promise<{ readings: Reading[]; errors: 
     errors.push(`SBP: ${(e as Error).message}`);
   }
 
-  try {
+  if (wanted("fx")) try {
     const rates = await erApi();
     const base = usdPkr ?? rates.PKR;
     const src = usdPkr ? "SBP USD/PKR × open.er-api.com cross rate (auto)" : "open.er-api.com (auto)";
@@ -170,7 +182,7 @@ export async function collectReadings(): Promise<{ readings: Reading[]; errors: 
     errors.push(`FX: ${(e as Error).message}`);
   }
 
-  try {
+  if (wanted("pso")) try {
     const p = await pso();
     const note = `PSO ex-depot price${p.effective ? `, effective ${p.effective}` : ""} (auto)`;
     const url = "https://psopk.com/en/fuels/fuel-prices";
@@ -180,7 +192,7 @@ export async function collectReadings(): Promise<{ readings: Reading[]; errors: 
     errors.push(`PSO: ${(e as Error).message}`);
   }
 
-  try {
+  if (wanted("gold")) try {
     const fx = usdPkr ?? (await erApi()).PKR;
     const [xau, xag] = await Promise.all([spot("XAU"), spot("XAG")]);
     const tola24 = Math.round(xau * TOLA_PER_OZ * fx);
@@ -192,7 +204,7 @@ export async function collectReadings(): Promise<{ readings: Reading[]; errors: 
     errors.push(`Gold: ${(e as Error).message}`);
   }
 
-  try {
+  if (wanted("psx")) try {
     const t = strip(await text("https://dps.psx.com.pk/indices"));
     const kse = t.match(/KSE100\s+([\d,]+\.\d+)/)?.[1];
     if (kse) readings.push({ slug: "kse-100", value: Number(kse.replace(/,/g, "")), date, note: "PSX data portal, KSE-100 (auto)", sourceUrl: "https://dps.psx.com.pk/indices" });
@@ -201,7 +213,7 @@ export async function collectReadings(): Promise<{ readings: Reading[]; errors: 
     errors.push(`PSX: ${(e as Error).message}`);
   }
 
-  try {
+  if (wanted("crypto")) try {
     const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd", { headers: { "user-agent": UA }, cache: "no-store" });
     if (!res.ok) throw new Error(`coingecko → ${res.status}`);
     const d = (await res.json()) as { bitcoin?: { usd: number }; ethereum?: { usd: number } };
@@ -218,7 +230,7 @@ export async function collectReadings(): Promise<{ readings: Reading[]; errors: 
 export async function runIngestion(opts: { maxJump?: number; only?: string[]; force?: boolean } = {}): Promise<{ results: IngestResult[]; errors: string[]; at: string }> {
   const maxJump = opts.maxJump ?? 0.3;
   const db = await getDb();
-  const { readings, errors } = await collectReadings();
+  const { readings, errors } = await collectReadings(opts.only);
   const results: IngestResult[] = [];
   for (const r of readings) {
     if (opts.only?.length && !opts.only.includes(r.slug)) continue;
@@ -247,5 +259,31 @@ export async function runIngestion(opts: { maxJump?: number; only?: string[]; fo
   }
   const at = new Date().toISOString();
   await db.insert(schema.settings).values({ key: "ingest:last", value: { at, results, errors } }).onConflictDoUpdate({ target: schema.settings.key, set: { value: { at, results, errors }, updatedAt: new Date() } });
+  await recordRuns(results, errors, new Date(at));
   return { results, errors, at };
+}
+
+/** One ingest_runs row per series (success or failure) and per source that raised an error, for /api/admin/ingest/status. */
+async function recordRuns(results: IngestResult[], errors: string[], at: Date) {
+  const db = await getDb();
+  const rows: (typeof schema.ingestRuns.$inferInsert)[] = results.map((r) => {
+    const ok = r.status === "written" || r.status === "unchanged";
+    return { source: r.slug, lastRunAt: at, lastSuccessAt: ok ? at : undefined, lastValue: r.value ?? null, lastStatus: r.status, lastError: ok ? null : (r.message ?? r.status) };
+  });
+  for (const e of errors) {
+    const [source, ...rest] = e.split(": ");
+    rows.push({ source: source ?? "unknown", lastRunAt: at, lastStatus: "error", lastError: rest.join(": ") || e });
+  }
+  for (const row of rows) {
+    const set: Partial<typeof schema.ingestRuns.$inferInsert> = { lastRunAt: row.lastRunAt, lastStatus: row.lastStatus, lastError: row.lastError ?? null };
+    if (row.lastSuccessAt) Object.assign(set, { lastSuccessAt: row.lastSuccessAt, lastValue: row.lastValue });
+    await db.insert(schema.ingestRuns).values(row).onConflictDoUpdate({ target: schema.ingestRuns.source, set });
+  }
+  // A source that produced readings this run has recovered: its own error row goes away.
+  const LABELS: Record<keyof typeof SOURCE_SERIES, string> = { sbp: "SBP", fx: "FX", pso: "PSO", gold: "Gold", psx: "PSX", crypto: "Crypto" };
+  const failing = new Set(errors.map((e) => e.split(": ")[0]));
+  const written = new Set(results.map((r) => r.slug));
+  for (const [key, label] of Object.entries(LABELS)) {
+    if (!failing.has(label) && SOURCE_SERIES[key as keyof typeof SOURCE_SERIES].some((slug) => written.has(slug))) await db.delete(schema.ingestRuns).where(eq(schema.ingestRuns.source, label));
+  }
 }

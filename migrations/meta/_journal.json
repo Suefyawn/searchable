@@ -8,6 +8,20 @@
       "when": 1789778939612,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1789781184413,
+      "tag": "0001_search_fts",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1789781187930,
+      "tag": "0002_ingest_runs",
+      "breakpoints": true
     }
   ]
 }
