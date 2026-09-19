@@ -32,6 +32,7 @@ export function ogImageUrl(title: string, kicker?: string) {
 }
 
 export function buildMetadata(input: MetaInput): Metadata {
+  // Next normalises the root canonical to the bare origin (no trailing slash); Google treats both forms as one URL.
   const url = `${SITE.url}${input.path}`;
   // The root layout applies the "%s · Searchable" template; social cards get the full string.
   const title = input.absoluteTitle ? input.title : `${input.title} · ${SITE.name}`;

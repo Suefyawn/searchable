@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { and, eq, sql } from "drizzle-orm";
-import { getDb, schema } from "@/db";
+import { getDb, rawQuery, schema } from "@/db";
 import { SITE } from "@/lib/utils";
 import { TOOLS, toolUrl } from "@/tools/registry";
 import { TOOL_CATEGORIES } from "@/tools/types";
@@ -24,7 +24,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     db.select({ slug: schema.locations.slug, updatedAt: schema.locations.updatedAt, lat: schema.locations.lat }).from(schema.locations).where(eq(schema.locations.kind, "city")),
     db.select({ slug: schema.entities.slug, updatedAt: schema.entities.updatedAt }).from(schema.entities),
     db.select({ kind: schema.categories.kind, slug: schema.categories.slug }).from(schema.categories),
-    db.select({ slug: schema.businessCategories.slug }).from(schema.businessCategories),
+    // Only categories with five or more live listings: thinner hubs are noindex (businesses/[category]) and must not be listed.
+    rawQuery<{ slug: string }>(
+      db,
+      sql`select c.slug from business_categories c
+          join business_category_links l on l.category_id = c.id
+          join businesses b on b.id = l.business_id and b.status = 'active'
+          group by c.slug having count(*) >= 5`,
+    ),
     db.select({ slug: schema.dataSeries.slug, updatedAt: schema.dataSeries.updatedAt }).from(schema.dataSeries),
     db.select({ slug: schema.professionals.slug, updatedAt: schema.professionals.updatedAt }).from(schema.professionals).where(eq(schema.professionals.status, "active")),
     db.select({ slug: schema.posts.slug, updatedAt: schema.posts.updatedAt }).from(schema.posts).where(eq(schema.posts.status, "published")),

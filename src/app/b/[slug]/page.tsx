@@ -31,7 +31,8 @@ export async function generateMetadata({ params }: Props) {
   if (!b || b.status !== "active") return {};
   return buildMetadata({
     title: `${b.name}${b.city ? `: ${b.primaryCategory?.name ?? "Business"} in ${b.city.name}` : ""}`,
-    description: b.tagline ?? b.description ?? `${b.name}: address, phone, WhatsApp, opening hours and reviews.`,
+    // Name and city first: a shared tagline (the HEC register gives every university the same one) must not make identical descriptions.
+    description: `${b.name}${b.city ? `, ${b.city.name}` : ""}: ${(b.tagline ?? b.description ?? "address, phone, WhatsApp, opening hours and reviews").replace(/\.$/, "")}.`.slice(0, 160),
     path: `/b/${b.slug}`,
     image: b.coverUrl ?? b.logoUrl,
   });
