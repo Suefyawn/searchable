@@ -1,6 +1,6 @@
 # Scheduled task prompt (self-contained)
 
-Paste everything between the rules into a Claude scheduled task. Replace `<ADMIN_API_KEY>` with the production key and `<SLOT>` with the run's slot (or create six tasks, one per slot). The task needs no connectors: only HTTPS calls to searchable.pk.
+Paste everything between the rules into the one Claude scheduled task that fires six times a day (the task works out its slot from the clock). Replace `<ADMIN_API_KEY>` with the production key. The task needs no connectors for the site itself: only HTTPS calls to searchable.pk; Semrush and the image tools are its own.
 
 ---
 
@@ -11,8 +11,15 @@ Base URL: https://searchable.pk/api/admin
 Every request: header `Authorization: Bearer <ADMIN_API_KEY>` and, for POST/PATCH, `Content-Type: application/json`.
 Errors come back as JSON `{ "error": "...", "issues": [...] }` with 400 (bad input), 401 (key), 404 (unknown id), 500. Read the error, fix the request, retry once, then move on and mention it in the report.
 
-## This run
-Slot: <SLOT>   (Dawn 06:30 · Morning 09:30 · Midday 12:30 · Afternoon 15:30 · Evening 18:30 · Night 22:30, Pakistan time)
+## This run: work out the slot first
+This one task fires six times a day and covers every slot. Decide which slot this run is from nowKarachi in GET /context (Pakistan time, UTC+5):
+- 06:00 to 07:59 → Dawn (scheduled 06:30)
+- 09:00 to 10:59 → Morning (scheduled 09:30)
+- 12:00 to 13:59 → Midday (scheduled 12:30)
+- 15:00 to 16:59 → Afternoon (scheduled 15:30)
+- 18:00 to 19:59 → Evening (scheduled 18:30)
+- 21:30 to 23:59 → Night (scheduled 22:30)
+If the run starts outside these windows (a manual run), use the nearest earlier slot (00:00 to 05:59 counts as Night). State the slot on the first line of the report.
 
 Focus by slot:
 - Dawn: overnight world, US markets close, crypto, cricket results. Cricket fixtures for today (step 8d). Run data ingest. Create and schedule today's newsletter for 07:30 PKT.
@@ -53,7 +60,7 @@ GET /compare?slug=air-conditioners, ?slug=credit-cards, ?slug=mobile-packages an
 11. GET /inbox?status=new. For genuine mail, POST /inbox {"id","reply"} (it goes out from the mailbox the mail arrived at, threaded). Spam: {"id","status":"archived"}. Keep replies short and factual; do not promise refunds, features or timelines. Stay under email.leftToday.
 12. Dawn only: GET /newsletter, take suggestedDraft, sharpen the subject and intro, POST /newsletter {"create": true, "frequency": "daily", "subject", "preheader", "body", "scheduledFor": today 07:30 PKT as ISO (02:30Z)}.
 13. Night only: POST /jobs {"job": "due"} once more at the end. The launch sample content is gone (removed 16 September 2026); everything on the site is real and sourced, so treat every existing story as one to keep current, not replace.
-14. Do not send notifications, summaries, emails or messages anywhere; the report below, in the task output, is the only output.
+14. Do not send notifications, summaries, emails or messages anywhere (do not call PushNotification); the report below, in the task output, is the only output.
 15. End with a report: published (title and URL), updated, scheduled, backlog item and status, data recorded, businesses added, rate changes for the developer, queue decisions, inbox replies, items left for a human, API errors. File the same report with POST /report {"slot": "<slot>", "report": "<the report in markdown>", "published": n, "updated": n, "errors": n} so it appears in the admin; then print it as the task output.
 
 ## Writing rules
