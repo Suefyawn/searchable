@@ -51,9 +51,9 @@ export const PATCH = withAdminApi<{ id: string }>(async (_req, { params, body })
   let image = { featuredImageUrl: a.featuredImageUrl ?? undefined, featuredImageAlt: a.featuredImageAlt ?? undefined, featuredImageCredit: a.featuredImageCredit ?? undefined, featuredImageSourceUrl: a.featuredImageSourceUrl ?? undefined };
   let imageNote: string | undefined;
   if (d.image && "query" in d.image) {
-    const img = await findAndImport(d.image.query, "article", d.image.alt ?? a.title, { fallbackQuery: d.image.fallbackQuery, budgetMs: 25_000, entities: d.image.entities ?? entitiesIn(a.title) });
+    const img = await findAndImport(d.image.query, "article", d.image.alt ?? a.title, { fallbackQuery: d.image.fallbackQuery, budgetMs: 25_000, entities: d.image.entities ?? entitiesIn(a.title), headline: a.title, strict: a.kind === "news" });
     if (img) image = { featuredImageUrl: img.url, featuredImageAlt: d.image.alt ?? a.title, featuredImageCredit: img.credit, featuredImageSourceUrl: img.sourceUrl };
-    else imageNote = `No openly licensed photo found for "${d.image.query}"; the photo is unchanged`;
+    else imageNote = `No openly licensed photo describes "${d.image.query}" well enough (ADR-51); the photo is unchanged`;
   } else if (d.image && "url" in d.image) {
     if (d.image.url.startsWith(process.env.R2_PUBLIC_URL ?? "https://img.searchable.pk")) {
       image = { featuredImageUrl: d.image.url, featuredImageAlt: d.image.alt ?? a.title, featuredImageCredit: d.image.credit, featuredImageSourceUrl: d.image.sourceUrl };

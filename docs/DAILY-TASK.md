@@ -38,7 +38,7 @@ When `POST /media` or an article image answers `400 This server does not resize 
 - Never copy press text. Headlines are leads; the story is ours, with our own numbers and a link to our tools.
 - No em dashes. No AI-sounding filler. No hedging paragraphs. Numbers first.
 - Every claim about a rate, fee or rule has a source with a URL, dated.
-- Photos only via Openverse query or a known openly licensed URL. Never a press or agency photo.
+- Photos only via Openverse query or a known openly licensed URL. Never a press or agency photo. News gets no photo rather than a loosely related one (ADR-51): the server scores candidates against entities, query and headline and refuses the rest; pass the subject's own image as a URL when the search finds nothing.
 - Do not publish anything invented. If a source cannot be found, do not write the story.
 - When unsure whether a business, claim or post is legitimate, do not approve; describe it in the report.
 

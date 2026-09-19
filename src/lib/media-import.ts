@@ -92,7 +92,9 @@ export async function backfillArticlePhotos(limit = 2): Promise<{ tried: number;
       .split(" ")
       .slice(0, 5)
       .join(" ");
-    const img = await findAndImport(tagQuery || titleQuery || generic, "article", a.title, { fallbackQuery: generic, budgetMs: 25_000, entities: entitiesIn(a.title) }).catch(() => null);
+    // News is strict (ADR-51): the story's own subject or nothing, never the category's generic photo.
+    const strict = a.kind === "news";
+    const img = await findAndImport(tagQuery || titleQuery || generic, "article", a.title, { fallbackQuery: generic, budgetMs: 25_000, entities: entitiesIn(a.title), headline: a.title, strict }).catch(() => null);
     if (!img) continue;
     await db.update(schema.articles).set({ featuredImageUrl: img.url, featuredImageAlt: a.title, featuredImageCredit: img.credit, featuredImageSourceUrl: img.sourceUrl }).where(eq(schema.articles.id, a.id));
     revalidatePath(`/${a.kind === "news" ? "news" : "guides"}/${a.category?.slug ?? "general"}/${a.slug}`);

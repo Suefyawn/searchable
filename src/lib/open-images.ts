@@ -29,6 +29,8 @@ export type OpenImage = {
   thumbnail: string;
   width: number | null;
   height: number | null;
+  /** Everything the source says about the file (title, tags, description, categories), for relevance scoring. */
+  text?: string;
 };
 
 let cachedToken: { token: string; expires: number } | null = null;
@@ -83,6 +85,7 @@ async function searchOpenImages(query: string, opts: { limit?: number; minWidth?
       thumbnail: String(r.thumbnail ?? r.url),
       width: (r.width as number | null) ?? null,
       height: (r.height as number | null) ?? null,
+      text: `${r.title ?? ""} ${((r.tags as Array<{ name?: string }> | undefined) ?? []).map((t) => t.name ?? "").join(" ")} ${r.description ?? ""}`.slice(0, 2000),
     }))
     .filter((r) => !r.width || r.width >= minWidth)
     .filter((r) => /\.(jpe?g|png|webp)(\?|$)/i.test(r.url) || !/\.(gif|svg|tiff?)(\?|$)/i.test(r.url));
@@ -119,6 +122,43 @@ export function isRelevant(hay: string, query: string): boolean {
 
 /** Words so common in captions that they never identify a subject by themselves. */
 const GENERIC_WORDS = new Set(["pakistan", "pakistani", "national", "city", "people", "photo", "image", "view", "street", "road", "building", "office", "online", "check", "guide", "2024", "2025", "2026"]);
+
+/**
+ * Stock subjects that pass a loose query but say nothing about a news event: a flag, banknotes, a skyline, a
+ * map. A hard-news story gets no photo rather than one of these (ADR-51), unless the query asked for them.
+ */
+const STOCK_SUBJECTS = /(flag|flags|banknote|banknotes|currency|coins?|rupee notes|skyline|aerial|map|maps|logo|emblem|stock photo|illustration|render|rendering|clipart|silhouette|sunset|sunrise)/i;
+
+/**
+ * How well a candidate's own text (title, tags, description) describes the story. Named entities count most
+ * (the person, body or place the headline is about), then the query's specific words, then the headline's.
+ * Returns 0 when no specific query word matches at all. A news photo needs 2 or more (strict mode): an entity
+ * plus a subject word, or every query word plus something from the headline.
+ */
+export function relevanceScore(text: string, about: { query: string; entities?: string[]; headline?: string }): number {
+  const h = text.toLowerCase();
+  const specific = queryWords(about.query).filter((w) => !GENERIC_WORDS.has(w));
+  const matched = specific.filter((w) => h.includes(w));
+  if (specific.length && !matched.length) return 0;
+  let score = specific.length ? (2 * matched.length) / specific.length : 0;
+  for (const e of about.entities ?? []) {
+    const el = e.toLowerCase().trim();
+    if (!el) continue;
+    if (h.includes(el)) score += 2;
+    else {
+      const last = el.split(/\s+/).pop()!;
+      if (last.length >= 4 && !GENERIC_WORDS.has(last) && h.includes(last)) score += 1;
+    }
+  }
+  if (about.headline) {
+    const hw = queryWords(about.headline).filter((w) => !GENERIC_WORDS.has(w) && w.length >= 4 && !specific.includes(w));
+    score += Math.min(1, 0.25 * hw.filter((w) => h.includes(w)).length);
+  }
+  if (STOCK_SUBJECTS.test(h) && !STOCK_SUBJECTS.test(about.query)) score -= 1.5;
+  return Math.round(score * 100) / 100;
+}
+
+export const STRICT_MIN_SCORE = 2;
 
 /** Files that are never a news photo: paintings, maps, diagrams, logos, scans, documents. */
 const NOT_A_PHOTO = /\b(painting|paintings|engraving|lithograph|drawing|drawings|map of|maps of|diagram|chart|logo|logos|coat of arms|emblem|seal of|scan|scanned|manuscript|document|poster|stamp|postage|screenshot|icon)\b/i;
@@ -158,6 +198,7 @@ function parseCommonsPage(page: CommonsPage, opts: { minWidth: number; allowOld?
     sourceUrl: ii.descriptionurl ?? `https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title)}`,
     url: ii.thumburl ?? ii.url,
     thumbnail: ii.thumburl ?? ii.url,
+    text: text.slice(0, 2000),
     width: ii.thumburl ? Math.min(1600, ii.width ?? 1600) : (ii.width ?? null),
     height: ii.height ?? null,
   };
@@ -297,8 +338,25 @@ export async function searchPhotos(query: string, opts: { limit?: number; minWid
  * First usable photo for a story: the Wikipedia lead photo of any named entity, then a search for the query
  * (wide, then any orientation), then the fallback query; skips candidates whose file no longer downloads.
  */
-export async function findAndImport(query: string, variant: "article" | "cover" | "photo" = "article", alt?: string, opts: { orientation?: "landscape" | "portrait" | "square"; pick?: number; fallbackQuery?: string; budgetMs?: number; /** Named people, teams, places or organisations: their Wikipedia lead photo is tried before any search. */ entities?: string[] } = {}) {
+export async function findAndImport(
+  query: string,
+  variant: "article" | "cover" | "photo" = "article",
+  alt?: string,
+  opts: {
+    orientation?: "landscape" | "portrait" | "square";
+    pick?: number;
+    fallbackQuery?: string;
+    budgetMs?: number;
+    /** Named people, teams, places or organisations: their Wikipedia lead photo is tried before any search. */
+    entities?: string[];
+    /** The story's headline, used to rank candidates (ADR-51). */
+    headline?: string;
+    /** News: only a photo that scores STRICT_MIN_SCORE against entities, query and headline; no generic fallback query; null otherwise. */
+    strict?: boolean;
+  } = {},
+) {
   const deadline = Date.now() + (opts.budgetMs ?? 25_000);
+  const about = { query, entities: opts.entities, headline: opts.headline };
   for (const name of (opts.entities ?? []).slice(0, 3)) {
     if (Date.now() > deadline) break;
     try {
@@ -311,7 +369,7 @@ export async function findAndImport(query: string, variant: "article" | "cover" 
   const attempts: Array<{ q: string; orientation?: "landscape" | "portrait" | "square"; minWidth: number }> = [
     { q: query, orientation: opts.orientation ?? "landscape", minWidth: 1000 },
     { q: query, minWidth: 800 },
-    ...(opts.fallbackQuery ? [{ q: opts.fallbackQuery, orientation: "landscape" as const, minWidth: 900 }, { q: opts.fallbackQuery, minWidth: 700 }] : []),
+    ...(opts.fallbackQuery && !opts.strict ? [{ q: opts.fallbackQuery, orientation: "landscape" as const, minWidth: 900 }, { q: opts.fallbackQuery, minWidth: 700 }] : []),
   ];
   for (const a of attempts) {
     if (Date.now() > deadline) break;
@@ -330,7 +388,13 @@ export async function findAndImport(query: string, variant: "article" | "cover" 
     }
     const used = await usedSources(results);
     const fresh = results.filter((r) => !used.has(r.sourceUrl));
-    const ordered = opts.pick ? [...fresh.slice(opts.pick), ...fresh.slice(0, opts.pick)] : fresh;
+    // Best description of the story first; in strict mode anything under the bar is not tried at all.
+    const scored = fresh
+      .map((r) => ({ r, score: relevanceScore(r.text ?? r.title, about) }))
+      .filter((x) => !opts.strict || x.score >= STRICT_MIN_SCORE)
+      .sort((a, b) => b.score - a.score)
+      .map((x) => x.r);
+    const ordered = opts.pick ? [...scored.slice(opts.pick), ...scored.slice(0, opts.pick)] : scored;
     for (const candidate of ordered.slice(0, 4)) {
       if (Date.now() > deadline) break;
       try {
