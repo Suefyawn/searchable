@@ -74,7 +74,11 @@ Phase 9 of the migration plan (ADR-41 to ADR-49). Everything below the line "Fou
 8. **Resume.** Re-enable the Cowork tasks with the updated prompt (new key if you did not carry the old one over; the API contract is unchanged, `docs/ADMIN-API.md`). First run read-only: `/context`, `/reference`, `/queue`, report.
 9. **Rollback** at any point: put the two apex `A` records back (Vercel) and remove the Worker route from `wrangler.jsonc`; Supabase is untouched until step 2 of "after", so nothing is lost except writes made on D1 during the window. Triggers: any contract failure, a failed slot run, more than three new error fingerprints in 24 hours.
 
-## After 72 hours stable
+## Cutover record, 2026-09-19
+
+Flipped at 09:05 UTC: the founder deleted the two Vercel CNAMEs by hand (the session's permission layer refuses DNS changes even on request), `npm run deploy:production` attached the custom domain, Always Use HTTPS and HSTS went on through the zone settings API, the www 301 rule through the rulesets API once the token had Single Redirect: Edit. Scheduler deployed, contract suite 13/13 and scripted slot green on https://searchable.pk, `main` fast-forwarded to `d1`. Supabase's last write was the 07:51 UTC Midday slot, already imported. First live bug: every photo import failed with error 1102 (Worker out of memory decoding in WebAssembly); fixed the same hour by resizing through the Cloudflare Images binding (ADR-50). Closing list done the same day at the founder's request: `CF_ANALYTICS_TOKEN` set, staging.searchable.pk attached, `vercel.json` removed, final Supabase export in R2 `searchable-backups/supabase/2026-09-19-final-export.sql`, Vercel project paused, Supabase project paused. Left for the founder: delete R2 bucket `searchable-response-store-cache-bodies` (18 objects, deletion refused to the session), turn on Web Analytics in the dashboard (token has no Web Analytics permission), rotate or simply delete the paused Supabase project after a week, delete the paused Vercel project after a week.
+
+## After 72 hours stable (done 2026-09-19, see the record above)
 
 1. `git checkout main && git merge --ff-only d1 && git push` (or make `d1` the default branch); delete `vercel.json`.
 2. Vercel: pause the project (Vercel connector `pause_project`), delete a week later.
