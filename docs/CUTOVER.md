@@ -7,7 +7,7 @@ Phase 9 of the migration plan (ADR-41 to ADR-49). Everything below the line "Fou
 | Piece | State |
 | --- | --- |
 | Code | branch `d1`, CI green (typecheck, lint, tests, authz guard, local D1 migrations, build). `main` is still the Vercel line. |
-| Staging | Worker `searchable` at https://searchable.sooviaan.workers.dev on D1 `searchable-staging` with production data from 2026-09-19 02:00 UTC, contract suite and scripted slot green, Turnstile live, scheduler `searchable-scheduler` running. |
+| Staging | Worker `searchable` at https://staging.searchable.pk on D1 `searchable-staging` with production data from 2026-09-19 02:00 UTC, contract suite and scripted slot green, Turnstile live, scheduler `searchable-scheduler` running. |
 | Production Worker | `searchable-production`, deployed dark at https://searchable-production.sooviaan.workers.dev. Fenced by `EMAIL_PROVIDER=none`, `JOBS_DISABLED=1`, `workers_dev: true` in `wrangler.jsonc` `env.production`. No route on searchable.pk yet. |
 | Production D1 | `searchable` (id `1a91bc6d-7826-499d-b677-e5ad6bd1e18b`), all four migrations applied, full import plus a delta up to 08:00 UTC 2026-09-19 done, search index rebuilt (678 documents). Contract suite 13/13 and the scripted slot green against the dark Worker at 08:30 UTC. |
 | Production secrets set | `ADMIN_API_KEY` (the same key the editorial tasks use today, so their prompts need no change), `BETTER_AUTH_SECRET` (new: every member signs in again once), `CRON_SECRET` (new, shared with the scheduler at deploy), `INDEXNOW_KEY` (new), `TURNSTILE_SECRET`, `RESEND_WEBHOOK_SECRET` (same as production today), `GOOGLE_SITE_VERIFICATION` (same). The new values are in the migration machine's `%TEMP%\sec-*-production.txt` files, nowhere else. |

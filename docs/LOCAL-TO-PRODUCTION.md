@@ -35,7 +35,7 @@ Secrets are set with `wrangler secret put <NAME>` (add `--env production` for pr
 ## 5. Deploy
 
 - `NEXT_PUBLIC_*` values are inlined into the browser bundle at build time from the shell (or `.env.local`), not from `wrangler.jsonc`. Build with `NEXT_PUBLIC_SITE_URL=https://staging.searchable.pk npm run build` for staging and `NEXT_PUBLIC_SITE_URL=https://searchable.pk npm run build` for production; anything the browser must read per environment is a runtime var instead (the Turnstile site key travels in a meta tag).
-- Staging: `npm run build && npm run deploy` publishes the default environment to https://searchable.sooviaan.workers.dev (custom domain staging.searchable.pk once its DNS record exists). Staging reads its own D1 and is fenced from side effects (`JOBS_DISABLED`, `EMAIL_PROVIDER=none`, `NOINDEX`).
+- Staging: `npm run build && npm run deploy` publishes the default environment to https://staging.searchable.pk (custom domain staging.searchable.pk once its DNS record exists). Staging reads its own D1 and is fenced from side effects (`JOBS_DISABLED`, `EMAIL_PROVIDER=none`, `NOINDEX`).
 - Production: `npm run deploy:production` publishes the `production` environment. Until cutover its route stays unattached; Phase 9 of the migration plan attaches `searchable.pk`.
 - Check with `curl -I`: a page answers with `cache-control` and, on a warm cache, in well under a second; `npx wrangler tail searchable --format json` shows CPU and wall time per request and any exception.
 
