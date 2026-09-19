@@ -8,6 +8,9 @@ import type { Instrumentation } from "next";
  * must never turn one error into two.
  */
 export const onRequestError: Instrumentation.onRequestError = async (err, request, context) => {
+  // Next compiles this file for its edge runtime too; that copy must not pull the database driver in (the
+  // constant is inlined at build time, so everything below is dropped from the edge bundle). Node and Workers run it.
+  if (process.env.NEXT_RUNTIME === "edge") return;
   try {
     const { getDb, schema } = await import("@/db");
     const e = err as Error & { digest?: string };
