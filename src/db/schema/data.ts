@@ -1,8 +1,8 @@
-import { date, doublePrecision, index, jsonb, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
-import { createdAt, id, updatedAt } from "./_shared";
+import { index, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { createdAt, id, json, updatedAt } from "./_shared";
 
 /** A named time series: petrol-price, usd-pkr, gold-24k-tola, sbp-policy-rate… */
-export const dataSeries = pgTable("data_series", {
+export const dataSeries = sqliteTable("data_series", {
   id: id(),
   slug: text("slug").notNull().unique(),
   name: text("name").notNull(),
@@ -11,20 +11,21 @@ export const dataSeries = pgTable("data_series", {
   description: text("description"),
   sourceName: text("source_name"),
   sourceUrl: text("source_url"),
-  meta: jsonb("meta").$type<Record<string, unknown>>().default({}).notNull(),
+  meta: json("meta").$type<Record<string, unknown>>().default({}).notNull(),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });
 
-export const dataPoints = pgTable(
+export const dataPoints = sqliteTable(
   "data_points",
   {
     id: id(),
     seriesId: text("series_id")
       .notNull()
       .references(() => dataSeries.id, { onDelete: "cascade" }),
-    date: date("date").notNull(),
-    value: doublePrecision("value").notNull(),
+    /** ISO date, YYYY-MM-DD; compared and sorted as text. */
+    date: text("date").notNull(),
+    value: real("value").notNull(),
     note: text("note"),
     sourceUrl: text("source_url"),
     createdAt: createdAt(),

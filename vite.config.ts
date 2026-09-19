@@ -29,6 +29,8 @@ export default defineConfig({
       cache: responseStoreAdapter({ mode: "self-contained" }),
     }),
     cloudflare({
+      // `vinext dev` runs on a config without the Response Store Durable Object, which the dev server cannot host.
+      configPath: process.argv.includes("dev") ? "wrangler.dev.jsonc" : undefined,
       viteEnvironment: {
         name: "rsc",
         childEnvironments: ["ssr"],

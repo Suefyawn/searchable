@@ -17,7 +17,7 @@ export const GET = withAdminApi(async (req) => {
   const db = await getDb();
   const conds = [];
   if (status !== "all") conds.push(eq(schema.businesses.status, status as (typeof schema.businessStatus.enumValues)[number]));
-  if (text) conds.push(sql`${schema.businesses.name} ilike ${"%" + text + "%"}`);
+  if (text) conds.push(sql`${schema.businesses.name} like ${"%" + text + "%"}`);
   const rows = await db.query.businesses.findMany({
     where: conds.length ? and(...conds) : undefined,
     orderBy: [desc(schema.businesses.updatedAt)],

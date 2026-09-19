@@ -23,7 +23,7 @@ export default async function AdminUser({ params }: { params: Promise<{ id: stri
   const [footprint, member, sessions, businesses, professionals, posts, orders, claims] = await Promise.all([
     userFootprint(id),
     db.query.memberProfiles.findFirst({ where: eq(schema.memberProfiles.userId, id) }),
-    db.select({ id: schema.sessions.id, userAgent: schema.sessions.userAgent, ipAddress: schema.sessions.ipAddress, updatedAt: schema.sessions.updatedAt, active: sql<boolean>`${schema.sessions.expiresAt} > now()` }).from(schema.sessions).where(eq(schema.sessions.userId, id)).orderBy(desc(schema.sessions.updatedAt)).limit(10),
+    db.select({ id: schema.sessions.id, userAgent: schema.sessions.userAgent, ipAddress: schema.sessions.ipAddress, updatedAt: schema.sessions.updatedAt, active: sql<boolean>`${schema.sessions.expiresAt} > ${Date.now()}` }).from(schema.sessions).where(eq(schema.sessions.userId, id)).orderBy(desc(schema.sessions.updatedAt)).limit(10),
     db.query.businesses.findMany({ where: eq(schema.businesses.ownerUserId, id), columns: { id: true, name: true, slug: true, status: true, isVerified: true }, limit: 20 }),
     db.query.professionals.findMany({ where: eq(schema.professionals.ownerUserId, id), columns: { id: true, name: true, slug: true, status: true }, limit: 5 }),
     db.query.posts.findMany({ where: eq(schema.posts.authorId, id), columns: { id: true, title: true, slug: true, status: true, kind: true }, orderBy: [desc(schema.posts.createdAt)], limit: 10 }),

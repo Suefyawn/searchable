@@ -1,28 +1,33 @@
-import "dotenv/config";
-import { assertDevServerStopped } from "./_guard";
 import { eq, sql } from "drizzle-orm";
-import { getDb, rawQuery, schema } from "../src/db";
-import { getAuth } from "../src/lib/auth";
-import { reindexAll } from "../src/lib/indexers";
-import { plainText } from "../src/lib/markdown";
-import { readingMinutes } from "../src/lib/format";
-import { BUSINESSES } from "./seed-data/businesses";
-import { GUIDES, type ArticleDef } from "./seed-data/guides";
-import { NEWS } from "./seed-data/news";
-import { BUSINESS_CATEGORIES, CITIES, DATA_SERIES, ENTITIES, GUIDE_CATEGORIES, NEWS_CATEGORIES, PROVINCES, SYNONYMS } from "./seed-data/reference";
+import { getDb, rawQuery, schema } from "@/db";
+import { BUSINESSES } from "@/db/seed-data/businesses";
+import { GUIDES, type ArticleDef } from "@/db/seed-data/guides";
+import { NEWS } from "@/db/seed-data/news";
+import { BUSINESS_CATEGORIES, CITIES, DATA_SERIES, ENTITIES, GUIDE_CATEGORIES, NEWS_CATEGORIES, PROVINCES, SYNONYMS } from "@/db/seed-data/reference";
+import { getAuth } from "@/lib/auth";
+import { readingMinutes } from "@/lib/format";
+import { reindexAll } from "@/lib/indexers";
+import { plainText } from "@/lib/markdown";
 
-/**
- * SEED_MODE=reference  → locations, categories, entities, synonyms, data series, tools, admin user.
- * SEED_MODE=sample     → all of the above + sample articles and businesses (default; local only).
+/*
+ * Seeding runs inside the app (POST /api/admin/jobs { job: "seed", mode, adminEmail, adminPassword }), because
+ * only the Worker holds the D1 binding. `reference`: locations, categories, entities, synonyms, data series,
+ * tools, the admin user. `sample`: all of that plus sample articles and businesses (local development only).
+ * Production data comes from scripts/export-for-d1.ts instead. The output lines are collected and returned.
  */
-const MODE = process.env.SEED_MODE === "reference" ? "reference" : "sample";
+export type SeedOptions = { mode: "reference" | "sample"; adminEmail?: string; adminPassword?: string };
+const log: string[] = [];
+const console = { log: (line: string) => log.push(line) };
 
-async function seedAdmin() {
-  const email = process.env.SEED_ADMIN_EMAIL ?? "admin@searchable.pk";
-  const local = (process.env.DATABASE_URL ?? "pglite://").startsWith("pglite://");
-  const password = process.env.SEED_ADMIN_PASSWORD ?? (local ? "searchable-admin-123" : undefined);
-  if (!password) throw new Error("Set SEED_ADMIN_PASSWORD before seeding a database that is not local PGlite.");
+async function seedAdmin(opts: SeedOptions) {
+  const email = opts.adminEmail ?? "admin@searchable.pk";
+  const password = opts.adminPassword;
   const db = await getDb();
+  if (!password) {
+    const existing = await db.query.users.findFirst({ where: eq(schema.users.email, email) });
+    if (existing) return existing.id;
+    throw new Error("Give adminPassword: no admin account exists yet.");
+  }
   const existing = await db.query.users.findFirst({ where: eq(schema.users.email, email) });
   if (existing) {
     if (existing.role !== "admin") await db.update(schema.users).set({ role: "admin" }).where(eq(schema.users.id, existing.id));
@@ -234,18 +239,19 @@ async function seedBusinesses(bcIds: Map<string, string>, cityIds: Map<string, s
 
 async function linkToolsToEntities(entityIds: Map<string, string>) {
   const db = await getDb();
-  const { TOOLS } = await import("../src/tools/registry");
+  const { TOOLS } = await import("@/tools/registry");
   for (const t of TOOLS) {
     const row = await db.query.tools.findFirst({ where: eq(schema.tools.slug, t.slug) });
     if (row) await linkEntities(entityIds, "tool", row.id, t.related?.entities);
   }
 }
 
-async function main() {
-  await assertDevServerStopped();
-  console.log(`Seeding (${MODE}) → ${process.env.DATABASE_URL ?? "pglite://./.data/pglite"}`);
+export async function runSeed(opts: SeedOptions): Promise<string[]> {
+  log.length = 0;
+  const MODE = opts.mode;
+  console.log(`Seeding (${MODE})`);
   const db = await getDb();
-  const adminId = await seedAdmin();
+  const adminId = await seedAdmin(opts);
   const { cityIds, areaIds } = await seedLocations();
   const { ids: catIds, bcIds } = await seedCategories();
   const entityIds = await seedEntities();
@@ -272,12 +278,8 @@ async function main() {
   const counts = await reindexAll();
   await linkToolsToEntities(entityIds);
   console.log(`  search index: ${JSON.stringify(counts)}`);
-  const [{ n }] = await rawQuery<{ n: number }>(db, sql`select count(*)::int as n from search_documents`);
-  console.log(`✓ seed complete, ${n} search documents`);
-  process.exit(0);
+  const [{ n }] = await rawQuery<{ n: number }>(db, sql`select count(*) as n from search_documents`);
+  console.log(`seed complete, ${n} search documents`);
+  return log;
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});

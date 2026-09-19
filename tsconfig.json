@@ -37,5 +37,5 @@
   ],
   "exclude": [
     "node_modules",
-    ".data", ".next/types/validator.ts"]
+    ".data", ".next/types/validator.ts", ".next/dev/types/validator.ts"]
 }

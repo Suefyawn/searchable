@@ -26,11 +26,11 @@ export default async function AdminCommunity({ searchParams }: { searchParams: P
   const [counts] = await rawQuery<Record<string, number>>(
     db,
     sql`select
-      (select count(*) from posts where status = 'pending')::int as posts,
-      (select count(*) from posts where status = 'published')::int as published,
-      (select count(*) from comments where status in ('pending', 'published') and created_at > now() - interval '7 days')::int as comments,
-      (select count(*) from reports where status = 'open' and target_type in ('post', 'comment', 'member'))::int as reported,
-      (select count(*) from member_profiles)::int as members`,
+      (select count(*) from posts where status = 'pending') as posts,
+      (select count(*) from posts where status = 'published') as published,
+      (select count(*) from comments where status in ('pending', 'published') and created_at > ${Date.now() - 7 * 86_400_000}) as comments,
+      (select count(*) from reports where status = 'open' and target_type in ('post', 'comment', 'member')) as reported,
+      (select count(*) from member_profiles) as members`,
   );
 
   return (

@@ -97,14 +97,14 @@ export async function sendActivityDigests(): Promise<{ sent: number }> {
 
   // Comments on my posts (not my own comments).
   const postComments = await rawQuery<{ author_id: string; title: string; slug: string; n: number }>(db, sql`
-    select p.author_id, p.title, p.slug, count(*)::int as n from comments c join posts p on p.id = c.target_id
+    select p.author_id, p.title, p.slug, count(*) as n from comments c join posts p on p.id = c.target_id
     where c.target_type = 'post' and c.status = 'published' and c.created_at > ${since} and c.author_id <> p.author_id and c.parent_id is null
     group by p.author_id, p.title, p.slug`);
   for (const r of postComments) push(r.author_id, { text: `${r.n} new comment${r.n === 1 ? "" : "s"} on "${r.title}"`, url: `/community/post/${r.slug}#comments` });
 
   // Replies to my comments.
   const replies = await rawQuery<{ author_id: string; target_type: string; target_id: string; n: number }>(db, sql`
-    select parent.author_id, parent.target_type, parent.target_id, count(*)::int as n from comments c join comments parent on parent.id = c.parent_id
+    select parent.author_id, parent.target_type, parent.target_id, count(*) as n from comments c join comments parent on parent.id = c.parent_id
     where c.status = 'published' and c.created_at > ${since} and c.author_id <> parent.author_id
     group by parent.author_id, parent.target_type, parent.target_id`);
   const postIds = replies.filter((r) => r.target_type === "post").map((r) => r.target_id);
@@ -123,13 +123,13 @@ export async function sendActivityDigests(): Promise<{ sent: number }> {
 
   // Likes on my posts.
   const likes = await rawQuery<{ author_id: string; title: string; slug: string; n: number }>(db, sql`
-    select p.author_id, p.title, p.slug, count(*)::int as n from reactions r join posts p on p.id = r.target_id
+    select p.author_id, p.title, p.slug, count(*) as n from reactions r join posts p on p.id = r.target_id
     where r.target_type = 'post' and r.created_at > ${since} and r.user_id <> p.author_id group by p.author_id, p.title, p.slug`);
   for (const r of likes) push(r.author_id, { text: `${r.n} like${r.n === 1 ? "" : "s"} on "${r.title}"`, url: `/community/post/${r.slug}` });
 
   // Bids on my auctions.
   const bids = await rawQuery<{ author_id: string; title: string; slug: string; n: number; top: number }>(db, sql`
-    select p.author_id, p.title, p.slug, count(*)::int as n, max(b.amount)::int as top from bids b join posts p on p.id = b.post_id
+    select p.author_id, p.title, p.slug, count(*) as n, max(b.amount) as top from bids b join posts p on p.id = b.post_id
     where b.created_at > ${since} group by p.author_id, p.title, p.slug`);
   for (const r of bids) push(r.author_id, { text: `${r.n} new bid${r.n === 1 ? "" : "s"} on "${r.title}", highest ${pkr(r.top)}`, url: `/community/post/${r.slug}` });
 

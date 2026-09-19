@@ -34,42 +34,42 @@ export default async function AdminSystem() {
     db.query.settings.findFirst({ where: eq(schema.settings.key, "ingest:last") }),
     db.query.settings.findFirst({ where: eq(schema.settings.key, "email:budget") }),
     emailAllowance("transactional"),
-    rawQuery<{ db: string }>(db, sql`select pg_size_pretty(pg_database_size(current_database())) as db`).catch(() => [{ db: "n/a" }]),
+    rawQuery<{ bytes: number }>(db, sql`select page_count * page_size as bytes from pragma_page_count(), pragma_page_size()`).catch(() => [{ bytes: NaN }]),
     rawQuery<Record<string, number>>(
       db,
       sql`select
-        (select count(*) from search_documents)::int as search_documents,
-        (select count(*) from search_queries)::int as search_queries,
-        (select count(*) from analytics_events)::int as analytics_events,
-        (select count(*) from media)::int as media,
-        (select coalesce(sum(bytes), 0) from media)::bigint as media_bytes,
-        (select count(*) from data_points)::int as data_points,
-        (select count(*) from sessions)::int as sessions`,
+        (select count(*) from search_documents) as search_documents,
+        (select count(*) from search_queries) as search_queries,
+        (select count(*) from analytics_events) as analytics_events,
+        (select count(*) from media) as media,
+        (select coalesce(sum(bytes), 0) from media) as media_bytes,
+        (select count(*) from data_points) as data_points,
+        (select count(*) from sessions) as sessions`,
     ),
     db.query.settings.findFirst({ where: eq(schema.settings.key, "seed:sample") }),
-    rawQuery<{ today: number; week: number; errors_today: number; last_at: string | null }>(
+    rawQuery<{ today: number; week: number; errors_today: number; last_at: number | null }>(
       db,
       sql`select
-        count(*) filter (where created_at > now() - interval '1 day')::int as today,
-        count(*) filter (where created_at > now() - interval '7 days')::int as week,
-        count(*) filter (where created_at > now() - interval '1 day' and (props->>'status')::int >= 400)::int as errors_today,
-        max(created_at)::text as last_at
+        sum(case when created_at > ${Date.now() - 86_400_000} then 1 else 0 end) as today,
+        sum(case when created_at > ${Date.now() - 7 * 86_400_000} then 1 else 0 end) as week,
+        sum(case when created_at > ${Date.now() - 86_400_000} and json_extract(props, '$.status') >= 400 then 1 else 0 end) as errors_today,
+        max(created_at) as last_at
         from analytics_events where name = 'admin_api'`,
     ).then((r) => r[0]),
-    rawQuery<{ path: string; method: string; status: number; ms: number; at: string }>(db, sql`select path, props->>'method' as method, (props->>'status')::int as status, (props->>'ms')::int as ms, created_at::text as at from analytics_events where name = 'admin_api' order by created_at desc limit 12`),
-    rawQuery<{ path: string; message: string; digest: string | null; route: string | null; source: string; n: number; last_at: string }>(
+    rawQuery<{ path: string; method: string; status: number; ms: number; at: number }>(db, sql`select path, json_extract(props, '$.method') as method, json_extract(props, '$.status') as status, json_extract(props, '$.ms') as ms, created_at as at from analytics_events where name = 'admin_api' order by created_at desc limit 12`),
+    rawQuery<{ path: string; message: string; digest: string | null; route: string | null; source: string; n: number; last_at: number }>(
       db,
-      sql`select path, props->>'message' as message, props->>'digest' as digest, props->>'routePath' as route, coalesce(props->>'source', 'server') as source, count(*)::int as n, max(created_at)::text as last_at
-        from analytics_events where name = 'error' and created_at > now() - interval '1 day'
-        group by path, props->>'message', props->>'digest', props->>'routePath', coalesce(props->>'source', 'server') order by max(created_at) desc limit 20`,
+      sql`select path, json_extract(props, '$.message') as message, json_extract(props, '$.digest') as digest, json_extract(props, '$.routePath') as route, coalesce(json_extract(props, '$.source'), 'server') as source, count(*) as n, max(created_at) as last_at
+        from analytics_events where name = 'error' and created_at > ${Date.now() - 86_400_000}
+        group by path, json_extract(props, '$.message'), json_extract(props, '$.digest'), json_extract(props, '$.routePath'), coalesce(json_extract(props, '$.source'), 'server') order by max(created_at) desc limit 20`,
     ),
-    rawQuery<{ today: number; week: number }>(db, sql`select count(*) filter (where created_at > now() - interval '1 day')::int as today, count(*) filter (where created_at > now() - interval '7 days')::int as week from analytics_events where name = 'error'`).then((r) => r[0]),
+    rawQuery<{ today: number; week: number }>(db, sql`select sum(case when created_at > ${Date.now() - 86_400_000} then 1 else 0 end) as today, sum(case when created_at > ${Date.now() - 7 * 86_400_000} then 1 else 0 end) as week from analytics_events where name = 'error'`).then((r) => r[0]),
   ]);
   const sample = sampleRow?.value as SampleSeed | undefined;
   const sampleLive = sample
     ? {
-        articles: sample.articles.length ? (await db.select({ n: sql<number>`count(*)::int` }).from(schema.articles).where(inArray(schema.articles.slug, sample.articles)))[0]?.n ?? 0 : 0,
-        businesses: sample.businesses.length ? (await db.select({ n: sql<number>`count(*)::int` }).from(schema.businesses).where(inArray(schema.businesses.slug, sample.businesses)))[0]?.n ?? 0 : 0,
+        articles: sample.articles.length ? (await db.select({ n: sql<number>`count(*)` }).from(schema.articles).where(inArray(schema.articles.slug, sample.articles)))[0]?.n ?? 0 : 0,
+        businesses: sample.businesses.length ? (await db.select({ n: sql<number>`count(*)` }).from(schema.businesses).where(inArray(schema.businesses.slug, sample.businesses)))[0]?.n ?? 0 : 0,
       }
     : { articles: 0, businesses: 0 };
   const j = jobs?.value as { at?: string } | undefined;
@@ -133,7 +133,7 @@ export default async function AdminSystem() {
         <Section title="Database" description="Supabase Free: 500 MB. Analytics older than 90 days and search logs older than 180 days are pruned daily.">
           <Details
             items={[
-              { label: "Size", value: sizes?.db ?? "n/a" },
+              { label: "Size", value: sizes && Number.isFinite(Number(sizes.bytes)) ? `${(Number(sizes.bytes) / 1_048_576).toFixed(1)} MB` : "n/a" },
               { label: "Search documents", value: (rows?.search_documents ?? 0).toLocaleString() },
               { label: "Search log rows", value: (rows?.search_queries ?? 0).toLocaleString() },
               { label: "Analytics events", value: (rows?.analytics_events ?? 0).toLocaleString() },
@@ -149,7 +149,7 @@ export default async function AdminSystem() {
               { label: "Key", value: process.env.ADMIN_API_KEY ? "set" : "not set (API refuses everything)" },
               { label: "Writes today", value: `${api?.today ?? 0}${api?.errors_today ? ` (${api.errors_today} failed)` : ""}` },
               { label: "Writes, 7 days", value: (api?.week ?? 0).toLocaleString() },
-              { label: "Last write", value: api?.last_at ? timeAgo(api.last_at) : "never" },
+              { label: "Last write", value: api?.last_at ? timeAgo(new Date(api.last_at)) : "never" },
             ]}
           />
           {apiCalls.length ? (
@@ -160,7 +160,7 @@ export default async function AdminSystem() {
                   <span className="min-w-0 flex-1 truncate font-mono text-[12.5px]">{c.path.replace("/api/admin", "")}</span>
                   <span className={c.status >= 400 ? "font-semibold" : "text-2"}>{c.status}</span>
                   <span className="tabular text-3">{c.ms} ms</span>
-                  <span className="text-3">{timeAgo(c.at)}</span>
+                  <span className="text-3">{timeAgo(new Date(c.at))}</span>
                 </li>
               ))}
             </ul>
@@ -181,7 +181,7 @@ export default async function AdminSystem() {
                     <span className="min-w-0 flex-1 truncate font-mono text-[12.5px]">{e.path}</span>
                     <span className="text-3">{e.source}</span>
                     <span className="tabular font-semibold">{e.n}×</span>
-                    <span className="text-3">{timeAgo(e.last_at)}</span>
+                    <span className="text-3">{timeAgo(new Date(e.last_at))}</span>
                   </div>
                   <p className="mt-0.5 text-2">
                     {e.message}

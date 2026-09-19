@@ -1,14 +1,12 @@
-import "dotenv/config";
-import { assertDevServerStopped } from "./_guard";
-import { reindexAll } from "../src/lib/indexers";
+import { adminPost } from "./_api";
 
-assertDevServerStopped()
-  .then(() => reindexAll())
-  .then((counts) => {
-    console.log("✓ reindexed", counts);
-    process.exit(0);
-  })
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+/** Rebuilds the search index of the running instance (BASE_URL, default http://localhost:3000) through the admin API. */
+async function main() {
+  const out = (await adminPost("/jobs", { job: "reindex" })) as { counts: Record<string, number> };
+  console.log(`✓ reindexed: ${JSON.stringify(out.counts)}`);
+  process.exit(0);
+}
+main().catch((e) => {
+  console.error(e.message ?? e);
+  process.exit(1);
+});

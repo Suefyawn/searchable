@@ -17,7 +17,7 @@ export default async function AdminOrders({ searchParams }: { searchParams: Prom
   const [orders, totals] = await Promise.all([
     db.query.orders.findMany({ where: status ? eq(schema.orders.status, status as "pending") : undefined, orderBy: [desc(schema.orders.createdAt)], limit: 200, with: { business: { columns: { name: true, slug: true } }, professional: { columns: { name: true, slug: true } } } }),
     db
-      .select({ status: schema.orders.status, n: sql<number>`count(*)::int`, sum: sql<number>`coalesce(sum(${schema.orders.amountPkr}),0)::int`, month: sql<number>`coalesce(sum(case when ${schema.orders.paidAt} > now() - interval '30 days' then ${schema.orders.amountPkr} else 0 end),0)::int` })
+      .select({ status: schema.orders.status, n: sql<number>`count(*)`, sum: sql<number>`coalesce(sum(${schema.orders.amountPkr}),0)`, month: sql<number>`coalesce(sum(case when ${schema.orders.paidAt} > ${Date.now() - 30 * 86_400_000} then ${schema.orders.amountPkr} else 0 end),0)` })
       .from(schema.orders)
       .groupBy(schema.orders.status),
   ]);

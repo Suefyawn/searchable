@@ -9,9 +9,9 @@ export default async function AdminSubscribers() {
   const db = await getDb();
   const [rows, byStatus, byTopic, byFreq] = await Promise.all([
     db.query.newsletterSubscribers.findMany({ orderBy: [desc(schema.newsletterSubscribers.createdAt)], limit: 200 }),
-    rawQuery<{ status: string; n: number }>(db, sql`select status, count(*)::int as n from newsletter_subscribers group by status`),
-    rawQuery<{ topic: string; n: number }>(db, sql`select t as topic, count(*)::int as n from newsletter_subscribers, jsonb_array_elements_text(topics) as t where status = 'active' group by t order by n desc`),
-    rawQuery<{ frequency: string; n: number }>(db, sql`select frequency, count(*)::int as n from newsletter_subscribers where status = 'active' group by frequency`),
+    rawQuery<{ status: string; n: number }>(db, sql`select status, count(*) as n from newsletter_subscribers group by status`),
+    rawQuery<{ topic: string; n: number }>(db, sql`select t.value as topic, count(*) as n from newsletter_subscribers, json_each(topics) as t where status = 'active' group by t.value order by n desc`),
+    rawQuery<{ frequency: string; n: number }>(db, sql`select frequency, count(*) as n from newsletter_subscribers where status = 'active' group by frequency`),
   ]);
   const n = (s: string) => byStatus.find((x) => x.status === s)?.n ?? 0;
   const daily = byFreq.find((f) => f.frequency === "daily")?.n ?? 0;

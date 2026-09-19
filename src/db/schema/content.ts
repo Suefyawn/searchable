@@ -1,21 +1,10 @@
-import {
-  boolean,
-  index,
-  integer,
-  jsonb,
-  pgEnum,
-  pgTable,
-  primaryKey,
-  text,
-  timestamp,
-  uniqueIndex,
-} from "drizzle-orm/pg-core";
-import { createdAt, id, updatedAt } from "./_shared";
+import { check, index, integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { bool, createdAt, enumCheckSql, enumColumn, id, json, textEnum, timestampMs, updatedAt } from "./_shared";
 import { users } from "./auth";
 import { locations } from "./geo";
 
-export const articleKind = pgEnum("article_kind", ["news", "guide", "explainer", "page"]);
-export const articleStatus = pgEnum("article_status", [
+export const articleKind = textEnum("article_kind", ["news", "guide", "explainer", "page"]);
+export const articleStatus = textEnum("article_status", [
   "draft",
   "research",
   "editing",
@@ -26,11 +15,11 @@ export const articleStatus = pgEnum("article_status", [
 ]);
 
 /** Categories are scoped by kind so /news/technology and /guides/technology can coexist. */
-export const categories = pgTable(
+export const categories = sqliteTable(
   "categories",
   {
     id: id(),
-    kind: articleKind("kind").notNull(),
+    kind: enumColumn("kind", articleKind).notNull(),
     slug: text("slug").notNull(),
     name: text("name").notNull(),
     description: text("description"),
@@ -38,10 +27,10 @@ export const categories = pgTable(
     sortOrder: integer("sort_order").default(0).notNull(),
     createdAt: createdAt(),
   },
-  (t) => [uniqueIndex("categories_kind_slug_idx").on(t.kind, t.slug)],
+  (t) => [uniqueIndex("categories_kind_slug_idx").on(t.kind, t.slug), check("categories_kind_check", enumCheckSql("kind", articleKind))],
 );
 
-export const authors = pgTable("authors", {
+export const authors = sqliteTable("authors", {
   id: id(),
   userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
   slug: text("slug").notNull().unique(),
@@ -54,12 +43,12 @@ export const authors = pgTable("authors", {
 export type ArticleSource = { title: string; url?: string; publisher?: string; date?: string };
 export type ArticleFaq = { question: string; answer: string };
 
-export const articles = pgTable(
+export const articles = sqliteTable(
   "articles",
   {
     id: id(),
-    kind: articleKind("kind").notNull(),
-    status: articleStatus("status").default("draft").notNull(),
+    kind: enumColumn("kind", articleKind).notNull(),
+    status: enumColumn("status", articleStatus).default("draft").notNull(),
     slug: text("slug").notNull(),
     title: text("title").notNull(),
     dek: text("dek"),
@@ -75,25 +64,25 @@ export const articles = pgTable(
     /** Attribution line for openly licensed photos, e.g. "Kamran Aslam / Wikimedia Commons, CC BY-SA 4.0". */
     featuredImageCredit: text("featured_image_credit"),
     featuredImageSourceUrl: text("featured_image_source_url"),
-    sources: jsonb("sources").$type<ArticleSource[]>().default([]).notNull(),
+    sources: json("sources").$type<ArticleSource[]>().default([]).notNull(),
     /** Hand-picked related article ids (shown before automatic same-category picks). */
-    relatedIds: jsonb("related_ids").$type<string[]>().default([]).notNull(),
-    faqs: jsonb("faqs").$type<ArticleFaq[]>().default([]).notNull(),
+    relatedIds: json("related_ids").$type<string[]>().default([]).notNull(),
+    faqs: json("faqs").$type<ArticleFaq[]>().default([]).notNull(),
     seoTitle: text("seo_title"),
     seoDescription: text("seo_description"),
     /** Paid / sponsored content: disclosure shown, outbound links rel="sponsored". */
-    isSponsored: boolean("is_sponsored").default(false).notNull(),
+    isSponsored: bool("is_sponsored").default(false).notNull(),
     /** Guest contributor byline when the author is not a staff author. */
     contributorName: text("contributor_name"),
     contributorBio: text("contributor_bio"),
     canonicalUrl: text("canonical_url"),
-    noindex: boolean("noindex").default(false).notNull(),
-    isFeatured: boolean("is_featured").default(false).notNull(),
+    noindex: bool("noindex").default(false).notNull(),
+    isFeatured: bool("is_featured").default(false).notNull(),
     readingMinutes: integer("reading_minutes"),
     viewCount: integer("view_count").default(0).notNull(),
-    publishedAt: timestamp("published_at", { withTimezone: true }),
-    scheduledFor: timestamp("scheduled_for", { withTimezone: true }),
-    lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
+    publishedAt: timestampMs("published_at"),
+    scheduledFor: timestampMs("scheduled_for"),
+    lastReviewedAt: timestampMs("last_reviewed_at"),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -101,16 +90,18 @@ export const articles = pgTable(
     uniqueIndex("articles_kind_slug_idx").on(t.kind, t.slug),
     index("articles_status_published_idx").on(t.status, t.publishedAt),
     index("articles_category_idx").on(t.categoryId),
+    check("articles_kind_check", enumCheckSql("kind", articleKind)),
+    check("articles_status_check", enumCheckSql("status", articleStatus)),
   ],
 );
 
-export const tags = pgTable("tags", {
+export const tags = sqliteTable("tags", {
   id: id(),
   slug: text("slug").notNull().unique(),
   name: text("name").notNull(),
 });
 
-export const articleTags = pgTable(
+export const articleTags = sqliteTable(
   "article_tags",
   {
     articleId: text("article_id")
@@ -124,7 +115,7 @@ export const articleTags = pgTable(
 );
 
 /** Every publish snapshots the article so corrections are auditable. */
-export const articleRevisions = pgTable(
+export const articleRevisions = sqliteTable(
   "article_revisions",
   {
     id: id(),

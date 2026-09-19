@@ -46,13 +46,13 @@ async function getPostRaw(slug: string) {
 
 export async function postCounts(): Promise<Record<string, number>> {
   const db = await getDb();
-  const rows = await rawQuery<{ kind: string; n: number }>(db, sql`select kind, count(*)::int as n from posts where status = 'published' group by kind`);
+  const rows = await rawQuery<{ kind: string; n: number }>(db, sql`select kind, count(*) as n from posts where status = 'published' group by kind`);
   return Object.fromEntries(rows.map((r) => [r.kind, Number(r.n)]));
 }
 
 export async function postTopics(kind?: PostKindKey, limit = 12) {
   const db = await getDb();
-  return rawQuery<{ topic: string; n: number }>(db, sql`select topic, count(*)::int as n from posts where status = 'published' and topic is not null and topic <> '' ${kind ? sql`and kind = ${kind}` : sql``} group by topic order by n desc limit ${limit}`);
+  return rawQuery<{ topic: string; n: number }>(db, sql`select topic, count(*) as n from posts where status = 'published' and topic is not null and topic <> '' ${kind ? sql`and kind = ${kind}` : sql``} group by topic order by n desc limit ${limit}`);
 }
 
 /* ───────────── Comments ───────────── */
@@ -154,7 +154,7 @@ export async function closeExpiredPosts(): Promise<number> {
   const rows = await db
     .update(schema.posts)
     .set({ status: "closed" })
-    .where(and(eq(schema.posts.status, "published"), or(lt(schema.posts.expiresAt, now), and(eq(schema.posts.kind, "auction"), sql`(meta->>'endsAt')::timestamptz < now()`))))
+    .where(and(eq(schema.posts.status, "published"), or(lt(schema.posts.expiresAt, now), and(eq(schema.posts.kind, "auction"), sql`json_extract(meta, '$.endsAt') < ${now.toISOString()}`))))
     .returning({ id: schema.posts.id });
   for (const r of rows) await removeSearchDocument("post", r.id);
   return rows.length;

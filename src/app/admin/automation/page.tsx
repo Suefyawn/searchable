@@ -14,16 +14,16 @@ export default async function AutomationPage() {
   const [reports, backlog, api, calls] = await Promise.all([
     readReports(),
     readBacklog(),
-    rawQuery<{ today: number; week: number; errors_today: number; last_at: string | null }>(
+    rawQuery<{ today: number; week: number; errors_today: number; last_at: number | null }>(
       db,
       sql`select
-        count(*) filter (where created_at > now() - interval '1 day')::int as today,
-        count(*) filter (where created_at > now() - interval '7 days')::int as week,
-        count(*) filter (where created_at > now() - interval '1 day' and (props->>'status')::int >= 400)::int as errors_today,
-        max(created_at)::text as last_at
+        sum(case when created_at > ${Date.now() - 86_400_000} then 1 else 0 end) as today,
+        sum(case when created_at > ${Date.now() - 7 * 86_400_000} then 1 else 0 end) as week,
+        sum(case when created_at > ${Date.now() - 86_400_000} and json_extract(props, '$.status') >= 400 then 1 else 0 end) as errors_today,
+        max(created_at) as last_at
         from analytics_events where name = 'admin_api'`,
     ).then((r) => r[0]),
-    rawQuery<{ path: string; method: string; status: number; ms: number; at: string }>(db, sql`select path, props->>'method' as method, (props->>'status')::int as status, (props->>'ms')::int as ms, created_at::text as at from analytics_events where name = 'admin_api' order by created_at desc limit 25`),
+    rawQuery<{ path: string; method: string; status: number; ms: number; at: number }>(db, sql`select path, json_extract(props, '$.method') as method, json_extract(props, '$.status') as status, json_extract(props, '$.ms') as ms, created_at as at from analytics_events where name = 'admin_api' order by created_at desc limit 25`),
   ]);
   const open = backlog.filter((b) => b.status === "open").length;
   const done = backlog.filter((b) => b.status === "done").length;
@@ -57,7 +57,7 @@ export default async function AutomationPage() {
               { label: "Key", value: process.env.ADMIN_API_KEY ? "set" : "not set (API refuses everything)" },
               { label: "Writes today", value: `${api?.today ?? 0}${api?.errors_today ? ` (${api.errors_today} failed)` : ""}` },
               { label: "Writes, 7 days", value: (api?.week ?? 0).toLocaleString() },
-              { label: "Last write", value: api?.last_at ? timeAgo(api.last_at) : "never" },
+              { label: "Last write", value: api?.last_at ? timeAgo(new Date(api.last_at)) : "never" },
               { label: "Backlog", value: `${open} open · ${done} done` },
             ]}
           />
@@ -69,7 +69,7 @@ export default async function AutomationPage() {
                   <span className="w-12 font-mono text-[11.5px] text-3">{c.method}</span>
                   <span className="min-w-0 flex-1 truncate font-mono text-[12px]">{c.path.replace("/api/admin", "")}</span>
                   <span className={c.status >= 400 ? "font-semibold" : "text-2"}>{c.status}</span>
-                  <span className="text-3">{timeAgo(c.at)}</span>
+                  <span className="text-3">{timeAgo(new Date(c.at))}</span>
                 </li>
               ))}
               {calls.length === 0 ? <li className="py-3 text-2">No calls yet.</li> : null}

@@ -17,7 +17,7 @@ export default async function IssuePage({ params }: { params: Promise<{ id: stri
   const issue = await db.query.newsletterIssues.findFirst({ where: eq(schema.newsletterIssues.id, id) });
   if (!issue) notFound();
   const [{ n }] = await db
-    .select({ n: sql<number>`count(*)::int` })
+    .select({ n: sql<number>`count(*)` })
     .from(schema.newsletterSubscribers)
     .where(and(eq(schema.newsletterSubscribers.status, "active"), eq(schema.newsletterSubscribers.frequency, issue.frequency)));
   const previewHtml = renderIssueHtml(issue, { unsubscribeUrl: `${SITE.url}/newsletter/unsubscribe?token=preview`, manageUrl: `${SITE.url}/newsletter/manage?token=preview` });

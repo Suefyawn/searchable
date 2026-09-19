@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
+import { alias } from "drizzle-orm/sqlite-core";
 import { getDb, schema } from "@/db";
 
 export async function listBusinessCategories(opts: { topLevelOnly?: boolean } = {}) {
@@ -27,7 +27,7 @@ export async function categoryCounts(cityId?: string, areaId?: string) {
       namePlural: schema.businessCategories.namePlural,
       icon: schema.businessCategories.icon,
       imageUrl: schema.businessCategories.imageUrl,
-      count: sql<number>`count(${schema.businesses.id})::int`,
+      count: sql<number>`count(${schema.businesses.id})`,
     })
     .from(schema.businessCategories)
     .leftJoin(
@@ -43,7 +43,7 @@ export async function categoryCounts(cityId?: string, areaId?: string) {
 export async function areaCounts(cityId: string, categoryId?: string) {
   const db = await getDb();
   return db
-    .select({ id: schema.locations.id, slug: schema.locations.slug, name: schema.locations.name, count: sql<number>`count(${schema.businesses.id})::int` })
+    .select({ id: schema.locations.id, slug: schema.locations.slug, name: schema.locations.name, count: sql<number>`count(${schema.businesses.id})` })
     .from(schema.locations)
     .innerJoin(schema.businesses, and(eq(schema.businesses.areaId, schema.locations.id), eq(schema.businesses.status, "active"), categoryId ? eq(schema.businesses.primaryCategoryId, categoryId) : undefined))
     .where(and(eq(schema.locations.kind, "area"), eq(schema.locations.cityId, cityId)))
@@ -59,7 +59,7 @@ export async function cityCountsForCategory(categoryId: string) {
       id: schema.locations.id,
       slug: schema.locations.slug,
       name: schema.locations.name,
-      count: sql<number>`count(${schema.businesses.id})::int`,
+      count: sql<number>`count(${schema.businesses.id})`,
     })
     .from(schema.businesses)
     .innerJoin(schema.locations, eq(schema.businesses.cityId, schema.locations.id))
@@ -148,7 +148,7 @@ export async function countBusinesses(opts: { categoryId?: string; cityId?: stri
   if (opts.categoryId) conds.push(eq(schema.businesses.primaryCategoryId, opts.categoryId));
   if (opts.cityId) conds.push(eq(schema.businesses.cityId, opts.cityId));
   if (opts.areaId) conds.push(eq(schema.businesses.areaId, opts.areaId));
-  const [row] = await db.select({ n: sql<number>`count(*)::int` }).from(schema.businesses).where(and(...conds));
+  const [row] = await db.select({ n: sql<number>`count(*)` }).from(schema.businesses).where(and(...conds));
   return row?.n ?? 0;
 }
 

@@ -23,9 +23,9 @@ export default async function BusinessDashboard() {
   const clicks = ids30.length
     ? await rawQuery<{ business_id: string; kind: string; n: number }>(
         db,
-        sql`select props->>'businessId' as business_id, props->>'kind' as kind, count(*)::int as n
-            from analytics_events where name = 'business_click' and created_at > now() - interval '30 days'
-            and props->>'businessId' in (${sql.join(ids30.map((i) => sql`${i}`), sql`, `)}) group by 1, 2`,
+        sql`select json_extract(props, '$.businessId') as business_id, json_extract(props, '$.kind') as kind, count(*) as n
+            from analytics_events where name = 'business_click' and created_at > ${Date.now() - 30 * 86_400_000}
+            and json_extract(props, '$.businessId') in (${sql.join(ids30.map((i) => sql`${i}`), sql`, `)}) group by 1, 2`,
       )
     : [];
   const clicksFor = (id: string) => clicks.filter((c) => c.business_id === id);

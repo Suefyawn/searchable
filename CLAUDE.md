@@ -3,23 +3,23 @@
 Read `SEARCHABLE_MASTER_SPEC.md` first. Then the doc for the area you are touching in `docs/`.
 
 ## Stack
-Next.js 16 (App Router, RSC, Server Actions) · TypeScript strict · Tailwind v4 · Drizzle ORM · Postgres (PGlite locally via `DATABASE_URL=pglite://…`, Supabase in prod) · better-auth · Zod 4 · npm.
+Next.js 16 (App Router, RSC, Server Actions) on Cloudflare Workers via vinext · TypeScript strict · Tailwind v4 · Drizzle ORM · Cloudflare D1 (SQLite; wrangler's local D1 in development) · R2 · better-auth · Zod 4 · npm.
 
 ## Commands
 ```
-npm run dev            # http://localhost:3000
-npm run db:migrate     # apply drizzle/ migrations to DATABASE_URL
-npm run db:generate    # generate a migration after editing src/db/schema
-npm run db:seed        # seed reference + sample data
-npm run db:reset       # wipe .data/pglite, migrate, seed
-npm run search:reindex # rebuild search_documents
-npm test              # pure-function checks, no database (calculators, slugs, markdown, webhook signatures, no em dashes)
+npm run dev            # vinext dev server with a local D1, http://localhost:3000 (needs .dev.vars, see docs/LOCAL-TO-PRODUCTION.md)
+npm run db:migrate     # apply migrations/ to the local D1 (db:migrate:staging, db:migrate:production for the remote ones)
+npm run db:generate    # generate a migration after editing src/db/schema (hand-written SQL such as FTS goes in its own numbered file)
+npm run db:seed        # reference + sample data through the admin API of the running dev server (SEED_MODE, SEED_ADMIN_*)
+npm run search:reindex # rebuild the search index through the admin API of the running instance (BASE_URL)
+npm run db:export      # Supabase -> .data/export.sql for the content migration (DATABASE_URL); -- --verify <db> compares
+npm test              # pure-function checks, no database (calculators, slugs, markdown, webhook signatures, WebP headers, no em dashes)
 npm run typecheck && npm run lint && npm run build
-npm run build:vinext   # Cloudflare Workers build (dist/); npm run start:vinext runs it under wrangler dev
+npm run deploy         # staging Worker; npm run deploy:production for the production environment
 ```
 
 ## Rules
-1. **Schema changes:** edit `src/db/schema/*.ts` → `npm run db:generate` → commit the SQL in `drizzle/` → `npm run db:migrate`. Never hand-edit generated SQL; never use `db:push` against production.
+1. **Schema changes:** edit `src/db/schema/*.ts` (sqlite-core; enums via `textEnum`/`enumColumn` plus a CHECK, JSON via `json()`, timestamps via `timestampMs()`, see `docs/schema-notes.md`) → `npm run db:generate` → commit the SQL in `migrations/` → `npm run db:migrate`. Never hand-edit generated SQL. Raw SQL is SQLite: no casts, epoch-millisecond timestamps, `json_extract` for JSON.
 2. **Data access** only through `src/db` + `src/lib/*` query functions (public pages; an admin page may run its own Drizzle query for a one-off listing). Server Components read; Server Actions write; Zod-validate every action input; guard with `requireRole()`. Export only actions from a `"use server"` file: every export there is a public endpoint.
 3. **Search:** any create/update/delete of an article, tool, business, location, or entity must call `syncSearchDocument()` / `removeSearchDocument()` from `src/lib/search.ts`.
 4. **New tool:** add `src/tools/calculators/<slug>.ts` implementing `ToolDefinition`, register it in `src/tools/registry.ts`, add rate data under `src/tools/data/` with `effectiveFrom` and `source`. Run `npm run db:seed` to mirror metadata into the `tools` table.

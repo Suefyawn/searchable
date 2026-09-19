@@ -1,6 +1,6 @@
 # Database
 
-Postgres, managed by Drizzle. Schema lives in `src/db/schema/*.ts`; generated SQL in `drizzle/`. All primary keys are `text` UUIDs so polymorphic references (`entity_links`, `search_documents`) share one type. Timestamps are `timestamptz`.
+Cloudflare D1 (SQLite), managed by Drizzle (ADR-45; every Postgres-to-SQLite translation is in `schema-notes.md`). Schema lives in `src/db/schema/*.ts`; generated SQL in `migrations/`, applied with `npm run db:migrate` (local), `db:migrate:staging` or `db:migrate:production`. All primary keys are `text` UUIDs so polymorphic references (`entity_links`, `search_documents`) share one type; `search_documents` also carries an integer `seq` for its FTS5 index. Timestamps are integer epoch milliseconds, JSON is text, enums are text with CHECK constraints.
 
 ```
 src/db/schema/
@@ -14,7 +14,7 @@ src/db/schema/
   data.ts        data_series · data_points
   newsletter.ts  newsletter_subscribers · newsletter_issues
   search.ts      search_documents · search_queries · search_synonyms
-  platform.ts    redirects · media · analytics_events · settings · reports · messages · inbox_messages
+  platform.ts    redirects · media · analytics_events · settings · reports · messages · inbox_messages · automation_reports
   professionals.ts  professionals · professional_leads · professional_reviews
   community.ts   member_profiles · posts · bids · comments · reactions · saved_items
   commerce.ts    orders · submissions

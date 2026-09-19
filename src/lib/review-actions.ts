@@ -19,7 +19,7 @@ const ReviewInput = z.object({
 async function recomputeRating(businessId: string) {
   const db = await getDb();
   const [row] = await db
-    .select({ avg: sql<number>`coalesce(avg(rating), 0)`, n: sql<number>`count(*)::int` })
+    .select({ avg: sql<number>`coalesce(avg(rating), 0)`, n: sql<number>`count(*)` })
     .from(schema.businessReviews)
     .where(and(eq(schema.businessReviews.businessId, businessId), eq(schema.businessReviews.status, "published")));
   await db.update(schema.businesses).set({ ratingAvg: Number(row?.avg ?? 0), ratingCount: row?.n ?? 0 }).where(eq(schema.businesses.id, businessId));
@@ -67,7 +67,7 @@ const ProReviewInput = z.object({ professionalId: z.string().min(1), rating: z.n
 async function recomputeProRating(professionalId: string) {
   const db = await getDb();
   const [row] = await db
-    .select({ avg: sql<number>`coalesce(avg(rating), 0)`, n: sql<number>`count(*)::int` })
+    .select({ avg: sql<number>`coalesce(avg(rating), 0)`, n: sql<number>`count(*)` })
     .from(schema.professionalReviews)
     .where(and(eq(schema.professionalReviews.professionalId, professionalId), eq(schema.professionalReviews.status, "published")));
   await db.update(schema.professionals).set({ ratingAvg: Number(row?.avg ?? 0), ratingCount: row?.n ?? 0 }).where(eq(schema.professionals.id, professionalId));

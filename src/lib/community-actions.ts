@@ -183,7 +183,7 @@ export async function deleteOwnComment(commentId: string, path?: string): Promis
   if (!c) return { ok: false, error: "Not found" };
   if (c.authorId !== user.id && !hasRole(user, "editor")) return { ok: false, error: "Not yours" };
   await db.update(schema.comments).set({ status: "deleted", body: "" }).where(eq(schema.comments.id, commentId));
-  if (c.targetType === "post" && c.status === "published") await db.update(schema.posts).set({ commentCount: sql`greatest(${schema.posts.commentCount} - 1, 0)` }).where(eq(schema.posts.id, c.targetId));
+  if (c.targetType === "post" && c.status === "published") await db.update(schema.posts).set({ commentCount: sql`max(${schema.posts.commentCount} - 1, 0)` }).where(eq(schema.posts.id, c.targetId));
   if (path) revalidatePath(path);
   return { ok: true };
 }
@@ -208,7 +208,7 @@ export async function toggleLike(targetType: "post" | "comment" | "article", tar
   if (targetType === "post") {
     await db.update(schema.posts).set({ likeCount: count }).where(eq(schema.posts.id, targetId));
     const p = await db.query.posts.findFirst({ where: eq(schema.posts.id, targetId), columns: { authorId: true } });
-    if (p) await db.update(schema.memberProfiles).set({ likesReceived: sql`greatest(${schema.memberProfiles.likesReceived} + ${liked ? 1 : -1}, 0)` }).where(eq(schema.memberProfiles.userId, p.authorId));
+    if (p) await db.update(schema.memberProfiles).set({ likesReceived: sql`max(${schema.memberProfiles.likesReceived} + ${liked ? 1 : -1}, 0)` }).where(eq(schema.memberProfiles.userId, p.authorId));
   }
   if (targetType === "comment") {
     await db.update(schema.comments).set({ likeCount: count }).where(eq(schema.comments.id, targetId));

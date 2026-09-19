@@ -1,16 +1,11 @@
-import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
 
-const url = process.env.DATABASE_URL ?? "pglite://./.data/pglite";
-const isPglite = url.startsWith("pglite://");
-
+/** Schema lives in TypeScript; `npm run db:generate` writes SQL migrations for D1 into migrations/ (ADR-45). */
 export default defineConfig({
   schema: "./src/db/schema/index.ts",
-  out: "./drizzle",
-  dialect: "postgresql",
-  ...(isPglite
-    ? { driver: "pglite", dbCredentials: { url: url.replace("pglite://", "") } }
-    : { dbCredentials: { url } }),
+  out: "./migrations",
+  dialect: "sqlite",
+  driver: "d1-http",
   strict: true,
   verbose: true,
 });

@@ -2,7 +2,7 @@
 
 ## Shape
 
-One Next.js 16 application serves everything: public site, admin, business dashboard, API routes, and background scripts. There is no separate backend. Postgres is the only stateful dependency.
+One Next.js 16 application serves everything: public site, admin, business dashboard, API routes, and background jobs. There is no separate backend. It runs on Cloudflare Workers through vinext (ADR-41); D1 is the only database (ADR-45), R2 holds images and the page cache.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -20,8 +20,8 @@ One Next.js 16 application serves everything: public site, admin, business dashb
 └───────────────┬─────────────────────────────────────────────┘
                 │ Drizzle
         ┌───────┴────────┐
-        │  Postgres      │  local: PGlite (embedded, .data/pglite)
-        │                │  prod : Supabase
+        │  D1 (SQLite)   │  local: wrangler's D1 in .wrangler/state (npm run dev)
+        │                │  prod : searchable, staging: searchable-staging
         └────────────────┘
 ```
 
@@ -41,12 +41,10 @@ Everything that differs between Node (Vercel, `next dev`, scripts) and Cloudflar
 ## Database client (`src/db/index.ts`)
 
 ```
-DATABASE_URL = pglite://./.data/pglite   → drizzle-orm/pglite  (dev, tests)
-DATABASE_URL = postgres://…              → drizzle-orm/postgres-js (Supabase, CI)
-HYPERDRIVE binding (Workers)             → drizzle-orm/postgres-js through Cloudflare Hyperdrive
+DB binding (D1)  → drizzle-orm/d1, one Drizzle instance per isolate
 ```
 
-A `globalThis` singleton prevents duplicate PGlite instances across HMR. `@electric-sql/pglite` is marked as a server-external package in `next.config.ts`.
+There is no connection to pool or close. `rawQuery()` returns rows and turns `Date` parameters into epoch milliseconds; `rawRun()` returns the number of changed rows. Nothing in Node opens the database: scripts call the admin API of a running instance (`scripts/_api.ts`), and `scripts/export-for-d1.ts` is the one Postgres client, for the content migration.
 
 ## Auth (better-auth)
 
@@ -58,7 +56,7 @@ A `globalThis` singleton prevents duplicate PGlite instances across HMR. `@elect
 ## Caching
 
 - Public pages: `revalidate` (ISR) plus `revalidatePath()` on the paths a write touches; publishing an article purges the article, its section and the homepage. A site-wide `revalidatePath("/", "layout")` is reserved for chrome changes (brand, identity, breaking bar), because ISR writes are the metered line (docs/FREE-TIER.md).
-- Search: `/search` is dynamic and noindex; `/api/search` and `/api/suggest` are CDN-cached for two and thirty minutes.
+- Search: `/search` is dynamic and noindex; `/api/search` and `/api/suggest` are CDN-cached for two and thirty minutes. Full text is FTS5 (`search_fts`, `search_trgm`), kept in step by triggers (`migrations/0001_search_fts.sql`).
 - Data series: ISR one hour, purged by the ingestion cron when a reading changes.
 
 ## Rendering strategy per route

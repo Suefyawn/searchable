@@ -13,15 +13,15 @@ export default async function AdminSearchLog() {
     rawQuery<Record<string, number>>(
       db,
       sql`select
-        (select count(*) from search_queries where created_at > now() - interval '30 days')::int as total,
-        (select count(distinct normalized) from search_queries where created_at > now() - interval '30 days')::int as distinct_q,
-        (select count(*) from search_queries where created_at > now() - interval '30 days' and result_count = 0)::int as zero,
-        (select count(*) from search_queries where created_at > now() - interval '30 days' and clicked_url is not null)::int as clicked`,
+        (select count(*) from search_queries where created_at > ${Date.now() - 30 * 86_400_000}) as total,
+        (select count(distinct normalized) from search_queries where created_at > ${Date.now() - 30 * 86_400_000}) as distinct_q,
+        (select count(*) from search_queries where created_at > ${Date.now() - 30 * 86_400_000} and result_count = 0) as zero,
+        (select count(*) from search_queries where created_at > ${Date.now() - 30 * 86_400_000} and clicked_url is not null) as clicked`,
     ),
-    rawQuery<{ query: string; n: number; avg: number; clicks: number }>(db, sql`select normalized as query, count(*)::int as n, round(avg(result_count))::int as avg, count(clicked_url)::int as clicks from search_queries where created_at > now() - interval '30 days' group by normalized order by n desc limit 40`),
-    rawQuery<{ query: string; n: number; last: string }>(db, sql`select normalized as query, count(*)::int as n, max(created_at) as last from search_queries where result_count = 0 and created_at > now() - interval '90 days' group by normalized order by n desc, last desc limit 40`),
-    rawQuery<{ url: string; n: number }>(db, sql`select clicked_url as url, count(*)::int as n from search_queries where clicked_url is not null and created_at > now() - interval '30 days' group by clicked_url order by n desc limit 15`),
-    rawQuery<{ query: string; n: number }>(db, sql`select normalized as query, count(*)::int as n from search_queries where created_at > now() - interval '30 days' and result_count > 0 group by normalized having count(*) >= 3 and count(clicked_url) = 0 order by n desc limit 15`),
+    rawQuery<{ query: string; n: number; avg: number; clicks: number }>(db, sql`select normalized as query, count(*) as n, round(avg(result_count)) as avg, count(clicked_url) as clicks from search_queries where created_at > ${Date.now() - 30 * 86_400_000} group by normalized order by n desc limit 40`),
+    rawQuery<{ query: string; n: number; last: number }>(db, sql`select normalized as query, count(*) as n, max(created_at) as last from search_queries where result_count = 0 and created_at > ${Date.now() - 90 * 86_400_000} group by normalized order by n desc, last desc limit 40`),
+    rawQuery<{ url: string; n: number }>(db, sql`select clicked_url as url, count(*) as n from search_queries where clicked_url is not null and created_at > ${Date.now() - 30 * 86_400_000} group by clicked_url order by n desc limit 15`),
+    rawQuery<{ query: string; n: number }>(db, sql`select normalized as query, count(*) as n from search_queries where created_at > ${Date.now() - 30 * 86_400_000} and result_count > 0 group by normalized having count(*) >= 3 and count(clicked_url) = 0 order by n desc limit 15`),
   ]);
   const ctr = k?.total ? Math.round(((k.clicked ?? 0) / k.total) * 100) : 0;
 
@@ -71,7 +71,7 @@ export default async function AdminSearchLog() {
                     {r.n}
                   </Td>
                   <Td muted className="whitespace-nowrap text-[13px]">
-                    {timeAgo(r.last)}
+                    {timeAgo(new Date(r.last))}
                   </Td>
                   <Td align="right">
                     <Link href={`/admin/articles/new?kind=guide&title=${encodeURIComponent(r.query)}`} className="whitespace-nowrap text-[13px] font-medium underline-offset-4 hover:underline">

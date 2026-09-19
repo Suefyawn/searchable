@@ -16,8 +16,8 @@ export default async function AdminReviews({ searchParams }: { searchParams: Pro
   const [bizRows, proRows, counts, proCounts] = await Promise.all([
     db.query.businessReviews.findMany({ where: status === "all" ? undefined : eq(schema.businessReviews.status, st), orderBy: [desc(schema.businessReviews.createdAt)], limit: 100, with: { business: true } }),
     db.query.professionalReviews.findMany({ where: status === "all" ? undefined : eq(schema.professionalReviews.status, st), orderBy: [desc(schema.professionalReviews.createdAt)], limit: 100, with: { professional: { columns: { name: true, slug: true } } } }),
-    db.select({ status: schema.businessReviews.status, n: sql<number>`count(*)::int` }).from(schema.businessReviews).groupBy(schema.businessReviews.status),
-    db.select({ status: schema.professionalReviews.status, n: sql<number>`count(*)::int` }).from(schema.professionalReviews).groupBy(schema.professionalReviews.status),
+    db.select({ status: schema.businessReviews.status, n: sql<number>`count(*)` }).from(schema.businessReviews).groupBy(schema.businessReviews.status),
+    db.select({ status: schema.professionalReviews.status, n: sql<number>`count(*)` }).from(schema.professionalReviews).groupBy(schema.professionalReviews.status),
   ]);
   // One list, business and professional reviews together, newest first.
   const rows = [

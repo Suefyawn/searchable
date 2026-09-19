@@ -45,7 +45,7 @@ export async function citiesWithCounts(limit = 12) {
       population: schema.locations.population,
       imageUrl: schema.locations.imageUrl,
       imageCredit: schema.locations.imageCredit,
-      count: sql<number>`count(${schema.businesses.id})::int`,
+      count: sql<number>`count(${schema.businesses.id})`,
     })
     .from(schema.locations)
     .leftJoin(schema.businesses, and(eq(schema.businesses.cityId, schema.locations.id), eq(schema.businesses.status, "active")))

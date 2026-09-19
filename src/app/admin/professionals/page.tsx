@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, sql } from "drizzle-orm";
+import { and, desc, eq, like, sql } from "drizzle-orm";
 import Link from "next/link";
 import { AdminPage, Empty, FilterTabs, Pager, Row, Rows, Status, Toolbar } from "@/components/admin";
 import { Badge, Button } from "@/components/ui";
@@ -18,12 +18,12 @@ export default async function AdminProfessionals({ searchParams }: { searchParam
   const db = await getDb();
   const conds = [];
   if (status !== "all") conds.push(eq(schema.professionals.status, status as (typeof schema.professionalStatus.enumValues)[number]));
-  if (q) conds.push(ilike(schema.professionals.name, `%${q}%`));
+  if (q) conds.push(like(schema.professionals.name, `%${q}%`));
   const where = conds.length ? and(...conds) : undefined;
   const [rows, total, counts] = await Promise.all([
     db.query.professionals.findMany({ where, orderBy: [desc(schema.professionals.createdAt)], limit: PAGE, offset: (pageNum - 1) * PAGE, with: { city: true, owner: { columns: { email: true, name: true } } } }),
     db.$count(schema.professionals, where),
-    db.select({ status: schema.professionals.status, n: sql<number>`count(*)::int` }).from(schema.professionals).groupBy(schema.professionals.status),
+    db.select({ status: schema.professionals.status, n: sql<number>`count(*)` }).from(schema.professionals).groupBy(schema.professionals.status),
   ]);
   const count = (s: string) => (s === "all" ? counts.reduce((a, c) => a + c.n, 0) : counts.find((c) => c.status === s)?.n ?? 0);
   const link = (p: Partial<Params>) => {

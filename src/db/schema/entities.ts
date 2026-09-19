@@ -1,7 +1,7 @@
-import { index, jsonb, pgEnum, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
-import { createdAt, id, updatedAt } from "./_shared";
+import { check, index, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { createdAt, enumCheckSql, enumColumn, id, json, textEnum, updatedAt } from "./_shared";
 
-export const entityKind = pgEnum("entity_kind", [
+export const entityKind = textEnum("entity_kind", [
   "organization", // FBR, NADRA, PTA, SBP, K-Electric
   "company", // Toyota, Meezan Bank, Jazz
   "brand", // Apple, Samsung
@@ -13,37 +13,37 @@ export const entityKind = pgEnum("entity_kind", [
   "topic", // Income Tax, Solar Energy
 ]);
 
-export const entityLinkTarget = pgEnum("entity_link_target", ["article", "tool", "business", "location", "data_series", "comparison"]);
+export const entityLinkTarget = textEnum("entity_link_target", ["article", "tool", "business", "location", "data_series", "comparison"]);
 
 /** Knowledge-graph nodes. Anything that deserves a hub page at /e/[slug]. */
-export const entities = pgTable(
+export const entities = sqliteTable(
   "entities",
   {
     id: id(),
-    kind: entityKind("kind").notNull(),
+    kind: enumColumn("kind", entityKind).notNull(),
     slug: text("slug").notNull().unique(),
     name: text("name").notNull(),
     nameUrdu: text("name_urdu"),
-    aliases: jsonb("aliases").$type<string[]>().default([]).notNull(),
+    aliases: json("aliases").$type<string[]>().default([]).notNull(),
     description: text("description"),
     website: text("website"),
     logoUrl: text("logo_url"),
     /** Free-form structured facts shown on the hub (founded, headquarters, regulator…). */
-    facts: jsonb("facts").$type<Record<string, string>>().default({}).notNull(),
+    facts: json("facts").$type<Record<string, string>>().default({}).notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (t) => [index("entities_kind_idx").on(t.kind)],
+  (t) => [index("entities_kind_idx").on(t.kind), check("entities_kind_check", enumCheckSql("kind", entityKind))],
 );
 
-export const entityLinks = pgTable(
+export const entityLinks = sqliteTable(
   "entity_links",
   {
     id: id(),
     entityId: text("entity_id")
       .notNull()
       .references(() => entities.id, { onDelete: "cascade" }),
-    targetType: entityLinkTarget("target_type").notNull(),
+    targetType: enumColumn("target_type", entityLinkTarget).notNull(),
     targetId: text("target_id").notNull(),
     relation: text("relation").default("mentions").notNull(), // mentions | about | operated_by | sells …
     createdAt: createdAt(),
@@ -51,5 +51,6 @@ export const entityLinks = pgTable(
   (t) => [
     uniqueIndex("entity_links_unique_idx").on(t.entityId, t.targetType, t.targetId),
     index("entity_links_target_idx").on(t.targetType, t.targetId),
+    check("entity_links_target_type_check", enumCheckSql("target_type", entityLinkTarget)),
   ],
 );

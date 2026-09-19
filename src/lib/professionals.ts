@@ -73,7 +73,7 @@ export async function getProfessionalById(id: string) {
 /** Counts per profession (active), for the hub and the mega menu. */
 export async function professionCounts(): Promise<{ slug: string; name: string; plural: string; group: string; count: number }[]> {
   const db = await getDb();
-  const rows = await rawQuery<{ slug: string; n: number }>(db, sql`select profession_slug as slug, count(*)::int as n from professionals where status = 'active' group by profession_slug`);
+  const rows = await rawQuery<{ slug: string; n: number }>(db, sql`select profession_slug as slug, count(*) as n from professionals where status = 'active' group by profession_slug`);
   const map = new Map(rows.map((r) => [r.slug, Number(r.n)]));
   return PROFESSIONS.map((p) => ({ slug: p.slug, name: p.name, plural: p.plural, group: p.group, count: map.get(p.slug) ?? 0 }));
 }
@@ -83,7 +83,7 @@ export async function professionalCities(profession?: string, limit = 12) {
   const db = await getDb();
   return rawQuery<{ slug: string; name: string; n: number }>(
     db,
-    sql`select l.slug, l.name, count(*)::int as n from professionals p join locations l on l.id = p.city_id
+    sql`select l.slug, l.name, count(*) as n from professionals p join locations l on l.id = p.city_id
         where p.status = 'active' ${profession ? sql`and p.profession_slug = ${profession}` : sql``}
         group by l.slug, l.name order by n desc, l.name asc limit ${limit}`,
   );

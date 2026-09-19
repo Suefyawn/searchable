@@ -1,5 +1,5 @@
-import { boolean, doublePrecision, index, integer, jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { createdAt, id, updatedAt } from "./_shared";
+import { check, index, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { bool, createdAt, enumCheckSql, enumColumn, id, json, textEnum, timestampMs, updatedAt } from "./_shared";
 import { users } from "./auth";
 import { reviewStatus } from "./directory";
 import { locations } from "./geo";
@@ -9,8 +9,8 @@ import { locations } from "./geo";
  * the account that created it (or claimed it), reviewed before it goes live, and can carry a paid Verified badge.
  * Profession slugs come from src/content/professions.ts.
  */
-export const professionalStatus = pgEnum("professional_status", ["pending", "active", "hidden", "rejected"]);
-export const professionalTier = pgEnum("professional_tier", ["free", "verified"]);
+export const professionalStatus = textEnum("professional_status", ["pending", "active", "hidden", "rejected"]);
+export const professionalTier = textEnum("professional_tier", ["free", "verified"]);
 
 export type ProfessionalSocial = { linkedin?: string; x?: string; instagram?: string; facebook?: string; github?: string; youtube?: string; tiktok?: string; behance?: string; dribbble?: string };
 export type Experience = { title: string; org?: string; from?: string; to?: string; description?: string };
@@ -18,15 +18,15 @@ export type Education = { degree: string; institution?: string; year?: string };
 export type Certification = { name: string; issuer?: string; year?: string; number?: string };
 export type ProService = { name: string; priceFrom?: number; unit?: string };
 
-export const professionals = pgTable(
+export const professionals = sqliteTable(
   "professionals",
   {
     id: id(),
     slug: text("slug").notNull().unique(),
     ownerUserId: text("owner_user_id").references(() => users.id, { onDelete: "set null" }),
-    status: professionalStatus("status").default("pending").notNull(),
-    tier: professionalTier("tier").default("free").notNull(),
-    tierExpiresAt: timestamp("tier_expires_at", { withTimezone: true }),
+    status: enumColumn("status", professionalStatus).default("pending").notNull(),
+    tier: enumColumn("tier", professionalTier).default("free").notNull(),
+    tierExpiresAt: timestampMs("tier_expires_at"),
     name: text("name").notNull(),
     professionSlug: text("profession_slug").notNull(),
     /** One line under the name: "Consultant cardiologist, 12 years, Shifa International". */
@@ -40,15 +40,15 @@ export const professionals = pgTable(
     phone: text("phone"),
     whatsapp: text("whatsapp"),
     email: text("email"),
-    showEmail: boolean("show_email").default(false).notNull(),
+    showEmail: bool("show_email").default(false).notNull(),
     website: text("website"),
-    social: jsonb("social").$type<ProfessionalSocial>().default({}).notNull(),
-    languages: jsonb("languages").$type<string[]>().default([]).notNull(),
-    skills: jsonb("skills").$type<string[]>().default([]).notNull(),
-    services: jsonb("services").$type<ProService[]>().default([]).notNull(),
-    experience: jsonb("experience").$type<Experience[]>().default([]).notNull(),
-    education: jsonb("education").$type<Education[]>().default([]).notNull(),
-    certifications: jsonb("certifications").$type<Certification[]>().default([]).notNull(),
+    social: json("social").$type<ProfessionalSocial>().default({}).notNull(),
+    languages: json("languages").$type<string[]>().default([]).notNull(),
+    skills: json("skills").$type<string[]>().default([]).notNull(),
+    services: json("services").$type<ProService[]>().default([]).notNull(),
+    experience: json("experience").$type<Experience[]>().default([]).notNull(),
+    education: json("education").$type<Education[]>().default([]).notNull(),
+    certifications: json("certifications").$type<Certification[]>().default([]).notNull(),
     yearsExperience: integer("years_experience"),
     /** Registration number with the profession's body (PMDC, PEC, PCATP, Bar Council, ICAP). */
     licenceNo: text("licence_no"),
@@ -57,21 +57,27 @@ export const professionals = pgTable(
     rateFrom: integer("rate_from"),
     rateUnit: text("rate_unit"),
     cvUrl: text("cv_url"),
-    cvPublic: boolean("cv_public").default(true).notNull(),
+    cvPublic: bool("cv_public").default(true).notNull(),
     photoUrl: text("photo_url"),
-    isVerified: boolean("is_verified").default(false).notNull(),
-    verifiedAt: timestamp("verified_at", { withTimezone: true }),
-    ratingAvg: doublePrecision("rating_avg").default(0).notNull(),
+    isVerified: bool("is_verified").default(false).notNull(),
+    verifiedAt: timestampMs("verified_at"),
+    ratingAvg: real("rating_avg").default(0).notNull(),
     ratingCount: integer("rating_count").default(0).notNull(),
     viewCount: integer("view_count").default(0).notNull(),
     clickCount: integer("click_count").default(0).notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (t) => [index("professionals_profession_city_idx").on(t.professionSlug, t.cityId, t.status), index("professionals_owner_idx").on(t.ownerUserId), index("professionals_status_idx").on(t.status)],
+  (t) => [
+    index("professionals_profession_city_idx").on(t.professionSlug, t.cityId, t.status),
+    index("professionals_owner_idx").on(t.ownerUserId),
+    index("professionals_status_idx").on(t.status),
+    check("professionals_status_check", enumCheckSql("status", professionalStatus)),
+    check("professionals_tier_check", enumCheckSql("tier", professionalTier)),
+  ],
 );
 
-export const professionalLeads = pgTable(
+export const professionalLeads = sqliteTable(
   "professional_leads",
   {
     id: id(),
@@ -89,7 +95,7 @@ export const professionalLeads = pgTable(
 );
 
 /** Client reviews of a professional; same moderation flow as business reviews. */
-export const professionalReviews = pgTable(
+export const professionalReviews = sqliteTable(
   "professional_reviews",
   {
     id: id(),
@@ -101,10 +107,10 @@ export const professionalReviews = pgTable(
     rating: integer("rating").notNull(),
     title: text("title"),
     body: text("body"),
-    status: reviewStatus("status").default("pending").notNull(),
+    status: enumColumn("status", reviewStatus).default("pending").notNull(),
     ownerResponse: text("owner_response"),
-    ownerRespondedAt: timestamp("owner_responded_at", { withTimezone: true }),
+    ownerRespondedAt: timestampMs("owner_responded_at"),
     createdAt: createdAt(),
   },
-  (t) => [index("professional_reviews_pro_idx").on(t.professionalId, t.status)],
+  (t) => [index("professional_reviews_pro_idx").on(t.professionalId, t.status), check("professional_reviews_status_check", enumCheckSql("status", reviewStatus))],
 );

@@ -1,91 +1,43 @@
 # Local to production
 
-Local runs on PGlite with files on disk. Production is **Vercel (Hobby for now) + Supabase Postgres (free) + Cloudflare R2 for images (free) + Resend for email (free)**. The application code does not change; only environment variables do. The budget logic that keeps us inside the free tiers is in `docs/FREE-TIER.md`.
+Everything runs on Cloudflare: the Worker (vinext build of the Next.js app), D1 (database), R2 (images, page cache), Cron Triggers and Workflows (Phase 4), Turnstile (Phase 5), Analytics Engine (Phase 7). Resend sends and receives email. The application code is the same everywhere; only bindings and secrets differ between `wrangler.dev.jsonc` (development), the default environment in `wrangler.jsonc` (staging) and its `production` environment. Cost and allowances: `docs/FREE-TIER.md`; decisions: ADR-41 to ADR-45.
 
-`npm run preflight` reads the environment and prints what is still missing. Run it with the production variables before the first deploy.
+## 1. Local development
 
-## 1. Accounts, in this order
-1. **GitHub**: done, `Suefyawn/searchable`, branch `main`.
-2. **Supabase**: one project, free plan. Ours is `searchablepk` in ap-northeast-1 (Tokyo); Mumbai or Singapore would be closer for a new one.
-3. **Cloudflare**: the domain's DNS, an R2 bucket (`searchable-images`) with a public custom domain (`img.searchable.pk`), an R2 API token (object read and write on that bucket), Web Analytics, Turnstile (later).
-4. **Resend**: verify `searchable.pk` (DKIM, SPF, DMARC records go in Cloudflare DNS). Sending from `daily@searchable.pk`. Enable receiving (MX record) so every @searchable.pk address lands in `/admin/inbox`; the API key must be **full access** because the receiving endpoints need it. Add a webhook for `email.received` pointing at `https://searchable.pk/api/webhooks/resend` and put its signing secret in `RESEND_WEBHOOK_SECRET` (optional: without it the inbox syncs every 5 minutes instead of instantly).
-5. **Vercel**: import the GitHub repo. Framework Next.js, Node 22. Hobby plan is fine until there is revenue (it forbids commercial use; move to Pro or Cloudflare Workers when ads or paid listings start).
-6. **cron-job.org** (free): pings `/api/cron/publish` every 5 minutes so scheduled publishing and newsletters are exact; Hobby crons run once a day.
-7. Later: Google Search Console, Bing Webmaster Tools, Google News Publisher Center, AdSense.
+1. `npm install`. Node 22.
+2. Create `.dev.vars` (gitignored) with `NEXT_PUBLIC_SITE_URL=http://localhost:3000`, `NEXT_PUBLIC_SITE_NAME=Searchable`, `BETTER_AUTH_URL=http://localhost:3000`, `BETTER_AUTH_SECRET=<openssl rand -hex 32>`, `ADMIN_API_KEY=<openssl rand -hex 32>`, `EMAIL_PROVIDER=local`, `STORAGE_PROVIDER=local`, `HEAVY_COMPUTE=1`.
+3. `npm run db:migrate` applies `migrations/` to wrangler's local D1 in `.wrangler/state`.
+4. `npm run dev` starts the vinext dev server on http://localhost:3000 against that database, using `wrangler.dev.jsonc` (no Response Store Durable Object; pages are served uncached in development).
+5. In another terminal, `SEED_MODE=sample SEED_ADMIN_EMAIL=admin@searchable.pk SEED_ADMIN_PASSWORD=<8+ chars> npm run db:seed` fills reference data, sample content and the admin account through the admin API, then rebuilds the search index. `npm run search:reindex` rebuilds it alone.
+6. `npm test` runs the pure-function checks (no database). `npm run typecheck && npm run lint && npm run build` is what CI runs.
 
-## 2. Environment variables for Vercel (Production)
-```
-NEXT_PUBLIC_SITE_URL=https://searchable.pk
-NEXT_PUBLIC_SITE_NAME=Searchable
-BETTER_AUTH_URL=https://searchable.pk
-BETTER_AUTH_SECRET=<openssl rand -hex 32>
+A copy of production content is the better development database: `.data/export.sql` from step 4 below imports with `npx wrangler d1 execute searchable-staging --local --file .data/export.sql`, followed by `npm run search:reindex`.
 
-# Supabase: Connect > Transaction pooler (port 6543) for the app
-DATABASE_URL=postgres://postgres.<ref>:<password>@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres
+## 2. Accounts
 
-CRON_SECRET=<openssl rand -hex 24>
-ADMIN_API_KEY=<openssl rand -hex 32>   # the scheduled editorial task, docs/DAILY-TASK.md
+1. **GitHub**: `Suefyawn/searchable`. `main` is the Vercel line until cutover; `d1` is the Workers line (ADR-45). Hotfixes are cherry-picked between them until `d1` becomes `main`.
+2. **Cloudflare** (one account, Workers Paid, ADR-44): the `searchable.pk` zone; Workers `searchable` (staging) and `searchable-production`; D1 `searchable-staging` and `searchable`; R2 `searchable-images` (public at img.searchable.pk), `searchable-page-cache`, `searchable-production-page-cache`. `wrangler login` once per machine.
+3. **Resend**: `searchable.pk` verified, sending and receiving. Webhook for `email.received` (plus `email.bounced`, `email.complained` from Phase 8) at `https://searchable.pk/api/webhooks/resend`; its signing secret is `RESEND_WEBHOOK_SECRET`.
+4. Later: Google Search Console, Bing, Google News Publisher Center, AdSense (unchanged from before).
 
-EMAIL_PROVIDER=resend
-RESEND_API_KEY=re_...            # full access (receiving needs it)
-RESEND_WEBHOOK_SECRET=whsec_...  # optional, instant inbox
-EMAIL_FROM="Searchable <daily@searchable.pk>"
-EMAIL_DAILY_CAP=95
-EMAIL_MONTHLY_CAP=2900
-EMAIL_BULK_RESERVE=15
-BILLING_EMAIL=billing@searchable.pk
-EDITORIAL_EMAIL=editorial@searchable.pk
-CLAIM_WHATSAPP_NUMBER=+92 3xx xxxxxxx
+## 3. Bindings and configuration
 
-STORAGE_PROVIDER=r2
-R2_ACCOUNT_ID=<cloudflare account id>
-R2_ACCESS_KEY_ID=...
-R2_SECRET_ACCESS_KEY=...
-R2_BUCKET=searchable-images
-R2_PUBLIC_URL=https://img.searchable.pk
+`wrangler.jsonc` holds every binding and public variable per environment: `DB` (D1), `MEDIA` (R2 images), `CACHE_BODIES` and `CACHE_METADATA` (Response Store), `ASSETS`, and the vars `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_SITE_NAME`, `BETTER_AUTH_URL`, `STORAGE_PROVIDER=r2`, `R2_PUBLIC_URL=https://img.searchable.pk`, `EMAIL_PROVIDER`, `EMAIL_FROM`, `HEAVY_COMPUTE=1`. Staging adds `NOINDEX=1` and `JOBS_DISABLED=1`.
 
-INDEXNOW_KEY=<32 hex chars>
-SEED_ADMIN_EMAIL=<your admin email>
-SEED_ADMIN_PASSWORD=<strong password, change after first login>
+Secrets are set with `wrangler secret put <NAME>` (add `--env production` for production) and never written down: `BETTER_AUTH_SECRET`, `ADMIN_API_KEY` (the same value the scheduled editorial task uses; keys made at `/admin/api-keys` work as well), `CRON_SECRET`, `RESEND_API_KEY` (full access, receiving needs it), `RESEND_WEBHOOK_SECRET`, `INDEXNOW_KEY` (32 hex), `BILLING_EMAIL`, `EDITORIAL_EMAIL`, `CLAIM_WHATSAPP_NUMBER`, `GOOGLE_SITE_VERIFICATION`, `TURNSTILE_SECRET` (Phase 5), `CF_ANALYTICS_TOKEN` (Phase 7).
 
-# Off until approved / wanted
-NEXT_PUBLIC_ADSENSE_CLIENT=
-OPENVERSE_CLIENT_ID=
-OPENVERSE_CLIENT_SECRET=
-```
-Preview deployments can reuse the same variables with a second free Supabase project, or simply be disabled.
+## 4. Database
 
-## 3. Database, from this machine
-```bash
-# Session pooler (port 5432) for migrations and scripts; the app uses 6543
-export DATABASE_URL="postgres://postgres.<ref>:<password>@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres"
-export SEED_ADMIN_EMAIL=... SEED_ADMIN_PASSWORD=...
+- Migrations: `npm run db:generate` after a schema change writes `migrations/NNNN_*.sql`; hand-written SQL (FTS tables, triggers) goes in its own numbered file. Apply with `npm run db:migrate` (local), `npm run db:migrate:staging`, `npm run db:migrate:production`. Wrangler records applied files in the database's `d1_migrations` table.
+- Content migration from Supabase (once, and again for the delta at cutover): `DATABASE_URL=<Supabase transaction pooler, port 6543> npm run db:export` writes `.data/export.sql` (idempotent upserts; `-- --since <ISO time>` limits it to rows changed after the Phase 2 snapshot). Import with `npx wrangler d1 execute <db> --remote --file .data/export.sql`, rebuild search with `BASE_URL=<host> ADMIN_API_KEY=<key> npm run search:reindex`, then `npm run db:export -- --verify <db>` compares every table's count and ten random rows column by column.
+- Sessions, verifications and the search index are not exported; the first two are re-created on use, the last by the reindex.
 
-npm run db:migrate                 # applies drizzle/0000 to 0012
-SEED_MODE=reference npm run db:seed   # locations, categories, entities, synonyms, data series, tools, admin user; no sample articles or businesses
-npm run search:reindex
-npm run preflight                  # should print "Ready to deploy"
-```
-In Supabase: Database > Extensions > enable `pg_trgm` before reindexing (search needs it). Turn on daily backups (free plan keeps 7 days).
+## 5. Deploy
 
-## 4. First deploy checks
-- [ ] `/`, `/sitemap.xml`, `/news-sitemap.xml`, `/robots.txt`, `/llms.txt`, `/feed.xml`, `/indexnow-key.txt` respond.
-- [ ] Sign in at `/login` with the seeded admin; open `/admin` and `/admin/system` (it shows host, storage, email and budget).
-- [ ] `/admin/data` > Fetch now: petrol, USD, KIBOR, gold, KSE-100 and BTC fill from live sources.
-- [ ] Upload a photo in the article editor: it lands on `img.searchable.pk` with 480 and 960 renditions.
-- [ ] Publish an article; it appears on `/news` within a minute and shows up in `/search`.
-- [ ] Subscribe to the newsletter with your own address: the confirmation arrives from Resend.
-- [ ] Send a mail to hello@searchable.pk from your phone: it appears in `/admin/inbox` (instantly with the webhook, within 5 minutes without); reply from there and check it threads.
-- [ ] `curl -H "authorization: Bearer $CRON_SECRET" https://searchable.pk/api/cron/publish` returns `ran: true`; add that URL to cron-job.org every 5 minutes with the header.
-- [ ] Search Console and Bing: verify (HTML tag method: put the token in `GOOGLE_SITE_VERIFICATION` / `BING_SITE_VERIFICATION` and redeploy, or add their DNS TXT records in Cloudflare), submit both sitemaps; check the IndexNow key URL.
-- [ ] Rich Results test on one tool page, one data page, one professional profile.
+- Staging: `npm run build && npm run deploy` publishes the default environment to https://searchable.sooviaan.workers.dev (custom domain staging.searchable.pk once its DNS record exists). Staging reads its own D1 and is fenced from side effects (`JOBS_DISABLED`, `EMAIL_PROVIDER=none`, `NOINDEX`).
+- Production: `npm run deploy:production` publishes the `production` environment. Until cutover its route stays unattached; Phase 9 of the migration plan attaches `searchable.pk`.
+- Check with `curl -I`: a page answers with `cache-control` and, on a warm cache, in well under a second; `npx wrangler tail searchable --format json` shows CPU and wall time per request and any exception.
 
-## 5. Photos and content
-- The 65 seeded Openverse photos live in local `public/uploads/`; re-run `npm run db:seed-images` against production once R2 is configured, or upload through admin.
-- Import real businesses with email addresses (`/admin/businesses/import`), then switch on claim outreach (`/admin/outreach`).
+## 6. Cutover (Phase 9 of the migration plan)
 
-## 6. Rollback
-Vercel > Deployments > Promote the previous one. Migrations are forward-only: write a compensating migration rather than editing history.
-
-## 7. When revenue starts
-Vercel Hobby forbids commercial use. At that point either Vercel Pro (USD 20 a month) or Cloudflare Workers Paid (USD 5 a month, OpenNext adapter, Hyperdrive to the same Supabase database). The code is host-agnostic apart from `vercel.json` crons.
+Between the Night and Dawn slots: final `db:export -- --since`, import, reindex, replace the apex `A` records with the production Worker's custom domain (TTL lowered the day before), Redirect Rule `www` to apex (301) and Always Use HTTPS, contract suite against production, a scripted slot run, one cron of each, one newsletter test, then the Cowork tasks resume with their updated prompt. Rollback is restoring the DNS records; Vercel and Supabase stay warm for 72 hours, then are paused and deleted a week later.

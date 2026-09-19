@@ -1,7 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { getDb, rawQuery, schema } from "@/db";
+import { getDb, rawQuery, rawRun, schema } from "@/db";
 import { expireStaleClaims, sendClaimInvites } from "./claims";
 import { expireLapsedPlans } from "./commerce";
 import { closeExpiredPosts } from "./community";
@@ -71,11 +71,11 @@ export async function runDueJobs(opts: { force?: boolean } = {}): Promise<JobsRe
   // Cross-instance guard: claim the slot only if the last run is older than the interval.
   // The row also remembers when the slow work last ran (heavyAt), so a five-minute pinger does not pay for
   // photo searches and mailbox polling 288 times a day: those run every HEAVY_INTERVAL, the rest every time.
-  const claimed = await rawQuery<{ key: string; value: { heavyAt?: string } | null }>(
+  const claimed = await rawQuery<{ key: string; value: string | null }>(
     db,
-    sql`insert into settings (key, value, updated_at) values ('jobs:last', ${JSON.stringify({ at: new Date(now).toISOString() })}::jsonb, now())
-        on conflict (key) do update set value = coalesce(settings.value, '{}'::jsonb) || excluded.value, updated_at = now()
-        where ${opts.force ? sql`true` : sql`settings.updated_at < now() - interval '4 minutes 30 seconds'`}
+    sql`insert into settings (key, value, updated_at) values ('jobs:last', ${JSON.stringify({ at: new Date(now).toISOString() })}, ${now})
+        on conflict (key) do update set value = json_patch(coalesce(settings.value, '{}'), excluded.value), updated_at = ${now}
+        where ${opts.force ? sql`1` : sql`settings.updated_at < ${now - 270_000}`}
         returning key, value`,
   );
   lastLocalRun = now;
@@ -83,9 +83,10 @@ export async function runDueJobs(opts: { force?: boolean } = {}): Promise<JobsRe
   const published = await publishDueArticles();
   const newsletters = await sendDueIssues();
   const lapsedPlans = await expireLapsedPlans();
-  const heavyAt = Date.parse(claimed[0].value?.heavyAt ?? "") || 0;
+  const value = claimed[0].value ? (JSON.parse(claimed[0].value) as { heavyAt?: string }) : null;
+  const heavyAt = Date.parse(value?.heavyAt ?? "") || 0;
   if (now - heavyAt < HEAVY_INTERVAL_MS) return { ran: true, published, newsletters, lapsedPlans, at: new Date().toISOString() };
-  await rawQuery(db, sql`update settings set value = value || ${JSON.stringify({ heavyAt: new Date(now).toISOString() })}::jsonb where key = 'jobs:last'`);
+  await rawRun(db, sql`update settings set value = json_patch(value, ${JSON.stringify({ heavyAt: new Date(now).toISOString() })}) where key = 'jobs:last'`);
   const invites = await sendClaimInvites();
   const digests = await sendActivityDigests();
   // Mirror new mail into the admin inbox; the webhook is faster, this is the safety net.
@@ -101,12 +102,10 @@ export async function runDueJobs(opts: { force?: boolean } = {}): Promise<JobsRe
 export async function pruneOldRows(): Promise<Record<string, number>> {
   const db = await getDb();
   const out: Record<string, number> = {};
-  const events = await rawQuery<{ n: number }>(db, sql`with d as (delete from analytics_events where created_at < now() - interval '90 days' returning 1) select count(*)::int as n from d`);
-  out.analyticsEvents = Number(events[0]?.n ?? 0);
-  const searches = await rawQuery<{ n: number }>(db, sql`with d as (delete from search_queries where created_at < now() - interval '180 days' returning 1) select count(*)::int as n from d`);
-  out.searchQueries = Number(searches[0]?.n ?? 0);
-  const rl = await rawQuery<{ n: number }>(db, sql`with d as (delete from ${schema.verifications} where expires_at < now() - interval '7 days' returning 1) select count(*)::int as n from d`);
-  out.verifications = Number(rl[0]?.n ?? 0);
+  const now = Date.now();
+  out.analyticsEvents = await rawRun(db, sql`delete from analytics_events where created_at < ${now - 90 * 86_400_000}`);
+  out.searchQueries = await rawRun(db, sql`delete from search_queries where created_at < ${now - 180 * 86_400_000}`);
+  out.verifications = await rawRun(db, sql`delete from ${schema.verifications} where expires_at < ${now - 7 * 86_400_000}`);
   out.expiredClaims = await expireStaleClaims();
   out.closedPosts = await closeExpiredPosts();
   return out;

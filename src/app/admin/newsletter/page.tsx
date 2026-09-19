@@ -16,7 +16,7 @@ export default async function AdminNewsletter() {
   const [issues, counts, allowance] = await Promise.all([
     db.query.newsletterIssues.findMany({ orderBy: [desc(schema.newsletterIssues.createdAt)], limit: 100 }),
     db
-      .select({ frequency: schema.newsletterSubscribers.frequency, n: sql<number>`count(*)::int` })
+      .select({ frequency: schema.newsletterSubscribers.frequency, n: sql<number>`count(*)` })
       .from(schema.newsletterSubscribers)
       .where(eq(schema.newsletterSubscribers.status, "active"))
       .groupBy(schema.newsletterSubscribers.frequency),

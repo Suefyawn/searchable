@@ -225,12 +225,12 @@ export async function outreachStats(): Promise<OutreachStats> {
   const [r] = await rawQuery<Record<string, number>>(
     db,
     sql`select
-      (select count(*) from businesses where status = 'active')::int as active,
-      (select count(*) from businesses where status = 'active' and email is not null and email <> '')::int as with_email,
-      (select count(*) from businesses where status = 'active' and claim_invite_sent_at is not null and claim_invite_count < 99)::int as invited,
-      (select count(*) from businesses where status = 'active' and claimed_at is not null)::int as claimed,
-      (select count(*) from businesses where claim_invite_count >= 99)::int as opted_out,
-      (select count(*) from businesses where status = 'active' and email is not null and email <> '' and claimed_at is null and owner_user_id is null and (claim_invite_sent_at is null or (claim_invite_count < 2 and claim_invite_sent_at < now() - interval '14 days')))::int as eligible`,
+      (select count(*) from businesses where status = 'active') as active,
+      (select count(*) from businesses where status = 'active' and email is not null and email <> '') as with_email,
+      (select count(*) from businesses where status = 'active' and claim_invite_sent_at is not null and claim_invite_count < 99) as invited,
+      (select count(*) from businesses where status = 'active' and claimed_at is not null) as claimed,
+      (select count(*) from businesses where claim_invite_count >= 99) as opted_out,
+      (select count(*) from businesses where status = 'active' and email is not null and email <> '' and claimed_at is null and owner_user_id is null and (claim_invite_sent_at is null or (claim_invite_count < 2 and claim_invite_sent_at < ${Date.now() - 14 * 86_400_000}))) as eligible`,
   );
   const setting = await db.query.settings.findFirst({ where: eq(schema.settings.key, "outreach:state") });
   const st = (setting?.value as { enabled?: boolean; lastRun?: string; lastSent?: number } | undefined) ?? {};

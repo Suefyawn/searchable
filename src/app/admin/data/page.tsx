@@ -21,7 +21,7 @@ export default async function AdminData() {
     db.query.settings.findFirst({ where: eq(schema.settings.key, "ingest:last") }),
     rawQuery<{ id: string; series_id: string; date: string; value: number; note: string | null; source_url: string | null }>(
       db,
-      sql`select id, series_id, date::text as date, value, note, source_url from (select *, row_number() over (partition by series_id order by date desc) as rn from data_points) t where rn <= 30 order by series_id, date asc`,
+      sql`select id, series_id, date, value, note, source_url from (select *, row_number() over (partition by series_id order by date desc) as rn from data_points) t where rn <= 30 order by series_id, date asc`,
     ),
     db.query.dataSeries.findMany({ columns: { id: true, description: true, sourceUrl: true } }),
   ]);

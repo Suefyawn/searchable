@@ -1,25 +1,21 @@
-import { eq } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 
 /**
- * Run reports from the scheduled editorial task, kept in one settings row (the last 60) so the founder can read
- * them in admin instead of in the task's own console. Small text, no table needed.
+ * Run reports from the scheduled editorial task, one row each (they used to share one settings value, which
+ * outgrew D1's statement size). /admin/automation shows the newest; nothing prunes them, at six a day they stay small.
  */
 export type RunReport = { id: string; slot: string; at: string; report: string; published?: number; updated?: number; errors?: number };
-const KEY = "automation:reports";
-const KEEP = 60;
 
-export async function readReports(): Promise<RunReport[]> {
+export async function readReports(limit = 60): Promise<RunReport[]> {
   const db = await getDb();
-  const row = await db.query.settings.findFirst({ where: eq(schema.settings.key, KEY) });
-  return ((row?.value as { items?: RunReport[] } | undefined)?.items ?? []).slice().sort((a, b) => b.at.localeCompare(a.at));
+  const rows = await db.query.automationReports.findMany({ orderBy: [desc(schema.automationReports.at)], limit });
+  return rows.map((r) => ({ id: r.id, slot: r.slot, at: r.at.toISOString(), report: r.report, published: r.published ?? undefined, updated: r.updated ?? undefined, errors: r.errors ?? undefined }));
 }
 
 export async function addReport(r: Omit<RunReport, "id" | "at"> & { at?: string }): Promise<RunReport> {
   const db = await getDb();
-  const items = await readReports();
-  const item: RunReport = { id: crypto.randomUUID(), at: r.at ?? new Date().toISOString(), slot: r.slot, report: r.report, published: r.published, updated: r.updated, errors: r.errors };
-  const value = { items: [item, ...items].slice(0, KEEP) };
-  await db.insert(schema.settings).values({ key: KEY, value }).onConflictDoUpdate({ target: schema.settings.key, set: { value, updatedAt: new Date() } });
-  return item;
+  const at = r.at ? new Date(r.at) : new Date();
+  const [row] = await db.insert(schema.automationReports).values({ slot: r.slot, at, report: r.report, published: r.published ?? null, updated: r.updated ?? null, errors: r.errors ?? null }).returning({ id: schema.automationReports.id });
+  return { id: row.id, at: at.toISOString(), slot: r.slot, report: r.report, published: r.published, updated: r.updated, errors: r.errors };
 }

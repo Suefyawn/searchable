@@ -25,7 +25,7 @@ export default async function AdminMessages({ searchParams }: { searchParams: Pr
   const db = await getDb();
   const [rows, counts] = await Promise.all([
     db.query.messages.findMany({ where: status === "all" ? undefined : eq(schema.messages.status, status), orderBy: [desc(schema.messages.createdAt)], limit: 100 }),
-    db.select({ status: schema.messages.status, n: sql<number>`count(*)::int` }).from(schema.messages).groupBy(schema.messages.status),
+    db.select({ status: schema.messages.status, n: sql<number>`count(*)` }).from(schema.messages).groupBy(schema.messages.status),
   ]);
   const count = (s: string) => (s === "all" ? counts.reduce((a, c) => a + c.n, 0) : counts.find((c) => c.status === s)?.n ?? 0);
   return (

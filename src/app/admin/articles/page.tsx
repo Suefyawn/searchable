@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, sql } from "drizzle-orm";
+import { and, desc, eq, like, sql } from "drizzle-orm";
 import Link from "next/link";
 import { AdminPage, EmptyRow, FilterTabs, Pager, Status, SubFilter, Table, TBody, Td, THead, Toolbar } from "@/components/admin";
 import { ButtonLink } from "@/components/ui";
@@ -16,12 +16,12 @@ export default async function AdminArticles({ searchParams }: { searchParams: Pr
   const conds = [];
   if (status !== "all") conds.push(eq(schema.articles.status, status as (typeof schema.articleStatus.enumValues)[number]));
   if (kind !== "all") conds.push(eq(schema.articles.kind, kind as (typeof schema.articleKind.enumValues)[number]));
-  if (q) conds.push(ilike(schema.articles.title, `%${q}%`));
+  if (q) conds.push(like(schema.articles.title, `%${q}%`));
   const where = conds.length ? and(...conds) : undefined;
   const [rows, total, counts] = await Promise.all([
     db.query.articles.findMany({ where, orderBy: [desc(schema.articles.updatedAt)], limit: PAGE, offset: (pageNum - 1) * PAGE, with: { category: true, author: true } }),
     db.$count(schema.articles, where),
-    db.select({ status: schema.articles.status, n: sql<number>`count(*)::int` }).from(schema.articles).where(kind !== "all" ? eq(schema.articles.kind, kind as "news") : undefined).groupBy(schema.articles.status),
+    db.select({ status: schema.articles.status, n: sql<number>`count(*)` }).from(schema.articles).where(kind !== "all" ? eq(schema.articles.kind, kind as "news") : undefined).groupBy(schema.articles.status),
   ]);
   const count = (s: string) => (s === "all" ? counts.reduce((a, c) => a + c.n, 0) : counts.find((c) => c.status === s)?.n ?? 0);
   const link = (p: Partial<Params>) => {

@@ -1,4 +1,4 @@
-import { and, eq, ne, or, sql } from "drizzle-orm";
+import { and, eq, ne, or, sql, type AnyColumn } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 
 /**
@@ -79,10 +79,12 @@ export async function findDuplicates(c: Candidate): Promise<DuplicateMatch[]> {
 
   if (phones.length) {
     const tails = phones.map((p) => p.slice(-9));
+    // SQLite has no regexp_replace: strip the separators people type into phone fields, then compare the tail.
+    const digits = (col: AnyColumn) => sql`replace(replace(replace(replace(replace(coalesce(${col}, ''), ' ', ''), '-', ''), '(', ''), ')', ''), '.', '')`;
     const rows = await db
       .select({ id: schema.businesses.id, slug: schema.businesses.slug, name: schema.businesses.name, status: schema.businesses.status })
       .from(schema.businesses)
-      .where(and(notSelf, or(...tails.flatMap((t) => [sql`regexp_replace(coalesce(${schema.businesses.phone}, ''), '\\D', '', 'g') like ${"%" + t}`, sql`regexp_replace(coalesce(${schema.businesses.whatsapp}, ''), '\\D', '', 'g') like ${"%" + t}`]))))
+      .where(and(notSelf, or(...tails.flatMap((t) => [sql`${digits(schema.businesses.phone)} like ${"%" + t}`, sql`${digits(schema.businesses.whatsapp)} like ${"%" + t}`]))))
       .limit(10);
     for (const r of rows) out.set(r.id, { ...r, reason: "phone", score: 1 });
   }

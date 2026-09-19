@@ -10,8 +10,8 @@ import path from "node:path";
 /** Bucket, database and static-asset bindings, present only on Workers. */
 export type R2Put = (key: string, value: Uint8Array, options?: { httpMetadata?: { contentType?: string; cacheControl?: string } }) => Promise<unknown>;
 export type Bindings = {
+  DB?: D1Database;
   MEDIA?: { put: R2Put };
-  HYPERDRIVE?: { connectionString: string };
   ASSETS?: { fetch: (input: Request | string) => Promise<Response> };
 };
 

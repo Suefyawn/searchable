@@ -101,7 +101,7 @@ export async function countArticles(kind?: ArticleKind, categorySlug?: string) {
   const conds = [published(kind)];
   if (categorySlug) conds.push(eq(schema.categories.slug, categorySlug));
   const [row] = await db
-    .select({ n: sql<number>`count(*)::int` })
+    .select({ n: sql<number>`count(*)` })
     .from(schema.articles)
     .leftJoin(schema.categories, eq(schema.articles.categoryId, schema.categories.id))
     .where(and(...conds));

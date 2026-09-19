@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, like, isNull, sql } from "drizzle-orm";
 import Link from "next/link";
 import { AdminPage, Empty, FilterTabs, Pager, Row, Rows, Status, SubFilter, Toolbar } from "@/components/admin";
 import { Badge, Button, ButtonLink } from "@/components/ui";
@@ -16,7 +16,7 @@ export default async function AdminBusinesses({ searchParams }: { searchParams: 
   const db = await getDb();
   const conds = [];
   if (status !== "all") conds.push(eq(schema.businesses.status, status as (typeof schema.businessStatus.enumValues)[number]));
-  if (q) conds.push(ilike(schema.businesses.name, `%${q}%`));
+  if (q) conds.push(like(schema.businesses.name, `%${q}%`));
   if (claim === "claimed") conds.push(sql`(${schema.businesses.claimedAt} is not null or ${schema.businesses.ownerUserId} is not null)`);
   if (claim === "unclaimed") conds.push(and(isNull(schema.businesses.claimedAt), isNull(schema.businesses.ownerUserId))!);
   if (claim === "verified") conds.push(eq(schema.businesses.isVerified, true));
@@ -24,7 +24,7 @@ export default async function AdminBusinesses({ searchParams }: { searchParams: 
   const [rows, total, counts] = await Promise.all([
     db.query.businesses.findMany({ where, orderBy: [desc(schema.businesses.createdAt)], limit: PAGE, offset: (pageNum - 1) * PAGE, with: { primaryCategory: true, city: true } }),
     db.$count(schema.businesses, where),
-    db.select({ status: schema.businesses.status, n: sql<number>`count(*)::int` }).from(schema.businesses).groupBy(schema.businesses.status),
+    db.select({ status: schema.businesses.status, n: sql<number>`count(*)` }).from(schema.businesses).groupBy(schema.businesses.status),
   ]);
   const count = (s: string) => (s === "all" ? counts.reduce((a, c) => a + c.n, 0) : counts.find((c) => c.status === s)?.n ?? 0);
   const link = (p: Partial<Params>) => {

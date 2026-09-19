@@ -16,7 +16,7 @@
     "logs": { "enabled": true, "head_sampling_rate": 1 },
     "traces": { "enabled": true }
   },
-  // The database is remote (Supabase in Tokyo through Hyperdrive until Phase 2), so run the Worker near it.
+  // D1 lives in one region (APAC hint); Smart Placement runs the Worker next to it.
   "placement": { "mode": "smart" },
   // Images: the existing bucket behind img.searchable.pk, written through this binding (src/lib/storage.ts).
   // Page cache: vinext's Response Store keeps rendered pages in R2 with a SQLite Durable Object as the index, one
@@ -31,8 +31,8 @@
     "ResponseStoreBinding": { "type": "worker", "cache": { "enabled": true } },
     "CacheMetadata": { "type": "durable-object", "storage": "sqlite" }
   },
-  // Phase 1: the existing Supabase database through Hyperdrive (pooled next to it, query cache off).
-  "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "d6577f9e3cc9465cb479327ccabe3682" }],
+  // The database: D1 (ADR-45). Migrations live in migrations/ and are applied with wrangler d1 migrations apply.
+  "d1_databases": [{ "binding": "DB", "database_name": "searchable-staging", "database_id": "7185c5fd-a1f9-45e1-8f91-71eae5544637", "migrations_dir": "migrations" }],
   // Public configuration. Secrets (BETTER_AUTH_SECRET, ADMIN_API_KEY, CRON_SECRET, RESEND_API_KEY,
   // RESEND_WEBHOOK_SECRET, INDEXNOW_KEY, ...) are set with `wrangler secret put`, never here.
   // HEAVY_COMPUTE=1: this plan may spend CPU inside a request (image resizing, social cards); unset on the free plan.
@@ -56,7 +56,7 @@
         { "binding": "CACHE_BODIES", "bucket_name": "searchable-production-page-cache" }
       ],
       "durable_objects": { "bindings": [{ "name": "CACHE_METADATA", "class_name": "CacheMetadata" }] },
-      "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "d6577f9e3cc9465cb479327ccabe3682" }],
+      "d1_databases": [{ "binding": "DB", "database_name": "searchable", "database_id": "1a91bc6d-7826-499d-b677-e5ad6bd1e18b", "migrations_dir": "migrations" }],
       "vars": {
         "NEXT_PUBLIC_SITE_URL": "https://searchable.pk",
         "NEXT_PUBLIC_SITE_NAME": "Searchable",

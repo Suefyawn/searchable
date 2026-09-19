@@ -22,8 +22,8 @@ export async function listSeriesWithLatest(): Promise<SeriesSummary[]> {
              l.date as latest_date, l.value as latest_value,
              p.date as prev_date, p.value as prev_value
       from data_series s
-      left join lateral (select date, value from data_points where series_id = s.id order by date desc limit 1) l on true
-      left join lateral (select date, value from data_points where series_id = s.id order by date desc limit 1 offset 1) p on true
+      left join (select series_id, date, value from (select series_id, date, value, row_number() over (partition by series_id order by date desc) as rn from data_points) where rn = 1) l on l.series_id = s.id
+      left join (select series_id, date, value from (select series_id, date, value, row_number() over (partition by series_id order by date desc) as rn from data_points) where rn = 2) p on p.series_id = s.id
       order by s.name
     `,
   );
@@ -63,7 +63,7 @@ export async function seriesStats(seriesId: string) {
   const db = await getDb();
   const [row] = await rawQuery<{ min: number; max: number; avg: number; n: number; first: string; last: string }>(
     db,
-    sql`select min(value) as min, max(value) as max, avg(value) as avg, count(*)::int as n, min(date) as first, max(date) as last from data_points where series_id = ${seriesId}`,
+    sql`select min(value) as min, max(value) as max, avg(value) as avg, count(*) as n, min(date) as first, max(date) as last from data_points where series_id = ${seriesId}`,
   );
   return row;
 }

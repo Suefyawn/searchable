@@ -33,3 +33,4 @@ coverage/
 graphify-out/
 .vinext/
 .wrangler/
+.dev.vars

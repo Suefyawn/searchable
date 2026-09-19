@@ -41,7 +41,7 @@ export async function backfillArticlePhotos(limit = 2): Promise<{ tried: number;
   if (!heavyComputeAllowed) return { tried: 0, filled: 0, skipped: "no server-side image processing here" };
   const db = await getDb();
   const rows = await db.query.articles.findMany({
-    where: sql`${schema.articles.featuredImageUrl} is null and ${schema.articles.status} in ('published', 'scheduled') and ${schema.articles.updatedAt} > now() - interval '14 days'`,
+    where: sql`${schema.articles.featuredImageUrl} is null and ${schema.articles.status} in ('published', 'scheduled') and ${schema.articles.updatedAt} > ${Date.now() - 14 * 86_400_000}`,
     orderBy: [desc(schema.articles.updatedAt)],
     limit,
     columns: { id: true, title: true, kind: true, slug: true },

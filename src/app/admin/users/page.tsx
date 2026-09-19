@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, desc, eq, like, or, sql } from "drizzle-orm";
 import Link from "next/link";
 import { AdminPage, Empty, FilterTabs, Pager, Row, Rows, Status, Toolbar } from "@/components/admin";
 import { ButtonLink, Select } from "@/components/ui";
@@ -21,7 +21,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
   const db = await getDb();
   const conds = [];
   if (role !== "all") conds.push(eq(schema.users.role, role as (typeof schema.userRole.enumValues)[number]));
-  if (q) conds.push(or(ilike(schema.users.name, `%${q}%`), ilike(schema.users.email, `%${q}%`))!);
+  if (q) conds.push(or(like(schema.users.name, `%${q}%`), like(schema.users.email, `%${q}%`))!);
   const where = conds.length ? and(...conds) : undefined;
   const [rows, total, counts] = await Promise.all([
     db
@@ -34,11 +34,11 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
         role: schema.users.role,
         emailVerified: schema.users.emailVerified,
         createdAt: schema.users.createdAt,
-        lastSeen: sql<string | null>`(select max(updated_at)::text from sessions s where s.user_id = ${schema.users}."id")`,
-        businesses: sql<number>`(select count(*) from businesses b where b.owner_user_id = ${schema.users}."id")::int`,
-        professionals: sql<number>`(select count(*) from professionals p where p.owner_user_id = ${schema.users}."id")::int`,
-        posts: sql<number>`(select count(*) from posts p where p.author_id = ${schema.users}."id")::int`,
-        banned: sql<boolean>`coalesce((select m.is_banned from member_profiles m where m.user_id = ${schema.users}."id"), false)`,
+        lastSeen: sql<number | null>`(select max(updated_at) from sessions s where s.user_id = ${schema.users}."id")`,
+        businesses: sql<number>`(select count(*) from businesses b where b.owner_user_id = ${schema.users}."id")`,
+        professionals: sql<number>`(select count(*) from professionals p where p.owner_user_id = ${schema.users}."id")`,
+        posts: sql<number>`(select count(*) from posts p where p.author_id = ${schema.users}."id")`,
+        banned: sql<boolean>`coalesce((select m.is_banned from member_profiles m where m.user_id = ${schema.users}."id"), 0)`,
       })
       .from(schema.users)
       .where(where)
@@ -46,7 +46,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
       .limit(PAGE)
       .offset((pageNum - 1) * PAGE),
     db.$count(schema.users, where),
-    db.select({ role: schema.users.role, n: sql<number>`count(*)::int` }).from(schema.users).groupBy(schema.users.role),
+    db.select({ role: schema.users.role, n: sql<number>`count(*)` }).from(schema.users).groupBy(schema.users.role),
   ]);
   const count = (r: string) => (r === "all" ? counts.reduce((a, c) => a + c.n, 0) : counts.find((c) => c.role === r)?.n ?? 0);
   const link = (p: Partial<Params>) => {
@@ -98,7 +98,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
               </p>
               <p className="mt-1 text-[13px] text-3">
                 Joined {timeAgo(u.createdAt)}
-                {u.lastSeen ? ` · last seen ${timeAgo(u.lastSeen)}` : " · never signed in"}
+                {u.lastSeen ? ` · last seen ${timeAgo(new Date(u.lastSeen))}` : " · never signed in"}
                 {u.businesses ? ` · ${u.businesses} business${u.businesses === 1 ? "" : "es"}` : ""}
                 {u.professionals ? ` · professional profile` : ""}
                 {u.posts ? ` · ${u.posts} post${u.posts === 1 ? "" : "s"}` : ""}

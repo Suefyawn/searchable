@@ -130,15 +130,15 @@ export async function listInbox(opts: { status?: string; mailbox?: string; q?: s
   const where = [];
   if (opts.status && opts.status !== "all") where.push(eq(schema.inboxMessages.status, opts.status));
   if (opts.mailbox) where.push(eq(schema.inboxMessages.mailbox, opts.mailbox));
-  if (opts.q) where.push(sql`(${schema.inboxMessages.subject} ilike ${"%" + opts.q + "%"} or ${schema.inboxMessages.fromAddress} ilike ${"%" + opts.q + "%"} or ${schema.inboxMessages.snippet} ilike ${"%" + opts.q + "%"})`);
+  if (opts.q) where.push(sql`(${schema.inboxMessages.subject} like ${"%" + opts.q + "%"} or ${schema.inboxMessages.fromAddress} like ${"%" + opts.q + "%"} or ${schema.inboxMessages.snippet} like ${"%" + opts.q + "%"})`);
   return db.query.inboxMessages.findMany({ where: where.length ? and(...where) : undefined, orderBy: [desc(schema.inboxMessages.receivedAt)], limit: opts.limit ?? 100 });
 }
 
 export async function inboxCounts() {
   const db = await getDb();
   const [byStatus, byMailbox] = await Promise.all([
-    db.select({ status: schema.inboxMessages.status, n: sql<number>`count(*)::int` }).from(schema.inboxMessages).groupBy(schema.inboxMessages.status),
-    db.select({ mailbox: schema.inboxMessages.mailbox, n: sql<number>`count(*)::int` }).from(schema.inboxMessages).groupBy(schema.inboxMessages.mailbox).orderBy(sql`count(*) desc`),
+    db.select({ status: schema.inboxMessages.status, n: sql<number>`count(*)` }).from(schema.inboxMessages).groupBy(schema.inboxMessages.status),
+    db.select({ mailbox: schema.inboxMessages.mailbox, n: sql<number>`count(*)` }).from(schema.inboxMessages).groupBy(schema.inboxMessages.mailbox).orderBy(sql`count(*) desc`),
   ]);
   const status = (s: string) => (s === "all" ? byStatus.reduce((a, c) => a + c.n, 0) : (byStatus.find((c) => c.status === s)?.n ?? 0));
   return { status, mailboxes: byMailbox };

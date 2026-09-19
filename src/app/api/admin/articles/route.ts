@@ -20,7 +20,7 @@ export const GET = withAdminApi(async (req) => {
   const conds = [];
   if (status !== "all") conds.push(eq(schema.articles.status, status as (typeof schema.articleStatus.enumValues)[number]));
   if (kind) conds.push(eq(schema.articles.kind, kind as (typeof schema.articleKind.enumValues)[number]));
-  if (text) conds.push(sql`${schema.articles.title} ilike ${"%" + text + "%"}`);
+  if (text) conds.push(sql`${schema.articles.title} like ${"%" + text + "%"}`);
   const rows = await db.query.articles.findMany({
     where: conds.length ? and(...conds) : undefined,
     orderBy: [desc(schema.articles.updatedAt)],
