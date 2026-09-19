@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 
 /** The hub is the "all" list. */
 export default function CommunityHub() {
-  redirect("/community/all");
+  permanentRedirect("/community/all");
 }

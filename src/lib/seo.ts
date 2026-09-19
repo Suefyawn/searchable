@@ -42,7 +42,9 @@ export function buildMetadata(input: MetaInput): Metadata {
     description,
     alternates: { canonical: url, ...(input.markdownPath ? { types: { "text/markdown": `${SITE.url}${input.markdownPath}` } } : {}) },
     // Large previews unlock Google Discover; unlimited snippets let search and AI engines quote the page.
-    robots: input.noindex ? { index: false, follow: true } : { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
+    // NOINDEX is set on staging (wrangler.jsonc): its robots.txt already disallows crawling, and this keeps a
+    // linked staging URL out of the index as well.
+    robots: input.noindex || process.env.NOINDEX ? { index: false, follow: true } : { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
     openGraph: {
       title,
       description,
@@ -120,7 +122,8 @@ export function articleJsonLd(a: {
     headline: a.title,
     description: a.description,
     mainEntityOfPage: `${SITE.url}${a.path}`,
-    image: a.image ? [a.image] : undefined,
+    // A story without a photo still needs an image for the Article rich result: the social card is 1200 x 630.
+    image: [a.image ?? ogImageUrl(a.title)],
     datePublished: a.publishedAt?.toISOString(),
     dateModified: (a.updatedAt ?? a.publishedAt)?.toISOString(),
     author: { "@type": a.authorName ? "Person" : "Organization", name: a.authorName ?? SITE.name },

@@ -18,6 +18,6 @@ export const SITE = {
   name: process.env.NEXT_PUBLIC_SITE_NAME?.trim() || "Searchable",
   url: siteUrl(),
   tagline: "Find what you need. Know what matters.",
-  description: "News from Pakistan and the world, step-by-step guides, calculators with verified rates, a business directory and daily data, all searchable in one place.",
+  description: "Pakistan news, step-by-step guides, calculators with verified rates, a business directory and daily prices, all searchable in one place.",
   twitter: "@searchablepk",
 };

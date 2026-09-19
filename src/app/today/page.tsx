@@ -14,8 +14,8 @@ import { describeSymbol, fetchForecast } from "@/lib/today/weather";
 
 export const revalidate = 1800;
 export const metadata = buildMetadata({
-  title: "Today in Pakistan: Prices, Rates, Weather, Prayer Times and the Islamic Date",
-  description: "One page for the numbers Pakistanis check every day: petrol and gold today, dollar, riyal and dirham rates, weather and prayer times in your city, and today's Islamic date.",
+  title: "Today in Pakistan: Prices, Weather, Prayer Times",
+  description: "The numbers Pakistanis check every day on one page: petrol and gold today, dollar, riyal and dirham rates, weather and prayer times in your city, the Islamic date.",
   path: "/today",
   kicker: "Today",
 });

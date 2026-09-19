@@ -7,8 +7,8 @@ import { breadcrumbJsonLd, buildMetadata, faqJsonLd } from "@/lib/seo";
 
 export const revalidate = 86400;
 export const metadata = buildMetadata({
-  title: "Pakistan Postal Codes: Every Post Office and Zip Code, Searchable",
-  description: "Find the postal code (zip code) of any post office in Pakistan: 2,298 delivery post offices under 89 GPOs, from Pakistan Post's own list. Search by town, office or code; Karachi 74000, Lahore 54000, Islamabad 44000.",
+  title: "Pakistan Postal Codes: Every Post Office Zip Code",
+  description: "The postal code of any post office in Pakistan: 2,298 delivery offices under 89 GPOs, from Pakistan Post's own list. Karachi 74000, Lahore 54000, Islamabad 44000.",
   path: "/postal-codes",
   kicker: "Postal codes",
 });

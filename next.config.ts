@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
     "/og": ["./public/fonts/*.ttf"],
     "/**": ["./node_modules/@cf-wasm/photon/dist/lib/photon_rs_bg.wasm", "./node_modules/@jsquash/webp/codec/enc/*.wasm"],
   },
+  // Title, canonical, description and social tags go in <head> for every visitor. Next streams them into the body
+  // for browsers and only blocks for known JS-less bots, but the page cache serves one rendering to everyone, so
+  // the first visitor's browser copy is what Googlebot and every link preview would get (found 2026-09-19).
+  htmlLimitedBots: /.*/,
   experimental: {
     serverActions: { bodySizeLimit: "4mb" },
     ...(usingPglite ? { cpus: 1, workerThreads: false } : {}),

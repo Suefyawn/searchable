@@ -2,7 +2,7 @@ import { NewsletterForm } from "@/components/newsletter-form";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Searchable Daily: the useful morning email about Pakistan",
+  title: "Searchable Daily: the morning email about Pakistan",
   description: "Top stories, what changed, one useful number and a tool of the day. Two minutes to read, every morning at 7. Free.",
   path: "/newsletter",
 });
