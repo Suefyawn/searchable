@@ -9,8 +9,8 @@ Phase 9 of the migration plan (ADR-41 to ADR-49). Everything below the line "Fou
 | Code | branch `d1`, CI green (typecheck, lint, tests, authz guard, local D1 migrations, build). `main` is still the Vercel line. |
 | Staging | Worker `searchable` at https://searchable.sooviaan.workers.dev on D1 `searchable-staging` with production data from 2026-09-19 02:00 UTC, contract suite and scripted slot green, Turnstile live, scheduler `searchable-scheduler` running. |
 | Production Worker | `searchable-production`, deployed dark at https://searchable-production.sooviaan.workers.dev. Fenced by `EMAIL_PROVIDER=none`, `JOBS_DISABLED=1`, `workers_dev: true` in `wrangler.jsonc` `env.production`. No route on searchable.pk yet. |
-| Production D1 | `searchable` (id `1a91bc6d-7826-499d-b677-e5ad6bd1e18b`), all four migrations applied, **no rows yet** (the import below). |
-| Production secrets set | `ADMIN_API_KEY` (new value), `BETTER_AUTH_SECRET` (new: every member signs in again once), `CRON_SECRET` (new, shared with the scheduler at deploy), `INDEXNOW_KEY` (new), `TURNSTILE_SECRET`, `RESEND_WEBHOOK_SECRET` (same as production today), `GOOGLE_SITE_VERIFICATION` (same). The new values are in the migration machine's `%TEMP%\sec-*-production.txt` files, nowhere else. |
+| Production D1 | `searchable` (id `1a91bc6d-7826-499d-b677-e5ad6bd1e18b`), all four migrations applied, full import plus a delta up to 08:00 UTC 2026-09-19 done, search index rebuilt (678 documents). Contract suite 13/13 and the scripted slot green against the dark Worker at 08:30 UTC. |
+| Production secrets set | `ADMIN_API_KEY` (the same key the editorial tasks use today, so their prompts need no change), `BETTER_AUTH_SECRET` (new: every member signs in again once), `CRON_SECRET` (new, shared with the scheduler at deploy), `INDEXNOW_KEY` (new), `TURNSTILE_SECRET`, `RESEND_WEBHOOK_SECRET` (same as production today), `GOOGLE_SITE_VERIFICATION` (same). The new values are in the migration machine's `%TEMP%\sec-*-production.txt` files, nowhere else. |
 | Production secrets missing | `RESEND_API_KEY` (create one in Resend for the Worker, or reuse Vercel's), `BILLING_EMAIL` and `EDITORIAL_EMAIL` (defaults `billing@` and `editorial@searchable.pk` apply when unset), `CLAIM_WHATSAPP_NUMBER` (default is a placeholder), `CF_ANALYTICS_TOKEN` (`/admin/metrics` says "not configured" until then). |
 | Export | `.data/export.sql` from Supabase at 02:00 UTC 2026-09-19 (5,048 rows, 47 tables, idempotent upserts). |
 | Turnstile | widgets `searchable-staging` and `searchable-production` exist; site keys are vars, secrets are set. |
@@ -19,23 +19,20 @@ Phase 9 of the migration plan (ADR-41 to ADR-49). Everything below the line "Fou
 
 ## Founder steps, before the window (any time, nothing goes live)
 
-1. Import the content into production D1 (one command, safe to re-run; the migration session was not allowed to write to the production database):
-   ```bash
-   npx wrangler d1 execute searchable --remote --file .data/export.sql -y
-   ```
+1. Done 2026-09-19 08:30 UTC: full import, delta import, reindex, verify, contract suite, scripted slot. Two things learned: the reindex job takes about six minutes on production (one document at a time) and the HTTP call may drop before it answers, so confirm with `select count(*) from search_documents` (678 on 2026-09-19); and a delta import cannot replay deletes, so `--verify` after the freeze may show D1 with a few more rows than Postgres (drafts the slots discarded in between), which is harmless or removed by hand.
 2. Set the missing secrets on the production Worker. The Resend key must have full access (receiving needs it):
    ```bash
    npx wrangler secret put RESEND_API_KEY --env production
    ```
-   Optional, same form: `BILLING_EMAIL`, `EDITORIAL_EMAIL`, `CLAIM_WHATSAPP_NUMBER`, `CF_ANALYTICS_TOKEN`. To keep the scheduled editorial task's existing key instead of the new one: `npx wrangler secret put ADMIN_API_KEY --env production` and paste today's value; otherwise update the task's prompt with the new value after the flip.
-3. Rebuild the search index and check the copy (replace `<key>` with the production `ADMIN_API_KEY`):
+   Optional, same form: `BILLING_EMAIL`, `EDITORIAL_EMAIL`, `CLAIM_WHATSAPP_NUMBER`, `CF_ANALYTICS_TOKEN`. The editorial task's existing key is already on the Worker.
+3. Done (see 1). To repeat the checks at any time (replace `<key>` with the production `ADMIN_API_KEY`):
    ```bash
    BASE_URL=https://searchable-production.sooviaan.workers.dev ADMIN_API_KEY=<key> npm run search:reindex
    ```
    ```bash
    DATABASE_URL=<Supabase transaction pooler URL, port 6543> npm run db:export -- --verify searchable
    ```
-4. Contract suite and a scripted slot run against the dark production Worker:
+4. Done (see 1). To repeat:
    ```bash
    CONTRACT_BASE_URL=https://searchable-production.sooviaan.workers.dev CONTRACT_ADMIN_KEY=<key> npm run contract
    ```
@@ -54,7 +51,7 @@ Phase 9 of the migration plan (ADR-41 to ADR-49). Everything below the line "Fou
    ```bash
    npx wrangler d1 execute searchable --remote --file .data/export.sql -y
    ```
-   Then the reindex from step 3 above once more.
+   Then the reindex from step 3 once more (six minutes; confirm by count), and `--verify` for extras.
 3. **Un-fence production** in `wrangler.jsonc` `env.production`: `EMAIL_PROVIDER` to `"resend"`, delete `JOBS_DISABLED`, set `"workers_dev": false`, and add the custom domain:
    ```jsonc
    "routes": [{ "pattern": "searchable.pk", "custom_domain": true }]

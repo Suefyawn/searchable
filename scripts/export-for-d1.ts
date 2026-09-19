@@ -16,6 +16,19 @@ import postgres from "postgres";
  */
 
 const SKIP = new Set(["search_documents", "sessions", "verifications", "__drizzle_migrations"]);
+/** Composite unique indexes besides the id (src/db/schema); the upsert must also resolve conflicts on these. */
+const NATURAL_KEYS: Record<string, string[]> = {
+  saved_items: ["user_id", "target_type", "target_id"],
+  reactions: ["user_id", "target_type", "target_id"],
+  categories: ["kind", "slug"],
+  articles: ["kind", "slug"],
+  data_points: ["series_id", "date"],
+  business_hours: ["business_id", "day_of_week"],
+  business_claims: ["business_id", "user_id"],
+  entity_links: ["entity_id", "target_type", "target_id"],
+  locations: ["kind", "slug"],
+};
+
 const args = process.argv.slice(2);
 const since = args.includes("--since") ? new Date(args[args.indexOf("--since") + 1]) : null;
 const verify = args.includes("--verify") ? args[args.indexOf("--verify") + 1] : null;
@@ -112,7 +125,11 @@ async function exportSql() {
         continue;
       }
       const values = t.cols.map((c) => lit(r[c.name], c.type)).join(", ");
-      const conflict = pk.length ? ` ON CONFLICT(${pk.join(", ")}) DO ${updates.length ? `UPDATE SET ${updates.join(", ")}` : "NOTHING"}` : "";
+      const doUpdate = updates.length ? `UPDATE SET ${updates.join(", ")}` : "NOTHING";
+      // A row re-created on Postgres carries a new id but the same natural key; the second clause lets the
+      // delta import overwrite the old row instead of tripping the unique index (found on the first rehearsal).
+      const natural = NATURAL_KEYS[t.name];
+      const conflict = pk.length ? ` ON CONFLICT(${pk.join(", ")}) DO ${doUpdate}${natural ? ` ON CONFLICT(${natural.map((c) => `"${c}"`).join(", ")}) DO ${doUpdate}` : ""}` : "";
       out.push(`INSERT INTO "${t.name}" (${colList}) VALUES (${values})${conflict};`);
     }
     total += rows.length;
